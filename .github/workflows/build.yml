@@ -10,7 +10,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      run: git fetch --prune --unshallow
+    - run: git fetch --prune --unshallow
     
     - name: Install dependencies
       run: sudo apt install -y clang libboost-all-dev ninja-build qtbase5-dev libqt5svg5-dev python3-pip
