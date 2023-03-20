@@ -8,9 +8,9 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+    - name: Checkout
+      uses: actions/checkout@v2
+      run: git fetch --prune --unshallow
     
     - name: Install dependencies
       run: sudo apt install -y clang libboost-all-dev ninja-build qtbase5-dev libqt5svg5-dev python3-pip
