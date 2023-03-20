@@ -11,7 +11,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        submodules: ''
+        submodules: 'true'
 
     - name: Get tags
       run: git fetch --tags origin
