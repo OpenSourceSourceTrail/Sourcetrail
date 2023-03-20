@@ -13,9 +13,6 @@ jobs:
 
     - name: Get tags
       run: git fetch --tags origin
-
-    - name: Test version
-      run: git describe --long --match "[0-9]*" HEAD
     
     - name: Install dependencies
       run: sudo apt install -y clang libboost-all-dev ninja-build qtbase5-dev libqt5svg5-dev python3-pip
