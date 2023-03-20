@@ -19,6 +19,9 @@ jobs:
     - name: Install conan
       run: sudo pip install conan
 
+    - name: check sourcetrail git
+      run: git tag
+
     - name: Configure CMake
       run: cmake -G Ninja -B ${{github.workspace}}/build
 
