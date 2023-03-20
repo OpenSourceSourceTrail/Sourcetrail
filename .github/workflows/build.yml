@@ -10,8 +10,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     
     - name: Install dependencies
       run: sudo apt install -y clang libboost-all-dev qtbase5-dev ninja-build libqt5svg5-dev python3-pip
@@ -23,4 +21,4 @@ jobs:
       run: cmake -G Ninja -B ${{github.workspace}}/build
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build
