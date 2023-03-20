@@ -91,6 +91,9 @@ endif(EXISTS "${CMAKE_SOURCE_DIR}/.git")
 set(VERSION_STRING "${VERSION_YEAR}.${VERSION_MINOR}.${VERSION_COMMIT}")
 if("${VERSION_STRING}" STREQUAL "..")
     # TODO(Hussein): For texting
+    set(VERSION_YEAR "2023")
+    set(VERSION_MINOR "1")
+    set(VERSION_COMMIT "126")
     set(VERSION_STRING "2023.1.126")
 endif()
 
