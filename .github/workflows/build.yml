@@ -6,6 +6,22 @@ on:
 
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {
+            name: "Ubuntu Latest GCC",
+            cc: "gcc",
+            cxx: "g++"
+          }
+          - {
+            name: "Ubuntu Latest CLang",
+            cc: "clang",
+            cxx: "clang++"
+          }
+  
+    name: ${{ matrix.config.name }}
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
@@ -23,7 +39,7 @@ jobs:
       run: sudo pip install conan==1.59.0
 
     - name: Configure CMake
-      run: cmake -G Ninja -B ${{github.workspace}}/build
+      run: cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build
