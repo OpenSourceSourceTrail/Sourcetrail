@@ -2,35 +2,14 @@ name: Build
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-
-env:
-  BUILD_TYPE: Release
+    branches: [ "CI" ]
 
 jobs:
   build:
-    name: ${ { matrix.config.name } }
-    runs-on: ${ { matrix.config.os } }
-
-    strategy:
-      fail-fast: false
-      matrix:
-        config:
-        - {
-            name: "Ubuntu Latest GCC", artifact: "gcc.tar.xz",
-            os: Ubuntu-22.04,
-            build_type: "Release", cc: "gcc", cxx: "g++"
-          }
-        - {
-            name: "Ubuntu Latest Clang", artifact: "clang.tar.xz",
-            os: Ubuntu-22.04,
-            build_type: "Release", cc: "clang", cxx: "clang++"
-          }
-
+    runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
     
@@ -41,7 +20,7 @@ jobs:
       run: sudo pip install conan
 
     - name: Configure CMake
-      run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -G Ninja -B ${{github.workspace}}/build
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
