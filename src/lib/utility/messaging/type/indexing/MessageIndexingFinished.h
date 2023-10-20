@@ -1,12 +1,11 @@
 #pragma once
-// internal
 #include "Message.h"
 
-class MessageIndexingFinished final : public Message<MessageIndexingFinished> {
-public:
-  static const std::string getStaticType() {
+/**
+ * @brief Message listeners that the indexing finished
+ */
+struct MessageIndexingFinished final : Message<MessageIndexingFinished> {
+  static std::string getStaticType() {
     return "MessageIndexingFinished";
   }
-
-  MessageIndexingFinished() = default;
 };

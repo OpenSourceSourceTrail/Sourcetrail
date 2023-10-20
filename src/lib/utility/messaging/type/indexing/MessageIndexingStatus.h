@@ -1,18 +1,21 @@
 #pragma once
-// interal
 #include "Message.h"
 
-class MessageIndexingStatus final : public Message<MessageIndexingStatus> {
-public:
-  static const std::string getStaticType() {
+/**
+ * @brief Message listeners what is the progress percent?
+ *
+ * @note It's forced to be a task
+ */
+struct MessageIndexingStatus final : Message<MessageIndexingStatus> {
+  static std::string getStaticType() {
     return "MessageIndexingStatus";
   }
 
-  MessageIndexingStatus(bool showProgress_, size_t progressPercent_ = 0)
+  explicit MessageIndexingStatus(bool showProgress_, size_t progressPercent_ = 0)
       : showProgress(showProgress_), progressPercent(progressPercent_) {
     setSendAsTask(false);
   }
 
-  const bool showProgress;
-  const size_t progressPercent;
+  bool showProgress;
+  size_t progressPercent;
 };

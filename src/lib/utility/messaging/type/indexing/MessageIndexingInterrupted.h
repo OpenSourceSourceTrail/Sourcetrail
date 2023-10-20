@@ -2,9 +2,14 @@
 // internal
 #include "Message.h"
 
-class MessageIndexingInterrupted final : public Message<MessageIndexingInterrupted> {
+/**
+ * @brief Message listeners that the indexing interrupted
+ *
+ * @note It's forced to be a task.
+ */
+struct MessageIndexingInterrupted final : Message<MessageIndexingInterrupted> {
 public:
-  static const std::string getStaticType() {
+  static std::string getStaticType() {
     return "MessageIndexingInterrupted";
   }
 
