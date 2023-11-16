@@ -5,6 +5,7 @@
 #include <QGraphicsSceneEvent>
 
 #include "Edge.h"
+#include "Node.h"
 #include "GraphFocusHandler.h"
 #include "GraphViewStyle.h"
 #include "MessageActivateEdge.h"

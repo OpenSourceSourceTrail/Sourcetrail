@@ -16,7 +16,7 @@ std::shared_ptr<ConfigManager> ConfigManager::createEmpty() {
 
 std::shared_ptr<ConfigManager> ConfigManager::createAndLoad(
     const std::shared_ptr<TextAccess> textAccess) {
-  std::shared_ptr<ConfigManager> configManager = std::shared_ptr<ConfigManager>(new ConfigManager());
+  auto configManager = std::shared_ptr<ConfigManager>(new ConfigManager());
   configManager->load(textAccess);
   return configManager;
 }

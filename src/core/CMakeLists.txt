@@ -52,6 +52,7 @@ target_link_libraries(
 target_link_libraries(
   Sourcetrail_core
   PRIVATE
+    # TODO(Hussein): Should be replaced with STL
     Boost::filesystem
     Sourcetrail::lib_utility
     TinyXML::TinyXML
