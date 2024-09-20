@@ -136,4 +136,11 @@ function(
               $<$<COMPILE_LANGUAGE:C>:${PROJECT_WARNINGS_C}>
               # Cuda warnings
               $<$<COMPILE_LANGUAGE:CUDA>:${PROJECT_WARNINGS_CUDA}>)
+
+  # Unifiy Debug Marco
+  target_compile_definitions(
+    ${project_name}
+    INTERFACE
+    $<$<CONFIG:Debug>:ST_DEBUG>
+  )
 endfunction()

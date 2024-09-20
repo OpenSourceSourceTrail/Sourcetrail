@@ -1,0 +1,72 @@
+class MessageListener~MessageActivateWindow~ {
+  <<interface>>
+}
+class MessageListener~MessageCloseProject~ {
+  <<interface>>
+}
+class MessageListener~MessageIndexingFinished~ {
+  <<interface>>
+}
+class MessageListener~MessageLoadProject~ {
+  <<interface>>
+}
+class MessageListener~MessageRefresh~ {
+  <<interface>>
+}
+class MessageListener~MessageRefreshUI~ {
+  <<interface>>
+}
+class MessageListener~MessageSwitchColorScheme~ {
+  <<interface>>
+}
+class MessageListener~MessageBookmarkUpdate~ {
+  <<interface>>
+}
+
+class Application {
+  -bool m_hasGUI
+  -bool m_loadedWindow
+  -shared_ptr~Project~ m_pProject
+  -shared_ptr~StorageCache~ m_storageCache
+  -shared_ptr~MainView~ m_mainView
+  -shared_ptr~IDECommunicationController~ m_ideCommunicationController
+  +createInstance(Version, ViewFactory*, NetworkFactory*)
+  +getInstance() shared_ptr~Application~
+  +destroyInstance()
+  +getUUID() string
+  +loadSettings()
+  +loadStyle(FilePath)
+  +getCurrentProject() shared_ptr~const Project~
+  +getCurrentProjectPath() FilePath
+  +isProjectLoaded() bool
+  +hasGUI() bool
+  +handleDialog(wstring) int
+  +handleDialog(wstring, vector~wstring~) int
+  +getDialogView(DialogView::UseCase) shared_ptr~DialogView~
+  +updateHistoryMenu(shared_ptr~MessageBase~)
+  -Application(bool)
+  -handleMessage(MessageActivateWindow*)
+  -handleMessage(MessageCloseProject*)
+  -handleMessage(MessageIndexingFinished*)
+  -handleMessage(MessageLoadProject*)
+  -handleMessage(MessageRefresh*)
+  -handleMessage(MessageRefreshUI*)
+  -handleMessage(MessageSwitchColorScheme*)
+  -handleMessage(MessageBookmarkUpdate*)
+  -startMessagingAndScheduling()
+  -loadWindow(bool)
+  -refreshProject(RefreshMode, bool)
+  -updateRecentProjects(FilePath)
+  -logStorageStats()
+  -updateTitle()
+  -checkSharedMemory() bool
+}
+
+MessageListener~MessageActivateWindow~ <|-- Application
+MessageListener~MessageCloseProject~ <|-- Application
+MessageListener~MessageIndexingFinished~ <|-- Application
+MessageListener~MessageLoadProject~ <|-- Application
+MessageListener~MessageRefresh~ <|-- Application
+MessageListener~MessageRefreshUI~ <|-- Application
+MessageListener~MessageSwitchColorScheme~ <|-- Application
+MessageListener~MessageBookmarkUpdate~ <|-- Application

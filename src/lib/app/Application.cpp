@@ -1,4 +1,11 @@
 #include "Application.h"
+
+#include <algorithm>
+
+#include <spdlog/common.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/spdlog.h>
+
 // internal
 #include "ApplicationSettings.h"
 #include "ColorScheme.h"
@@ -68,11 +75,8 @@ void Application::createInstance(const Version& version, ViewFactory* viewFactor
   s_instance->startMessagingAndScheduling();
 }
 
-std::shared_ptr<Application> Application::getInstance() {
-  return s_instance;
-}
-
 void Application::destroyInstance() {
+  LOG_INFO("destroyInstance");
   MessageQueue::getInstance()->stopMessageLoop();
   TaskManager::destroyScheduler(TabId::background());
   TaskManager::destroyScheduler(TabId::app());
@@ -81,7 +85,7 @@ void Application::destroyInstance() {
 }
 
 std::string Application::getUUID() {
-  if(!s_uuid.size()) {
+  if(s_uuid.empty()) {
     s_uuid = utility::getUuidString();
   }
 
@@ -91,11 +95,12 @@ std::string Application::getUUID() {
 void Application::loadSettings() {
   MessageStatus(L"Load settings: " + UserPaths::getAppSettingsFilePath().wstr()).dispatch();
 
-  std::shared_ptr<ApplicationSettings> settings = ApplicationSettings::getInstance();
+  auto settings = ApplicationSettings::getInstance();
   settings->load(UserPaths::getAppSettingsFilePath());
 
 // FIXME
 #if 0
+  // Initialize file logger
   LogManager::getInstance()->setLoggingEnabled(settings->getLoggingEnabled());
   Logger* logger = LogManager::getInstance()->getLoggerByType("FileLogger");
   if(logger) {
@@ -120,33 +125,9 @@ Application::~Application() {
     m_mainView->saveLayout();
   }
 
-  SharedMemoryGarbageCollector* collector = SharedMemoryGarbageCollector::getInstance();
-  if(collector) {
+  if(auto* collector = SharedMemoryGarbageCollector::getInstance(); nullptr != collector) {
     collector->stop();
   }
-}
-
-std::shared_ptr<const Project> Application::getCurrentProject() const {
-  return m_pProject;
-}
-
-FilePath Application::getCurrentProjectPath() const {
-  if(m_pProject) {
-    return m_pProject->getProjectSettingsFilePath();
-  }
-
-  return {};
-}
-
-bool Application::isProjectLoaded() const {
-  if(m_pProject) {
-    return m_pProject->isLoaded();
-  }
-  return false;
-}
-
-bool Application::hasGUI() const {
-  return m_hasGUI;
 }
 
 int Application::handleDialog(const std::wstring& message) {
@@ -166,7 +147,10 @@ std::shared_ptr<DialogView> Application::getDialogView(DialogView::UseCase useCa
 }
 
 void Application::updateHistoryMenu(std::shared_ptr<MessageBase> message) {
-  m_mainView->updateHistoryMenu(message);
+  if(!message) {
+    LOG_INFO("The message is empty");
+  }
+  m_mainView->updateHistoryMenu(std::move(message));
 }
 
 void Application::handleMessage(MessageActivateWindow* /*pMessage*/) {
@@ -347,13 +331,11 @@ void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRe
 
 void Application::updateRecentProjects(const FilePath& projectSettingsFilePath) {
   if(m_hasGUI) {
-    ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+    auto appSettings = ApplicationSettings::getInstance();
     std::vector<FilePath> recentProjects = appSettings->getRecentProjects();
-    if(recentProjects.size()) {
-      std::vector<FilePath>::iterator it = std::find(recentProjects.begin(), recentProjects.end(), projectSettingsFilePath);
-      if(it != recentProjects.end()) {
-        recentProjects.erase(it);
-      }
+    if(auto found = std::find(recentProjects.begin(), recentProjects.end(), projectSettingsFilePath);
+       found != recentProjects.end()) {
+      recentProjects.erase(found);
     }
 
     recentProjects.insert(recentProjects.begin(), projectSettingsFilePath);
@@ -373,25 +355,25 @@ void Application::logStorageStats() const {
     return;
   }
 
-  std::stringstream ss;
-  StorageStats stats = m_storageCache->getStorageStats();
+  const StorageStats stats = m_storageCache->getStorageStats();
+  const ErrorCountInfo errorCount = m_storageCache->getErrorCount();
 
-  ss << "\nGraph:\n";
-  ss << "\t" << stats.nodeCount << " Nodes\n";
-  ss << "\t" << stats.edgeCount << " Edges\n";
-
-  ss << "\nCode:\n";
-  ss << "\t" << stats.fileCount << " Files\n";
-  ss << "\t" << stats.fileLOCCount << " Lines of Code\n";
-
-
-  ErrorCountInfo errorCount = m_storageCache->getErrorCount();
-
-  ss << "\nErrors:\n";
-  ss << "\t" << errorCount.total << " Errors\n";
-  ss << "\t" << errorCount.fatal << " Fatal Errors\n";
-
-  LOG_INFO(ss.str());
+  LOG_INFO(
+      fmt::format("\nGraph:\n"
+                  "\t{} Nodes\n"
+                  "\t{} Edges\n"
+                  "\nCode:\n"
+                  "\t{} Files\n"
+                  "\t{} Lines of Code\n"
+                  "\nErrors:\n"
+                  "\t{} Errors\n"
+                  "\t{} Fatal Errors\n",
+                  stats.nodeCount,
+                  stats.edgeCount,
+                  stats.fileCount,
+                  stats.fileLOCCount,
+                  errorCount.total,
+                  errorCount.fatal));
 }
 
 void Application::updateTitle() {
@@ -412,19 +394,18 @@ void Application::updateTitle() {
 
 bool Application::checkSharedMemory() {
   std::wstring error = utility::decodeFromUtf8(SharedMemory::checkSharedMemory(getUUID()));
-  if(error.size()) {
-    MessageStatus(
-        L"Error on accessing shared memory. Indexing not possible. "
-        "Please restart computer or run as admin: " +
-            error,
-        true)
-        .dispatch();
-    handleDialog(L"There was an error accessing shared memory on your computer: " + error +
-                 L"\n\n"
-                 "Project indexing is not possible. Please restart your computer or try running "
-                 "Sourcetrail as admin.");
-    return false;
+  if(error.empty()) {
+    return true;
   }
-
-  return true;
+  MessageStatus(fmt::format(L"Error on accessing shared memory. Indexing not possible. "
+                            "Please restart computer or run as admin: {}",
+                            error),
+                true)
+      .dispatch();
+  handleDialog(
+      fmt::format(L"There was an error accessing shared memory on your computer: {}\n\n"
+                  "Project indexing is not possible. Please restart your computer or try running "
+                  "Sourcetrail as admin.",
+                  error));
+  return false;
 }

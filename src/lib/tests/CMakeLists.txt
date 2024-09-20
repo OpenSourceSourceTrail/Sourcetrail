@@ -6,6 +6,7 @@ add_library(lib_test_utilities utilities/FileHandler.cpp)
 target_include_directories(lib_test_utilities PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 set(test_lib_names
+    ApplicationTestSuite
     BookmarkControllerTestSuite
     CommandLineParserTestSuite
     CommandlineCommandConfigTestSuite
