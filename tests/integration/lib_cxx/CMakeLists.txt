@@ -8,8 +8,10 @@ foreach(test_name IN LISTS test_cxx_names)
     ${test_name}
     PUBLIC testHelper
            GTest::gtest
-           GTest::gtest_main
+           GTest::gmock
+           GTest::Main
            Sourcetrail::lib
+           # Sourcetrail::gtest_main
            Sourcetrail::lib_cxx
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
@@ -19,5 +21,5 @@ foreach(test_name IN LISTS test_cxx_names)
   gtest_discover_tests(
     ${test_name}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "integration.")
+    TEST_PREFIX "integration.lib_cxx.")
 endforeach()

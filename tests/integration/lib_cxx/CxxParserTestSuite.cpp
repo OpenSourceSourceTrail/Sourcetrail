@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
 #include "CxxParser.h"
 #include "IndexerCommandCxx.h"
 #include "IndexerStateInfo.h"
@@ -33,25 +34,37 @@ std::shared_ptr<TestStorage> parseCode(const std::string& code, const std::vecto
 
 }    // namespace
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalVariableDeclaration) {
+struct CxxParserTestSuite : testing::Test {
+  void SetUp() override {
+    IApplicationSettings::setInstance(mMocked);
+    EXPECT_CALL(*mMocked, getLoggingEnabled).WillRepeatedly(testing::Return(false));
+  }
+  void TearDown() override {
+    IApplicationSettings::setInstance(nullptr);
+    mMocked.reset();
+  }
+  std::shared_ptr<MockedApplicationSettings> mMocked = std::make_shared<MockedApplicationSettings>();
+};
+
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalVariableDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode("int x;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"int x <1:5 1:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStaticGlobalVariableDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStaticGlobalVariableDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode("static int x;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"int x (temp.cpp) <1:12 1:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStaticConstGlobalVariableDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStaticConstGlobalVariableDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode("static const int x;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"const int x (temp.cpp) <1:18 1:18>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalClassDefinition) {
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalClassDefinition) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -60,13 +73,13 @@ TEST(CxxParserTestSuite, cxxParserFindsGlobalClassDefinition) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"A <1:1 <1:7 1:7> 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalClassDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalClassDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode("class A;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"A <1:7 1:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalStructDefinition) {
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalStructDefinition) {
   std::shared_ptr<TestStorage> client = parseCode(
       "struct A\n"
       "{\n"
@@ -75,19 +88,19 @@ TEST(CxxParserTestSuite, cxxParserFindsGlobalStructDefinition) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"A <1:1 <1:8 1:8> 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalStructDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalStructDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode("struct A;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"A <1:8 1:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsVariableDefinitionsInGlobalScope) {
+TEST_F(CxxParserTestSuite, cxxParserFindsVariableDefinitionsInGlobalScope) {
   std::shared_ptr<TestStorage> client = parseCode("int x;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"int x <1:5 1:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFieldsInClassWithAccessType) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFieldsInClassWithAccessType) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -107,7 +120,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFieldsInClassWithAccessType) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->fields, L"private const int A::d <10:12 10:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFunctionDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFunctionDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int ceil(float a)\n"
       "{\n"
@@ -117,7 +130,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFunctionDeclaration) {
   EXPECT_THAT(client->functions, testing::Contains(testing::StrEq(L"int ceil(float) <1:1 <1:1 <1:5 1:8> 1:17> 4:1>")));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStaticFunctionDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStaticFunctionDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "static int ceil(float a)\n"
       "{\n"
@@ -128,7 +141,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStaticFunctionDeclaration) {
               testing::Contains(testing::StrEq(L"static int ceil(float) (temp.cpp) <1:1 <1:1 <1:12 1:15> 1:24> 4:1>")));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMethodDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMethodDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -139,7 +152,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMethodDeclaration) {
   EXPECT_THAT(client->methods, testing::Contains(testing::StrEq(L"public void B::B() <4:2 <4:2 4:2> 4:4>")));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsOverloadedOperatorDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsOverloadedOperatorDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -151,7 +164,7 @@ TEST(CxxParserTestSuite, cxxParserFindsOverloadedOperatorDeclaration) {
       utility::containsElement<std::wstring>(client->methods, L"public B & B::operator=(const B &) <4:2 <4:5 4:13> 4:29>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMethodDeclarationAndDefinition) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMethodDeclarationAndDefinition) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -165,7 +178,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMethodDeclarationAndDefinition) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->methods, L"public void B::B() <6:1 <6:4 6:4> 8:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsVirtualMethodDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsVirtualMethodDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -176,7 +189,7 @@ TEST(CxxParserTestSuite, cxxParserFindsVirtualMethodDeclaration) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->methods, L"public void B::process() <4:2 <4:15 4:21> 4:23>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsPureVirtualMethodDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsPureVirtualMethodDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -187,7 +200,7 @@ TEST(CxxParserTestSuite, cxxParserFindsPureVirtualMethodDeclaration) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->methods, L"protected void B::process() <4:2 <4:15 4:21> 4:27>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNamedNamespaceDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNamedNamespaceDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace A\n"
       "{\n"
@@ -196,7 +209,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNamedNamespaceDeclaration) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->namespaces, L"A <1:1 <1:11 1:11> 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace\n"
       "{\n"
@@ -206,7 +219,7 @@ TEST(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclaration) {
       utility::containsElement<std::wstring>(client->namespaces, L"anonymous namespace (temp.cpp<1:1>) <1:1 <2:1 2:1> 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMultipleAnonymousNamespaceDeclarationsAsSameSymbol) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMultipleAnonymousNamespaceDeclarationsAsSameSymbol) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace\n"
       "{\n"
@@ -222,7 +235,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMultipleAnonymousNamespaceDeclarationsAsS
       utility::containsElement<std::wstring>(client->namespaces, L"anonymous namespace (temp.cpp<1:1>) <4:1 <5:1 5:1> 6:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMultipleNestedAnonymousNamespaceDeclarationsAsDifferentSymbol) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMultipleNestedAnonymousNamespaceDeclarationsAsDifferentSymbol) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace\n"
       "{\n"
@@ -240,7 +253,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMultipleNestedAnonymousNamespaceDeclarati
       L"5:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclarationsNestedInsideNamespacesWithDifferentNameAsDifferentSymbol) {
+TEST_F(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclarationsNestedInsideNamespacesWithDifferentNameAsDifferentSymbol) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace a\n"
       "{\n"
@@ -266,7 +279,7 @@ TEST(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclarationsNestedInsid
       client->namespaces, L"b::anonymous namespace (temp.cpp<9:2>) <9:2 <10:2 10:2> 11:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclarationsNestedInsideNamespacesWithSameNameAsSameSymbol) {
+TEST_F(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclarationsNestedInsideNamespacesWithSameNameAsSameSymbol) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace a\n"
       "{\n"
@@ -292,7 +305,7 @@ TEST(CxxParserTestSuite, cxxParserFindsAnonymousNamespaceDeclarationsNestedInsid
       client->namespaces, L"a::anonymous namespace (temp.cpp<3:2>) <9:2 <10:2 10:2> 11:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsAnonymousStructDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsAnonymousStructDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef struct\n"
       "{\n"
@@ -302,7 +315,7 @@ TEST(CxxParserTestSuite, cxxParserFindsAnonymousStructDeclaration) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"anonymous struct (temp.cpp<1:9>) <1:9 <1:9 1:14> 4:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMultipleAnonymousStructDeclarationsAsDistinctElements) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMultipleAnonymousStructDeclarationsAsDistinctElements) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef struct\n"
       "{\n"
@@ -318,7 +331,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMultipleAnonymousStructDeclarationsAsDist
   EXPECT_TRUE(utility::substrBeforeLast(client->fields[0], '<') != utility::substrBeforeLast(client->fields[1], '<'));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsAnonymousUnionDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsAnonymousUnionDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef union\n"
       "{\n"
@@ -329,7 +342,7 @@ TEST(CxxParserTestSuite, cxxParserFindsAnonymousUnionDeclaration) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->unions, L"anonymous union (temp.cpp<1:9>) <1:9 <1:9 1:13> 5:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousStructDeclaredInsideTypedef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousStructDeclaredInsideTypedef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef struct\n"
       "{\n"
@@ -340,7 +353,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousStructDeclaredInsideTypede
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"Foo <4:3 4:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousClassDeclaredInsideTypedef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousClassDeclaredInsideTypedef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef class\n"
       "{\n"
@@ -351,7 +364,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousClassDeclaredInsideTypedef
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"Foo <4:3 4:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousEnumDeclaredInsideTypedef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousEnumDeclaredInsideTypedef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef enum\n"
       "{\n"
@@ -362,7 +375,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousEnumDeclaredInsideTypedef)
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enums, L"Foo <4:3 4:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousUnionDeclaredInsideTypedef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousUnionDeclaredInsideTypedef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef union\n"
       "{\n"
@@ -374,7 +387,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousUnionDeclaredInsideTypedef
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->unions, L"Foo <5:3 5:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousStructDeclaredInsideTypeAlias) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousStructDeclaredInsideTypeAlias) {
   std::shared_ptr<TestStorage> client = parseCode(
       "using Foo = struct\n"
       "{\n"
@@ -385,7 +398,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousStructDeclaredInsideTypeAl
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"Foo <1:7 1:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousClassDeclaredInsideTypeAlias) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousClassDeclaredInsideTypeAlias) {
   std::shared_ptr<TestStorage> client = parseCode(
       "using Foo = class\n"
       "{\n"
@@ -396,7 +409,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousClassDeclaredInsideTypeAli
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"Foo <1:7 1:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousEnumDeclaredInsideTypeAlias) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousEnumDeclaredInsideTypeAlias) {
   std::shared_ptr<TestStorage> client = parseCode(
       "using Foo = enum\n"
       "{\n"
@@ -407,7 +420,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousEnumDeclaredInsideTypeAlia
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enums, L"Foo <1:7 1:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousUnionDeclaredInsideTypeAlias) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNameOfAnonymousUnionDeclaredInsideTypeAlias) {
   std::shared_ptr<TestStorage> client = parseCode(
       "using Foo = union\n"
       "{\n"
@@ -419,7 +432,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNameOfAnonymousUnionDeclaredInsideTypeAli
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->unions, L"Foo <1:7 1:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumDefinedInGlobalNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumDefinedInGlobalNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "enum E\n"
       "{\n"
@@ -428,7 +441,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumDefinedInGlobalNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enums, L"E <1:1 <1:6 1:6> 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumConstantInGlobalEnum) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumConstantInGlobalEnum) {
   std::shared_ptr<TestStorage> client = parseCode(
       "enum E\n"
       "{\n"
@@ -438,13 +451,13 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumConstantInGlobalEnum) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enumConstants, L"E::P <3:2 3:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypedefInGlobalNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypedefInGlobalNamespace) {
   std::shared_ptr<TestStorage> client = parseCode("typedef unsigned int uint;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typedefs, L"uint <1:22 1:25>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypedefInNamedNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypedefInNamedNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace test\n"
       "{\n"
@@ -454,7 +467,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypedefInNamedNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typedefs, L"test::uint <3:23 3:26>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypedefInAnonymousNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypedefInAnonymousNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace\n"
       "{\n"
@@ -464,7 +477,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypedefInAnonymousNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typedefs, L"anonymous namespace (temp.cpp<1:1>)::uint <3:23 3:26>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeAliasInClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeAliasInClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo\n"
       "{\n"
@@ -474,7 +487,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeAliasInClass) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typedefs, L"private Foo::Bar <3:8 3:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroDefine) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroDefine) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define PI\n"
       "void test()\n"
@@ -484,7 +497,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroDefine) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macros, L"PI <1:9 1:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroUndefine) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroUndefine) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#undef PI\n"
       "void test()\n"
@@ -494,7 +507,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroUndefine) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macroUses, L"temp.cpp -> PI <1:8 1:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroInIfdef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroInIfdef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define PI\n"
       "#ifdef PI\n"
@@ -506,7 +519,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroInIfdef) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macroUses, L"temp.cpp -> PI <2:8 2:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroInIfndef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroInIfndef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define PI\n"
       "#ifndef PI\n"
@@ -518,7 +531,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroInIfndef) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macroUses, L"temp.cpp -> PI <2:9 2:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroInIfdefined) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroInIfdefined) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define PI\n"
       "#if defined(PI)\n"
@@ -530,7 +543,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroInIfdefined) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macroUses, L"temp.cpp -> PI <2:13 2:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroExpand) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroExpand) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define PI 3.14159265359\n"
       "void test()\n"
@@ -541,7 +554,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroExpand) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macroUses, L"temp.cpp -> PI <4:12 4:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroExpandWithinMacro) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroExpandWithinMacro) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define PI 3.14159265359\n"
       "#define TAU (2 * PI)\n"
@@ -553,7 +566,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroExpandWithinMacro) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macroUses, L"temp.cpp -> PI <2:18 2:19>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroDefineScope) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroDefineScope) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define MAX(a,b) \\\n"
       "	((a)>(b)?(a):(b))");
@@ -561,7 +574,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroDefineScope) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->macros, L"MAX <1:9 <1:9 1:11> 2:17>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfTemplateTypeAlias) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfTemplateTypeAlias) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template<class T>\n"
       "using MyType = int;\n");
@@ -569,7 +582,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfTemplate
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:16> <1:16 1:16>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfClassTemplate) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfClassTemplate) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -579,7 +592,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfClassTem
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:20> <1:20 1:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T, typename U>\n"
       "class A\n"
@@ -595,7 +608,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfExplicit
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<5:20> <6:9 6:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfVariableTemplate) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfVariableTemplate) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T v;\n");
@@ -603,7 +616,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfVariable
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:20> <1:20 1:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfExplicitPartialVariableTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfExplicitPartialVariableTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T, typename Q>\n"
       "T t = Q(5);\n"
@@ -616,7 +629,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfExplicit
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:20> <5:12 5:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinedWithClassKeyword) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinedWithClassKeyword) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <class T>\n"
       "class A\n"
@@ -626,7 +639,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinedWithClassKeyw
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:17> <1:17 1:17>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterDefinitionOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterDefinitionOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T>\n"
       "class A\n"
@@ -636,7 +649,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterDefinitionOfTe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:15> <1:15 1:15>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeBoolTemplateParameterDefinitionOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeBoolTemplateParameterDefinitionOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T>\n"
       "class A\n"
@@ -646,7 +659,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeBoolTemplateParameterDefinitionOfT
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:16> <1:16 1:16>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateParameterDefinitionOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateParameterDefinitionOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -657,7 +670,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateParameterDefi
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:14> <3:14 3:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateParameterDefinitionOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateParameterDefinitionOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -668,7 +681,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateParameterDe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:14> <3:14 3:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeTemplateParameterDefinitionThatDependsOnTypeTemplateParameterOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeTemplateParameterDefinitionThatDependsOnTypeTemplateParameterOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T1, T1& T2>\n"
       "class A\n"
@@ -680,7 +693,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeTemplateParameterDefinitionThatDep
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:20> <1:24 1:25>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeTemplateParameterDefinitionThatDependsOnTemplateTemplateParameterOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeTemplateParameterDefinitionThatDependsOnTemplateTemplateParameterOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <template<typename> class T1, T1<int>& T2>\n"
       "class A\n"
@@ -691,8 +704,8 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeTemplateParameterDefinitionThatDep
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:36> <1:40 1:41>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsNonTypeTemplateParameterDefinitionThatDependsOnTypeTemplateParameterOfTemplateTemplateParameter) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsNonTypeTemplateParameterDefinitionThatDependsOnTypeTemplateParameterOfTemplateTemplateParameter) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <template<typename T, T R>typename S>\n"
       "class A\n"
@@ -704,7 +717,7 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:29> <1:32 1:32>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentOfDependentNonTypeTemplateParameter) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateArgumentOfDependentNonTypeTemplateParameter) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <template<typename> class T1, T1<int>& T2>\n"
       "class A\n"
@@ -735,7 +748,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentOfDependentNonTypeTemplat
 //	));
 //}
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -751,7 +764,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterOfTemplateClass)
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:36> <4:36 4:36>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterPackTypeOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterPackTypeOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename... T>\n"
       "class A\n"
@@ -761,7 +774,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterPackTypeOfTemplateCl
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:23> <1:23 1:23>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterPackTypeOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterPackTypeOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int... T>\n"
       "class A\n"
@@ -771,7 +784,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterPackTypeOfTemp
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:18> <1:18 1:18>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterPackTypeOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterPackTypeOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <template<typename> typename... T>\n"
       "class A\n"
@@ -781,7 +794,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterPackTypeOfTempla
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:42> <1:42 1:42>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParametersOfTemplateClassWithMultipleParameters) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParametersOfTemplateClassWithMultipleParameters) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T, typename U>\n"
       "class A\n"
@@ -792,7 +805,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParametersOfTemplateClassWith
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:32> <1:32 1:32>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserSkipsCreatingNodeForTemplateParameterWithoutAName) {
+TEST_F(CxxParserTestSuite, cxxParserSkipsCreatingNodeForTemplateParameterWithoutAName) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename>\n"
       "class A\n"
@@ -804,7 +817,7 @@ TEST(CxxParserTestSuite, cxxParserSkipsCreatingNodeForTemplateParameterWithoutAN
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"A<typename> <1:1 <2:7 2:7> 4:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterOfTemplateMethodDefinitionOutsideTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterOfTemplateMethodDefinitionOutsideTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -820,7 +833,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterOfTemplateMethodDefi
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<8:20> <8:20 8:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -834,7 +847,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitClassTemplateSpecialization) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"A<int> <5:1 <6:7 6:7> 8:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitVariableTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitVariableTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T t = T(5);\n"
@@ -845,7 +858,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitVariableTemplateSpecialization) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"int t<int> <5:5 5:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T, typename U>\n"
       "class A\n"
@@ -859,7 +872,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitPartialClassTemplateSpecializatio
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"A<typename T, int> <5:1 <6:7 6:7> 8:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitPartialVariableTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitPartialVariableTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T, typename Q>\n"
       "T t = Q(5);\n"
@@ -870,7 +883,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitPartialVariableTemplateSpecializa
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"int t<int, typename R> <5:5 5:5>"));
 }
 
-TEST(CxxParserTestSuite, CxxParserFindsCorrectFieldMemberNameOfTemplateClassInDeclaration) {
+TEST_F(CxxParserTestSuite, CxxParserFindsCorrectFieldMemberNameOfTemplateClassInDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -881,7 +894,7 @@ TEST(CxxParserTestSuite, CxxParserFindsCorrectFieldMemberNameOfTemplateClassInDe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->fields, L"private int A<typename T>::foo <4:6 4:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectTypeOfFieldMemberOfTemplateClassInDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectTypeOfFieldMemberOfTemplateClassInDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -899,7 +912,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectTypeOfFieldMemberOfTemplateClassIn
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:20> <4:2 4:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectMethodMemberNameOfTemplateClassInDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectMethodMemberNameOfTemplateClassInDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -910,7 +923,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectMethodMemberNameOfTemplateClassInD
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->methods, L"private int A<typename T>::foo() <4:2 <4:6 4:8> 4:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T test(T a)\n"
@@ -921,7 +934,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateParameterDefinitionOfTemplate
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:20> <1:20 1:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterDefinitionOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterDefinitionOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T>\n"
       "int test(int a)\n"
@@ -932,7 +945,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeIntTemplateParameterDefinitionOfTe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:15> <1:15 1:15>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeBoolTemplateParameterDefinitionOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeBoolTemplateParameterDefinitionOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T>\n"
       "int test(int a)\n"
@@ -943,7 +956,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeBoolTemplateParameterDefinitionOfT
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:16> <1:16 1:16>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateParameterDefinitionOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateParameterDefinitionOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -956,7 +969,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateParameterDefi
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:14> <3:14 3:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateParameterDefinitionOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateParameterDefinitionOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -969,7 +982,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateParameterDe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:14> <3:14 3:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterDefinitionOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterDefinitionOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -983,7 +996,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateParameterDefinitionOfTemp
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:36> <4:36 4:36>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFunctionForImplicitInstantiationOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFunctionForImplicitInstantiationOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T test(T a)\n"
@@ -999,7 +1012,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFunctionForImplicitInstantiationOfTemplat
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->functions, L"int test<int>(int) <2:1 <2:1 <2:3 2:6> 2:11> 5:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserSkipsImplicitTemplateMethodDefinitionOfImplicitTemplateClassInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserSkipsImplicitTemplateMethodDefinitionOfImplicitTemplateClassInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -1021,7 +1034,7 @@ TEST(CxxParserTestSuite, cxxParserSkipsImplicitTemplateMethodDefinitionOfImplici
       client->templateSpecializations, L"void A<int>::foo<float>() -> void A<typename T>::foo<typename U>() <6:7 6:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsLambdaDefinitionAndCallInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsLambdaDefinitionAndCallInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void lambdaCaller()\n"
       "{\n"
@@ -1036,7 +1049,7 @@ TEST(CxxParserTestSuite, cxxParserFindsLambdaDefinitionAndCallInFunction) {
       client->calls, L"void lambdaCaller() -> void lambdaCaller::lambda at 3:2() const <3:8 3:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMutableLambdaDefinition) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMutableLambdaDefinition) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void lambdaWrapper()\n"
       "{\n"
@@ -1049,7 +1062,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMutableLambdaDefinition) {
   // ));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsLocalVariableDeclaredInLambdaCapture) {
+TEST_F(CxxParserTestSuite, cxxParserFindsLocalVariableDeclaredInLambdaCapture) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void lambdaWrapper()\n"
       "{\n"
@@ -1060,7 +1073,7 @@ TEST(CxxParserTestSuite, cxxParserFindsLocalVariableDeclaredInLambdaCapture) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:3> <3:21 3:21>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsDefinitionOfLocalSymbolInFunctionParameterList) {
+TEST_F(CxxParserTestSuite, cxxParserFindsDefinitionOfLocalSymbolInFunctionParameterList) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void test(int a)\n"
       "{\n"
@@ -1069,7 +1082,7 @@ TEST(CxxParserTestSuite, cxxParserFindsDefinitionOfLocalSymbolInFunctionParamete
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:15> <1:15 1:15>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsDefinitionOfLocalSymbolInFunctionScope) {
+TEST_F(CxxParserTestSuite, cxxParserFindsDefinitionOfLocalSymbolInFunctionScope) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void test()\n"
       "{\n"
@@ -1082,7 +1095,7 @@ TEST(CxxParserTestSuite, cxxParserFindsDefinitionOfLocalSymbolInFunctionScope) {
 ///////////////////////////////////////////////////////////////////////////////
 // test finding nested symbol definitions and declarations
 
-TEST(CxxParserTestSuite, cxxParserFindsClassDefinitionInClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassDefinitionInClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -1093,7 +1106,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassDefinitionInClass) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"public A::B <4:8 4:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassDefinitionInNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassDefinitionInNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace a\n"
       "{\n"
@@ -1103,7 +1116,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassDefinitionInNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"a::B <3:8 3:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructDefinitionInClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructDefinitionInClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -1115,7 +1128,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructDefinitionInClass) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"private A::B <3:2 <3:9 3:9> 5:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructDefinitionInNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructDefinitionInNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace A\n"
       "{\n"
@@ -1127,7 +1140,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructDefinitionInNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"A::B <3:2 <3:9 3:9> 5:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructDefinitionInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructDefinitionInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void foo(int)\n"
       "{\n"
@@ -1146,7 +1159,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructDefinitionInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->structs, L"foo::B <9:2 <9:9 9:9> 11:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsVariableDefinitionsInNamespaceScope) {
+TEST_F(CxxParserTestSuite, cxxParserFindsVariableDefinitionsInNamespaceScope) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace n"
       "{\n"
@@ -1156,7 +1169,7 @@ TEST(CxxParserTestSuite, cxxParserFindsVariableDefinitionsInNamespaceScope) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->globalVariables, L"int n::x <2:6 2:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFieldInNestedClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFieldInNestedClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -1171,7 +1184,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFieldInNestedClass) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->fields, L"private static const int B::C::amount <7:20 7:25>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFunctionInAnonymousNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFunctionInAnonymousNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace\n"
       "{\n"
@@ -1182,7 +1195,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFunctionInAnonymousNamespace) {
       client->functions, L"int anonymous namespace (temp.cpp<1:1>)::sum(int, int) <3:2 <3:6 3:8> 3:22>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMethodDeclaredInNestedClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMethodDeclaredInNestedClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -1196,7 +1209,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMethodDeclaredInNestedClass) {
       utility::containsElement<std::wstring>(client->methods, L"private bool B::C::isGreat() const <5:3 <5:8 5:14> 5:22>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNestedNamedNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNestedNamedNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace A\n"
       "{\n"
@@ -1208,7 +1221,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNestedNamedNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->namespaces, L"A::B <3:2 <3:12 3:12> 5:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumDefinedInClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumDefinedInClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class B\n"
       "{\n"
@@ -1221,7 +1234,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumDefinedInClass) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enums, L"public B::Z <4:2 <4:7 4:7> 6:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumDefinedInNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumDefinedInNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace n\n"
       "{\n"
@@ -1233,7 +1246,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumDefinedInNamespace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enums, L"n::Z <3:2 <3:7 3:7> 5:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumDefinitionInTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumDefinitionInTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -1248,7 +1261,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumDefinitionInTemplateClass) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->enums, L"private A<typename T>::TestType <4:2 <4:7 4:14> 8:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumConstantsInTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumConstantsInTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -1266,7 +1279,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumConstantsInTemplateClass) {
 ///////////////////////////////////////////////////////////////////////////////
 // test qualifier locations
 
-TEST(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToGlobalVariableDefinedInNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToGlobalVariableDefinedInNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace foo {\n"
       "	namespace bar {\n"
@@ -1281,7 +1294,7 @@ TEST(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToGlobalVariableDefinedI
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->qualifiers, L"foo::bar <7:7 7:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToStaticField) {
+TEST_F(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToStaticField) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo {\n"
       "public:\n"
@@ -1298,7 +1311,7 @@ TEST(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToStaticField) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->qualifiers, L"Foo::Bar <9:7 9:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToEnumConstant) {
+TEST_F(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToEnumConstant) {
   std::shared_ptr<TestStorage> client = parseCode(
       "enum Foo {\n"
       "	FOO_V\n"
@@ -1310,7 +1323,7 @@ TEST(CxxParserTestSuite, cxxParserFindsQualifierOfAccessToEnumConstant) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->qualifiers, L"Foo <5:10 5:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsQualifierOfReferenceToMethod) {
+TEST_F(CxxParserTestSuite, cxxParserFindsQualifierOfReferenceToMethod) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo {\n"
       "public:\n"
@@ -1326,7 +1339,7 @@ TEST(CxxParserTestSuite, cxxParserFindsQualifierOfReferenceToMethod) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->qualifiers, L"Foo <9:9 9:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsQualifierOfConstructorCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsQualifierOfConstructorCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo {\n"
       "public:\n"
@@ -1344,7 +1357,7 @@ TEST(CxxParserTestSuite, cxxParserFindsQualifierOfConstructorCall) {
 ///////////////////////////////////////////////////////////////////////////////
 // test implicit symbols
 
-TEST(CxxParserTestSuite, cxxParserFindsBuiltinTypes) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBuiltinTypes) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void t1(int v) {}\n"
       "void t2(float v) {}\n"
@@ -1358,7 +1371,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBuiltinTypes) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->builtinTypes, L"bool"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsImplicitCopyConstructor) {
+TEST_F(CxxParserTestSuite, cxxParserFindsImplicitCopyConstructor) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class TestClass {}\n"
       "void foo()\n"
@@ -1378,7 +1391,7 @@ TEST(CxxParserTestSuite, cxxParserFindsImplicitCopyConstructor) {
 ///////////////////////////////////////////////////////////////////////////////
 // test finding usages of symbols
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumUsageInTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumUsageInTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -1395,7 +1408,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumUsageInTemplateClass) {
       client->typeUses, L"A<typename T>::TestType A<typename T>::foo -> A<typename T>::TestType <9:2 9:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectFieldMemberTypeOfNestedTemplateClassInDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectFieldMemberTypeOfNestedTemplateClassInDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -1417,19 +1430,19 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectFieldMemberTypeOfNestedTemplateCla
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<int>::B b -> A<int>::B <11:9 11:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeUsageOfGlobalVariable) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeUsageOfGlobalVariable) {
   std::shared_ptr<TestStorage> client = parseCode("int x;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int x -> int <1:1 1:3>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypedefsTypeUse) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypedefsTypeUse) {
   std::shared_ptr<TestStorage> client = parseCode("typedef unsigned int uint;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"uint -> unsigned int <1:9 1:16>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypedefThatUsesTypeDefinedInNamedNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypedefThatUsesTypeDefinedInNamedNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace test\n"
       "{\n"
@@ -1440,7 +1453,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypedefThatUsesTypeDefinedInNamedNamespac
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"globalTestStruct -> test::TestStruct <5:15 5:24>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeUseOfTypedef) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeUseOfTypedef) {
   std::shared_ptr<TestStorage> client = parseCode(
       "typedef unsigned int uint;\n"
       "uint number;\n");
@@ -1448,7 +1461,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeUseOfTypedef) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"uint number -> uint <2:1 2:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassDefaultPrivateInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassDefaultPrivateInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {};\n"
       "class B : A {};\n");
@@ -1456,7 +1469,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassDefaultPrivateInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:11 2:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassPublicInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassPublicInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {};\n"
       "class B : public A {};\n");
@@ -1464,7 +1477,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassPublicInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:18 2:18>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassProtectedInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassProtectedInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {};\n"
       "class B : protected A {};\n");
@@ -1472,7 +1485,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassProtectedInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:21 2:21>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassPrivateInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassPrivateInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {};\n"
       "class B : private A {};\n");
@@ -1480,7 +1493,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassPrivateInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:19 2:19>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassMultipleInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassMultipleInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {};\n"
       "class B {};\n"
@@ -1493,7 +1506,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassMultipleInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"C -> B <5:12 5:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructDefaultPublicInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructDefaultPublicInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "struct A {};\n"
       "struct B : A {};\n");
@@ -1501,7 +1514,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructDefaultPublicInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:12 2:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructPublicInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructPublicInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "struct A {};\n"
       "struct B : public A {};\n");
@@ -1509,7 +1522,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructPublicInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:19 2:19>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructProtectedInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructProtectedInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "struct A {};\n"
       "struct B : protected A {};\n");
@@ -1517,7 +1530,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructProtectedInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:22 2:22>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructPrivateInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructPrivateInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "struct A {};\n"
       "struct B : private A {};\n");
@@ -1525,7 +1538,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructPrivateInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"B -> A <2:20 2:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsStructMultipleInheritance) {
+TEST_F(CxxParserTestSuite, cxxParserFindsStructMultipleInheritance) {
   std::shared_ptr<TestStorage> client = parseCode(
       "struct A {};\n"
       "struct B {};\n"
@@ -1538,7 +1551,7 @@ TEST(CxxParserTestSuite, cxxParserFindsStructMultipleInheritance) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->inheritances, L"C -> B <5:12 5:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMethodOverrideWhenVirtual) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMethodOverrideWhenVirtual) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {\n"
       "	virtual void foo();\n"
@@ -1550,7 +1563,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMethodOverrideWhenVirtual) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->overrides, L"void B::foo() -> void A::foo() <5:7 5:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMultiLayerMethodOverrides) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMultiLayerMethodOverrides) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {\n"
       "	virtual void foo();\n"
@@ -1566,7 +1579,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMultiLayerMethodOverrides) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->overrides, L"void C::foo() -> void B::foo() <8:7 8:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMethodOverridesOnDifferentReturnTypes) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMethodOverridesOnDifferentReturnTypes) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {\n"
       "	virtual void foo();\n"
@@ -1579,7 +1592,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMethodOverridesOnDifferentReturnTypes) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->overrides, L"int B::foo() -> void A::foo() <5:6 5:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoMethodOverrideWhenNotVirtual) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoMethodOverrideWhenNotVirtual) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {\n"
       "	void foo();\n"
@@ -1591,7 +1604,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoMethodOverrideWhenNotVirtual) {
   EXPECT_TRUE(client->overrides.size() == 0);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoMethodOverridesOnDifferentSignatures) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoMethodOverridesOnDifferentSignatures) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {\n"
       "	virtual void foo(int a);\n"
@@ -1603,7 +1616,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoMethodOverridesOnDifferentSignatures) {
   EXPECT_TRUE(client->overrides.size() == 0);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsingDirectiveDeclInFunctionContext) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsingDirectiveDeclInFunctionContext) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void foo()\n"
       "{\n"
@@ -1613,13 +1626,13 @@ TEST(CxxParserTestSuite, cxxParserFindsUsingDirectiveDeclInFunctionContext) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void foo() -> std <3:18 3:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsingDirectiveDeclInFileContext) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsingDirectiveDeclInFileContext) {
   std::shared_ptr<TestStorage> client = parseCode("using namespace std;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"temp.cpp -> std <1:17 1:19>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsingDeclInFunctionContext) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsingDeclInFunctionContext) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace foo\n"
       "{\n"
@@ -1633,7 +1646,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsingDeclInFunctionContext) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void bar() -> foo::a <7:13 7:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsingDeclInFileContext) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsingDeclInFileContext) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace foo\n"
       "{\n"
@@ -1644,7 +1657,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsingDeclInFileContext) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"temp.cpp -> foo::a <5:12 5:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCallInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCallInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int sum(int a, int b)\n"
       "{\n"
@@ -1658,7 +1671,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCallInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> int sum(int, int) <7:2 7:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCallInFunctionWithCorrectSignature) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCallInFunctionWithCorrectSignature) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int sum(int a, int b)\n"
       "{\n"
@@ -1675,7 +1688,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCallInFunctionWithCorrectSignature) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"void func(bool) -> int sum(int, int) <10:2 10:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCallToFunctionWithRightSignature) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCallToFunctionWithRightSignature) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int sum(int a, int b)\n"
       "{\n"
@@ -1695,7 +1708,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCallToFunctionWithRightSignature) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> float sum(float, float) <12:2 12:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFunctionCallInFunctionParameterList) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFunctionCallInFunctionParameterList) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int sum(int a, int b)\n"
       "{\n"
@@ -1709,7 +1722,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFunctionCallInFunctionParameterList) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> int sum(int, int) <7:16 7:18>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFunctionCallInMethod) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFunctionCallInMethod) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int sum(int a, int b)\n"
       "{\n"
@@ -1726,7 +1739,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFunctionCallInMethod) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int App::main() -> int sum(int, int) <9:10 9:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsImplicitConstructorWithoutDefinitionCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsImplicitConstructorWithoutDefinitionCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1739,7 +1752,7 @@ TEST(CxxParserTestSuite, cxxParserFindsImplicitConstructorWithoutDefinitionCall)
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> void App::App() <6:6 6:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitConstructorCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitConstructorCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1754,7 +1767,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitConstructorCall) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> void App::App() <8:2 8:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCallOfExplicitlyDefinedDestructorAtDeleteKeyword) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCallOfExplicitlyDefinedDestructorAtDeleteKeyword) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo\n"
       "{\n"
@@ -1772,7 +1785,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCallOfExplicitlyDefinedDestructorAtDelete
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"void foo() -> void Foo::~Foo() <11:2 11:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCallOfImplicitlyDefinedDestructorAtDeleteKeyword) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCallOfImplicitlyDefinedDestructorAtDeleteKeyword) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo\n"
       "{\n"
@@ -1787,7 +1800,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCallOfImplicitlyDefinedDestructorAtDelete
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"void foo() -> void Foo::~Foo() <8:2 8:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitConstructorCallOfField) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitConstructorCallOfField) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Item\n"
       "{\n"
@@ -1802,7 +1815,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitConstructorCallOfField) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"void App::App() -> void Item::Item() <7:10 7:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsFunctionCallInMemberInitialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsFunctionCallInMemberInitialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int one() { return 1; }\n"
       "class Item\n"
@@ -1821,7 +1834,7 @@ TEST(CxxParserTestSuite, cxxParserFindsFunctionCallInMemberInitialization) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"void App::App() -> int one() <10:10 10:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCopyConstructorCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCopyConstructorCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1838,7 +1851,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCopyConstructorCall) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> void App::App(const App &) <10:6 10:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalVariableConstructorCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalVariableConstructorCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1850,7 +1863,7 @@ TEST(CxxParserTestSuite, cxxParserFindsGlobalVariableConstructorCall) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"App app -> void App::App() <6:5 6:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsGlobalVariableFunctionCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsGlobalVariableFunctionCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int one() { return 1; }\n"
       "int a = one();\n");
@@ -1858,7 +1871,7 @@ TEST(CxxParserTestSuite, cxxParserFindsGlobalVariableFunctionCall) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int a -> int one() <2:9 2:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsOperatorCall) {
+TEST_F(CxxParserTestSuite, cxxParserFindsOperatorCall) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1876,7 +1889,7 @@ TEST(CxxParserTestSuite, cxxParserFindsOperatorCall) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> void App::operator+(int) <11:6 11:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfFunctionPointer) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfFunctionPointer) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void my_int_func(int x)\n"
       "{\n"
@@ -1891,7 +1904,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfFunctionPointer) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void test() -> void my_int_func(int) <8:9 8:19>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int bar;\n"
       "\n"
@@ -1903,7 +1916,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"int main() -> int bar <5:2 5:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInGlobalVariableInitialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInGlobalVariableInitialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int a = 0;\n"
       "int b[] = {a};\n");
@@ -1911,7 +1924,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInGlobalVariableInit
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"int [] b -> int a <2:12 2:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInMethod) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInMethod) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int bar;\n"
       "\n"
@@ -1926,7 +1939,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfGlobalVariableInMethod) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void App::foo() -> int bar <7:3 7:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInMethod) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfFieldInMethod) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1942,7 +1955,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInMethod) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void App::foo() -> int App::bar <6:9 6:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInFunctionCallArguments) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfFieldInFunctionCallArguments) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -1957,7 +1970,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInFunctionCallArguments) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void A::foo(int) -> int A::bar <6:7 6:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInFunctionCallContext) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfFieldInFunctionCallContext) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -1972,7 +1985,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInFunctionCallContext) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void A::foo(int) -> A * A::a <6:3 6:3>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInInitializationList) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfFieldInInitializationList) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -1985,7 +1998,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfFieldInInitializationList) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void App::App() -> int App::bar <4:5 4:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfMemberInCallExpressionToUnresolvedMemberExpression) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfMemberInCallExpressionToUnresolvedMemberExpression) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A {\n"
       "	template <typename T>\n"
@@ -2002,7 +2015,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfMemberInCallExpressionToUnresolved
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"T B::run<typename T>() -> A B::a <8:10 8:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfMemberInTemporaryObjectExpression) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfMemberInTemporaryObjectExpression) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class Foo\n"
       "{\n"
@@ -2027,7 +2040,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfMemberInTemporaryObjectExpression)
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->usages, L"void Bar::baba() -> const Foo Bar::m_i <15:7 15:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfMemberInDependentScopeMemberExpression) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfMemberInDependentScopeMemberExpression) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2044,7 +2057,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfMemberInDependentScopeMemberExpres
       utility::containsElement<std::wstring>(client->usages, L"void A<typename T>::foo() -> T A<typename T>::m_t <8:3 8:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsReturnTypeUseInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsReturnTypeUseInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "double PI()\n"
       "{\n"
@@ -2054,7 +2067,7 @@ TEST(CxxParserTestSuite, cxxParserFindsReturnTypeUseInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"double PI() -> double <1:1 1:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsParameterTypeUsesInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsParameterTypeUsesInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void ceil(float a)\n"
       "{\n"
@@ -2063,7 +2076,7 @@ TEST(CxxParserTestSuite, cxxParserFindsParameterTypeUsesInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void ceil(float) -> float <1:11 1:15>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUseOfDecayedParameterTypeInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUseOfDecayedParameterTypeInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template<class T, unsigned int N>\n"
       "class VectorBase\n"
@@ -2076,7 +2089,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUseOfDecayedParameterTypeInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<1:32> <5:22 5:22>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserUsageOfInjectedTypeInMethodDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserUsageOfInjectedTypeInMethodDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class Foo\n"
@@ -2094,7 +2107,7 @@ TEST(CxxParserTestSuite, cxxParserUsageOfInjectedTypeInMethodDeclaration) {
       L"<4:23 4:25>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUseOfQualifiedTypeInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUseOfQualifiedTypeInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void test(const int t)\n"
       "{\n"
@@ -2103,7 +2116,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUseOfQualifiedTypeInFunction) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void test(const int) -> int <1:17 1:19>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsParameterTypeUsesInConstructor) {
+TEST_F(CxxParserTestSuite, cxxParserFindsParameterTypeUsesInConstructor) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -2113,7 +2126,7 @@ TEST(CxxParserTestSuite, cxxParserFindsParameterTypeUsesInConstructor) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void A::A(int) -> int <3:4 3:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeUsesInFunctionBody) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeUsesInFunctionBody) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int main()\n"
       "{\n"
@@ -2123,7 +2136,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeUsesInFunctionBody) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <3:2 3:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeUsesInMethodBody) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeUsesInMethodBody) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -2137,7 +2150,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeUsesInMethodBody) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int A::main() -> int <5:3 5:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeUsesInLoopsAndConditions) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeUsesInLoopsAndConditions) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int main()\n"
       "{\n"
@@ -2156,7 +2169,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeUsesInLoopsAndConditions) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <9:3 9:5>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeUsesOfBaseClassInDerivedConstructor) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeUsesOfBaseClassInDerivedConstructor) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -2172,7 +2185,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeUsesOfBaseClassInDerivedConstructor) 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void B::B() -> A <9:8 9:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumUsesInGlobalSpace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumUsesInGlobalSpace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "enum A\n"
       "{\n"
@@ -2188,7 +2201,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumUsesInGlobalSpace) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A * aPtr -> A <7:15 7:15>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsEnumUsesInFunctionBody) {
+TEST_F(CxxParserTestSuite, cxxParserFindsEnumUsesInFunctionBody) {
   std::shared_ptr<TestStorage> client = parseCode(
       "enum A\n"
       "{\n"
@@ -2207,7 +2220,7 @@ TEST(CxxParserTestSuite, cxxParserFindsEnumUsesInFunctionBody) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> A <9:16 9:16>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParameterOfTemplateMemberVariableDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParameterOfTemplateMemberVariableDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "struct IsBaseType {\n"
@@ -2223,7 +2236,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParameterOfTemplateMemberV
       L"temp.cpp<5:20> <5:20 5:20>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParametersWithDifferentDepthOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParametersWithDifferentDepthOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2240,7 +2253,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParametersWithDifferentDep
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:21> <5:11 5:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParametersWithDifferentDepthOfPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParametersWithDifferentDepthOfPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2262,8 +2275,8 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParametersWithDifferentDep
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<10:21> <13:9 13:9>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsUsageOfTemplateTemplateParameterOfTemplateClassExplicitlyInstantiatedWithConcreteTypeArgument) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsUsageOfTemplateTemplateParameterOfTemplateClassExplicitlyInstantiatedWithConcreteTypeArgument) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2278,7 +2291,7 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:36> <7:11 7:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateTemplateParameterOfTemplateClassExplicitlyInstantiatedWithTemplateType) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfTemplateTemplateParameterOfTemplateClassExplicitlyInstantiatedWithTemplateType) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2294,7 +2307,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateTemplateParameterOfTemplat
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:36> <8:11 8:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypedefInOtherClassThatDependsOnOwnTemplateParameter) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypedefInOtherClassThatDependsOnOwnTemplateParameter) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2317,7 +2330,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypedefInOtherClassThatDependsOnOwnTempla
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"B<int>::type f -> B<int>::type <13:9 13:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParameterInQualifierOfOtherSymbol) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParameterInQualifierOfOtherSymbol) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "struct find_if_impl;\n"
@@ -2332,7 +2345,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfTemplateParameterInQualifierOfOthe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:20> <8:49 8:49>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUseOfDependentTemplateSpecializationType) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUseOfDependentTemplateSpecializationType) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2354,7 +2367,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUseOfDependentTemplateSpecializationType)
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"B<bool>::type f -> B<bool>::type <14:10 14:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserCreatesSingleNodeForAllPossibleParameterPackExpansionsOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserCreatesSingleNodeForAllPossibleParameterPackExpansionsOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template<typename T>\n"
       "T adder(T v) { return v; }\n"
@@ -2370,7 +2383,7 @@ TEST(CxxParserTestSuite, cxxParserCreatesSingleNodeForAllPossibleParameterPackEx
       client->calls, L"int adder<int, <...>>(int, ...) -> int adder<int, <...>>(int, ...) <5:49 5:53>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2386,7 +2399,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateIns
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <7:4 7:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateInstantiatedWithFunctionPrototype) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateInstantiatedWithFunctionPrototype) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2402,7 +2415,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateIns
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void foo() -> int <7:4 7:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentForParameterPackOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentForParameterPackOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename... T>\n"
       "class A\n"
@@ -2421,7 +2434,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentForParameterPackOfExp
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> float <7:11 7:15>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInNonDefaultConstructorOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInNonDefaultConstructorOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2439,7 +2452,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInNonDefaultConstruct
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <9:4 9:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInDefaultConstructorOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInDefaultConstructorOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2457,7 +2470,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInDefaultConstructorO
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <9:4 9:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInNewExpressionOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInNewExpressionOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2475,7 +2488,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentInNewExpressionOfExpl
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <9:8 9:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T>\n"    // use of "int"
       "class A\n"
@@ -2490,7 +2503,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTem
   EXPECT_TRUE(client->typeUses.size() == 3);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTemplateParameterOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTemplateParameterOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T>\n"    // use of "bool"
       "class A\n"
@@ -2505,7 +2518,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTe
   EXPECT_TRUE(client->typeUses.size() == 3);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateArgumentOfImplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateArgumentOfImplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -2521,7 +2534,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateArgumentOfImp
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<&g_p> -> P g_p <9:5 9:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateArgumentOfImplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateArgumentOfImplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -2537,7 +2550,8 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateArgumentOfI
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<g_p> -> P g_p <9:4 9:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterPackOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterPackOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int... T>\n"    // use of "int"
       "class A\n"
@@ -2551,7 +2565,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTem
   EXPECT_TRUE(client->typeUses.size() == 3);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2568,7 +2582,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentOfExplicitTemplat
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> A<typename T> <9:4 9:4>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentForParameterPackOfExplicitTemplateInstantiation) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentForParameterPackOfExplicitTemplateInstantiation) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2589,7 +2603,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentForParameterPackO
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> A<typename T> <11:7 11:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentForImplicitSpecializationOfGlobalTemplateVariable) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateArgumentForImplicitSpecializationOfGlobalTemplateVariable) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T v;\n"
@@ -2602,7 +2616,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentForImplicitSpecialization
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void test() -> int <5:4 5:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForMethodOfImplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForMethodOfImplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2619,7 +2633,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForMethodOfIm
       client->templateSpecializations, L"int A<int>::foo() -> T A<typename T>::foo() <5:4 5:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForStaticVariableOfImplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForStaticVariableOfImplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2636,7 +2650,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForStaticVari
       client->templateSpecializations, L"static int A<int>::foo -> static T A<typename T>::foo <5:11 5:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForFieldOfImplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForFieldOfImplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2653,7 +2667,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForFieldOfImp
       client->templateSpecializations, L"int A<int>::foo -> T A<typename T>::foo <5:4 5:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForFieldOfMemberClassOfImplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForFieldOfMemberClassOfImplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2673,7 +2687,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForFieldOfMem
       client->templateSpecializations, L"int A<int>::B::foo -> T A<typename T>::B::foo <7:5 7:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForMemberClassOfImplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForMemberClassOfImplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2689,7 +2703,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateMemberSpecializationForMemberClas
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->templateSpecializations, L"A<int>::B -> A<typename T>::B <5:8 5:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2703,7 +2717,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfExplicitTemplateSpe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<int> -> int <6:9 6:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterOfExplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterOfExplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T>\n"    // use of "int"
       "class A\n"
@@ -2717,7 +2731,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTem
   EXPECT_TRUE(client->typeUses.size() == 1);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTemplateParameterOfExplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTemplateParameterOfExplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T>\n"    // use of "bool"
       "class A\n"
@@ -2731,7 +2745,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTe
   EXPECT_TRUE(client->typeUses.size() == 1);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateArgumentOfExplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateArgumentOfExplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -2747,7 +2761,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomPointerTemplateArgumentOfExp
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<&g_p> -> P g_p <8:10 8:12>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateArgumentOfExplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateArgumentOfExplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -2763,7 +2777,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNonTypeCustomReferenceTemplateArgumentOfE
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<g_p> -> P g_p <8:9 8:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentOfExplicitTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentOfExplicitTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2779,7 +2793,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateArgumentOfExplicitTemplat
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"B<A> -> A<typename T> <8:9 8:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentsOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentsOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T, typename U>\n"
       "class A\n"
@@ -2794,8 +2808,8 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentsOfExplicitPartialCla
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<typename T, int> -> int <6:12 6:14>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsNoTemplateArgumentForBuiltinNonTypeIntTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T, int U>\n"
       "class A\n"
@@ -2809,8 +2823,8 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<5:15> <6:12 6:12>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsNoTemplateArgumentForBuiltinNonTypeBoolTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T, bool U>\n"
       "class A\n"
@@ -2824,8 +2838,8 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<5:16> <6:15 6:15>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsTemplateArgumentForNonTypeCustomPointerTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsTemplateArgumentForNonTypeCustomPointerTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -2845,8 +2859,8 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<7:14> <8:15 8:15>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsTemplateArgumentForNonTypeCustomReferenceTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsTemplateArgumentForNonTypeCustomReferenceTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class P\n"
       "{};\n"
@@ -2863,7 +2877,7 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<7:14> <8:14 8:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentForTemplateTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateArgumentForTemplateTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2881,8 +2895,8 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentForTemplateTemplateParame
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<7:36> <8:12 8:12>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsNonTypeTemplateArgumentThatDependsOnTypeTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsNonTypeTemplateArgumentThatDependsOnTypeTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T1, typename T2, T2 T3>\n"
       "class A\n"
@@ -2896,8 +2910,8 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<5:27> <6:16 6:17>"));
 }
 
-TEST(CxxParserTestSuite,
-     cxxParserFindsNonTypeTemplateArgumentThatDependsOnTemplateTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite,
+       cxxParserFindsNonTypeTemplateArgumentThatDependsOnTemplateTemplateParameterOfExplicitPartialClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T1, template<typename> class T2, T2<int> T3>\n"
       "class A\n"
@@ -2912,7 +2926,7 @@ TEST(CxxParserTestSuite,
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<5:48> <6:16 6:17>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsImplicitTemplateClassSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsImplicitTemplateClassSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2925,7 +2939,7 @@ TEST(CxxParserTestSuite, cxxParserFindsImplicitTemplateClassSpecialization) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->templateSpecializations, L"A<int> -> A<typename T> <2:7 2:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsClassInheritanceFromImplicitTemplateClassSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsClassInheritanceFromImplicitTemplateClassSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2941,7 +2955,7 @@ TEST(CxxParserTestSuite, cxxParserFindsClassInheritanceFromImplicitTemplateClass
 }
 
 // TODO(Hussein): Fix the test case
-TEST(CxxParserTestSuite, DISABLED_recordBaseClassOfImplicitTemplateClassSpecialization) {
+TEST_F(CxxParserTestSuite, DISABLED_recordBaseClassOfImplicitTemplateClassSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template<class T, unsigned int N>\n"
       "class VectorBase {}; \n"
@@ -2956,7 +2970,7 @@ TEST(CxxParserTestSuite, DISABLED_recordBaseClassOfImplicitTemplateClassSpeciali
   EXPECT_THAT(client->inheritances, testing::Contains(testing::StrEq(L"Vector2<float> -> VectorBase<float, 2> <5:24 5:33>")));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateClassSpecializationWithTemplateArgument) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateClassSpecializationWithTemplateArgument) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -2975,7 +2989,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateClassSpecializationWithTemplateAr
   EXPECT_TRUE(client->fields.size() == 1);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectOrderOfTemplateArgumentsForExplicitClassTemplateSpecialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectOrderOfTemplateArgumentsForExplicitClassTemplateSpecialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T1, typename T2, typename T3>\n"
       "class vector { };\n"
@@ -2986,7 +3000,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectOrderOfTemplateArgumentsForExplici
       utility::containsElement<std::wstring>(client->classes, L"vector<class Foo2, class Foo1, int> <3:1 <4:7 4:12> 4:33>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserReplacesDependentTemplateArgumentsOfExplicitTemplateSpecializationWithNameOfBaseTemplate) {
+TEST_F(CxxParserTestSuite, cxxParserReplacesDependentTemplateArgumentsOfExplicitTemplateSpecializationWithNameOfBaseTemplate) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A {};\n"
@@ -2998,7 +3012,7 @@ TEST(CxxParserTestSuite, cxxParserReplacesDependentTemplateArgumentsOfExplicitTe
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->classes, L"vector<class Foo1, A<typename T>> <5:1 <6:7 6:12> 6:31>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserReplacesUnknownTemplateArgumentsOfExplicitTemplateSpecializationWithDepthAndPositionIndex) {
+TEST_F(CxxParserTestSuite, cxxParserReplacesUnknownTemplateArgumentsOfExplicitTemplateSpecializationWithDepthAndPositionIndex) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T0>\n"
       "class foo {\n"
@@ -3012,7 +3026,7 @@ TEST(CxxParserTestSuite, cxxParserReplacesUnknownTemplateArgumentsOfExplicitTemp
       client->classes, L"foo<typename T0>::vector<arg0_0, class T1> <5:2 <6:8 6:13> 6:25>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateClassConstructorUsageOfField) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateClassConstructorUsageOfField) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -3025,7 +3039,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateClassConstructorUsageOfField) {
       utility::containsElement<std::wstring>(client->usages, L"void A<typename T>::A<T>() -> T A<typename T>::foo <4:7 4:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectMethodReturnTypeOfTemplateClassInDeclaration) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectMethodReturnTypeOfTemplateClassInDeclaration) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -3038,7 +3052,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectMethodReturnTypeOfTemplateClassInD
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->methods, L"private T A<typename T>::foo() <4:2 <4:4 4:6> 4:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateDefaultArgumentTypeOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateDefaultArgumentTypeOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T = int>\n"
       "class A\n"
@@ -3048,7 +3062,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateDefaultArgumentTypeOfTemplate
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"A<typename T> -> int <1:24 1:26>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoDefaultArgumentTypeForNonTypeBoolTemplateParameterOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoDefaultArgumentTypeForNonTypeBoolTemplateParameterOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T = true>\n"
       "class A\n"
@@ -3059,7 +3073,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoDefaultArgumentTypeForNonTypeBoolTempla
   ;    // only the "bool" type is recorded and nothing for the default arg
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateDefaultArgumentTypeOfTemplateClass) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateDefaultArgumentTypeOfTemplateClass) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -3072,7 +3086,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateDefaultArgumentTypeOfTemp
       utility::containsElement<std::wstring>(client->typeUses, L"B<template<typename> typename T> -> A<typename T> <4:40 4:40>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsImplicitInstantiationOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsImplicitInstantiationOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T test(T a)\n"
@@ -3089,7 +3103,7 @@ TEST(CxxParserTestSuite, cxxParserFindsImplicitInstantiationOfTemplateFunction) 
       client->templateSpecializations, L"int test<int>(int) -> T test<typename T>(T) <2:3 2:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitSpecializationOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitSpecializationOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T test(T a)\n"
@@ -3107,7 +3121,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitSpecializationOfTemplateFunction)
       client->templateSpecializations, L"int test<int>(int) -> T test<typename T>(T) <8:5 8:8>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfExplicitInstantiationOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfExplicitInstantiationOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "void test()\n"
@@ -3122,7 +3136,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfExplicitIns
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void test<int>() -> int <7:11 7:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfFunctionCallInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfFunctionCallInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "void test(){}\n"
@@ -3136,7 +3150,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfFunctionCal
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void test<int>() -> int <6:7 6:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoExplicitNonTypeIntTemplateArgumentOfFunctionCallInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoExplicitNonTypeIntTemplateArgumentOfFunctionCallInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <int T>\n"    // use of "int"
       "void test(){}\n"       // 2x use of "void"
@@ -3150,7 +3164,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoExplicitNonTypeIntTemplateArgumentOfFun
   EXPECT_TRUE(client->typeUses.size() == 4);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitTemplateTemplateArgumentOfFunctionCallInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitTemplateTemplateArgumentOfFunctionCallInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A {};\n"
@@ -3165,7 +3179,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitTemplateTemplateArgumentOfFunctio
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void test<A>() -> A<typename T> <7:7 7:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoImplicitTypeTemplateArgumentOfFunctionCallInFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoImplicitTypeTemplateArgumentOfFunctionCallInFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "void test(T data){}\n"    // 2x use of "void" + 1x use of "int"
@@ -3179,7 +3193,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoImplicitTypeTemplateArgumentOfFunctionC
   EXPECT_TRUE(client->typeUses.size() == 4);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfFunctionCallInVarDecl) {
+TEST_F(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfFunctionCallInVarDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T test(){ return 1; }\n"
@@ -3192,7 +3206,7 @@ TEST(CxxParserTestSuite, cxxParserFindsExplicitTypeTemplateArgumentOfFunctionCal
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int test<int>() -> int <6:17 6:19>"));
 }
 
-TEST(CxxParserTestSuite, CxxParserFindsNoImplicitTypeTemplateArgumentOfFunctionCallInVarDecl) {
+TEST_F(CxxParserTestSuite, CxxParserFindsNoImplicitTypeTemplateArgumentOfFunctionCallInVarDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "T test(T i){ return i; }\n"    // 2x use of "int"
@@ -3205,7 +3219,7 @@ TEST(CxxParserTestSuite, CxxParserFindsNoImplicitTypeTemplateArgumentOfFunctionC
   EXPECT_TRUE(client->typeUses.size() == 3);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateDefaultArgumentTypeOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateDefaultArgumentTypeOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T = int>\n"
       "void test()\n"
@@ -3221,7 +3235,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateDefaultArgumentTypeOfTemplate
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"void test<typename T>() -> int <1:24 1:26>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserDoesNotFindDefaultArgumentTypeForNonTypeBoolTemplateParameterOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserDoesNotFindDefaultArgumentTypeForNonTypeBoolTemplateParameterOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <bool T = true>\n"
       "void test()\n"
@@ -3232,7 +3246,7 @@ TEST(CxxParserTestSuite, cxxParserDoesNotFindDefaultArgumentTypeForNonTypeBoolTe
   ;    // only "bool" and "void" is recorded
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateDefaultArgumentTypeOfTemplateFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateTemplateDefaultArgumentTypeOfTemplateFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class A\n"
@@ -3246,7 +3260,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateTemplateDefaultArgumentTypeOfTemp
       client->typeUses, L"void test<template<typename> typename T>() -> A<typename T> <4:40 4:40>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsLambdaCallingAFunction) {
+TEST_F(CxxParserTestSuite, cxxParserFindsLambdaCallingAFunction) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void func() {}\n"
       "void lambdaCaller()\n"
@@ -3261,7 +3275,7 @@ TEST(CxxParserTestSuite, cxxParserFindsLambdaCallingAFunction) {
       client->calls, L"void lambdaCaller::lambda at 4:2() const -> void func() <6:3 6:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsLocalVariableInLambdaCapture) {
+TEST_F(CxxParserTestSuite, cxxParserFindsLocalVariableInLambdaCapture) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void lambdaWrapper()\n"
       "{\n"
@@ -3272,7 +3286,7 @@ TEST(CxxParserTestSuite, cxxParserFindsLocalVariableInLambdaCapture) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:6> <4:3 4:3>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsUsageOfLocalVariableInMicrosoftInlineAssemblyStatement) {
+TEST_F(CxxParserTestSuite, cxxParserFindsUsageOfLocalVariableInMicrosoftInlineAssemblyStatement) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void foo()\n"
       "{\n"
@@ -3290,7 +3304,7 @@ TEST(CxxParserTestSuite, cxxParserFindsUsageOfLocalVariableInMicrosoftInlineAsse
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:6> <7:6 7:6>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentOfUnresolvedLookupExpression) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTemplateArgumentOfUnresolvedLookupExpression) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "void a()\n"
@@ -3309,7 +3323,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTemplateArgumentOfUnresolvedLookupExpress
 ///////////////////////////////////////////////////////////////////////////////
 // test finding symbol locations
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectLocationOfExplicitConstructorDefinedInNamespace) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectLocationOfExplicitConstructorDefinedInNamespace) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace n\n"
       "{\n"
@@ -3327,7 +3341,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectLocationOfExplicitConstructorDefin
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int main() -> void n::App::App(int) <11:16 11:18>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroArgumentLocationForFieldDefinitionWithNamePassedAsArgumentToMacro) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroArgumentLocationForFieldDefinitionWithNamePassedAsArgumentToMacro) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define DEF_INT_FIELD(name) int name;\n"
       "class A {\n"
@@ -3337,7 +3351,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroArgumentLocationForFieldDefinitionWi
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->fields, L"private int A::m_value <3:16 3:22>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroUsageLocationForFieldDefinitionWithNamePartiallyPassedAsArgumentToMacro) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroUsageLocationForFieldDefinitionWithNamePartiallyPassedAsArgumentToMacro) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define DEF_INT_FIELD(name) int m_##name;\n"
       "class A {\n"
@@ -3347,7 +3361,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroUsageLocationForFieldDefinitionWithN
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->fields, L"private int A::m_value <3:2 3:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroArgumentLocationForFunctionCallInCodePassedAsArgumentToMacro) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroArgumentLocationForFunctionCallInCodePassedAsArgumentToMacro) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define DEF_INT_FIELD(name, init) int name = init;\n"
       "int foo() { return 5; }\n"
@@ -3358,7 +3372,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroArgumentLocationForFunctionCallInCod
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int A::m_value -> int foo() <4:25 4:27>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsMacroUsageLocationForFunctionCallInCodeOfMacroBody) {
+TEST_F(CxxParserTestSuite, cxxParserFindsMacroUsageLocationForFunctionCallInCodeOfMacroBody) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int foo() { return 5; }\n"
       "#define DEF_INT_FIELD(name) int name = foo();\n"
@@ -3369,7 +3383,7 @@ TEST(CxxParserTestSuite, cxxParserFindsMacroUsageLocationForFunctionCallInCodeOf
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"int A::m_value -> int foo() <4:2 4:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfStaticCastExpression) {
+TEST_F(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfStaticCastExpression) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int main()\n"
       "{\n"
@@ -3379,7 +3393,7 @@ TEST(CxxParserTestSuite, cxxParserFindsTypeTemplateArgumentOfStaticCastExpressio
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->typeUses, L"int main() -> int <3:21 3:23>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsImplicitConstructorCallInInitialization) {
+TEST_F(CxxParserTestSuite, cxxParserFindsImplicitConstructorCallInInitialization) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -3393,7 +3407,7 @@ TEST(CxxParserTestSuite, cxxParserFindsImplicitConstructorCallInInitialization) 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->calls, L"void B::B() -> void A::A() <6:2 6:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserParsesMultipleFiles) {
+TEST_F(CxxParserTestSuite, cxxParserParsesMultipleFiles) {
   const std::set<FilePath> indexedPaths = {FilePath(L"data/CxxParserTestSuite/")};
   const std::set<FilePathFilter> excludeFilters;
   const std::set<FilePathFilter> includeFilters;
@@ -3439,7 +3453,7 @@ TEST(CxxParserTestSuite, cxxParserParsesMultipleFiles) {
   EXPECT_TRUE(testStorage->includes.size() == 1);
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfClassDecl) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfClassDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -3449,7 +3463,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfClassDecl) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<2:1> <3:1 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfNamespaceDecl) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfNamespaceDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "namespace n\n"
       "{\n"
@@ -3459,7 +3473,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfNamespaceDecl) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<2:1> <3:1 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfFunctionDecl) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfFunctionDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int main()\n"
       "{\n"
@@ -3469,7 +3483,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfFunctionDecl) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<2:1> <3:1 3:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfMethodDecl) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfMethodDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class App\n"
       "{\n"
@@ -3481,7 +3495,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfMethodDecl) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:13> <4:14 4:14>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfInitList) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfInitList) {
   std::shared_ptr<TestStorage> client = parseCode(
       "int a = 0;\n"
       "int b[] = {a};\n");
@@ -3490,7 +3504,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfInitList) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<2:11> <2:13 2:13>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfLambda) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfLambda) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void lambdaCaller()\n"
       "{\n"
@@ -3501,7 +3515,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfLambda) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<3:6> <3:7 3:7>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesOfAsmStmt) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesOfAsmStmt) {
   std::shared_ptr<TestStorage> client = parseCode(
       "void foo()\n"
       "{\n"
@@ -3516,7 +3530,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesOfAsmStmt) {
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->localSymbols, L"temp.cpp<4:2> <6:2 6:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsNoDuplicateBracesOfTemplateClassAndMethodDecl) {
+TEST_F(CxxParserTestSuite, cxxParserFindsNoDuplicateBracesOfTemplateClassAndMethodDecl) {
   std::shared_ptr<TestStorage> client = parseCode(
       "template <typename T>\n"
       "class App\n"
@@ -3534,7 +3548,7 @@ TEST(CxxParserTestSuite, cxxParserFindsNoDuplicateBracesOfTemplateClassAndMethod
   ;    // 8 braces + 1 template parameter
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsBracesWithClosingBracketInMacro) {
+TEST_F(CxxParserTestSuite, cxxParserFindsBracesWithClosingBracketInMacro) {
   std::shared_ptr<TestStorage> client = parseCode(
       "\n"
       "namespace constants\n"
@@ -3571,7 +3585,7 @@ TEST(CxxParserTestSuite, cxxParserFindsBracesWithClosingBracketInMacro) {
   // L"<0:0> <10:1 10:1>")); // unwanted sideeffect
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectSignatureLocationOfConstructorWithInitializerList) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectSignatureLocationOfConstructorWithInitializerList) {
   std::shared_ptr<TestStorage> client = parseCode(
       "class A\n"
       "{\n"
@@ -3586,19 +3600,19 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectSignatureLocationOfConstructorWith
       utility::containsElement<std::wstring>(client->methods, L"private void A::A(const int &) <3:2 <3:2 <3:2 3:2> 3:18> 5:2>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserCatchesError) {
+TEST_F(CxxParserTestSuite, cxxParserCatchesError) {
   std::shared_ptr<TestStorage> client = parseCode("int a = b;\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->errors, L"use of undeclared identifier \'b\' <1:9 1:9>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserCatchesErrorInForceInclude) {
+TEST_F(CxxParserTestSuite, cxxParserCatchesErrorInForceInclude) {
   std::shared_ptr<TestStorage> client = parseCode("void foo() {} \n", {L"-include nothing"});
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->errors, L"' nothing' file not found <1:1 1:1>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsCorrectErrorLocationAfterLineDirective) {
+TEST_F(CxxParserTestSuite, cxxParserFindsCorrectErrorLocationAfterLineDirective) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#line 55 \"foo.hpp\"\n"
       "void foo()\n");
@@ -3607,7 +3621,7 @@ TEST(CxxParserTestSuite, cxxParserFindsCorrectErrorLocationAfterLineDirective) {
       utility::containsElement<std::wstring>(client->errors, L"expected function body after function declarator <2:11 2:11>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserCatchesErrorInMacroExpansion) {
+TEST_F(CxxParserTestSuite, cxxParserCatchesErrorInMacroExpansion) {
   std::shared_ptr<TestStorage> client = parseCode(
       "#define MACRO_WITH_NONEXISTENT_PATH \"this_path_does_not_exist.txt\"\n"
       "#include MACRO_WITH_NONEXISTENT_PATH\n");
@@ -3616,13 +3630,13 @@ TEST(CxxParserTestSuite, cxxParserCatchesErrorInMacroExpansion) {
       utility::containsElement<std::wstring>(client->errors, L"'this_path_does_not_exist.txt' file not found <2:10 2:10>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsLocationOfLineComment) {
+TEST_F(CxxParserTestSuite, cxxParserFindsLocationOfLineComment) {
   std::shared_ptr<TestStorage> client = parseCode("// this is a line comment\n");
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(client->comments, L"comment <1:1 1:26>"));
 }
 
-TEST(CxxParserTestSuite, cxxParserFindsLocationOfBlockComment) {
+TEST_F(CxxParserTestSuite, cxxParserFindsLocationOfBlockComment) {
   std::shared_ptr<TestStorage> client = parseCode(
       "/* this is a\n"
       "block comment */\n");

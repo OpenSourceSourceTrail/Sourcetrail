@@ -1,13 +1,27 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
 #include "IncludeDirective.h"
 #include "IncludeProcessing.h"
 #include "TextAccess.h"
 #include "language_packages.h"
 #include "utility.h"
 
-TEST(CxxIncludeProcessing, includeDetectionFindsIncludeWithQuotes) {
+struct CxxIncludeProcessing : testing::Test {
+  void SetUp() override {
+    IApplicationSettings::setInstance(mMocked);
+    EXPECT_CALL(*mMocked, getLoggingEnabled).WillRepeatedly(testing::Return(false));
+    ON_CALL(*mMocked, getTextEncoding).WillByDefault(testing::Return("UTF-8"));
+  }
+  void TearDown() override {
+    IApplicationSettings::setInstance(nullptr);
+    mMocked.reset();
+  }
+  std::shared_ptr<MockedApplicationSettings> mMocked = std::make_shared<MockedApplicationSettings>();
+};
+
+TEST_F(CxxIncludeProcessing, includeDetectionFindsIncludeWithQuotes) {
   auto includeDirectives = IncludeProcessing::getIncludeDirectives(
       TextAccess::createFromString("#include \"foo.h\"", FilePath(L"foo.cpp")));
 
@@ -16,7 +30,7 @@ TEST(CxxIncludeProcessing, includeDetectionFindsIncludeWithQuotes) {
   EXPECT_THAT(includeDirectives.front().getIncludingFile().wstr(), testing::StrEq(L"foo.cpp"));
 }
 
-TEST(CxxIncludeProcessing, includeDetectionFindsIncludeWithAngleBrackets) {
+TEST_F(CxxIncludeProcessing, includeDetectionFindsIncludeWithAngleBrackets) {
   auto includeDirectives = IncludeProcessing::getIncludeDirectives(
       TextAccess::createFromString("#include <foo.h>", FilePath(L"foo.cpp")));
 
@@ -25,7 +39,7 @@ TEST(CxxIncludeProcessing, includeDetectionFindsIncludeWithAngleBrackets) {
   EXPECT_THAT(includeDirectives.front().getIncludingFile().wstr(), testing::StrEq(L"foo.cpp"));
 }
 
-TEST(CxxIncludeProcessing, includeDetectionFindsIncludeWithQuotesAndSpaceBeforeKeyword) {
+TEST_F(CxxIncludeProcessing, includeDetectionFindsIncludeWithQuotesAndSpaceBeforeKeyword) {
   auto includeDirectives = IncludeProcessing::getIncludeDirectives(
       TextAccess::createFromString("# include \"foo.h\"", FilePath(L"foo.cpp")));
 
@@ -34,19 +48,19 @@ TEST(CxxIncludeProcessing, includeDetectionFindsIncludeWithQuotesAndSpaceBeforeK
   EXPECT_THAT(includeDirectives.front().getIncludingFile().wstr(), testing::StrEq(L"foo.cpp"));
 }
 
-TEST(CxxIncludeProcessing, includeDetectionDoesNotFindIncludeInEmptyFile) {
+TEST_F(CxxIncludeProcessing, includeDetectionDoesNotFindIncludeInEmptyFile) {
   EXPECT_TRUE(IncludeProcessing::getIncludeDirectives(TextAccess::createFromString("")).empty());
 }
 
-TEST(CxxIncludeProcessing, includeDetectionDoesNotFindIncludeInFileWithoutPreprocessorDirective) {
+TEST_F(CxxIncludeProcessing, includeDetectionDoesNotFindIncludeInFileWithoutPreprocessorDirective) {
   EXPECT_TRUE(IncludeProcessing::getIncludeDirectives(TextAccess::createFromString("foo")).empty());
 }
 
-TEST(CxxIncludeProcessing, includeDetectionDoesNotFindIncludeInFileWithoutIncludePreprocessorDirective) {
+TEST_F(CxxIncludeProcessing, includeDetectionDoesNotFindIncludeInFileWithoutIncludePreprocessorDirective) {
   EXPECT_TRUE(IncludeProcessing::getIncludeDirectives(TextAccess::createFromString("#ifdef xx\n#endif")).empty());
 }
 
-TEST(CxxIncludeProcessing, headerSearchPathDetectionDoesNotFindPathRelativeToIncludingFile) {
+TEST_F(CxxIncludeProcessing, headerSearchPathDetectionDoesNotFindPathRelativeToIncludingFile) {
   auto headerSearchDirectories = utility::toVector(IncludeProcessing::getHeaderSearchDirectories(
       {FilePath(L"data/CxxIncludeProcessingTestSuite/"
                 L"test_header_search_path_detection_does_not_find_path_relative_to_including_"
@@ -61,7 +75,7 @@ TEST(CxxIncludeProcessing, headerSearchPathDetectionDoesNotFindPathRelativeToInc
   EXPECT_TRUE(headerSearchDirectories.empty());
 }
 
-TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathInsideSubDirectory) {
+TEST_F(CxxIncludeProcessing, headerSearchPathDetectionFindsPathInsideSubDirectory) {
   auto headerSearchDirectories = utility::toVector(IncludeProcessing::getHeaderSearchDirectories(
       {FilePath(L"data/CxxIncludeProcessingTestSuite/"
                 L"test_header_search_path_detection_finds_path_inside_sub_directory/a.cpp")},
@@ -78,7 +92,7 @@ TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathInsideSubDirectory)
                                              .makeAbsolute()));
 }
 
-TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathRelativeToSubDirectory) {
+TEST_F(CxxIncludeProcessing, headerSearchPathDetectionFindsPathRelativeToSubDirectory) {
   auto headerSearchDirectories = utility::toVector(IncludeProcessing::getHeaderSearchDirectories(
       {FilePath(L"data/CxxIncludeProcessingTestSuite/"
                 L"test_header_search_path_detection_finds_path_relative_to_sub_directory/"
@@ -96,7 +110,7 @@ TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathRelativeToSubDirect
           .makeAbsolute()));
 }
 
-TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathIncludedInHeaderSearchPath) {
+TEST_F(CxxIncludeProcessing, headerSearchPathDetectionFindsPathIncludedInHeaderSearchPath) {
   auto headerSearchDirectories = utility::toVector(IncludeProcessing::getHeaderSearchDirectories(
       {FilePath(L"data/CxxIncludeProcessingTestSuite/"
                 L"test_header_search_path_detection_finds_path_included_in_header_search_"
@@ -119,7 +133,7 @@ TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathIncludedInHeaderSea
                                              .makeAbsolute()));
 }
 
-TEST(CxxIncludeProcessing, headerSearchPathDetectionFindsPathIncludedInFutureHeaderSearchPath) {
+TEST_F(CxxIncludeProcessing, headerSearchPathDetectionFindsPathIncludedInFutureHeaderSearchPath) {
   auto headerSearchDirectories = utility::toVector(IncludeProcessing::getHeaderSearchDirectories(
       {FilePath(L"data/CxxIncludeProcessingTestSuite/"
                 L"test_header_search_path_detection_finds_path_included_in_future_header_"

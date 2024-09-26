@@ -6,6 +6,7 @@
 #include "Application.h"
 #include "ApplicationSettings.h"
 #include "FileSystem.h"
+#include "IApplicationSettings.hpp"
 #include "IndexerCommandCustom.h"
 #include "ProjectSettings.h"
 #include "SourceGroupCustomCommand.h"
@@ -17,6 +18,7 @@
 #include "utilityString.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
 #  include "IndexerCommandCxx.h"
 #  include "SourceGroupCxxCdb.h"
 #  include "SourceGroupCxxCodeblocks.h"
@@ -25,6 +27,7 @@
 #  include "SourceGroupSettingsCppEmpty.h"
 #  include "SourceGroupSettingsCxxCdb.h"
 #  include "SourceGroupSettingsCxxCodeblocks.h"
+#  include "utilityFile.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 
@@ -117,35 +120,49 @@ std::shared_ptr<TextAccess> generateExpectedOutput(std::wstring projectName, std
   return TextAccess::createFromString(utility::encodeToUtf8(outputString));
 }
 
-void generateAndCompareExpectedOutput(std::wstring projectName, std::shared_ptr<const SourceGroup> sourceGroup) {
-  const std::shared_ptr<const TextAccess> output = generateExpectedOutput(projectName, sourceGroup);
+void generateAndCompareExpectedOutput(const std::wstring& projectName, std::shared_ptr<const SourceGroup> sourceGroup) {
+  const std::shared_ptr<const TextAccess> output = generateExpectedOutput(projectName, std::move(sourceGroup));
 #ifdef WIN32
   const std::wstring expectedOutputFileName = L"output_windows.txt";
 #else
   const std::wstring expectedOutputFileName = L"output_unix.txt";
 #endif
   const FilePath expectedOutputFilePath = getOutputDirectoryPath(projectName).concatenate(expectedOutputFileName);
-  if(updateExpectedOutput || !expectedOutputFilePath.exists()) {
+  if(!expectedOutputFilePath.exists()) {
     std::ofstream expectedOutputFile;
     expectedOutputFile.open(expectedOutputFilePath.str());
     expectedOutputFile << output->getText();
     expectedOutputFile.close();
   } else {
     const std::shared_ptr<const TextAccess> expectedOutput = TextAccess::createFromFile(expectedOutputFilePath);
-    EXPECT_TRUE(expectedOutput->getLineCount() == output->getLineCount())
+    ASSERT_EQ(expectedOutput->getLineCount(), output->getLineCount())
         << "Output does not match the expected line count for project \"" + utility::encodeToUtf8(projectName) +
             "\". Output was: " + output->getText();
     if(expectedOutput->getLineCount() == output->getLineCount()) {
       for(unsigned int i = 1; i <= expectedOutput->getLineCount(); i++) {
-        EXPECT_TRUE(expectedOutput->getLine(i) == output->getLine(i));
+        EXPECT_EQ(expectedOutput->getLine(i), output->getLine(i));
       }
     }
   }
 }
 }    // namespace
 
+struct SourceGroupFix : testing::Test {
+  void SetUp() override {
+    IApplicationSettings::setInstance(mMocked);
+  }
+
+  void TearDown() override {
+    IApplicationSettings::setInstance(nullptr);
+    mMocked.reset();
+  }
+
+  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMocked =
+      std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
+};
+
 #ifdef DISABLED
-TEST(SourceGroup, can create application instance) {
+TEST(SourceGroupFix, can create application instance) {
   // required to query in SourceGroup for dialog view... this is not a very elegant solution.
   // should be refactored to pass dialog view to SourceGroup on creation.
   Application::createInstance(Version(), nullptr, nullptr);
@@ -154,7 +171,12 @@ TEST(SourceGroup, can create application instance) {
 #endif
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
-TEST(SourceGroup, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
+TEST_F(SourceGroupFix, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
+  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+
   const std::wstring projectName = L"cxx_c_empty";
 
   ProjectSettings projectSettings;
@@ -175,21 +197,15 @@ TEST(SourceGroup, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
   sourceGroupSettings->setFrameworkSearchPaths({getInputDirectoryPath(projectName).concatenate(L"framework_search/local")});
   sourceGroupSettings->setCompilerFlags({L"-local-flag"});
 
-  std::shared_ptr<ApplicationSettings> applicationSettings = ApplicationSettings::getInstance();
-
-  std::vector<FilePath> storedHeaderSearchPaths = applicationSettings->getHeaderSearchPaths();
-  std::vector<FilePath> storedFrameworkSearchPaths = applicationSettings->getFrameworkSearchPaths();
-
-  applicationSettings->setHeaderSearchPaths({FilePath(L"test/header/search/path")});
-  applicationSettings->setFrameworkSearchPaths({FilePath(L"test/framework/search/path")});
-
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxEmpty>(sourceGroupSettings));
-
-  applicationSettings->setHeaderSearchPaths(storedHeaderSearchPaths);
-  applicationSettings->setFrameworkSearchPaths(storedFrameworkSearchPaths);
 }
 
-TEST(SourceGroup, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
+TEST_F(SourceGroupFix, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
+  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+
   const std::wstring projectName = L"cxx_cpp_empty";
 
   ProjectSettings projectSettings;
@@ -210,21 +226,15 @@ TEST(SourceGroup, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
   sourceGroupSettings->setFrameworkSearchPaths({getInputDirectoryPath(projectName).concatenate(L"framework_search/local")});
   sourceGroupSettings->setCompilerFlags({L"-local-flag"});
 
-  std::shared_ptr<ApplicationSettings> applicationSettings = ApplicationSettings::getInstance();
-
-  std::vector<FilePath> storedHeaderSearchPaths = applicationSettings->getHeaderSearchPaths();
-  std::vector<FilePath> storedFrameworkSearchPaths = applicationSettings->getFrameworkSearchPaths();
-
-  applicationSettings->setHeaderSearchPaths({FilePath(L"test/header/search/path")});
-  applicationSettings->setFrameworkSearchPaths({FilePath(L"test/framework/search/path")});
-
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxEmpty>(sourceGroupSettings));
-
-  applicationSettings->setHeaderSearchPaths(storedHeaderSearchPaths);
-  applicationSettings->setFrameworkSearchPaths(storedFrameworkSearchPaths);
 }
 
-TEST(SourceGroup, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
+TEST_F(SourceGroupFix, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
+  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+
   const std::wstring projectName = L"cxx_codeblocks";
   const FilePath cbpPath = getInputDirectoryPath(projectName).concatenate(L"project.cbp");
   const FilePath sourceCbpPath = getInputDirectoryPath(projectName).concatenate(L"project.cbp.in");
@@ -255,23 +265,17 @@ TEST(SourceGroup, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
   sourceGroupSettings->setFrameworkSearchPaths({getInputDirectoryPath(projectName).concatenate(L"framework_search/local")});
   sourceGroupSettings->setCompilerFlags({L"-local-flag"});
 
-  std::shared_ptr<ApplicationSettings> applicationSettings = ApplicationSettings::getInstance();
-
-  std::vector<FilePath> storedHeaderSearchPaths = applicationSettings->getHeaderSearchPaths();
-  std::vector<FilePath> storedFrameworkSearchPaths = applicationSettings->getFrameworkSearchPaths();
-
-  applicationSettings->setHeaderSearchPaths({FilePath(L"test/header/search/path")});
-  applicationSettings->setFrameworkSearchPaths({FilePath(L"test/framework/search/path")});
-
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxCodeblocks>(sourceGroupSettings));
-
-  applicationSettings->setHeaderSearchPaths(storedHeaderSearchPaths);
-  applicationSettings->setFrameworkSearchPaths(storedFrameworkSearchPaths);
 
   FileSystem::remove(cbpPath);
 }
 
-TEST(SourceGroup, sourceGroupCxxCdbGeneratesExpectedOutput) {
+TEST_F(SourceGroupFix, sourceGroupCxxCdbGeneratesExpectedOutput) {
+  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+
   const std::wstring projectName = L"cxx_cdb";
 
   ProjectSettings projectSettings;
@@ -286,22 +290,11 @@ TEST(SourceGroup, sourceGroupCxxCdbGeneratesExpectedOutput) {
   sourceGroupSettings->setFrameworkSearchPaths({getInputDirectoryPath(projectName).concatenate(L"framework_search/local")});
   sourceGroupSettings->setCompilerFlags({L"-local-flag"});
 
-  std::shared_ptr<ApplicationSettings> applicationSettings = ApplicationSettings::getInstance();
-
-  std::vector<FilePath> storedHeaderSearchPaths = applicationSettings->getHeaderSearchPaths();
-  std::vector<FilePath> storedFrameworkSearchPaths = applicationSettings->getFrameworkSearchPaths();
-
-  applicationSettings->setHeaderSearchPaths({FilePath(L"test/header/search/path")});
-  applicationSettings->setFrameworkSearchPaths({FilePath(L"test/framework/search/path")});
-
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxCdb>(sourceGroupSettings));
-
-  applicationSettings->setHeaderSearchPaths(storedHeaderSearchPaths);
-  applicationSettings->setFrameworkSearchPaths(storedFrameworkSearchPaths);
 }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
-TEST(SourceGroup, sourceGroupCustomCommandGeneratesExpectedOutput) {
+TEST_F(SourceGroupFix, sourceGroupCustomCommandGeneratesExpectedOutput) {
   const std::wstring projectName = L"custom_command";
 
   ProjectSettings projectSettings;
@@ -317,7 +310,7 @@ TEST(SourceGroup, sourceGroupCustomCommandGeneratesExpectedOutput) {
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCustomCommand>(sourceGroupSettings));
 }
 
-TEST(SourceGroup, canDestroyApplicationInstance) {
+TEST_F(SourceGroupFix, canDestroyApplicationInstance) {
   Application::destroyInstance();
   EXPECT_TRUE(0 == Application::getInstance().use_count());
 }
