@@ -11,7 +11,6 @@
 #include <spdlog/spdlog.h>
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "ApplicationSettingsPrefiller.h"
 #include "CommandLineParser.h"
 #include "FilePath.h"
@@ -28,6 +27,7 @@
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
 #include "Version.h"
+#include "IApplicationSettings.hpp"
 #include "includes.h"
 #include "language_packages.h"
 #include "logging.h"
@@ -101,7 +101,7 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
   Application::createInstance(version, nullptr, nullptr);
   [[maybe_unused]] ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
-  ApplicationSettingsPrefiller::prefillPaths(ApplicationSettings::getInstance().get());
+  ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
   addLanguagePackages();
 
   // TODO(Hussein): Replace with Boost or Qt
@@ -147,7 +147,7 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 
   setupLogging();
 
-  qtApp.setAttribute(Qt::AA_UseHighDpiPixmaps);
+  QtApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
   QtViewFactory viewFactory;
   QtNetworkFactory networkFactory;
@@ -155,7 +155,7 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   Application::createInstance(version, &viewFactory, &networkFactory);
   [[maybe_unused]] ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
 
-  ApplicationSettingsPrefiller::prefillPaths(ApplicationSettings::getInstance().get());
+  ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
   addLanguagePackages();
 
   // NOTE(Hussein): Extract to function
@@ -200,6 +200,7 @@ int main(int argc, char* argv[]) {
 
   setupPlatform(argc, argv);
 
+  IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
   if(commandLineParser.runWithoutGUI()) {
     return runConsole(argc, argv, version, commandLineParser);
   }

@@ -1,12 +1,11 @@
-#include <type_traits>
-
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
+#include <type_traits>
 
 #include "AppPath.h"
-#include "ApplicationSettings.h"
 #include "InterprocessIndexer.h"
 #include "LanguagePackageManager.h"
+#include "IApplicationSettings.hpp"
 #include "includes.h"
 #include "language_packages.h"
 #include "logging.h"
@@ -63,7 +62,8 @@ int main(int argc, char* argv[]) {
 
   suppressCrashMessage();
 
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
+  auto appSettings = IApplicationSettings::getInstanceRaw();
   appSettings->load(UserPaths::getAppSettingsFilePath());
 
   LOG_INFO_W(L"sharedDataPath: " + AppPath::getSharedDataDirectoryPath().wstr());
