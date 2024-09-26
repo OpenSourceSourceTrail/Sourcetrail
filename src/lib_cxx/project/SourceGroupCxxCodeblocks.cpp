@@ -1,12 +1,12 @@
 #include "SourceGroupCxxCodeblocks.h"
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "CodeblocksProject.h"
 #include "CxxIndexerCommandProvider.h"
 #include "IndexerCommandCxx.h"
 #include "MessageStatus.h"
 #include "SourceGroupSettingsCxxCodeblocks.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 
 SourceGroupCxxCodeblocks::SourceGroupCxxCodeblocks(std::shared_ptr<SourceGroupSettingsCxxCodeblocks> settings)
@@ -53,7 +53,7 @@ std::shared_ptr<IndexerCommandProvider> SourceGroupCxxCodeblocks::getIndexerComm
   if(std::shared_ptr<Codeblocks::Project> project = Codeblocks::Project::load(
          m_settings->getCodeblocksProjectPathExpandedAndAbsolute())) {
     for(std::shared_ptr<IndexerCommandCxx> indexerCommand :
-        project->getIndexerCommands(m_settings, ApplicationSettings::getInstance())) {
+        project->getIndexerCommands(m_settings, IApplicationSettings::getInstanceRaw())) {
       if(info.filesToIndex.find(indexerCommand->getSourceFilePath()) != info.filesToIndex.end()) {
         provider->addCommand(indexerCommand);
       }

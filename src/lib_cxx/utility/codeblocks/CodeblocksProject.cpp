@@ -1,11 +1,14 @@
 #include "CodeblocksProject.h"
 
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/transform.hpp>
+
 #include <tinyxml.h>
 
-#include "ApplicationSettings.h"
 #include "CodeblocksCompiler.h"
 #include "CodeblocksTarget.h"
 #include "CodeblocksUnit.h"
+#include "IApplicationSettings.hpp"
 #include "IndexerCommandCxx.h"
 #include "OrderedCache.h"
 #include "SourceGroupSettingsCxxCodeblocks.h"
@@ -160,8 +163,7 @@ std::set<FilePath> Project::getAllCxxHeaderSearchPathsCanonical() const {
 }
 
 std::vector<std::shared_ptr<IndexerCommandCxx>> Project::getIndexerCommands(
-    std::shared_ptr<const SourceGroupSettingsCxxCodeblocks> sourceGroupSettings,
-    std::shared_ptr<const ApplicationSettings> appSettings) const {
+    std::shared_ptr<const SourceGroupSettingsCxxCodeblocks> sourceGroupSettings, const IApplicationSettings* appSettings) const {
   const std::set<std::wstring> lowerSourceExtensions = utility::toSet(utility::convert<std::wstring, std::wstring>(
       sourceGroupSettings->getSourceExtensions(), [](const std::wstring& e) { return utility::toLowerCase(e); }));
 
@@ -170,14 +172,16 @@ std::vector<std::shared_ptr<IndexerCommandCxx>> Project::getIndexerCommands(
   const std::set<FilePathFilter> excludeFilters = utility::toSet(sourceGroupSettings->getExcludeFiltersExpandedAndAbsolute());
 
   const std::vector<FilePath> systemHeaderSearchPaths = utility::concat(
-      sourceGroupSettings->getHeaderSearchPathsExpandedAndAbsolute(), appSettings->getHeaderSearchPathsExpanded());
+      sourceGroupSettings->getHeaderSearchPathsExpandedAndAbsolute(),
+      utility::toFilePath(appSettings->getHeaderSearchPathsExpanded()));
 
   const std::vector<FilePath> frameworkSearchPaths = utility::concat(
-      sourceGroupSettings->getFrameworkSearchPathsExpandedAndAbsolute(), appSettings->getFrameworkSearchPathsExpanded());
+      sourceGroupSettings->getFrameworkSearchPathsExpandedAndAbsolute(),
+      utility::toFilePath(appSettings->getFrameworkSearchPathsExpanded()));
 
   OrderedCache<std::wstring, std::vector<std::wstring>> optionsCache([&](const std::wstring& targetName) {
     std::vector<std::wstring> compilerFlags;
-    for(std::shared_ptr<Target> target : m_targets) {
+    for(const auto& target : m_targets) {
       if(target && target->getTitle() == targetName) {
         if(std::shared_ptr<const Compiler> compiler = target->getCompiler()) {
           compilerFlags = utility::concat(IndexerCommandCxx::getCompilerFlagsForSystemHeaderSearchPaths(
@@ -244,7 +248,7 @@ std::vector<std::shared_ptr<IndexerCommandCxx>> Project::getIndexerCommands(
     }
   }
 
-  if(!indexerCommands.size()) {
+  if(indexerCommands.empty()) {
     return nonTargetIndexerCommands;
   }
 

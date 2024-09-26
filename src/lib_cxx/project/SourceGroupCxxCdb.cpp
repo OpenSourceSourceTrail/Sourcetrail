@@ -1,13 +1,16 @@
 #include "SourceGroupCxxCdb.h"
 
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/transform.hpp>
+
 #include <clang/Tooling/JSONCompilationDatabase.h>
 #include <clang/Tooling/Tooling.h>
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "ClangInvocationInfo.h"
 #include "CxxCompilationDatabaseSingle.h"
 #include "CxxIndexerCommandProvider.h"
+#include "IApplicationSettings.hpp"
 #include "IndexerCommandCxx.h"
 #include "MessageStatus.h"
 #include "SourceGroupSettingsCxxCdb.h"
@@ -180,15 +183,15 @@ std::shared_ptr<const SourceGroupSettings> SourceGroupCxxCdb::getSourceGroupSett
 std::vector<std::wstring> SourceGroupCxxCdb::getBaseCompilerFlags() const {
   std::vector<std::wstring> compilerFlags;
 
-  std::shared_ptr<ApplicationSettings> appSettings = ApplicationSettings::getInstance();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
   utility::append(compilerFlags,
-                  IndexerCommandCxx::getCompilerFlagsForSystemHeaderSearchPaths(utility::concat(
-                      m_settings->getHeaderSearchPathsExpandedAndAbsolute(), appSettings->getHeaderSearchPathsExpanded())));
+                  IndexerCommandCxx::getCompilerFlagsForSystemHeaderSearchPaths(
+                      utility::concat(m_settings->getHeaderSearchPathsExpandedAndAbsolute(), utility::toFilePath(appSettings->getHeaderSearchPathsExpanded()))));
 
   utility::append(compilerFlags,
-                  IndexerCommandCxx::getCompilerFlagsForFrameworkSearchPaths(utility::concat(
-                      m_settings->getFrameworkSearchPathsExpandedAndAbsolute(), appSettings->getFrameworkSearchPathsExpanded())));
+                  IndexerCommandCxx::getCompilerFlagsForFrameworkSearchPaths(
+                      utility::concat(m_settings->getFrameworkSearchPathsExpandedAndAbsolute(), utility::toFilePath(appSettings->getFrameworkSearchPathsExpanded()))));
 
   return compilerFlags;
 }

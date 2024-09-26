@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "FilePath.h"
+#include "IApplicationSettings.hpp"
 
 class ApplicationSettings;
 class FilePath;
@@ -29,7 +30,7 @@ public:
 
   std::vector<std::shared_ptr<IndexerCommandCxx>> getIndexerCommands(
       std::shared_ptr<const SourceGroupSettingsCxxCodeblocks> sourceGroupSettings,
-      std::shared_ptr<const ApplicationSettings> appSettings) const;
+      const IApplicationSettings* appSettings) const;
 
 private:
   Project(const FilePath& projectFilePath);

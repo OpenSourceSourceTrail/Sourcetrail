@@ -13,7 +13,6 @@
 #include <llvm/Support/VirtualFileSystem.h>
 // internal
 #include "ASTAction.h"
-#include "ApplicationSettings.h"
 #include "CanonicalFilePathCache.h"
 #include "ClangInvocationInfo.h"
 #include "CxxCompilationDatabaseSingle.h"
@@ -24,6 +23,7 @@
 #include "ParserClient.h"
 #include "SingleFrontendActionFactory.h"
 #include "TextAccess.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "utility.h"
 #include "utilityString.h"
@@ -158,7 +158,7 @@ void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabas
   info = ClangInvocationInfo::getClangInvocationString(pCompilationDatabase);
   LOG_INFO("Clang Invocation: " +
             info.invocation.substr(
-                0, ApplicationSettings::getInstance()->getVerboseIndexerLoggingEnabled() ? std::string::npos : 20000));
+                0, IApplicationSettings::getInstanceRaw()->getVerboseIndexerLoggingEnabled() ? std::string::npos : 20000));
 
   if(!info.errors.empty()) {
     LOG_INFO("Clang Invocation errors: " + info.errors);

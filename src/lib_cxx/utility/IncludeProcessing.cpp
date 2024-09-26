@@ -5,12 +5,12 @@
 
 #include <unordered_set>
 
-#include "ApplicationSettings.h"
 #include "FilePath.h"
 #include "FileTree.h"
 #include "IncludeDirective.h"
 #include "TextAccess.h"
 #include "TextCodec.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 #include "utilityString.h"
 
@@ -128,7 +128,7 @@ std::vector<IncludeDirective> IncludeProcessing::getIncludeDirectives(const File
 std::vector<IncludeDirective> IncludeProcessing::getIncludeDirectives(std::shared_ptr<TextAccess> textAccess) {
   std::vector<IncludeDirective> includeDirectives;
 
-  TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding());
+  TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding());
   const std::vector<std::string> lines = textAccess->getAllLines();
   for(unsigned i = 0; i < lines.size(); i++) {
     const std::wstring line = codec.decode(lines[i]);

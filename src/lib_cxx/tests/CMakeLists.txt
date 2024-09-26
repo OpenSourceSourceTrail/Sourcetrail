@@ -11,7 +11,7 @@ foreach(test_name IN LISTS test_cxx_names)
     PUBLIC testHelper
            lib::mocks
            GTest::gtest
-           GTest::gtest_main
+           Sourcetrail::gtest_main
            Sourcetrail::lib
            Sourcetrail::lib_cxx
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
@@ -20,5 +20,5 @@ foreach(test_name IN LISTS test_cxx_names)
   gtest_discover_tests(
     ${test_name}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "unittests.")
+    TEST_PREFIX "unittests.lib_cxx.")
 endforeach()
