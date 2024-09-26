@@ -34,7 +34,7 @@ foreach(test_name IN LISTS test_lib_names)
            lib::mocks
            GTest::gmock
            GTest::gtest
-           GTest::gtest_main
+           Sourcetrail::gtest_main
            Sourcetrail::lib)
 
   set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")

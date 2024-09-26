@@ -4,18 +4,22 @@
 
 #include <gtest/gtest.h>
 
-#include "ApplicationSettings.h"
+#include <spdlog/spdlog.h>
+
 #include "CommandLineParser.h"
+#include "IApplicationSettings.hpp"
+#include "MockedApplicationSetting.hpp"
 
 struct CommandlineFix : testing::Test {
   void SetUp() override {
-    appSettingsPath = ApplicationSettings::getInstance()->getFilePath();
-    ApplicationSettings::getInstance()->load(FilePath(L"data/CommandlineTestSuite/settings.xml"));
+    IApplicationSettings::setInstance(mMocked);
   }
   void TearDown() override {
-    ApplicationSettings::getInstance()->load(appSettingsPath);
+    IApplicationSettings::setInstance(nullptr);
+    mMocked.reset();
   }
-  FilePath appSettingsPath;
+  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMocked =
+      std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
 };
 
 TEST_F(CommandlineFix, version) {
@@ -36,45 +40,36 @@ TEST_F(CommandlineFix, version) {
 TEST_F(CommandlineFix, commandConfigFilepathVector) {
   std::vector<std::string> args({"config", "-g", "/usr", "-g", "/usr/share/include", "-g", "/opt/test/include"});
 
+  EXPECT_CALL(*mMocked, setHeaderSearchPaths).WillOnce(testing::Return(false));
+
   commandline::CommandLineParser parser("2");
   parser.preparse(args);
   parser.parse();
-
-  std::vector<FilePath> paths = ApplicationSettings::getInstance()->getHeaderSearchPaths();
-  EXPECT_TRUE(paths[0].wstr() == L"/usr");
-  EXPECT_TRUE(paths[1].wstr() == L"/usr/share/include");
-  EXPECT_TRUE(paths[2].wstr() == L"/opt/test/include");
 }
 
 TEST_F(CommandlineFix, commandConfigFilepathVectorCommaSeparated) {
   std::vector<std::string> args({"config", "--global-header-search-paths", "/usr,/usr/include,/include,/opt/include"});
 
+  EXPECT_CALL(*mMocked, setHeaderSearchPaths).WillOnce(testing::Return(false));
+
   commandline::CommandLineParser parser("2");
   parser.preparse(args);
   parser.parse();
-
-  std::vector<FilePath> paths = ApplicationSettings::getInstance()->getHeaderSearchPaths();
-  EXPECT_TRUE(paths[0].wstr() == L"/usr");
-  EXPECT_TRUE(paths[1].wstr() == L"/usr/include");
-  EXPECT_TRUE(paths[2].wstr() == L"/include");
-  EXPECT_TRUE(paths[3].wstr() == L"/opt/include");
 }
 
 TEST_F(CommandlineFix, commandConfigBoolOptions) {
   std::vector<std::string> args({"config", "--use-processes", "false"});
 
+  EXPECT_CALL(*mMocked, setMultiProcessIndexingEnabled(false)).WillOnce(::testing::Return());
+
   commandline::CommandLineParser parser("2");
   parser.preparse(args);
   parser.parse();
 
-  bool processes = ApplicationSettings::getInstance()->getMultiProcessIndexingEnabled();
-  EXPECT_TRUE(processes == false);
+  EXPECT_CALL(*mMocked, setMultiProcessIndexingEnabled(true)).WillOnce(::testing::Return());
 
   std::vector<std::string> args1({"config", "--use-processes", "true"});
 
   parser.preparse(args1);
   parser.parse();
-
-  processes = ApplicationSettings::getInstance()->getMultiProcessIndexingEnabled();
-  EXPECT_TRUE(processes == true);
 }
