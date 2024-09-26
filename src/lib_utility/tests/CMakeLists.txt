@@ -8,12 +8,12 @@ foreach(test_name IN LISTS test_lib_names)
     ${test_name}
     PUBLIC GTest::gtest
            GTest::gmock
-           GTest::gtest_main
+           Sourcetrail::gtest_main
            Sourcetrail::lib_utility
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 
   set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
 
-  gtest_discover_tests(${test_name} TEST_PREFIX "unittests.")
+  gtest_discover_tests(${test_name} TEST_PREFIX "unittests.lib_utility.")
 endforeach()

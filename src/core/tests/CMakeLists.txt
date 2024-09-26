@@ -18,9 +18,9 @@ foreach(test_name IN LISTS gtest_lib_names)
     ${test_name}
     PUBLIC GTest::gmock
            GTest::gtest
-           GTest::gtest_main
            lib::mocks
            Sourcetrail::core
+           Sourcetrail::gtest_main
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 
@@ -29,7 +29,7 @@ foreach(test_name IN LISTS gtest_lib_names)
   gtest_discover_tests(
     ${test_name}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "unittests.")
+    TEST_PREFIX "unittests.core.")
 endforeach()
 
 target_link_libraries(FileSystemTestSuite PRIVATE Sourcetrail::lib_utility)
