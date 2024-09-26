@@ -1,13 +1,13 @@
 #include "Application.h"
 
 #include <algorithm>
+#include <filesystem>
 
 #include <spdlog/common.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
 // internal
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "CppSQLite3.h"
 #include "DialogView.h"
@@ -30,16 +30,58 @@
 #include "UserPaths.h"
 #include "Version.h"
 #include "ViewFactory.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "tracing.h"
 #include "utilityString.h"
 #include "utilityUuid.h"
 
-std::shared_ptr<Application> Application::s_instance;
+namespace fs = std::filesystem;
+
+namespace {
+std::wstring generateDatedFileName(const std::wstring& prefix, const std::wstring& suffix = L"", int offsetDays = 0) {
+  time_t time;
+  std::time(&time);
+
+#ifdef _WIN32
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#endif
+  tm t = *std::localtime(&time);
+
+  if(0 != offsetDays) {
+    time = mktime(&t) + offsetDays * 24 * 60 * 60;
+    t = *std::localtime(&time);
+  }
+#ifdef _WIN32
+#pragma warning(pop)
+#endif
+
+  std::wstringstream filename;
+  if(!prefix.empty()) {
+    filename << prefix << L"_";
+  }
+
+  filename << t.tm_year + 1900 << L"-";
+  filename << (t.tm_mon < 9 ? L"0" : L"") << t.tm_mon + 1 << L"-";
+  filename << (t.tm_mday < 10 ? L"0" : L"") << t.tm_mday << L"_";
+  filename << (t.tm_hour < 10 ? L"0" : L"") << t.tm_hour << L"-";
+  filename << (t.tm_min < 10 ? L"0" : L"") << t.tm_min << L"-";
+  filename << (t.tm_sec < 10 ? L"0" : L"") << t.tm_sec;
+
+  if(!suffix.empty()) {
+    filename << L"_" << suffix;
+  }
+
+  return filename.str();
+}
+}    // namespace
+
+Application::Ptr Application::sInstance;
 std::string Application::s_uuid;
 
 void Application::createInstance(const Version& version, ViewFactory* viewFactory, NetworkFactory* networkFactory) {
-  bool hasGui = (viewFactory != nullptr);
+  const bool hasGui = (nullptr != viewFactory);
 
   Version::setApplicationVersion(version);
 
@@ -50,7 +92,7 @@ void Application::createInstance(const Version& version, ViewFactory* viewFactor
   loadSettings();
 
   SharedMemoryGarbageCollector* collector = SharedMemoryGarbageCollector::createInstance();
-  if(collector) {
+  if(nullptr != collector) {
     collector->run(Application::getUUID());
   }
 
@@ -58,21 +100,21 @@ void Application::createInstance(const Version& version, ViewFactory* viewFactor
   TaskManager::createScheduler(TabId::background());
   MessageQueue::getInstance();
 
-  s_instance = std::shared_ptr<Application>(new Application(hasGui));
+  sInstance = std::shared_ptr<Application>(new Application(hasGui));
 
-  s_instance->m_storageCache = std::make_shared<StorageCache>();
+  sInstance->m_storageCache = std::make_shared<StorageCache>();
 
   if(hasGui) {
-    s_instance->m_mainView = viewFactory->createMainView(s_instance->m_storageCache.get());
-    s_instance->m_mainView->setup();
+    sInstance->m_mainView = viewFactory->createMainView(sInstance->m_storageCache.get());
+    sInstance->m_mainView->setup();
   }
 
   if(networkFactory != nullptr) {
-    s_instance->m_ideCommunicationController = networkFactory->createIDECommunicationController(s_instance->m_storageCache.get());
-    s_instance->m_ideCommunicationController->startListening();
+    sInstance->m_ideCommunicationController = networkFactory->createIDECommunicationController(sInstance->m_storageCache.get());
+    sInstance->m_ideCommunicationController->startListening();
   }
 
-  s_instance->startMessagingAndScheduling();
+  sInstance->startMessagingAndScheduling();
 }
 
 void Application::destroyInstance() {
@@ -81,7 +123,7 @@ void Application::destroyInstance() {
   TaskManager::destroyScheduler(TabId::background());
   TaskManager::destroyScheduler(TabId::app());
 
-  s_instance.reset();
+  sInstance.reset();
 }
 
 std::string Application::getUUID() {
@@ -93,28 +135,31 @@ std::string Application::getUUID() {
 }
 
 void Application::loadSettings() {
-  MessageStatus(L"Load settings: " + UserPaths::getAppSettingsFilePath().wstr()).dispatch();
+  MessageStatus(fmt::format(L"Load settings: {}", UserPaths::getAppSettingsFilePath().wstr())).dispatch();
 
-  auto settings = ApplicationSettings::getInstance();
-  settings->load(UserPaths::getAppSettingsFilePath());
-
-// FIXME
-#if 0
-  // Initialize file logger
-  LogManager::getInstance()->setLoggingEnabled(settings->getLoggingEnabled());
-  Logger* logger = LogManager::getInstance()->getLoggerByType("FileLogger");
-  if(logger) {
-    const auto fileLogger = dynamic_cast<FileLogger*>(logger);
-    fileLogger->setLogDirectory(settings->getLogDirectoryPath());
-    fileLogger->setFileName(FileLogger::generateDatedFileName(L"log"));
+  auto settings = IApplicationSettings::getInstanceRaw();
+  if(auto* settingsPath = UserPaths::getAppSettingsFilePath(); !settings->load(settingsPath)) {
+    LOG_WARNING_W(fmt::format(L"Failed to load ApplicationSettings from the following path \"{}\"", settingsPath.wstr()));
   }
-#endif
+
+  if(settings->getLoggingEnabled()) {
+    namespace fs = std::filesystem;
+    auto loggerPath = fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log");
+    auto dLogger = spdlog::default_logger_raw();
+    if(nullptr == dLogger) {
+      return;
+    }
+
+    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(loggerPath, true);
+    fileSink->set_level(spdlog::level::trace);
+    dLogger->sinks().push_back(std::move(fileSink));
+  }
 
   loadStyle(settings->getColorSchemePath());
 }
 
-void Application::loadStyle(const FilePath& colorSchemePath) {
-  ColorScheme::getInstance()->load(colorSchemePath);
+void Application::loadStyle(const fs::path& colorSchemePath) {
+  ColorScheme::getInstance()->load(FilePath{colorSchemePath.wstring()});
   GraphViewStyle::loadStyleSettings();
 }
 
@@ -211,7 +256,7 @@ void Application::handleMessage(MessageLoadProject* pMessage) {
     }
 
     try {
-      updateRecentProjects(projectSettingsFilePath);
+      updateRecentProjects(fs::path{projectSettingsFilePath.wstr()});
 
       m_storageCache->clear();
       // TODO: check if this is really required.
@@ -264,7 +309,7 @@ void Application::handleMessage(MessageRefreshUI* pMessage) {
     updateTitle();
 
     if(pMessage->loadStyle) {
-      loadStyle(ApplicationSettings::getInstance()->getColorSchemePath());
+      loadStyle(IApplicationSettings::getInstanceRaw()->getColorSchemePath());
     }
 
     m_mainView->refreshViews();
@@ -276,7 +321,7 @@ void Application::handleMessage(MessageRefreshUI* pMessage) {
 void Application::handleMessage(MessageSwitchColorScheme* pMessage) {
   MessageStatus(L"Switch color scheme: " + pMessage->colorSchemePath.wstr()).dispatch();
 
-  loadStyle(pMessage->colorSchemePath);
+  loadStyle(pMessage->colorSchemePath.wstr());
   MessageRefreshUI().noStyleReload().dispatch();
 }
 
@@ -308,7 +353,7 @@ void Application::loadWindow(bool showStartWindow) {
   }
 
   if(!m_loadedWindow) {
-    [[maybe_unused]] ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+    [[maybe_unused]] IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
     updateTitle();
 
@@ -329,10 +374,10 @@ void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRe
   }
 }
 
-void Application::updateRecentProjects(const FilePath& projectSettingsFilePath) {
+void Application::updateRecentProjects(const fs::path& projectSettingsFilePath) {
   if(m_hasGUI) {
-    auto appSettings = ApplicationSettings::getInstance();
-    std::vector<FilePath> recentProjects = appSettings->getRecentProjects();
+    auto appSettings = IApplicationSettings::getInstanceRaw();
+    std::vector<fs::path> recentProjects = appSettings->getRecentProjects();
     if(auto found = std::find(recentProjects.begin(), recentProjects.end(), projectSettingsFilePath);
        found != recentProjects.end()) {
       recentProjects.erase(found);
@@ -351,7 +396,7 @@ void Application::updateRecentProjects(const FilePath& projectSettingsFilePath) 
 }
 
 void Application::logStorageStats() const {
-  if(!ApplicationSettings::getInstance()->getLoggingEnabled()) {
+  if(!IApplicationSettings::getInstanceRaw()->getLoggingEnabled()) {
     return;
   }
 
