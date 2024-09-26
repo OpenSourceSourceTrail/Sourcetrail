@@ -1,9 +1,9 @@
 #include "GraphViewStyle.h"
 
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "GraphViewStyleImpl.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "utilityString.h"
 
@@ -99,10 +99,10 @@ void GraphViewStyle::loadStyleSettings() {
 
   constexpr auto DefaultFontSize = 14;
   s_fontSize = DefaultFontSize;
-  s_fontName = ApplicationSettings::getInstance()->getFontName();
+  s_fontName = IApplicationSettings::getInstanceRaw()->getFontName();
 
   const float zoomDifference = getImpl()->getGraphViewZoomDifferenceForPlatform();
-  s_zoomFactor = float(ApplicationSettings::getInstance()->getFontSize()) / float(s_fontSize) * zoomDifference;
+  s_zoomFactor = float(IApplicationSettings::getInstanceRaw()->getFontSize()) / float(s_fontSize) * zoomDifference;
 
   s_charWidths.clear();
   s_charHeights.clear();

@@ -4,7 +4,6 @@
 
 #include "AccessKind.h"
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "BucketLayouter.h"
 #include "Graph.h"
 #include "GraphView.h"
@@ -17,6 +16,7 @@
 #include "TokenComponentFilePath.h"
 #include "TokenComponentInheritanceChain.h"
 #include "TrailLayouter.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "tracing.h"
 #include "utility.h"
@@ -835,7 +835,7 @@ void GraphController::setNodeVisibilityRecursiveTopDown(DummyNode* node, bool pa
 }
 
 void GraphController::hideBuiltinTypes() {
-  if(ApplicationSettings::getInstance()->getShowBuiltinTypesInGraph() || m_activeNodeIds.size() != 1) {
+  if(IApplicationSettings::getInstanceRaw()->getShowBuiltinTypesInGraph() || m_activeNodeIds.size() != 1) {
     return;
   }
 

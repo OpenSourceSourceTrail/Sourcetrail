@@ -3,7 +3,6 @@
 #include <memory>
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "FileInfo.h"
 #include "MessageFocusView.h"
 #include "MessageMoveIDECursor.h"
@@ -14,6 +13,7 @@
 #include "SourceLocationFile.h"
 #include "StorageAccess.h"
 #include "TextAccess.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "tracing.h"
 #include "utility.h"
@@ -636,7 +636,7 @@ std::vector<CodeSnippetParams> CodeController::getSnippetsForFile(std::shared_pt
   atomicRanges = SnippetMerger::Range::mergeAdjacent(atomicRanges);
   std::deque<SnippetMerger::Range> ranges = fileScopedMerger.merge(atomicRanges);
 
-  const int snippetExpandRange = ApplicationSettings::getInstance()->getCodeSnippetExpandRange();
+  const int snippetExpandRange = IApplicationSettings::getInstanceRaw()->getCodeSnippetExpandRange();
   std::vector<CodeSnippetParams> snippets;
 
   for(const SnippetMerger::Range& range : ranges) {

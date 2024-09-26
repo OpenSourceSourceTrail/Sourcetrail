@@ -1,11 +1,11 @@
 #include "StatusController.h"
 // internal
-#include "ApplicationSettings.h"
 #include "StatusView.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 
 StatusController::StatusController() {
-  m_statusFilter = ApplicationSettings::getInstance()->getStatusFilter();
+  m_statusFilter = IApplicationSettings::getInstanceRaw()->getStatusFilter();
 }
 
 StatusController::~StatusController() = default;
@@ -47,7 +47,7 @@ void StatusController::handleMessage(MessageStatusFilterChanged* message) {
   getView()->clear();
   addStatus(m_status);
 
-  auto* settings = ApplicationSettings::getInstance().get();
+  auto* settings = IApplicationSettings::getInstanceRaw();
   settings->setStatusFilter(m_statusFilter);
   settings->save();
 }

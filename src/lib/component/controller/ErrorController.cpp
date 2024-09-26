@@ -3,12 +3,12 @@
 #include <vector>
 // internal
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "DialogView.h"
 #include "Project.h"
 #include "QtHelpButtonInfo.h"
 #include "StorageAccess.h"
 #include "TabId.h"
+#include "IApplicationSettings.hpp"
 
 ErrorController::ErrorController(StorageAccess* pStorageAccess) : m_storageAccess(pStorageAccess) {}
 
@@ -104,7 +104,7 @@ void ErrorController::handleMessage(MessageErrorsForFile* pMessage) {
 }
 
 void ErrorController::handleMessage(MessageErrorsHelpMessage* pMessage) {
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
   if(!pMessage->force) {
     if(appSettings->getSeenErrorHelpMessage()) {
       return;

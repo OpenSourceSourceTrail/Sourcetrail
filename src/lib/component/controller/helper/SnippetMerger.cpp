@@ -4,7 +4,7 @@
 
 #include <range/v3/algorithm/sort.hpp>
 
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 
 SnippetMerger::SnippetMerger(int startRow, int endRow) : m_start(startRow), m_end(endRow) {}
 
@@ -13,7 +13,7 @@ void SnippetMerger::addChild(std::shared_ptr<SnippetMerger> child) {
 }
 
 std::deque<SnippetMerger::Range> SnippetMerger::merge(const std::vector<SnippetMerger::Range>& atomicRanges) const {
-  const int snippetExpandRange = ApplicationSettings::getInstance()->getCodeSnippetExpandRange();
+  const int snippetExpandRange = IApplicationSettings::getInstanceRaw()->getCodeSnippetExpandRange();
   std::deque<Range> merged;
   if(m_children.empty()) {
     merged.emplace_back(Border(m_start, false), Border(m_end, false));
@@ -35,7 +35,7 @@ std::deque<SnippetMerger::Range> SnippetMerger::merge(const std::vector<SnippetM
     merged = Range::mergeAdjacent(merged, snippetMergeRange);
 
     // snap to own borders
-    const int snippetSnapRange = ApplicationSettings::getInstance()->getCodeSnippetSnapRange();
+    const int snippetSnapRange = IApplicationSettings::getInstanceRaw()->getCodeSnippetSnapRange();
     if((m_start < merged.front().start.row) && (merged.front().start.row <= m_start + snippetSnapRange)) {
       merged.front().start.row = m_start;
       merged.front().start.strong = false;

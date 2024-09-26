@@ -1,6 +1,5 @@
 #include "ActivationController.h"
 
-#include "ApplicationSettings.h"
 #include "MessageActivateLegend.h"
 #include "MessageActivateOverview.h"
 #include "MessageActivateTokens.h"
@@ -12,6 +11,7 @@
 #include "MessageStatus.h"
 #include "MessageTooltipShow.h"
 #include "StorageAccess.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 
 ActivationController::ActivationController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
@@ -99,7 +99,7 @@ void ActivationController::handleMessage(MessageActivateSourceLocations* message
 }
 
 void ActivationController::handleMessage(MessageResetZoom* /*message*/) {
-  auto* settings = ApplicationSettings::getInstance().get();
+  auto* settings = IApplicationSettings::getInstanceRaw();
   const int fontSizeStd = settings->getFontSizeStd();
 
   if(settings->getFontSize() != fontSizeStd) {
@@ -155,7 +155,7 @@ void ActivationController::handleMessage(MessageSearch* message) {
 void ActivationController::handleMessage(MessageZoom* message) {
   bool zoomIn = message->zoomIn;
 
-  ApplicationSettings* settings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* settings = IApplicationSettings::getInstanceRaw();
 
   int fontSize = settings->getFontSize();
   int maxSize = settings->getFontSizeMax();
