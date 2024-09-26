@@ -15,7 +15,6 @@
 #include <QToolTip>
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "Bookmark.h"
 #include "CompositeView.h"
 #include "FileSystem.h"
@@ -56,6 +55,7 @@
 #include "TabbedView.h"
 #include "UserPaths.h"
 #include "View.h"
+#include "IApplicationSettings.hpp"
 #include "globalStrings.h"
 #include "logging.h"
 #include "tracing.h"
@@ -87,8 +87,8 @@ void QtViewToggle::toggledByUI() {
 
 
 MouseReleaseFilter::MouseReleaseFilter(QObject* parent) : QObject(parent) {
-  m_backButton = ApplicationSettings::getInstance()->getControlsMouseBackButton();
-  m_forwardButton = ApplicationSettings::getInstance()->getControlsMouseForwardButton();
+  m_backButton = IApplicationSettings::getInstanceRaw()->getControlsMouseBackButton();
+  m_forwardButton = IApplicationSettings::getInstanceRaw()->getControlsMouseForwardButton();
 }
 
 bool MouseReleaseFilter::eventFilter(QObject* obj, QEvent* event) {
@@ -353,7 +353,7 @@ void QtMainWindow::refreshStyle() {
   setStyleSheet(utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"main/main.css")).c_str());
 
   QFont tooltipFont = QToolTip::font();
-  tooltipFont.setPixelSize(ApplicationSettings::getInstance()->getFontSize());
+  tooltipFont.setPixelSize(IApplicationSettings::getInstanceRaw()->getFontSize());
   QToolTip::setFont(tooltipFont);
 }
 
@@ -470,7 +470,7 @@ void QtMainWindow::showDataFolder() {
 
 void QtMainWindow::showLogFolder() {
   QDesktopServices::openUrl(QUrl(
-      QString::fromStdWString(L"file:///" + ApplicationSettings::getInstance()->getLogDirectoryPath().wstr()), QUrl::TolerantMode));
+      QString::fromStdWString(L"file:///" + IApplicationSettings::getInstanceRaw()->getLogDirectoryPath().wstring()), QUrl::TolerantMode));
 }
 
 void QtMainWindow::openTab() {
@@ -649,15 +649,16 @@ void QtMainWindow::openRecentProject() {
 void QtMainWindow::updateRecentProjectsMenu() {
   m_recentProjectsMenu->clear();
 
-  const std::vector<FilePath> recentProjects = ApplicationSettings::getInstance()->getRecentProjects();
-  const size_t recentProjectsCount = ApplicationSettings::getInstance()->getMaxRecentProjectsCount();
+  const std::vector<std::filesystem::path> recentProjects = IApplicationSettings::getInstanceRaw()->getRecentProjects();
+  const size_t recentProjectsCount = IApplicationSettings::getInstanceRaw()->getMaxRecentProjectsCount();
 
   for(size_t i = 0; i < recentProjects.size() && i < recentProjectsCount; ++i) {
-    const FilePath& project = recentProjects[i];
-    if(project.exists()) {
+    const std::filesystem::path& project = recentProjects[i];
+    std::error_code errorCode;
+    if(std::filesystem::exists(project, errorCode)) {
       auto* recentProject = new QAction(this);
-      recentProject->setText(QString::fromStdWString(project.fileName()));
-      recentProject->setData(QString::fromStdWString(project.wstr()));
+      recentProject->setText(QString::fromStdWString(project.filename().wstring()));
+      recentProject->setData(QString::fromStdWString(project.wstring()));
       connect(recentProject, &QAction::triggered, this, &QtMainWindow::openRecentProject);
       m_recentProjectsMenu->addAction(recentProject);
     }

@@ -6,12 +6,12 @@
 #include <QPushButton>
 #include <QStandardItemModel>
 
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "MessageClearStatusView.h"
 #include "MessageStatusFilterChanged.h"
 #include "QtTable.h"
 #include "QtViewWidgetWrapper.h"
+#include "IApplicationSettings.hpp"
 #include "utilityQt.h"
 
 QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
@@ -43,7 +43,7 @@ QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
   filters->setContentsMargins(10, 3, 0, 3);
   filters->setSpacing(25);
 
-  const StatusFilter filter = ApplicationSettings::getInstance()->getStatusFilter();
+  const StatusFilter filter = IApplicationSettings::getInstanceRaw()->getStatusFilter();
   m_showInfo = createFilterCheckbox(QStringLiteral("Info"), filters, filter & StatusType::STATUS_INFO);
   m_showErrors = createFilterCheckbox(QStringLiteral("Error"), filters, filter & StatusType::STATUS_ERROR);
 

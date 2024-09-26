@@ -10,7 +10,6 @@
 #include <QSvgGenerator>
 #include <QTimer>
 
-#include "ApplicationSettings.h"
 #include "GraphFocusHandler.h"
 #include "MessageActivateLegend.h"
 #include "MessageBookmarkCreate.h"
@@ -30,13 +29,14 @@
 #include "QtGraphNodeExpandToggle.h"
 #include "QtSelfRefreshIconButton.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 #include "utilityApp.h"
 #include "utilityQt.h"
 
 QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
     : QGraphicsView(parent)
     , m_focusHandler(focusHandler)
-    , m_zoomFactor(ApplicationSettings::getInstance()->getGraphZoomLevel()) {
+    , m_zoomFactor(IApplicationSettings::getInstanceRaw()->getGraphZoomLevel()) {
   QString modifierName = utility::getOsType() == OS_MAC ? QStringLiteral("Cmd") : QStringLiteral("Ctrl");
 
   setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -195,7 +195,7 @@ void QtGraphicsView::ensureVisibleAnimated(const QRectF& rect, int xmargin, int 
 
   ensureVisible(rect, xmargin, ymargin);
 
-  if(ApplicationSettings::getInstance()->getUseAnimations() && isVisible()) {
+  if(IApplicationSettings::getInstanceRaw()->getUseAnimations() && isVisible()) {
     int xval2 = horizontalScrollBar()->value();
     int yval2 = verticalScrollBar()->value();
 
@@ -274,7 +274,7 @@ void QtGraphicsView::mouseReleaseEvent(QMouseEvent* event) {
 }
 
 void QtGraphicsView::wheelEvent(QWheelEvent* event) {
-  bool zoomDefault = ApplicationSettings::getInstance()->getControlsGraphZoomOnMouseWheel();
+  bool zoomDefault = IApplicationSettings::getInstanceRaw()->getControlsGraphZoomOnMouseWheel();
   bool shiftPressed = event->modifiers() == Qt::ShiftModifier;
   bool ctrlPressed = event->modifiers() == Qt::ControlModifier;
 
@@ -706,7 +706,7 @@ bool QtGraphicsView::moves() const {
 void QtGraphicsView::setZoomFactor(float zoomFactor) {
   m_zoomFactor = zoomFactor;
 
-  std::shared_ptr<ApplicationSettings> settings = ApplicationSettings::getInstance();
+  IApplicationSettings* settings = IApplicationSettings::getInstanceRaw();
   settings->setGraphZoomLevel(zoomFactor);
   settings->save();
 

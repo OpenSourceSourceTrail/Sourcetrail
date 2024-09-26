@@ -2,18 +2,18 @@
 
 #include <functional>
 
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 
 QtIDECommunicationController::QtIDECommunicationController(QObject* parent, StorageAccess* storageAccess)
     : IDECommunicationController(storageAccess), m_tcpWrapper(parent) {
   m_tcpWrapper.setReadCallback(std::bind(&QtIDECommunicationController::handleIncomingMessage, this, std::placeholders::_1));
 }
 
-QtIDECommunicationController::~QtIDECommunicationController() {}
+QtIDECommunicationController::~QtIDECommunicationController() = default;
 
 void QtIDECommunicationController::startListening() {
   m_onQtThread([=]() {
-    ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+    IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
     m_tcpWrapper.setServerPort(static_cast<uint16_t>(appSettings->getSourcetrailPort()));
     m_tcpWrapper.setClientPort(static_cast<uint16_t>(appSettings->getPluginPort()));
     m_tcpWrapper.startListening();

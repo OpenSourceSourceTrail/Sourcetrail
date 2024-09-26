@@ -3,11 +3,11 @@
 #include <QPainter>
 #include <QScrollBar>
 
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "GraphViewStyle.h"
 #include "QtDeviceScaledPixmap.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 #include "utilityString.h"
 
 QtAutocompletionModel::QtAutocompletionModel(QObject* parent) : QAbstractTableModel(parent) {}
@@ -278,7 +278,7 @@ void QtAutocompletionDelegate::calculateCharSizes(QFont font) {
       500.0f;
   m_charHeight1 = static_cast<float>(metrics1.height());
 
-  font.setPixelSize(ApplicationSettings::getInstance()->getFontSize() - 3);
+  font.setPixelSize(IApplicationSettings::getInstanceRaw()->getFontSize() - 3);
   m_font2 = font;
 
   QFontMetrics metrics2(font);

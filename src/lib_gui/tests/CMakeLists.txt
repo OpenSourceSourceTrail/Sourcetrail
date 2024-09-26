@@ -9,7 +9,7 @@ foreach(test_name IN LISTS test_names)
     PUBLIC lib::mocks
            GTest::gmock
            GTest::gtest
-           GTest::gtest_main
+           Sourcetrail::gtest_main
            Sourcetrail::lib
            Sourcetrail::lib_gui
            $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
@@ -21,7 +21,7 @@ foreach(test_name IN LISTS test_names)
   gtest_discover_tests(
     ${test_name}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "unittests.")
+    TEST_PREFIX "unittests.lib_gui.")
 endforeach()
 
 if(ENABLE_GUI_TEST)

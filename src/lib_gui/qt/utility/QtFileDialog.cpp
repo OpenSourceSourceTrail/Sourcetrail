@@ -4,9 +4,9 @@
 #include <QListView>
 #include <QTreeView>
 
-#include "ApplicationSettings.h"
 #include "FilePath.h"
 #include "QtFilesAndDirectoriesDialog.h"
+#include "IApplicationSettings.hpp"
 #include "utilityApp.h"
 
 QStringList QtFileDialog::getFileNamesAndDirectories(QWidget* parent, const FilePath& path) {
@@ -94,7 +94,7 @@ QString QtFileDialog::getDir(QString dir) {
     return dir;
   }
 
-  dir = QString::fromStdString(ApplicationSettings::getInstance()->getLastFilepickerLocation().str());
+  dir = QString::fromStdWString(IApplicationSettings::getInstanceRaw()->getLastFilepickerLocation().wstring());
 
   if(dir.isEmpty())    // first app launch, settings file absent
   {
@@ -106,8 +106,8 @@ QString QtFileDialog::getDir(QString dir) {
 
 void QtFileDialog::saveFilePickerLocation(const FilePath& path) {
   if(!path.empty()) {
-    std::shared_ptr<ApplicationSettings> settings = ApplicationSettings::getInstance();
-    settings->setLastFilepickerLocation(path);
+    IApplicationSettings* settings = IApplicationSettings::getInstanceRaw();
+    settings->setLastFilepickerLocation(path.wstr());
     settings->save();
   }
 }

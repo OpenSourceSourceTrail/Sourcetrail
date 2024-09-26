@@ -9,13 +9,13 @@
 #include <QPainter>
 #include <QWidget>
 // Internal
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "FilePath.h"
 #include "FileSystem.h"
 #include "QtMainView.h"
 #include "ResourcePaths.h"
 #include "TextAccess.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "utilityApp.h"
 #include "utilityString.h"
@@ -94,33 +94,33 @@ std::string getStyleSheet(const FilePath& path) {
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() + mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() + mod);
         } else if(val.find('-') != std::string::npos) {
           const size_t findPos = val.find('-');
           std::string sub = val.substr(findPos + 1);
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() - mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() - mod);
         } else if(val.find('*') != std::string::npos) {
           const size_t findPos = val.find('*');
           std::string sub = val.substr(findPos + 1);
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() * mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() * mod);
         } else if(val.find('/') != std::string::npos) {
           const size_t findPos = val.find('/');
           std::string sub = val.substr(findPos + 1);
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() / mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() / mod);
         } else {
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize());
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize());
         }
       } else if(val == "font_name") {
-        val = ApplicationSettings::getInstance()->getFontName();
+        val = IApplicationSettings::getInstanceRaw()->getFontName();
       } else if(val == "gui_path") {
         val = ResourcePaths::getGuiDirectoryPath().str();
 
@@ -210,33 +210,33 @@ QString getStyleSheet(const QString& resource) {
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() + mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() + mod);
         } else if(val.find('-') != std::string::npos) {
           const size_t findPos = val.find('-');
           std::string sub = val.substr(findPos + 1);
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() - mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() - mod);
         } else if(val.find('*') != std::string::npos) {
           const size_t findPos = val.find('*');
           std::string sub = val.substr(findPos + 1);
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() * mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() * mod);
         } else if(val.find('/') != std::string::npos) {
           const size_t findPos = val.find('/');
           std::string sub = val.substr(findPos + 1);
 
           int mod = std::stoi(sub);
 
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize() / mod);
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() / mod);
         } else {
-          val = std::to_string(ApplicationSettings::getInstance()->getFontSize());
+          val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize());
         }
       } else if(val == "font_name") {
-        val = ApplicationSettings::getInstance()->getFontName();
+        val = IApplicationSettings::getInstanceRaw()->getFontName();
       } else if(val == "gui_path") {
         val = ResourcePaths::getGuiDirectoryPath().str();
 

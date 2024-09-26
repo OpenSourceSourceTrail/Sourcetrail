@@ -4,7 +4,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 
 QtCodeNavigable::~QtCodeNavigable() = default;
 
@@ -61,7 +61,7 @@ void QtCodeNavigable::ensureWidgetVisibleAnimated(
 
   QScrollBar* scrollBar = area->verticalScrollBar();
   if((scrollBar != nullptr) && (value != 0)) {
-    if(animated && ApplicationSettings::getInstance()->getUseAnimations() && area->isVisible()) {
+    if(animated && IApplicationSettings::getInstanceRaw()->getUseAnimations() && area->isVisible()) {
       auto* anim = new QPropertyAnimation(scrollBar, "value");
       anim->setDuration(300);
       anim->setStartValue(scrollBar->value());
@@ -131,7 +131,7 @@ void QtCodeNavigable::ensurePercentVisibleAnimated(double percentA, double perce
   const int diff = visibleY - scrollY;
   if(diff > 5 || diff < -5) {
     const int value = static_cast<int>(scrollY * scrollFactor);
-    if(animated && ApplicationSettings::getInstance()->getUseAnimations() && area->isVisible()) {
+    if(animated && IApplicationSettings::getInstanceRaw()->getUseAnimations() && area->isVisible()) {
       auto* anim = new QPropertyAnimation(scrollBar, "value");
       anim->setDuration(300);
       anim->setStartValue(scrollBar->value());

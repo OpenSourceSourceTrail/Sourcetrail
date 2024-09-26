@@ -3,7 +3,6 @@
 #include <QMouseEvent>
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "FileSystem.h"
 #include "MessageActivateFile.h"
@@ -12,6 +11,7 @@
 #include "Project.h"
 #include "QtContextMenu.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 #include "utilityString.h"
 
 QtCodeFileTitleButton::QtCodeFileTitleButton(QWidget* parent)
@@ -111,7 +111,7 @@ void QtCodeFileTitleButton::updateTexts() {
     toolTip = L"out-of-date " + toolTip;
   }
 
-  if(ApplicationSettings::getInstance()->getShowDirectoryInCodeFileTitle()) {
+  if(IApplicationSettings::getInstanceRaw()->getShowDirectoryInCodeFileTitle()) {
     setAutoElide(true);
 
     FilePath directoryPath = m_filePath.getParentDirectory();

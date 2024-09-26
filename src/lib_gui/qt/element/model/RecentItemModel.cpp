@@ -50,16 +50,18 @@ int showMissingProjectDialog(const std::wstring& projectFilePath) {
 
 namespace qt::element::model {
 
-RecentItemModel::RecentItemModel(const std::vector<FilePath>& recentProjects, size_t maxRecentProjects, QObject* parent)
+RecentItemModel::RecentItemModel(const std::vector<std::filesystem::path>& recentProjects, size_t maxRecentProjects, QObject* parent)
     : QAbstractListModel(parent), mMaxRecentProjects(maxRecentProjects) {
-  mRecentProjects = recentProjects | ranges::views::transform([](const FilePath& recentProject) -> RecentItem {
-                      const auto lang = ProjectSettings::getLanguageOfProject(recentProject);
-                      return {recentProject.exists(),
-                              QString::fromStdWString(recentProject.withoutExtension().fileName()),
+  mRecentProjects = recentProjects | ranges::views::transform([](const std::filesystem::path& recentProject) -> RecentItem {
+                      const auto recentProjectPath = FilePath{recentProject.wstring()};
+                      const auto lang = ProjectSettings::getLanguageOfProject(recentProjectPath);
+                      std::error_code errorCode;
+                      return {std::filesystem::exists(recentProject, errorCode),
+                              QString::fromStdWString(recentProjectPath.withoutExtension().fileName()),
                               getProjectIcon(lang),
                               recentProject};
                     }) |
-      ranges::to<std::vector<RecentItem>>;
+      ranges::to<std::vector>;
 }
 
 QStringList RecentItemModel::mimeTypes() const {
@@ -139,7 +141,7 @@ QVariant RecentItemModel::data(const QModelIndex& index, int role) const {
   case Qt::DecorationRole:
     return item.icon;
   case Qt::ToolTipRole:
-    return item.exists ? QVariant {} : QString("\"%0\" is missed").arg(QString::fromStdWString(item.path.wstr()));
+    return item.exists ? QVariant {} : QString("\"%0\" is missed").arg(QString::fromStdWString(item.path.wstring()));
   case Qt::FontRole: {
     QFont font;
     font.setStrikeOut(true);
@@ -192,10 +194,10 @@ void RecentItemModel::clicked(const QModelIndex& index) {
 
   const auto& item = mRecentProjects[idx];
   if(item.exists) {
-    MessageLoadProject(item.path).dispatch();
+    MessageLoadProject(FilePath{item.path.wstring()}).dispatch();
     return;
   }
-  const auto status = ::showMissingProjectDialog(item.path.wstr());
+  const auto status = ::showMissingProjectDialog(item.path.wstring());
   if(status == 0) {
     mRecentProjects.erase(std::begin(mRecentProjects) + index.row());
   }

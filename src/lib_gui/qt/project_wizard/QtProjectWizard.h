@@ -1,11 +1,10 @@
 #pragma once
-// STL
 #include <functional>
-// internal
-#include "ApplicationSettings.h"
+
 #include "QtProjectWizardWindow.h"
 #include "QtWindowStack.h"
 #include "SourceGroupType.h"
+#include "details/ApplicationSettings.h"
 
 class QWidget;
 class QListWidget;

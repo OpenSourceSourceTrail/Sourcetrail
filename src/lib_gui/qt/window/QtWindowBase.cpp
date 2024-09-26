@@ -4,8 +4,8 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 // internal
-#include "ApplicationSettings.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 
 QtWindowBase::QtWindowBase(bool isSubWindow, QWidget* parent)
     : QtWindowStackElement(parent)
@@ -64,7 +64,7 @@ QtWindowBase::QtWindowBase(bool isSubWindow, QWidget* parent)
 }
 
 QSize QtWindowBase::sizeHint() const {
-  return {ApplicationSettings::getInstance()->getWindowBaseWidth(), ApplicationSettings::getInstance()->getWindowBaseHeight()};
+  return {IApplicationSettings::getInstanceRaw()->getWindowBaseWidth(), IApplicationSettings::getInstanceRaw()->getWindowBaseHeight()};
 }
 
 void QtWindowBase::setSizeGripStyle(bool isBlack) {

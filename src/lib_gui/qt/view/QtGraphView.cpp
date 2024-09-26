@@ -13,7 +13,6 @@
 #include <QSlider>
 #include <QStackedLayout>
 // internal
-#include "ApplicationSettings.h"
 #include "DummyEdge.h"
 #include "DummyNode.h"
 #include "GraphViewStyle.h"
@@ -37,6 +36,7 @@
 #include "QtSelfRefreshIconButton.h"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 #include "utilityQt.h"
 
 QtGraphView::QtGraphView(ViewLayout* viewLayout)
@@ -148,7 +148,7 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
     m_trailWidget->setGeometry(8, 8, 26, 238);
     m_trailWidget->setLayout(stack);
 
-    if(ApplicationSettings::getInstance()->getGraphControlsVisible()) {
+    if(IApplicationSettings::getInstanceRaw()->getGraphControlsVisible()) {
       clickedExpand();
     } else {
       clickedCollapse();
@@ -182,7 +182,7 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
     connect(m_groupFileButton, &QPushButton::clicked, [this]() { groupingUpdated(m_groupFileButton); });
     connect(m_groupNamespaceButton, &QPushButton::clicked, [this]() { groupingUpdated(m_groupNamespaceButton); });
 
-    GroupType type = ApplicationSettings::getInstance()->getGraphGrouping();
+    GroupType type = IApplicationSettings::getInstanceRaw()->getGraphGrouping();
     if(type == GroupType::FILE_TYPE) {
       m_groupFileButton->setChecked(true);
     } else if(type == GroupType::NAMESPACE) {
@@ -366,7 +366,7 @@ void QtGraphView::rebuildGraph(std::shared_ptr<Graph> graph,
     m_scrollToTop = params.scrollToTop;
     m_isIndexedList = params.isIndexedList;
 
-    if(params.animatedTransition && ApplicationSettings::getInstance()->getUseAnimations() && view->isVisible()) {
+    if(params.animatedTransition && IApplicationSettings::getInstanceRaw()->getUseAnimations() && view->isVisible()) {
       createTransition();
     } else {
       switchToNewGraphData();
@@ -644,15 +644,15 @@ void QtGraphView::trailDepthUpdated() {
 void QtGraphView::clickedCollapse() {
   dynamic_cast<QStackedLayout*>(m_trailWidget->layout())->setCurrentIndex(0);
 
-  ApplicationSettings::getInstance()->setGraphControlsVisible(false);
-  ApplicationSettings::getInstance()->save();
+  IApplicationSettings::getInstanceRaw()->setGraphControlsVisible(false);
+  IApplicationSettings::getInstanceRaw()->save();
 }
 
 void QtGraphView::clickedExpand() {
   dynamic_cast<QStackedLayout*>(m_trailWidget->layout())->setCurrentIndex(1);
 
-  ApplicationSettings::getInstance()->setGraphControlsVisible(true);
-  ApplicationSettings::getInstance()->save();
+  IApplicationSettings::getInstanceRaw()->setGraphControlsVisible(true);
+  IApplicationSettings::getInstanceRaw()->save();
 }
 
 void QtGraphView::clickedCustomTrail() {
@@ -670,7 +670,7 @@ void QtGraphView::clickedForwardTrail() {
 void QtGraphView::groupingUpdated(QPushButton* button) {
   (button == m_groupFileButton ? m_groupNamespaceButton : m_groupFileButton)->setChecked(false);
 
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
   if(appSettings->getGraphGrouping() != getGrouping()) {
     appSettings->setGraphGrouping(getGrouping());
     appSettings->save();
@@ -680,7 +680,7 @@ void QtGraphView::groupingUpdated(QPushButton* button) {
 }
 
 void QtGraphView::performScroll(QScrollBar* scrollBar, int value) const {
-  if(ApplicationSettings::getInstance()->getUseAnimations() && getView()->isVisible()) {
+  if(IApplicationSettings::getInstanceRaw()->getUseAnimations() && getView()->isVisible()) {
     QPropertyAnimation* anim = new QPropertyAnimation(scrollBar, "value");
     anim->setDuration(300);
     anim->setStartValue(scrollBar->value());

@@ -1,10 +1,9 @@
 #pragma once
+#include <filesystem>
 #include <memory>
 
 #include <QIcon>
 #include <QObject>
-
-#include "FilePath.h"
 
 namespace qt::element::model {
 class RecentItemModel;
@@ -16,7 +15,7 @@ public:
   RecentItemModelTestSuite();
   ~RecentItemModelTestSuite() override;
 
-  static const std::vector<FilePath> RecentItems;
+  static const std::vector<std::filesystem::path> RecentItems;
 
   static const QIcon ProjectIcon;
 

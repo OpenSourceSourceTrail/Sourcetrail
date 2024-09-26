@@ -9,10 +9,10 @@
 #include <QMessageBox>
 #include <QString>
 // internal
-#include "ApplicationSettings.h"
 #include "MessageLoadProject.h"
 #include "QtContextMenu.h"
 #include "UserPaths.h"
+#include "IApplicationSettings.hpp"
 
 QtRecentProjectButton::QtRecentProjectButton(QWidget* pParent) : QPushButton(pParent) {}
 
@@ -49,12 +49,12 @@ void QtRecentProjectButton::handleButtonClick() {
 
     // QMessageBox::Yes
     if(ret == 0) {
-      auto recentProjects = ApplicationSettings::getInstance()->getRecentProjects();
+      auto recentProjects = IApplicationSettings::getInstanceRaw()->getRecentProjects();
       for(size_t i = 0; i < recentProjects.size(); ++i) {
         if(recentProjects[i].wstr() == m_projectFilePath.wstr()) {
           recentProjects.erase(recentProjects.begin() + static_cast<long>(i));
-          ApplicationSettings::getInstance()->setRecentProjects(recentProjects);
-          ApplicationSettings::getInstance()->save();
+          IApplicationSettings::getInstanceRaw()->setRecentProjects(recentProjects);
+          IApplicationSettings::getInstanceRaw()->save();
           break;
         }
       }
@@ -68,7 +68,7 @@ void QtRecentProjectButton::contextMenuEvent(QContextMenuEvent* pEvent) {
 
   QAction deleteAction("delete");
   connect(&deleteAction, &QAction::triggered, [this]() {
-    auto recentProjects = ApplicationSettings::getInstance()->getRecentProjects();
+    auto recentProjects = IApplicationSettings::getInstanceRaw()->getRecentProjects();
     // Remove the current project from RecentProjects
     recentProjects.erase(std::remove_if(std::begin(recentProjects),
                                         std::end(recentProjects),
@@ -83,7 +83,7 @@ void QtRecentProjectButton::contextMenuEvent(QContextMenuEvent* pEvent) {
                                         }),
                          std::end(recentProjects));
     // Update RecentProjects
-    auto pApplicationSettings = ApplicationSettings::getInstance();
+    auto pApplicationSettings = IApplicationSettings::getInstanceRaw();
     pApplicationSettings->setRecentProjects(recentProjects);
     pApplicationSettings->save(UserPaths::getAppSettingsFilePath());
     hide();

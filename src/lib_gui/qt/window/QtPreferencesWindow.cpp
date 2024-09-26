@@ -15,7 +15,7 @@
 
 QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindow(parent) {
   // save old application settings so they can be compared later
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
   m_appSettings.setHeaderSearchPaths(appSettings->getHeaderSearchPaths());
   m_appSettings.setFrameworkSearchPaths(appSettings->getFrameworkSearchPaths());
   m_appSettings.setScrollSpeed(appSettings->getScrollSpeed());
@@ -61,7 +61,7 @@ void QtPreferencesWindow::handleNext() {
   saveContent();
 
   Application* app = Application::getInstance().get();
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
   bool needsRestart = m_appSettings.getScreenAutoScaling() != appSettings->getScreenAutoScaling() ||
       m_appSettings.getScreenScaleFactor() != appSettings->getScreenScaleFactor();

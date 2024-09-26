@@ -2,12 +2,12 @@
 
 #include <cmath>
 
-#include <QMessageBox>
 #include <QGridLayout>
+#include <QMessageBox>
 
 #include "Application.h"
-#include "ApplicationSettings.h"
 #include "FileManager.h"
+#include "IApplicationSettings.hpp"
 #include "IncludeDirective.h"
 #include "IncludeProcessing.h"
 #include "QtDialogView.h"
@@ -158,7 +158,7 @@ void QtProjectWizardContentPathsHeaderSearch::validateIncludesButtonClicked() {
 
           indexedFilePaths = pathSettings->getSourcePathsExpandedAndAbsolute();
 
-          headerSearchPaths = ApplicationSettings::getInstance()->getHeaderSearchPathsExpanded();
+          headerSearchPaths = utility::toFilePath(IApplicationSettings::getInstanceRaw()->getHeaderSearchPathsExpanded());
           if(std::shared_ptr<SourceGroupSettingsWithCxxPathsAndFlags> cxxSettings =
                  std::dynamic_pointer_cast<SourceGroupSettingsWithCxxPathsAndFlags>(m_settings)) {
             utility::append(headerSearchPaths, cxxSettings->getHeaderSearchPathsExpandedAndAbsolute());
@@ -218,7 +218,7 @@ void QtProjectWizardContentPathsHeaderSearch::finishedSelectDetectIncludesRootPa
                              extensionSettings->getSourceExtensions());
           sourceFilePaths = fileManager.getAllSourceFilePaths();
 
-          headerSearchPaths = ApplicationSettings::getInstance()->getHeaderSearchPathsExpanded();
+          headerSearchPaths = utility::toFilePath(IApplicationSettings::getInstanceRaw()->getHeaderSearchPathsExpanded());
           if(std::shared_ptr<SourceGroupSettingsWithCxxPathsAndFlags> cxxSettings =
                  std::dynamic_pointer_cast<SourceGroupSettingsWithCxxPathsAndFlags>(m_settings)) {
             utility::append(headerSearchPaths, cxxSettings->getHeaderSearchPathsExpandedAndAbsolute());

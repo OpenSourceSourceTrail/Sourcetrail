@@ -6,7 +6,6 @@
 #include <QTextCodec>
 #include <QWindow>
 
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "MessageActivateLocalSymbols.h"
 #include "MessageActivateSourceLocations.h"
@@ -18,9 +17,10 @@
 #include "SourceLocation.h"
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
+#include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "tracing.h"
 #include "utility.h"
-#include "logging.h"
 
 std::vector<QtCodeField::AnnotationColor> QtCodeField::s_annotationColors;
 std::string QtCodeField::s_focusColor;
@@ -58,7 +58,7 @@ QtCodeField::QtCodeField(size_t startLineNumber,
     }
   }
 
-  TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding().c_str());
+  TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding().c_str());
   if(convertLocationsOnDemand && codec.isValid()) {
     QString convertedDisplayCode = QString::fromStdWString(codec.decode(displayCode));
     setPlainText(convertedDisplayCode);
@@ -77,7 +77,7 @@ QtCodeField::QtCodeField(size_t startLineNumber,
   m_highlighter = std::make_shared<QtHighlighter>(document(), locationFile->getLanguage());
   m_highlighter->highlightDocument();
 
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
   QFont font(appSettings->getFontName().c_str());
   font.setPixelSize(appSettings->getFontSize());
   setFont(font);
@@ -687,7 +687,7 @@ void QtCodeField::createLineLengthCache() {
 
 void QtCodeField::createMultibyteCharacterLocationCache(const QString& code) {
   m_multibyteCharacterLocations.clear();
-  QTextCodec* codec = QTextCodec::codecForName(ApplicationSettings::getInstance()->getTextEncoding().c_str());
+  QTextCodec* codec = QTextCodec::codecForName(IApplicationSettings::getInstanceRaw()->getTextEncoding().c_str());
 
   for(const QString& line : code.split(QStringLiteral("\n"))) {
     std::vector<std::pair<int, int>> columnsToOffsets;

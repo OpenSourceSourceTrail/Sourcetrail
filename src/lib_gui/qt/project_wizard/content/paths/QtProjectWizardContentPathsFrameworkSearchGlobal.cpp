@@ -1,7 +1,11 @@
 #include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
 
-#include "ApplicationSettings.h"
+#include <range/v3/to_container.hpp>
+#include <range/v3/view/transform.hpp>
+
+#include "IApplicationSettings.hpp"
 #include "globalStrings.h"
+#include "utility.h"
 #include "utilityPathDetection.h"
 
 QtProjectWizardContentPathsFrameworkSearchGlobal::QtProjectWizardContentPathsFrameworkSearchGlobal(QtProjectWizardWindow* window)
@@ -24,10 +28,10 @@ QtProjectWizardContentPathsFrameworkSearchGlobal::QtProjectWizardContentPathsFra
 }
 
 void QtProjectWizardContentPathsFrameworkSearchGlobal::load() {
-  m_list->setPaths(ApplicationSettings::getInstance()->getFrameworkSearchPaths());
+  m_list->setPaths(utility::toFilePath(IApplicationSettings::getInstanceRaw()->getFrameworkSearchPaths()));
 }
 
 void QtProjectWizardContentPathsFrameworkSearchGlobal::save() {
-  ApplicationSettings::getInstance()->setFrameworkSearchPaths(m_list->getPathsAsDisplayed());
-  ApplicationSettings::getInstance()->save();
+  IApplicationSettings::getInstanceRaw()->setFrameworkSearchPaths(utility::toStlPath(m_list->getPathsAsDisplayed()));
+  IApplicationSettings::getInstanceRaw()->save();
 }

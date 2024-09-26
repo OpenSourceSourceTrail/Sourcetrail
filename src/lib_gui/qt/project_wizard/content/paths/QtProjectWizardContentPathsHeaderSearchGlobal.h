@@ -18,7 +18,7 @@ protected:
   virtual void detectedPaths(const std::vector<FilePath>& paths) override;
 
 private:
-  void setPaths(const std::vector<FilePath>& paths);
+  void setPaths(const std::vector<std::filesystem::path>& paths);
 };
 
 #endif    // QT_PROJECT_WIZARD_CONTENT_PATHS_HEADER_SEARCH_GLOBAL_H

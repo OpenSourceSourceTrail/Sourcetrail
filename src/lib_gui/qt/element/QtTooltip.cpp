@@ -8,11 +8,11 @@
 #include <QStyle>
 #include <QTimer>
 
-#include "ApplicationSettings.h"
 #include "QtCodeField.h"
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
 #include "TooltipInfo.h"
+#include "IApplicationSettings.hpp"
 
 QtTooltip::QtTooltip(QWidget* parent) : QFrame(parent), m_parentView(nullptr), m_isHovered(false) {
   QWidget::setWindowFlags(Qt::ToolTip);
@@ -38,7 +38,7 @@ void QtTooltip::setTooltipInfo(const TooltipInfo& info) {
   }
 
   for(const TooltipSnippet& snippet : info.snippets) {
-    const TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding());
+    const TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding());
 
     QtCodeField* field = new QtCodeField(1, codec.encode(snippet.code), snippet.locationFile, false);
 

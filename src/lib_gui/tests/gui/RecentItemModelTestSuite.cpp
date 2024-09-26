@@ -33,10 +33,10 @@ QModelIndex createModelIndex(int index, const QAbstractListModel* input) {
 
 }    // namespace
 
-const std::vector<FilePath> RecentItemModelTestSuite::RecentItems = std::vector<FilePath> {
-    FilePath {"data/RecentItemModelTestSuite/test00.srctrlprj"},
-    FilePath {"data/RecentItemModelTestSuite/test01.srctrlprj"},
-    FilePath {"data/RecentItemModelTestSuite/missing.srctrlprj"},
+const std::vector<std::filesystem::path> RecentItemModelTestSuite::RecentItems = std::vector<std::filesystem::path> {
+    std::filesystem::path{"data/RecentItemModelTestSuite/test00.srctrlprj"},
+    std::filesystem::path{"data/RecentItemModelTestSuite/test01.srctrlprj"},
+    std::filesystem::path{"data/RecentItemModelTestSuite/missing.srctrlprj"},
 };
 
 const QIcon RecentItemModelTestSuite::ProjectIcon = QIcon("://icon/empty_icon.png");
@@ -70,7 +70,7 @@ void RecentItemModelTestSuite::indexMissingProject() {
   const auto toolTip = mRecentItemModel->data(index, Qt::ToolTipRole);
   QVERIFY(toolTip.isValid());
   QCOMPARE(toolTip.type(), QVariant::Type::String);
-  QCOMPARE(toolTip, QString("\"%0\" is missed").arg(QString::fromStdWString(RecentItems[2].wstr())));
+  QCOMPARE(toolTip, QString("\"%0\" is missed").arg(QString::fromStdWString(RecentItems[2].wstring())));
 
   const auto font = mRecentItemModel->data(index, Qt::FontRole);
   QVERIFY(font.isValid());

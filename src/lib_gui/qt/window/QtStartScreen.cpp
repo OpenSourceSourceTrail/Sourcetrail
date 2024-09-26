@@ -17,10 +17,10 @@
 #include <QPushButton>
 #include <QUrl>
 
-#include "ApplicationSettings.h"
 #include "RecentItemModel.hpp"
 #include "UserPaths.h"
 #include "Version.h"
+#include "IApplicationSettings.hpp"
 #include "globalStrings.h"
 #include "utilityQt.h"
 
@@ -76,14 +76,13 @@ void QtStartScreen::setupStartScreen() {
 
 void QtStartScreen::hideEvent(QHideEvent* hideEvent) {
   if(mRecentModel->isDirty()) {
-    auto updatedRecentProjects = mRecentModel->getRecentProjects() | ranges::views::transform([](auto item) {
-                                   qDebug() << QString::fromStdWString(item.path.wstr());
-                                   return item.path;
+    auto updatedRecentProjects = mRecentModel->getRecentProjects() | ranges::views::transform([](auto item)-> std::filesystem::path {
+                                   return item.path.wstring();
                                  }) |
         ranges::to<std::vector>();
 
-    ApplicationSettings::getInstance()->setRecentProjects(updatedRecentProjects);
-    if(ApplicationSettings::getInstance()->save(UserPaths::getAppSettingsFilePath())) {
+    IApplicationSettings::getInstanceRaw()->setRecentProjects(updatedRecentProjects);
+    if(IApplicationSettings::getInstanceRaw()->save(UserPaths::getAppSettingsFilePath())) {
       mRecentModel->clearDirty();
     }
   }
@@ -106,8 +105,8 @@ void QtStartScreen::createRecentProjects(QHBoxLayout* layout) {
   constexpr int VBoxLayoutSpacing = 20;
   vBoxLayout->addSpacing(VBoxLayoutSpacing);
 
-  auto maxRecentProjectsCount = ApplicationSettings::getInstance()->getMaxRecentProjectsCount();
-  auto recentProjects = ApplicationSettings::getInstance()->getRecentProjects();
+  auto maxRecentProjectsCount = IApplicationSettings::getInstanceRaw()->getMaxRecentProjectsCount();
+  auto recentProjects = IApplicationSettings::getInstanceRaw()->getRecentProjects();
 
   auto* viewList = new QListView;    // NOLINT(cppcoreguidelines-owning-memory)
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)

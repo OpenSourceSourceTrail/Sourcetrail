@@ -4,7 +4,7 @@
 
 #include <QScrollBar>
 
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 
 QtScrollSpeedChangeListener::QtScrollSpeedChangeListener()
     : m_changeScrollSpeedFunctor(std::bind(&QtScrollSpeedChangeListener::doChangeScrollSpeed, this, std::placeholders::_1))
@@ -15,7 +15,7 @@ void QtScrollSpeedChangeListener::setScrollBar(QScrollBar* scrollbar) {
   m_scrollBar = scrollbar;
   m_singleStep = scrollbar->singleStep();
 
-  doChangeScrollSpeed(ApplicationSettings::getInstance()->getScrollSpeed());
+  doChangeScrollSpeed(IApplicationSettings::getInstanceRaw()->getScrollSpeed());
 }
 
 void QtScrollSpeedChangeListener::handleMessage(MessageScrollSpeedChange* message) {

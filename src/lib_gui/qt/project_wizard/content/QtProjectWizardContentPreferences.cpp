@@ -14,10 +14,10 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-#include "ApplicationSettings.h"
 #include "FileSystem.h"
 #include "MessageSwitchColorScheme.h"
 #include "ResourcePaths.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "utility.h"
 #include "utilityApp.h"
@@ -40,7 +40,7 @@ QtProjectWizardContentPreferences::~QtProjectWizardContentPreferences() {
 }
 
 void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) {
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
   // ui
   addTitle(QStringLiteral("USER INTERFACE"), layout, row);
@@ -280,7 +280,7 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
 }
 
 void QtProjectWizardContentPreferences::load() {
-  ApplicationSettings* appSettings = ApplicationSettings::getInstance().get();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
   QString fontName = QString::fromStdString(appSettings->getFontName());
   m_fontFace->setCurrentText(fontName);
@@ -292,7 +292,7 @@ void QtProjectWizardContentPreferences::load() {
 
   m_textEncoding->setCurrentText(QString::fromStdString(appSettings->getTextEncoding()));
 
-  FilePath colorSchemePath = appSettings->getColorSchemePath();
+  FilePath colorSchemePath = FilePath{appSettings->getColorSchemePath().wstring()};
   for(int i = 0; i < static_cast<int>(m_colorSchemePaths.size()); i++) {
     if(colorSchemePath == m_colorSchemePaths[i]) {
       m_colorSchemes->setCurrentIndex(i);
@@ -323,7 +323,7 @@ void QtProjectWizardContentPreferences::load() {
   m_verboseIndexerLoggingEnabled->setChecked(appSettings->getVerboseIndexerLoggingEnabled());
   m_verboseIndexerLoggingEnabled->setEnabled(m_loggingEnabled->isChecked());
   if(m_logPath != nullptr) {
-    m_logPath->setText(QString::fromStdWString(appSettings->getLogDirectoryPath().wstr()));
+    m_logPath->setText(QString::fromStdWString(appSettings->getLogDirectoryPath().wstring()));
   }
 
   m_sourcetrailPort->setText(QString::number(appSettings->getSourcetrailPort()));
@@ -335,7 +335,7 @@ void QtProjectWizardContentPreferences::load() {
 }
 
 void QtProjectWizardContentPreferences::save() {
-  std::shared_ptr<ApplicationSettings> appSettings = ApplicationSettings::getInstance();
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
   appSettings->setFontName(m_fontFace->currentText().toStdString());
 

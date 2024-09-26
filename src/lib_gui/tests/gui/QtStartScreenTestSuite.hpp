@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "../../../lib/tests/mocks/MockedApplicationSetting.hpp"
+
 namespace qt::window {
 class QtStartScreen;
 }
@@ -15,8 +17,11 @@ public:
   ~QtStartScreenTestSuite() override;
 
   std::unique_ptr<qt::window::QtStartScreen> mScreen;
+  std::shared_ptr<MockedApplicationSettings> mMocked = std::make_shared<MockedApplicationSettings>();
 private slots:
   void init();
 
   void goodCase();
+
+  void cleanup();
 };

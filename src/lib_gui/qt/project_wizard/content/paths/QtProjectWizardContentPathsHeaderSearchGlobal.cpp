@@ -2,9 +2,10 @@
 
 #include <QMessageBox>
 
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 #include "ResourcePaths.h"
 #include "globalStrings.h"
+#include "utility.h"
 #include "utilityApp.h"
 #include "utilityPathDetection.h"
 
@@ -28,7 +29,7 @@ QtProjectWizardContentPathsHeaderSearchGlobal::QtProjectWizardContentPathsHeader
 }
 
 void QtProjectWizardContentPathsHeaderSearchGlobal::load() {
-  setPaths(ApplicationSettings::getInstance()->getHeaderSearchPaths());
+  setPaths(IApplicationSettings::getInstanceRaw()->getHeaderSearchPaths());
 }
 
 void QtProjectWizardContentPathsHeaderSearchGlobal::save() {
@@ -39,12 +40,12 @@ void QtProjectWizardContentPathsHeaderSearchGlobal::save() {
     }
   }
 
-  ApplicationSettings::getInstance()->setHeaderSearchPaths(paths);
-  ApplicationSettings::getInstance()->save();
+  IApplicationSettings::getInstanceRaw()->setHeaderSearchPaths(utility::toStlPath(paths));
+  IApplicationSettings::getInstanceRaw()->save();
 }
 
 bool QtProjectWizardContentPathsHeaderSearchGlobal::check() {
-  if(utility::getOsType() == OS_WINDOWS) {
+  if constexpr(utility::getOsType() == OS_WINDOWS) {
     return QtProjectWizardContentPaths::check();
   }
 
@@ -78,7 +79,7 @@ bool QtProjectWizardContentPathsHeaderSearchGlobal::check() {
 
     if(ret == 0)    // QMessageBox::Yes
     {
-      setPaths(paths);
+      setPaths(utility::toStlPath(paths));
       save();
     }
   }
@@ -93,14 +94,14 @@ void QtProjectWizardContentPathsHeaderSearchGlobal::detectedPaths(const std::vec
       headerPaths.push_back(headerPath);
     }
   }
-  setPaths(headerPaths);
+  setPaths(utility::toStlPath(headerPaths));
 }
 
-void QtProjectWizardContentPathsHeaderSearchGlobal::setPaths(const std::vector<FilePath>& paths) {
+void QtProjectWizardContentPathsHeaderSearchGlobal::setPaths(const std::vector<std::filesystem::path>& paths) {
   // check data change to avoid UI update that messes with the scroll position
   {
-    std::vector<FilePath> currentPaths = m_list->getPathsAsDisplayed();
-    if(currentPaths.size()) {
+    auto currentPaths = utility::toStlPath(m_list->getPathsAsDisplayed());
+    if(!currentPaths.empty()) {
       currentPaths.erase(currentPaths.begin());
     }
 
@@ -121,5 +122,5 @@ void QtProjectWizardContentPathsHeaderSearchGlobal::setPaths(const std::vector<F
 
   m_list->setPaths({});
   m_list->addPaths({ResourcePaths::getCxxCompilerHeaderDirectoryPath()}, true);
-  m_list->addPaths(paths);
+  m_list->addPaths(utility::toFilePath(paths));
 }

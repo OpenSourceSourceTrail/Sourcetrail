@@ -12,37 +12,32 @@ struct RecentItem final {
   bool exists;
   QString title;
   QIcon icon;
-  FilePath path;
+  std::filesystem::path path;
 };
 
-inline QDataStream& operator<<(QDataStream & str, const RecentItem& item) {
-  str << item.exists
-      << item.title
-      << item.icon
-      << QString::fromStdWString(item.path.wstr());
+inline QDataStream& operator<<(QDataStream& str, const RecentItem& item) {
+  str << item.exists << item.title << item.icon << QString::fromStdWString(item.path.wstring());
   return str;
 }
 
-inline QDataStream& operator>>(QDataStream & str, RecentItem& item) {
+inline QDataStream& operator>>(QDataStream& str, RecentItem& item) {
   QString path;
-  str >> item.exists
-      >> item.title
-      >> item.icon
-      >> path;
-  item.path = FilePath(path.toStdWString());
+  str >> item.exists >> item.title >> item.icon >> path;
+  item.path = path.toStdWString();
   return str;
 }
 
 struct RecentItemModel final : QAbstractListModel {
-  RecentItemModel(const std::vector<FilePath>& recentProjects, size_t maxRecentProjects, QObject* parent = nullptr);
+  RecentItemModel(const std::vector<std::filesystem::path>& recentProjects, size_t maxRecentProjects, QObject* parent = nullptr);
 
   [[nodiscard]] QStringList mimeTypes() const override;
 
-  [[nodiscard]] QMimeData *mimeData(const QModelIndexList &indexes) const override;
+  [[nodiscard]] QMimeData* mimeData(const QModelIndexList& indexes) const override;
 
-  [[nodiscard]] bool canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) const override;
+  [[nodiscard]] bool canDropMimeData(
+      const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) const override;
 
-  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) override;
+  bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) override;
 
   [[nodiscard]] QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
@@ -92,6 +87,7 @@ struct RecentItemModel final : QAbstractListModel {
   [[nodiscard]] const std::vector<RecentItem>& getRecentProjects() const {
     return mRecentProjects;
   }
+
 private:
   bool mDirty = false;
   size_t mMaxRecentProjects = 0;

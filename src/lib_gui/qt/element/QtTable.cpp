@@ -8,7 +8,7 @@
 #include <QScrollBar>
 #include <QStyledItemDelegate>
 
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 
 
 class SelectableCellDelegate : public QStyledItemDelegate {
@@ -64,10 +64,10 @@ void QtTable::updateRows() {
   }
 
   const int rowCount = model()->rowCount() > m_rowsToFill ? model()->rowCount() : static_cast<int>(m_rowsToFill);
-  const int width = static_cast<int>(ApplicationSettings::getInstance()->getFontSize() * 0.7 * int(1 + std::log10(rowCount)));
+  const int width = static_cast<int>(IApplicationSettings::getInstanceRaw()->getFontSize() * 0.7 * int(1 + std::log10(rowCount)));
 
   verticalHeader()->setStyleSheet("::section { width: " + QString::number(width) + "px; }");
-  verticalHeader()->setDefaultSectionSize(ApplicationSettings::getInstance()->getFontSize() + 6);
+  verticalHeader()->setDefaultSectionSize(IApplicationSettings::getInstanceRaw()->getFontSize() + 6);
 
   if(this->selectionModel()->hasSelection() && selectionModel()->selection().indexes()[0].row() >= model()->rowCount() - 2) {
     clearSelection();

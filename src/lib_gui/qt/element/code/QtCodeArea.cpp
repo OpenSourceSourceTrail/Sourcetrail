@@ -17,7 +17,6 @@
 #include <QTextDocumentFragment>
 #include <QToolTip>
 
-#include "ApplicationSettings.h"
 #include "ColorScheme.h"
 #include "MessageActivateLocalSymbols.h"
 #include "MessageActivateTokenIds.h"
@@ -30,6 +29,7 @@
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
 #include "compatibilityQt.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityQt.h"
@@ -382,7 +382,7 @@ QRectF QtCodeArea::getLineRectForLineNumber(size_t lineNumber) const {
 }
 
 void QtCodeArea::findScreenMatches(const std::wstring& query, std::vector<std::pair<QtCodeArea*, Id>>* screenMatches) {
-  TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding());
+  TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding());
   // remove carriage return
   const std::wstring& code = utility::toLowerCase(codec.decode(utility::replace(getCode(), "\r", "")));
   size_t pos = 0;
@@ -484,7 +484,7 @@ void QtCodeArea::ensureLocationIdVisible(Id locationId, int parentWidth, bool an
   const double percentTarget = double(targetWidth) / (totalWidth - visibleWidth);
   const int newValue = static_cast<int>((scrollBar->maximum() - scrollBar->minimum()) * percentTarget + scrollBar->minimum());
 
-  if(animated && ApplicationSettings::getInstance()->getUseAnimations()) {
+  if(animated && IApplicationSettings::getInstanceRaw()->getUseAnimations()) {
     auto* anim = new QPropertyAnimation(scrollBar, "value");    // NOLINT(cppcoreguidelines-owning-memory)
     anim->setDuration(300);
     anim->setStartValue(oldValue);
