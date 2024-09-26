@@ -1,11 +1,15 @@
 #include "ApplicationSettingsPrefiller.h"
 
-#include "ApplicationSettings.h"
+#include <range/v3/to_container.hpp>
+#include <range/v3/view/transform.hpp>
+
+#include "IApplicationSettings.hpp"
 #include "MessageStatus.h"
 #include "logging.h"
+#include "utility.h"
 #include "utilityPathDetection.h"
 
-void ApplicationSettingsPrefiller::prefillPaths(ApplicationSettings* settings) {
+void ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings* settings) {
   bool updated = false;
 
   updated |= prefillCxxHeaderPaths(settings);
@@ -16,28 +20,28 @@ void ApplicationSettingsPrefiller::prefillPaths(ApplicationSettings* settings) {
   }
 }
 
-bool ApplicationSettingsPrefiller::prefillCxxHeaderPaths(ApplicationSettings* settings) {
+bool ApplicationSettingsPrefiller::prefillCxxHeaderPaths(IApplicationSettings* settings) {
   if(settings->getHasPrefilledHeaderSearchPaths())    // allow empty
   {
     return false;
   }
 
   LOG_INFO("Prefilling header search paths");
-  std::shared_ptr<CombinedPathDetector> cxxHeaderDetector = utility::getCxxHeaderPathDetector();
+  auto cxxHeaderDetector = utility::getCxxHeaderPathDetector();
   std::vector<FilePath> paths = cxxHeaderDetector->getPaths();
   if(!paths.empty()) {
     MessageStatus(L"Ran C/C++ header path detection, found " + std::to_wstring(paths.size()) + L" path" +
                   (paths.size() == 1 ? L"" : L"s"))
         .dispatch();
 
-    settings->setHeaderSearchPaths(paths);
+    settings->setHeaderSearchPaths(utility::toStlPath(paths));
   }
 
   settings->setHasPrefilledHeaderSearchPaths(true);
   return true;
 }
 
-bool ApplicationSettingsPrefiller::prefillCxxFrameworkPaths(ApplicationSettings* settings) {
+bool ApplicationSettingsPrefiller::prefillCxxFrameworkPaths(IApplicationSettings* settings) {
   if(settings->getHasPrefilledFrameworkSearchPaths())    // allow empty
   {
     return false;
@@ -51,7 +55,7 @@ bool ApplicationSettingsPrefiller::prefillCxxFrameworkPaths(ApplicationSettings*
                   (paths.size() == 1 ? L"" : L"s"))
         .dispatch();
 
-    settings->setFrameworkSearchPaths(paths);
+    settings->setFrameworkSearchPaths(utility::toStlPath(paths));
   }
 
   settings->setHasPrefilledFrameworkSearchPaths(true);

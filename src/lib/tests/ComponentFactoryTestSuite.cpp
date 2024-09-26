@@ -3,16 +3,33 @@
 
 #include "ActivationController.h"
 #include "ComponentFactory.h"
+#include "IApplicationSettings.hpp"
+#include "MockedApplicationSetting.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 
 using namespace testing;
 
-TEST(ComponentFactory, goodCase) {
+struct ComponentFactoryFix : Test {
+  void SetUp() override {
+    IApplicationSettings::setInstance(mMocked);
+  }
+
+  void TearDown() override {
+    IApplicationSettings::setInstance(nullptr);
+    mMocked.reset();
+  }
+
+  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMocked =
+      std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
   MockedViewFactory mockedViewFactory;
   MockedStorageAccess mockedStorageAccess;
+  ComponentFactory factory{&mockedViewFactory, &mockedStorageAccess};
+};
 
-  ComponentFactory factory(&mockedViewFactory, &mockedStorageAccess);
+TEST_F(ComponentFactoryFix, goodCase) {
+  EXPECT_CALL(*mMocked, getStatusFilter).WillOnce(testing::Return(0));
+
   ASSERT_EQ(&mockedViewFactory, factory.getViewFactory());
   ASSERT_EQ(&mockedStorageAccess, factory.getStorageAccess());
 

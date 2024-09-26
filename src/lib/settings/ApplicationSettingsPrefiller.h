@@ -1,12 +1,12 @@
 #pragma once
 
-class ApplicationSettings;
+struct IApplicationSettings;
 
-class ApplicationSettingsPrefiller {
+class ApplicationSettingsPrefiller final {
 public:
-  static void prefillPaths(ApplicationSettings* settings);
+  static void prefillPaths(IApplicationSettings* settings);
 
 private:
-  static bool prefillCxxHeaderPaths(ApplicationSettings* settings);
-  static bool prefillCxxFrameworkPaths(ApplicationSettings* settings);
+  static bool prefillCxxHeaderPaths(IApplicationSettings* settings);
+  static bool prefillCxxFrameworkPaths(IApplicationSettings* settings);
 };

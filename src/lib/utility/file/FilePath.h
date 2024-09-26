@@ -1,5 +1,5 @@
 #pragma once
-// STL
+#include <filesystem>
 #include <memory>
 #include <string>
 #include <vector>
@@ -43,6 +43,7 @@ public:
   FilePath getConcatenated(const std::wstring& other) const;
   FilePath getLowerCase() const;
   std::vector<FilePath> expandEnvironmentVariables() const;
+  std::vector<std::filesystem::path> expandEnvironmentVariablesStl() const;
 
   bool contains(const FilePath& other) const;
 

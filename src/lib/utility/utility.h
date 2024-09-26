@@ -81,6 +81,9 @@ std::vector<std::string> toStrings(const std::vector<T>& d);
 template <>
 std::vector<std::string> toStrings(const std::vector<FilePath>& d);
 
+std::vector<std::filesystem::path> toStlPath(const std::vector<FilePath>& oldPaths);
+std::vector<FilePath> toFilePath(const std::vector<std::filesystem::path>& d);
+
 template <typename T>
 std::vector<std::wstring> toWStrings(const std::vector<T>& d);
 template <>

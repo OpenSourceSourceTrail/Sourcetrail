@@ -1,10 +1,10 @@
 #include "FilePath.h"
-// STL
+
 #include <regex>
-// boost
+
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/path.hpp>
-// internal
+
 #include "logging.h"
 #include "utilityString.h"
 
@@ -230,8 +230,45 @@ std::vector<FilePath> FilePath::expandEnvironmentVariables() const {
 #endif
 
   for(const std::string& str : utility::splitToVector(text, environmentVariablePathSeparator)) {
-    if(str.size()) {
-      paths.push_back(FilePath(str));
+    if(!str.empty()) {
+      paths.emplace_back(str);
+    }
+  }
+
+  return paths;
+}
+
+std::vector<std::filesystem::path> FilePath::expandEnvironmentVariablesStl() const {
+  std::vector<std::filesystem::path> paths;
+  std::string text = str();
+
+  static std::regex env("\\$\\{([^}]+)\\}|%([^%]+)%");    // ${VARIABLE_NAME} or %VARIABLE_NAME%
+  std::smatch match;
+  while(std::regex_search(text, match, env)) {
+#ifdef _WIN32
+#  pragma warning(push)
+#  pragma warning(disable : 4996)
+#endif
+    const char* s = match[1].matched ? getenv(match[1].str().c_str()) : getenv(match[2].str().c_str());
+#ifdef _WIN32
+#  pragma warning(pop)
+#endif
+    if(s == nullptr) {
+      LOG_ERROR(match[1].str() + " is not an environment variable in: " + text);
+      return paths;
+    }
+    text.replace(static_cast<size_t>(match.position(0)), static_cast<size_t>(match.length(0)), s);
+  }
+
+  char environmentVariablePathSeparator = ':';
+
+#if defined(_WIN32) || defined(_WIN64)
+  environmentVariablePathSeparator = ';';
+#endif
+
+  for(const std::string& str : utility::splitToVector(text, environmentVariablePathSeparator)) {
+    if(!str.empty()) {
+      paths.emplace_back(str);
     }
   }
 

@@ -3,7 +3,6 @@
 #include <queue>
 
 #include "AccessKind.h"
-#include "ApplicationSettings.h"
 #include "ElementComponentKind.h"
 #include "FileInfo.h"
 #include "FilePath.h"
@@ -23,6 +22,7 @@
 #include "TokenComponentInheritanceChain.h"
 #include "TokenComponentIsAmbiguous.h"
 #include "UnorderedCache.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "tracing.h"
 #include "utility.h"
@@ -465,7 +465,7 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
     return collection;
   }
 
-  const TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding());
+  const TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding());
   {
     std::lock_guard<std::mutex> lock(m_fullTextSearchMutex);
 
@@ -1835,7 +1835,7 @@ TooltipSnippet PersistentStorage::getTooltipSnippetForNode(const StorageNode& no
 
       // format
       code = utility::convertWhiteSpacesToSingleSpaces(code);
-      snippet.code = utility::breakSignature(code, 50, ApplicationSettings::getInstance()->getCodeTabWidth());
+      snippet.code = utility::breakSignature(code, 50, IApplicationSettings::getInstanceRaw()->getCodeTabWidth());
 
       // create source locations for annotations via stored texts
       size_t pos = 0;
@@ -1859,7 +1859,7 @@ TooltipSnippet PersistentStorage::getTooltipSnippetForNode(const StorageNode& no
                                            nameHierarchy.getQualifiedName(),
                                            nameHierarchy.getSignature().getPostfix(),
                                            50,
-                                           ApplicationSettings::getInstance()->getCodeTabWidth());
+                                           IApplicationSettings::getInstanceRaw()->getCodeTabWidth());
 
     std::vector<Id> typeNodeIds;
     for(const auto& edge : m_sqliteIndexStorage.getEdgesBySourceId(node.id)) {
@@ -1918,7 +1918,7 @@ TooltipSnippet PersistentStorage::getTooltipSnippetForNode(const StorageNode& no
 
 TooltipInfo PersistentStorage::getTooltipInfoForSourceLocationIdsAndLocalSymbolIds(const std::vector<Id>& locationIds,
                                                                                    const std::vector<Id>& localSymbolIds) const {
-  const TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding());
+  const TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding());
 
   TooltipInfo info;
 
@@ -2572,7 +2572,7 @@ void PersistentStorage::buildSearchIndex() {
 }
 
 void PersistentStorage::buildFullTextSearchIndex() const {
-  TextCodec codec(ApplicationSettings::getInstance()->getTextEncoding());
+  TextCodec codec(IApplicationSettings::getInstanceRaw()->getTextEncoding());
 
   m_fullTextSearchCodec = codec.getName();
 

@@ -8,7 +8,7 @@
 // Qt5
 #include <QTimer>
 // internal
-#include "ApplicationSettings.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 
 namespace fs = std::filesystem;
@@ -31,7 +31,7 @@ PluginManager::PluginManager() noexcept = default;
 PluginManager::~PluginManager() = default;
 
 void PluginManager::loadPlugins() {
-  auto pluginsDir = ApplicationSettings::getInstance()->getPluginDir();
+  auto pluginsDir = IApplicationSettings::getInstanceRaw()->getPluginDir();
   if(!(fs::exists(pluginsDir) && fs::is_directory(pluginsDir))) {
     LOG_WARNING("Plugins dir is not exists");
     return;

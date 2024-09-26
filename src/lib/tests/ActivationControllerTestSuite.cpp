@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "ActivationController.h"
-#include "ApplicationSettings.h"
 #include "ConsoleLogger.h"
 #include "MessageActivateEdge.h"
 #include "MessageActivateTokenIds.h"
@@ -16,6 +15,7 @@
 #include "MessageSearch.h"
 #include "MessageStatus.h"
 #include "NameHierarchy.h"
+#include "IApplicationSettings.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 
 using namespace std::chrono_literals;
@@ -173,7 +173,7 @@ TEST_F(ActivationControllerFix, MessageResetZoom) {
   const ActivationController controller(&storageAccess);
   const SpyMessageRefreshUI spy;
 
-  auto* settings = ApplicationSettings::getInstance().get();
+  auto* settings = IApplicationSettings::getInstanceRaw();
   settings->setFontSizeStd(settings->getFontSizeStd() + 1);
 
   MessageResetZoom messageResetZoom;

@@ -1,6 +1,5 @@
 #include "TaskExecuteCustomCommands.h"
 
-#include "ApplicationSettings.h"
 #include "Blackboard.h"
 #include "DialogView.h"
 #include "ElementComponentKind.h"
@@ -16,6 +15,7 @@
 #include "SourceLocationCollection.h"
 #include "SourceLocationFile.h"
 #include "TextAccess.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityFile.h"

@@ -25,8 +25,8 @@ void parseConfigFile(po::variables_map& variablesMap, po::options_description& o
   }
 }
 
-std::vector<FilePath> extractPaths(const std::vector<std::string>& paths) {
-  std::vector<FilePath> filePaths;
+std::vector<std::filesystem::path> extractPaths(const std::vector<std::string>& paths) {
+  std::vector<std::filesystem::path> filePaths;
   for(const auto& pathString : paths) {
     const auto& temp = utility::splitToVector(pathString, ',');
     for(const auto& path : temp) {

@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "ApplicationSettings.h"
 #include "CombinedIndexerCommandProvider.h"
 #include "DialogView.h"
 #include "FilePath.h"
@@ -40,6 +39,7 @@
 #include "TaskReturnSuccessIf.h"
 #include "TaskSetValue.h"
 #include "TextAccess.h"
+#include "IApplicationSettings.hpp"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityString.h"
@@ -292,8 +292,8 @@ void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refres
     }
   }
 
-  if(ApplicationSettings::getInstance()->getLoggingEnabled() &&
-     ApplicationSettings::getInstance()->getVerboseIndexerLoggingEnabled() && m_hasGUI) {
+  if(IApplicationSettings::getInstanceRaw()->getLoggingEnabled() &&
+     IApplicationSettings::getInstanceRaw()->getVerboseIndexerLoggingEnabled() && m_hasGUI) {
     if(dialogView->confirm(L"Warning: You are about to index your project with the \"verbose indexer "
                            L"logging\" setting "
                            L"enabled. This will cause a significant slowdown in indexing performance. Do you "
@@ -489,7 +489,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
   taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("interrupted_indexing", false));
   taskSequential->addTask(std::make_shared<TaskSetValue<float>>("index_time", 0.0f));
 
-  int indexerThreadCount = ApplicationSettings::getInstance()->getIndexerThreadCount();
+  int indexerThreadCount = IApplicationSettings::getInstanceRaw()->getIndexerThreadCount();
   if(indexerThreadCount <= 0) {
     indexerThreadCount = utility::getIdealThreadCount();
     if(indexerThreadCount <= 0) {
@@ -525,7 +525,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
     taskParallelIndexing->addTask(std::make_shared<TaskFillIndexerCommandsQueue>(m_appUUID, std::move(indexerCommandProvider), 20));
 
     // add task for indexing
-    bool multiProcess = ApplicationSettings::getInstance()->getMultiProcessIndexingEnabled() && hasCxxSourceGroup();
+    bool multiProcess = IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && hasCxxSourceGroup();
     taskParallelIndexing->addChildTasks(std::make_shared<TaskGroupSequence>()->addChildTasks(
         // block until there are indexer commands to process
         std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)

@@ -1,6 +1,6 @@
 #pragma once
-#include "Message.h"
 #include "Bookmark.h"
+#include "Message.h"
 
 class MessageBookmarkUpdate : public Message<MessageBookmarkUpdate> {
 public:

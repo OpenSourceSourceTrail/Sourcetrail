@@ -7,23 +7,42 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <spdlog/common.h>
-#include <spdlog/spdlog.h>
-
 #include "Application.h"
+#include "MockedApplicationSetting.hpp"
 #include "Version.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
 
 
 using namespace std::chrono_literals;
 
-TEST(Application, singleton) {
-#ifdef ST_DEBUG
+struct SingletonApplicationFix : testing::Test {
+  void SetUp() override {
+    IApplicationSettings::setInstance(mMockedAppSettings);
+  }
+  void TearDown() override {
+    IApplicationSettings::setInstance(nullptr);
+  }
+
+  void MockAppSettingsForGetInstance() {
+    EXPECT_CALL(*mMockedAppSettings, load(testing::_, testing::_)).WillOnce(testing::Return(true));
+    EXPECT_CALL(*mMockedAppSettings, getLoggingEnabled()).WillOnce(testing::Return(false));
+    EXPECT_CALL(*mMockedAppSettings, getColorSchemePath()).WillOnce(testing::Return(std::filesystem::path {}));
+  }
+
+  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMockedAppSettings =
+      std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
+};
+
+TEST_F(SingletonApplicationFix, singleton) {
+#if 0    // Enabled when assert function is enabled in the getInstance function
+#  ifdef ST_DEBUG
   ASSERT_DEATH(Application::getInstance(), "");
-#else
+#  else
   ASSERT_THAT(Application::getInstance(), testing::IsNull());
+#  endif
 #endif
+  ASSERT_THAT(Application::getInstance(), testing::IsNull());
+
+  MockAppSettingsForGetInstance();
 
   Application::createInstance(Version {}, nullptr, nullptr);
   auto baseApp = Application::getInstance();
@@ -36,19 +55,27 @@ TEST(Application, singleton) {
   std::this_thread::sleep_for(100ms);
 
   Application::destroyInstance();
-#ifdef ST_DEBUG
-  ASSERT_DEATH(Application::getInstance(), "");
-#else
   ASSERT_THAT(Application::getInstance(), testing::IsNull());
+#if 0    // Enabled when assert function is enabled in the getInstance function
+#  ifdef ST_DEBUG
+  ASSERT_DEATH(Application::getInstance(), "");
+#  else
+  ASSERT_THAT(Application::getInstance(), testing::IsNull());
+#  endif
 #endif
 }
 
-struct ApplicationFix : testing::Test {
-  void SetUp() {
+struct ApplicationFix : SingletonApplicationFix {
+  void SetUp() override {
+    SingletonApplicationFix::SetUp();
+
+    MockAppSettingsForGetInstance();
+
     Application::createInstance(Version {}, nullptr, nullptr);
     mApp = Application::getInstance();
   }
-  void TearDown() {
+  void TearDown() override {
+    SingletonApplicationFix::TearDown();
     // HACK: destory before start the event-loop will start inf-loop
     std::this_thread::sleep_for(100ms);
     Application::destroyInstance();
@@ -62,11 +89,4 @@ TEST_F(ApplicationFix, getUUID) {
   std::smatch base_match;
   std::regex_match(uuid, base_match, mask);
   EXPECT_EQ(1, base_match.size());
-}
-
-int main(int argc, char* argv[]) {
-  auto logger = spdlog::default_logger_raw();
-  logger->set_level(spdlog::level::off);
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }

@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 
 #include "ComponentManager.h"
+#include "IApplicationSettings.hpp"
+#include "MockedApplicationSetting.hpp"
 #include "mocks/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
@@ -20,6 +22,8 @@ using namespace testing;
 
 struct SetupMainFix : Test {
   void SetUp() override {
+    IApplicationSettings::setInstance(mMocked);
+
     EXPECT_CALL(factory, createCompositeView(_, _, _, _)).WillOnce(Return(nullptr));
 
     EXPECT_CALL(mockedLayout, setViewEnabled(_, _)).Times(5);
@@ -58,13 +62,23 @@ struct SetupMainFix : Test {
     manager = std::make_unique<ComponentManager>(&factory, &mockedStorageAccess);
   }
 
+  void TearDown() override {
+    IApplicationSettings::setInstance(nullptr);
+    mMocked.reset();
+  }
+
   StrictMock<MockedViewFactory> factory;
   MockedViewLayout mockedLayout;
   MockedStorageAccess mockedStorageAccess;
   std::unique_ptr<ComponentManager> manager;
+
+  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMocked =
+      std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
 };
 
 TEST_F(SetupMainFix, goodCase) {
+  EXPECT_CALL(*mMocked, getStatusFilter).WillOnce(testing::Return(0));
+
   manager->setupMain(&mockedLayout, 0);
   auto view = manager->getDialogView(DialogView::UseCase::INDEXING);
   ASSERT_TRUE(view);

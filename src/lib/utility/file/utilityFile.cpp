@@ -76,6 +76,14 @@ std::vector<FilePath> utility::getExpandedPaths(const std::vector<FilePath>& pat
   return expandedPaths;
 }
 
+std::vector<std::filesystem::path> utility::getExpandedPaths(const std::vector<std::filesystem::path>& paths) {
+  std::vector<std::filesystem::path> expandedPaths;
+  for(const std::filesystem::path& path : paths) {
+    utility::append(expandedPaths, FilePath{path.wstring()}.expandEnvironmentVariablesStl());
+  }
+  return expandedPaths;
+}
+
 FilePath utility::getExpandedAndAbsolutePath(const FilePath& path, const FilePath& baseDirectory) {
   FilePath p = getExpandedPath(path);
 

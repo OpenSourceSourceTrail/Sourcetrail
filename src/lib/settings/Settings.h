@@ -50,6 +50,8 @@ protected:
 
   std::vector<FilePath> getPathValues(const std::string& key) const;
 
+  std::vector<std::filesystem::path> getPathValuesStl(const std::string& key) const noexcept;
+
   template <typename T>
   bool setValue(const std::string& key, T value);
 
@@ -57,6 +59,8 @@ protected:
   bool setValues(const std::string& key, std::vector<T> values);
 
   bool setPathValues(const std::string& key, const std::vector<FilePath>& paths);
+
+  bool setPathValues(const std::string& key, const std::vector<std::filesystem::path>& paths) noexcept;
 
   bool isValueDefined(const std::string& key) const;
 

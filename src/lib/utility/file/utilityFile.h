@@ -2,6 +2,7 @@
 // STL
 #include <set>
 #include <vector>
+#include <filesystem>
 
 class FilePath;
 
@@ -16,6 +17,8 @@ std::vector<FilePath> getTopLevelPaths(const std::set<FilePath>& paths);
 FilePath getExpandedPath(const FilePath& path);
 
 std::vector<FilePath> getExpandedPaths(const std::vector<FilePath>& paths);
+
+std::vector<std::filesystem::path> getExpandedPaths(const std::vector<std::filesystem::path>& paths);
 
 FilePath getExpandedAndAbsolutePath(const FilePath& path, const FilePath& baseDirectory);
 

@@ -4,30 +4,30 @@
 #include <iostream>
 #include <utility>
 
-#include "ApplicationSettings.h"
 #include "CommandLineParser.h"
 #include "CommandlineHelper.h"
 #include "FilePath.h"
+#include "IApplicationSettings.hpp"
 #include "logging.h"
 
 namespace commandline {
 // helper functions
-using intFunc = void (ApplicationSettings::*)(int);
-void parseAndSetValue(intFunc func, const char* opt, ApplicationSettings* settings, po::variables_map& variablesMap) {
+using intFunc = void (IApplicationSettings::*)(int);
+void parseAndSetValue(intFunc func, const char* opt, IApplicationSettings* settings, po::variables_map& variablesMap) {
   if(variablesMap.count(opt) != 0U) {
     (settings->*func)(variablesMap[opt].as<int>());
   }
 }
 
-using boolFunc = void (ApplicationSettings::*)(bool);
-void parseAndSetValue(boolFunc func, const char* opt, ApplicationSettings* settings, po::variables_map& variablesMap) {
+using boolFunc = void (IApplicationSettings::*)(bool);
+void parseAndSetValue(boolFunc func, const char* opt, IApplicationSettings* settings, po::variables_map& variablesMap) {
   if(variablesMap.count(opt) != 0U) {
     (settings->*func)(variablesMap[opt].as<bool>());
   }
 }
 
-using filePathFunc = void (ApplicationSettings::*)(const FilePath&);
-void parseAndSetValue(filePathFunc func, const char* opt, ApplicationSettings* settings, po::variables_map& variablesMap) {
+using filePathFunc = void (IApplicationSettings::*)(const FilePath&);
+void parseAndSetValue(filePathFunc func, const char* opt, IApplicationSettings* settings, po::variables_map& variablesMap) {
   if(variablesMap.count(opt) != 0U) {
     FilePath path(variablesMap[opt].as<std::string>());
     if(!path.exists()) {
@@ -37,8 +37,8 @@ void parseAndSetValue(filePathFunc func, const char* opt, ApplicationSettings* s
   }
 }
 
-using vectorFunc = bool (ApplicationSettings::*)(const std::vector<FilePath>&);
-void parseAndSetValue(vectorFunc func, const char* opt, ApplicationSettings* settings, po::variables_map& variablesMap) {
+using vectorFuncStl = bool (IApplicationSettings::*)(const std::vector<std::filesystem::path>&);
+void parseAndSetValue(vectorFuncStl func, const char* opt, IApplicationSettings* settings, po::variables_map& variablesMap) {
   if(variablesMap.count(opt) != 0U) {
     auto files = extractPaths(variablesMap[opt].as<std::vector<std::string>>());
     (settings->*func)(files);
@@ -96,7 +96,7 @@ CommandlineCommand::ReturnStatus CommandlineCommandConfig::parse(std::vector<std
     return ReturnStatus::CMD_QUIT;
   }
 
-  auto* settings = ApplicationSettings::getInstance().get();
+  auto* settings = IApplicationSettings::getInstanceRaw();
   if(settings == nullptr) {
     LOG_ERROR("No application settings loaded");
     return ReturnStatus::CMD_QUIT;
@@ -108,18 +108,18 @@ CommandlineCommand::ReturnStatus CommandlineCommandConfig::parse(std::vector<std
               << "\n  use-processes: " << settings->getMultiProcessIndexingEnabled()
               << "\n  logging-enabled: " << settings->getLoggingEnabled()
               << "\n  verbose-indexer-logging-enabled: " << settings->getVerboseIndexerLoggingEnabled();
-    printVector("global-header-search-paths", settings->getHeaderSearchPaths());
-    printVector("global-framework-search-paths", settings->getFrameworkSearchPaths());
+    // printVector("global-header-search-paths", settings->getHeaderSearchPaths());
+    // printVector("global-framework-search-paths", settings->getFrameworkSearchPaths());
     return ReturnStatus::CMD_QUIT;
   }
 
   // clang-format off
-  parseAndSetValue(&ApplicationSettings::setMultiProcessIndexingEnabled,  "use-processes",                   settings, variablesMap);
-  parseAndSetValue(&ApplicationSettings::setLoggingEnabled,               "logging-enabled",                 settings, variablesMap);
-  parseAndSetValue(&ApplicationSettings::setVerboseIndexerLoggingEnabled, "verbose-indexer-logging-enabled", settings, variablesMap);
-  parseAndSetValue(&ApplicationSettings::setIndexerThreadCount,           "indexer-threads",                 settings, variablesMap);
-  parseAndSetValue(&ApplicationSettings::setHeaderSearchPaths,            "global-header-search-paths",      settings, variablesMap);
-  parseAndSetValue(&ApplicationSettings::setFrameworkSearchPaths,         "global-framework-search-paths",   settings, variablesMap);
+  parseAndSetValue(&IApplicationSettings::setMultiProcessIndexingEnabled,  "use-processes",                   settings, variablesMap);
+  parseAndSetValue(&IApplicationSettings::setLoggingEnabled,               "logging-enabled",                 settings, variablesMap);
+  parseAndSetValue(&IApplicationSettings::setVerboseIndexerLoggingEnabled, "verbose-indexer-logging-enabled", settings, variablesMap);
+  parseAndSetValue(&IApplicationSettings::setIndexerThreadCount,           "indexer-threads",                 settings, variablesMap);
+  parseAndSetValue(&IApplicationSettings::setHeaderSearchPaths,            "global-header-search-paths",      settings, variablesMap);
+  parseAndSetValue(&IApplicationSettings::setFrameworkSearchPaths,         "global-framework-search-paths",   settings, variablesMap);
   // clang-format on
 
   settings->save();

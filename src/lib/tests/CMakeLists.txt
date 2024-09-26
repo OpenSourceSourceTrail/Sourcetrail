@@ -6,7 +6,7 @@ add_library(lib_test_utilities utilities/FileHandler.cpp)
 target_include_directories(lib_test_utilities PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 set(test_lib_names
-    ApplicationTestSuite
+    ApplicationTestSuite # TODO(Hussein): Move to integration-tests
     BookmarkControllerTestSuite
     CommandLineParserTestSuite
     CommandlineCommandConfigTestSuite
@@ -37,10 +37,11 @@ foreach(test_name IN LISTS test_lib_names)
   target_link_libraries(
     ${test_name}
     PUBLIC lib_test_utilities
+           lib::mocks
            GTest::gmock
            GTest::gtest
-           GTest::gtest_main
            Sourcetrail::lib
+           Sourcetrail::gtest_main
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 
@@ -51,7 +52,7 @@ foreach(test_name IN LISTS test_lib_names)
   gtest_discover_tests(
     ${test_name}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "unittests.")
+    TEST_PREFIX "unittests.lib.")
 endforeach()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")

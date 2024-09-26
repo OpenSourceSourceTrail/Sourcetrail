@@ -3,9 +3,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ApplicationSettings.h"
 #include "CommandLineParser.h"
 #include "CommandlineCommandIndex.h"
+#include "IApplicationSettings.hpp"
 #include "utilities/CollectOutStream.hpp"
 #include "utilities/FileHandler.hpp"
 

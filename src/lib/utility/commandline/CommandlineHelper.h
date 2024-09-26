@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -16,6 +17,6 @@ namespace commandline {
 
 void parseConfigFile(po::variables_map& variablesMap, po::options_description& options);
 
-std::vector<FilePath> extractPaths(const std::vector<std::string>& paths);
+std::vector<std::filesystem::path> extractPaths(const std::vector<std::string>& paths);
 
 }    // namespace commandline

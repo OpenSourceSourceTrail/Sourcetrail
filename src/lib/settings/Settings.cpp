@@ -99,8 +99,19 @@ std::vector<FilePath> Settings::getPathValues(const std::string& key) const {
   return values | ranges::cpp20::views::transform([](const auto& value) { return FilePath {value}; }) | ranges::to<std::vector>();
 }
 
+std::vector<std::filesystem::path> Settings::getPathValuesStl(const std::string& key) const noexcept {
+  auto values = getValues<std::wstring>(key, {});
+  return values | ranges::cpp20::views::transform([](const auto& value) -> std::filesystem::path { return value; }) | ranges::to<std::vector>();
+}
+
 bool Settings::setPathValues(const std::string& key, const std::vector<FilePath>& paths) {
   std::vector<std::wstring> values = paths | ranges::cpp20::views::transform([](const auto& value) { return value.wstr(); }) |
+      ranges::to<std::vector>();
+  return setValues(key, values);
+}
+
+bool Settings::setPathValues(const std::string& key, const std::vector<std::filesystem::path>& paths) noexcept {
+  std::vector<std::wstring> values = paths | ranges::cpp20::views::transform([](const auto& value) { return value.wstring(); }) |
       ranges::to<std::vector>();
   return setValues(key, values);
 }
