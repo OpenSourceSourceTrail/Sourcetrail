@@ -338,8 +338,10 @@ add_files(
   settings/source_group/SourceGroupStatusType.h
   settings/source_group/SourceGroupType.cpp
   settings/source_group/SourceGroupType.h
-  settings/ApplicationSettings.cpp
-  settings/ApplicationSettings.h
+  settings/details/ApplicationSettings.cpp
+  settings/details/ApplicationSettings.h
+  settings/IApplicationSettings.hpp
+  settings/IApplicationSettings.cpp
   settings/ApplicationSettingsPrefiller.cpp
   settings/ApplicationSettingsPrefiller.h
   settings/ColorScheme.cpp
