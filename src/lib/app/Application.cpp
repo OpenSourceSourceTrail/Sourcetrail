@@ -138,7 +138,7 @@ void Application::loadSettings() {
   MessageStatus(fmt::format(L"Load settings: {}", UserPaths::getAppSettingsFilePath().wstr())).dispatch();
 
   auto settings = IApplicationSettings::getInstanceRaw();
-  if(auto* settingsPath = UserPaths::getAppSettingsFilePath(); !settings->load(settingsPath)) {
+  if(auto settingsPath = UserPaths::getAppSettingsFilePath(); !settings->load(settingsPath)) {
     LOG_WARNING_W(fmt::format(L"Failed to load ApplicationSettings from the following path \"{}\"", settingsPath.wstr()));
   }
 
