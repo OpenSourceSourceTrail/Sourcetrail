@@ -219,6 +219,12 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
   enable_testing()
   find_package(GTest CONFIG REQUIRED)
   include(GoogleTest)
+  add_library(gtest_main ./tests/gtest_main.cpp)
+  add_library(Sourcetrail::gtest_main ALIAS gtest_main)
+  target_link_libraries(
+    gtest_main
+    PUBLIC GTest::gmock GTest::gtest
+    PRIVATE spdlog::spdlog)
 endif()
 
 add_subdirectory(src/external)
