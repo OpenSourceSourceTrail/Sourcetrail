@@ -2,7 +2,7 @@
 // STL
 #include <cassert>
 #include <memory>
-// internal
+
 #include "DialogView.h"
 #include "FilePath.h"
 #include "Project.h"
@@ -22,9 +22,11 @@ class IDECommunicationController;
 class MainView;
 class NetworkFactory;
 class StorageCache;
-class UpdateChecker;
 class Version;
 class ViewFactory;
+namespace lib {
+struct IFactory;
+}
 
 class Application final
     : public MessageListener<MessageActivateWindow>
@@ -44,7 +46,10 @@ public:
    * @param viewFactory Pointer to the ViewFactory.
    * @param networkFactory Pointer to the NetworkFactory.
    */
-  static void createInstance(const Version& version, ViewFactory* viewFactory, NetworkFactory* networkFactory);
+  static void createInstance(const Version& version,
+                             std::shared_ptr<lib::IFactory> factory,
+                             ViewFactory* viewFactory,
+                             NetworkFactory* networkFactory);
 
   /**
    * @brief Gets the singleton instance of the Application.
@@ -93,8 +98,8 @@ public:
    * @brief Gets the current project.
    * @return Shared pointer to the current Project.
    */
-  [[nodiscard]] std::shared_ptr<const Project> getCurrentProject() const noexcept {
-    return m_pProject;
+  [[nodiscard]] std::shared_ptr<IProject> getCurrentProject() const noexcept {
+    return mProject;
   }
 
   /**
@@ -102,7 +107,7 @@ public:
    * @return FilePath of the current project.
    */
   [[nodiscard]] FilePath getCurrentProjectPath() const noexcept {
-    return m_pProject ? m_pProject->getProjectSettingsFilePath() : FilePath{};
+    return mProject ? mProject->getProjectSettingsFilePath() : FilePath {};
   }
 
   /**
@@ -110,14 +115,16 @@ public:
    * @return True if a project is loaded, false otherwise.
    */
   [[nodiscard]] bool isProjectLoaded() const noexcept {
-    return m_pProject ? m_pProject->isLoaded() : false;
+    return mProject && mProject->isLoaded();
   }
 
   /**
    * @brief Checks if the application has a GUI.
    * @return True if the application has a GUI, false otherwise.
    */
-  [[nodiscard]] bool hasGUI() const noexcept { return m_hasGUI; }
+  [[nodiscard]] bool hasGUI() const noexcept {
+    return mHasGui;
+  }
 
   /**
    * @brief Handles a dialog with a message.
@@ -149,9 +156,9 @@ public:
 
 private:
   static std::shared_ptr<Application> sInstance;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-  static std::string s_uuid;                         // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+  static std::string s_uuid;                        // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-  explicit Application(bool withGUI = true);
+  Application(std::shared_ptr<lib::IFactory> factory, bool withGUI = true);
 
   /**
    * @name handle Message group
@@ -162,14 +169,15 @@ private:
   /**
    * @brief Handle a load project message
    *
-   * @param pMessage a message
+   * @param message a message
    */
-  void handleMessage(MessageLoadProject* pMessage) override;
+  void handleMessage(MessageLoadProject* message) override;
   void handleMessage(MessageRefresh* pMessage) override;
   void handleMessage(MessageRefreshUI* pMessage) override;
   void handleMessage(MessageSwitchColorScheme* pMessage) override;
-  /**  @} */
+
   void handleMessage(MessageBookmarkUpdate* message) override;
+  /**  @} */
 
   void startMessagingAndScheduling();
 
@@ -184,11 +192,12 @@ private:
 
   bool checkSharedMemory();
 
-  const bool m_hasGUI;
+  const bool mHasGui;
+  std::shared_ptr<lib::IFactory> mFactory = nullptr;
   bool m_loadedWindow = false;
 
-  std::shared_ptr<Project> m_pProject;
-  std::shared_ptr<StorageCache> m_storageCache;
+  std::shared_ptr<IProject> mProject;
+  std::shared_ptr<StorageCache> mStorageCache;
 
   std::shared_ptr<MainView> m_mainView;
 

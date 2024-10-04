@@ -5,8 +5,8 @@
 #include "QtNetworkFactory.h"
 
 void QtNetworkFactoryTestSuite::goodCase() {
-  const QtNetworkFactory factory;
-  QVERIFY(factory.createIDECommunicationController(nullptr) != nullptr);
+  const QtNetworkFactory mFactory;
+  QVERIFY(mFactory.createIDECommunicationController(nullptr) != nullptr);
 }
 
 QTEST_MAIN(QtNetworkFactoryTestSuite)

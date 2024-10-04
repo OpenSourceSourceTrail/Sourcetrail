@@ -2,7 +2,7 @@
 
 #include <fmt/format.h>
 
-#include "SharedMemoryGarbageCollector.h"
+#include "details/SharedMemoryGarbageCollector.h"
 #include "logging.h"
 
 const char* SharedMemory::s_memoryNamePrefix = "srctrlmem_";
@@ -105,8 +105,7 @@ SharedMemory::SharedMemory(const std::string& name, size_t initialMemorySize, Ac
 
     switch(mode) {
     case CREATE_AND_DELETE: {
-      SharedMemoryGarbageCollector* collector = SharedMemoryGarbageCollector::getInstance();
-      if(collector != nullptr) {
+      if(auto* collector = lib::ISharedMemoryGarbageCollector::getInstanceRaw(); nullptr != collector) {
         collector->registerSharedMemory(m_name);
       }
 
@@ -149,8 +148,7 @@ SharedMemory::SharedMemory(const std::string& name, size_t initialMemorySize, Ac
 SharedMemory::~SharedMemory() {
   try {
     if(m_mode == CREATE_AND_DELETE) {
-      SharedMemoryGarbageCollector* collector = SharedMemoryGarbageCollector::getInstance();
-      if(collector != nullptr) {
+      if(auto* collector = lib::ISharedMemoryGarbageCollector::getInstanceRaw(); nullptr != collector) {
         collector->unregisterSharedMemory(m_name);
       }
 

@@ -1,9 +1,11 @@
 #include "SourceGroupCxxEmpty.h"
 
-#include <range/v3/to_container.hpp>
-#include <range/v3/view/transform.hpp>
 #include <utility>
 
+#include <range/v3/to_container.hpp>
+#include <range/v3/view/transform.hpp>
+
+#include "../../scheduling/TaskLambda.h"
 #include "CxxIndexerCommandProvider.h"
 #include "FileManager.h"
 #include "IApplicationSettings.hpp"
@@ -14,7 +16,6 @@
 #include "SourceGroupSettingsWithCStandard.h"
 #include "SourceGroupSettingsWithCppStandard.h"
 #include "SourceGroupSettingsWithCxxPathsAndFlags.h"
-#include "TaskLambda.h"
 #include "logging.h"
 #include "utility.h"
 #include "utilitySourceGroupCxx.h"

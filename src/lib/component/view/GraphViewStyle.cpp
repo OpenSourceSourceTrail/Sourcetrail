@@ -89,7 +89,7 @@ std::shared_ptr<GraphViewStyleImpl> GraphViewStyle::getImpl() {
 }
 
 void GraphViewStyle::setImpl(std::shared_ptr<GraphViewStyleImpl> impl) {
-  s_impl = impl;
+  s_impl = std::move(impl);
 }
 
 void GraphViewStyle::loadStyleSettings() {

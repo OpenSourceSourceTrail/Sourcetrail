@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "Task.h"
+#include "../../scheduling/Task.h"
 #include "TimeStamp.h"
 
 class DialogView;

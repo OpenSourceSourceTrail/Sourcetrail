@@ -6,7 +6,7 @@
 #include "MessageFocusOut.h"
 
 class MessageFilterFocusInOut : public MessageFilter {
-  void filter(MessageQueue::MessageBufferType* messageBuffer) override {
+  void filter(IMessageQueue::MessageBufferType* messageBuffer) override {
     if(messageBuffer->size() < 2) {
       return;
     }

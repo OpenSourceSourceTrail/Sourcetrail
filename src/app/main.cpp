@@ -14,6 +14,7 @@
 #include "ApplicationSettingsPrefiller.h"
 #include "CommandLineParser.h"
 #include "FilePath.h"
+#include "IApplicationSettings.hpp"
 #include "LanguagePackageManager.h"
 #include "MessageIndexingInterrupted.h"
 #include "MessageLoadProject.h"
@@ -27,7 +28,7 @@
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
 #include "Version.h"
-#include "IApplicationSettings.hpp"
+#include "impls/Factory.hpp"
 #include "includes.h"
 #include "language_packages.h"
 #include "logging.h"
@@ -98,7 +99,8 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
 
   setupLogging();
 
-  Application::createInstance(version, nullptr, nullptr);
+  auto factory = std::make_shared<lib::Factory>();
+  Application::createInstance(version, factory, nullptr, nullptr);
   [[maybe_unused]] ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
@@ -152,8 +154,12 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   QtViewFactory viewFactory;
   QtNetworkFactory networkFactory;
 
-  Application::createInstance(version, &viewFactory, &networkFactory);
+  auto factory = std::make_shared<lib::Factory>();
+  Application::createInstance(version, factory, &viewFactory, &networkFactory);
   [[maybe_unused]] ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
+
+  const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());
+  MessageStatus(utility::decodeFromUtf8(message)).dispatch();
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
   addLanguagePackages();
@@ -182,9 +188,6 @@ int main(int argc, char* argv[]) {
 
   const Version version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
   QApplication::setApplicationVersion(version.toString().c_str());
-
-  const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());
-  MessageStatus(utility::decodeFromUtf8(message)).dispatch();
 
   commandline::CommandLineParser commandLineParser(version.toString());
   std::vector<std::string> args;

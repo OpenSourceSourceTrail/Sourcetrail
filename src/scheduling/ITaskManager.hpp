@@ -29,4 +29,4 @@ private:
   static Ptr sInstance;
 };
 
-}    // namespace lib
+}    // namespace scheduling

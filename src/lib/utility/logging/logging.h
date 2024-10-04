@@ -6,7 +6,7 @@
 #include "utilityString.h"
 
 /**
- * @brief Macros to simplify usage of the log manager
+ * @brief Macros to simplify usage of the log mManager
  */
 #define LOG_INFO(__str__) spdlog::info("{} {}:{} {}", __FILE__, __FUNCTION__, __LINE__, __str__);
 

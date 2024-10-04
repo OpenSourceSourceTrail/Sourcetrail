@@ -3,12 +3,12 @@
 
 #include <thread>
 
+#include "../../../scheduling/Task.h"
 #include "InterprocessIndexerCommandManager.h"
 #include "InterprocessIndexingStatusManager.h"
 #include "InterprocessIntermediateStorageManager.h"
 #include "MessageIndexingInterrupted.h"
 #include "MessageListener.h"
-#include "Task.h"
 
 class DialogView;
 class StorageProvider;

@@ -2,7 +2,7 @@
 
 #include <utility>
 
-#include "Blackboard.h"
+#include "../../scheduling/Blackboard.h"
 #include "DialogView.h"
 #include "MessageIndexingFinished.h"
 #include "MessageIndexingStatus.h"

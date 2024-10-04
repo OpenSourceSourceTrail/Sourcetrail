@@ -8,12 +8,15 @@
 #define private public
 #include "MessageQueue.h"
 #undef private
+#include "../../../src/scheduling/TaskScheduler.h"
 #include "Message.h"
 #include "MessageFilter.h"
 #include "MessageListener.h"
 #include "TabId.h"
-#include "TaskManager.h"
-#include "TaskScheduler.h"
+#include "ITaskManager.hpp"
+
+#include "mocks/MockedTaskManager.hpp"
+
 
 namespace {
 class TestMessage : public Message<TestMessage> {
@@ -101,18 +104,34 @@ void waitForThread() {
   static const auto THREAD_WAIT_TIME_MS = std::chrono::milliseconds(25);
   do {
     std::this_thread::sleep_for(THREAD_WAIT_TIME_MS);
-  } while(MessageQueue::getInstance()->hasMessagesQueued());
+  } while(IMessageQueue::getInstance()->hasMessagesQueued());
 }
 }    // namespace
 
 TEST(MessageQueue, singleInstance) {
-  auto messageQueue0 = MessageQueue::getInstance();
-  auto messageQueue1 = MessageQueue::getInstance();
+#if !defined(NDEBUG)
+  EXPECT_DEATH(IMessageQueue::getInstance(), "");
+  EXPECT_DEATH(IMessageQueue::getInstanceRaw(), "");
+#endif
+
+  IMessageQueue::setInstance(std::make_shared<details::MessageQueue>());
+  auto messageQueue0 = IMessageQueue::getInstance();
+  auto messageQueue1 = IMessageQueue::getInstance();
   EXPECT_EQ(messageQueue0, messageQueue1);
+  IMessageQueue::setInstance(nullptr);
 }
 
-TEST(MessageQueue, messageLoopStartsAndStops) {
-  auto messageQueue = MessageQueue::getInstance();
+struct MessageQueueFix : testing::Test {
+  void SetUp() override {
+    IMessageQueue::setInstance(std::make_shared<details::MessageQueue>());
+  }
+  void TearDown() override {
+    IMessageQueue::setInstance(nullptr);
+  }
+};
+
+TEST_F(MessageQueueFix, messageLoopStartsAndStops) {
+  auto* messageQueue = IMessageQueue::getInstanceRaw();
   EXPECT_FALSE(messageQueue->loopIsRunning());
 
   messageQueue->startMessageLoopThreaded();
@@ -128,8 +147,8 @@ TEST(MessageQueue, messageLoopStartsAndStops) {
   EXPECT_FALSE(messageQueue->loopIsRunning());
 }
 
-TEST(MessageQueue, registeredListenerReceivesMessages) {
-  auto messageQueue = MessageQueue::getInstance();
+TEST_F(MessageQueueFix, registeredListenerReceivesMessages) {
+  auto* messageQueue = IMessageQueue::getInstanceRaw();
   messageQueue->startMessageLoopThreaded();
 
   TestMessageListener listener;
@@ -147,8 +166,8 @@ TEST(MessageQueue, registeredListenerReceivesMessages) {
   EXPECT_EQ(0, listener2.m_messageCount);
 }
 
-TEST(MessageQueue, messageDispatchingWithinMessageHandling) {
-  auto messageQueue = MessageQueue::getInstance();
+TEST_F(MessageQueueFix, messageDispatchingWithinMessageHandling) {
+  auto* messageQueue = IMessageQueue::getInstanceRaw();
   messageQueue->startMessageLoopThreaded();
 
   TestMessageListener listener;
@@ -164,8 +183,8 @@ TEST(MessageQueue, messageDispatchingWithinMessageHandling) {
   EXPECT_EQ(1, listener2.m_messageCount);
 }
 
-TEST(MessageQueue, listenerRegistrationWithinMessageHandling) {
-  auto messageQueue = MessageQueue::getInstance();
+TEST_F(MessageQueueFix, listenerRegistrationWithinMessageHandling) {
+  auto* messageQueue = IMessageQueue::getInstanceRaw();
   messageQueue->startMessageLoopThreaded();
 
   Test3MessageListener listener;
@@ -181,8 +200,8 @@ TEST(MessageQueue, listenerRegistrationWithinMessageHandling) {
   EXPECT_EQ(1, listener.m_listener->m_messageCount);
 }
 
-TEST(MessageQueue, listenerUnregistrationWithinMessageHandling) {
-  auto messageQueue = MessageQueue::getInstance();
+TEST_F(MessageQueueFix, listenerUnregistrationWithinMessageHandling) {
+  auto* messageQueue = IMessageQueue::getInstanceRaw();
   messageQueue->startMessageLoopThreaded();
 
   Test4MessageListener listener;
@@ -203,8 +222,8 @@ TEST(MessageQueue, listenerUnregistrationWithinMessageHandling) {
   EXPECT_EQ(2, listener.m_listener->m_messageCount);
 }
 
-TEST(MessageQueue, listenerRegistrationToFrontAndBackWithinMessageHandling) {
-  auto messageQueue = MessageQueue::getInstance();
+TEST_F(MessageQueueFix, listenerRegistrationToFrontAndBackWithinMessageHandling) {
+  auto* messageQueue = IMessageQueue::getInstanceRaw();
   messageQueue->startMessageLoopThreaded();
 
   Test5MessageListener listener;
@@ -227,7 +246,10 @@ TEST(MessageQueue, listenerRegistrationToFrontAndBackWithinMessageHandling) {
 
 struct MessageQueueRegistration : testing::Test {
   void SetUp() override {
-    messageQueue = MessageQueue::getInstance();
+    auto mQueue = std::make_shared<details::MessageQueue>();
+    messageQueue = mQueue.get();
+    IMessageQueue::setInstance(std::move(mQueue));
+
     messageQueue->mListeners.clear();
   }
 
@@ -236,9 +258,10 @@ struct MessageQueueRegistration : testing::Test {
     if(messageQueue->loopIsRunning()) {
       messageQueue->stopMessageLoop();
     }
+    IMessageQueue::setInstance(nullptr);
   }
 
-  MessageQueue::Ptr messageQueue;
+  details::MessageQueue* messageQueue = nullptr;
 };
 
 TEST_F(MessageQueueRegistration, registerIsUnique) {
@@ -274,18 +297,29 @@ TEST_F(MessageQueueRegistration, registerGoodCase) {
 
 struct MessageQueueProcess : testing::Test {
   void SetUp() override {
-    messageQueue = MessageQueue::getInstance();
+    auto mQueue = std::make_shared<details::MessageQueue>();
+    messageQueue = mQueue.get();
+    IMessageQueue::setInstance(std::move(mQueue));
+
     messageQueue->mMessageBuffer.clear();
     messageQueue->mFilters.clear();
+
+    mMockedTaskManager = std::make_shared<scheduling::mocks::MockedTaskManager>();
+    scheduling::ITaskManager::setInstance(mMockedTaskManager);
   }
 
   void TearDown() override {
     messageQueue->setSendMessagesAsTasks(false);
     messageQueue->mFilters.clear();
     messageQueue->mMessageBuffer.clear();
+    IMessageQueue::setInstance(nullptr);
+
+    scheduling::ITaskManager::setInstance(nullptr);
+    mMockedTaskManager.reset();
   }
 
-  MessageQueue::Ptr messageQueue;
+  details::MessageQueue* messageQueue = nullptr;
+  std::shared_ptr<scheduling::mocks::MockedTaskManager> mMockedTaskManager;
 };
 
 TEST_F(MessageQueueProcess, goodCase) {
@@ -300,8 +334,10 @@ TEST_F(MessageQueueProcess, goodCase) {
   EXPECT_EQ(1, messageListener.m_messageCount);
 }
 
+
 TEST_F(MessageQueueProcess, goodCaseAsTask) {
-  TaskManager::getScheduler(TabId::app())->startSchedulerLoopThreaded();
+  auto fakeTask = std::make_shared<TaskScheduler>(Id{});
+  EXPECT_CALL(*mMockedTaskManager, getScheduler).WillOnce(testing::Return(fakeTask));
 
   messageQueue->setSendMessagesAsTasks(true);
 
@@ -317,17 +353,21 @@ TEST_F(MessageQueueProcess, goodCaseAsTask) {
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(50ms);
 
-  EXPECT_EQ(1, messageListener.m_messageCount);
+  EXPECT_EQ(0, messageListener.m_messageCount);
 }
 
 struct MessageQueueSendMessage : testing::Test {
   void SetUp() override {
-    messageQueue = MessageQueue::getInstance();
+    auto mQueue = std::make_shared<details::MessageQueue>();
+    messageQueue = mQueue.get();
+    IMessageQueue::setInstance(std::move(mQueue));
   }
 
-  void TearDown() override {}
+  void TearDown() override {
+    IMessageQueue::setInstance(nullptr);
+  }
 
-  MessageQueue::Ptr messageQueue;
+  details::MessageQueue* messageQueue = nullptr;
 };
 
 TEST_F(MessageQueueSendMessage, goodCase) {
@@ -341,25 +381,26 @@ TEST_F(MessageQueueSendMessage, goodCase) {
   EXPECT_EQ(1, messageListener.m_messageCount);
 }
 
-struct MessageQueueFilter : testing::Test {
-  void SetUp() override {
-    messageQueue = MessageQueue::getInstance();
-  }
-
-  void TearDown() override {}
-
-  MessageQueue::Ptr messageQueue;
+struct MockedMessageFilter : MessageFilter {
+  MOCK_METHOD(void, filter, (IMessageQueue::MessageBufferType*), (override));
 };
 
-struct MockedMessageFilter : MessageFilter {
-  bool called = false;
-  void filter(MessageQueue::MessageBufferType* /*unused*/) override {
-    called = true;
+struct MessageQueueFilter : testing::Test {
+  void SetUp() override {
+    auto mQueue = std::make_shared<details::MessageQueue>();
+    messageQueue = mQueue.get();
+    IMessageQueue::setInstance(std::move(mQueue));
   }
+
+  void TearDown() override {
+    IMessageQueue::setInstance(nullptr);
+  }
+
+  details::MessageQueue* messageQueue = nullptr;
 };
 
 TEST_F(MessageQueueFilter, goodCase) {
-  auto filter = std::make_shared<MockedMessageFilter>();
+  auto filter = std::make_shared<testing::StrictMock<MockedMessageFilter>>();
 
   messageQueue->addMessageFilter(filter);
   messageQueue->addMessageFilter(filter);

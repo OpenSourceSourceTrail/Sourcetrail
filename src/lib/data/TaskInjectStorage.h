@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include "../../scheduling/Task.h"
 #include "MessageIndexingInterrupted.h"
 #include "MessageListener.h"
-#include "Task.h"
 
 class Storage;
 class StorageProvider;

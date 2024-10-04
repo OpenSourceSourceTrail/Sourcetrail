@@ -16,6 +16,7 @@ set(test_lib_names
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite
+    FactoryTestSuite
     FileHandlerTestSuite
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite

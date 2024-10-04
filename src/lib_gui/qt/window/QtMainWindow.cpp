@@ -530,7 +530,7 @@ void QtMainWindow::openProject() {
 }
 
 void QtMainWindow::editProject() {
-  std::shared_ptr<const Project> currentProject = Application::getInstance()->getCurrentProject();
+  auto currentProject = Application::getInstance()->getCurrentProject();
   if(currentProject) {
     auto* wizard = createWindow<QtProjectWizard>();
 

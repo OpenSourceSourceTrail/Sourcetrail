@@ -3,7 +3,7 @@
 MessageListenerBase::~MessageListenerBase() {
   if(m_alive) {
     m_alive = false;
-    MessageQueue::getInstance()->unregisterListener(this);
+    IMessageQueue::getInstance()->unregisterListener(this);
   }
 }
 

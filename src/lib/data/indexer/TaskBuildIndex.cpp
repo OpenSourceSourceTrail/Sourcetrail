@@ -2,8 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../../../scheduling/Blackboard.h"
 #include "AppPath.h"
-#include "Blackboard.h"
 #include "DialogView.h"
 #include "InterprocessIndexer.h"
 #include "MessageIndexingStatus.h"

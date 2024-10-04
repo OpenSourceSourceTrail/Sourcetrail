@@ -1,7 +1,5 @@
 #pragma once
 
-#include <map>
-
 #include "StorageAccessProxy.h"
 
 class StorageCache : public StorageAccessProxy {

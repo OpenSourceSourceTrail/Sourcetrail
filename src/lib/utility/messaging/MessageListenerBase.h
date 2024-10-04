@@ -9,7 +9,7 @@
 class MessageListenerBase {
 public:
   MessageListenerBase() : m_id(s_nextId++), m_alive(true) {
-    MessageQueue::getInstance()->registerListener(this);
+    IMessageQueue::getInstance()->registerListener(this);
   }
 
   virtual ~MessageListenerBase();

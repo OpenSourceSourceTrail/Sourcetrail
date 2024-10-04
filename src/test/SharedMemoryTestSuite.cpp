@@ -3,9 +3,30 @@
 
 #include <gtest/gtest.h>
 
+#include "ISharedMemoryGarbageCollector.hpp"
+#include "MockedSharedMemoryGarbageCollector.hpp"
 #include "SharedMemory.h"
 
-TEST(SharedMemory, goodCase) {
+using namespace testing;
+
+struct SharedMemoryFixture : testing::Test {
+  void SetUp() override {
+    mSharedMemoryGarbageCollector = std::make_shared<lib::MockedSharedMemoryGarbageCollector>();
+    lib::ISharedMemoryGarbageCollector::setInstance(mSharedMemoryGarbageCollector);
+  }
+
+  void TearDown() override {
+    lib::ISharedMemoryGarbageCollector::setInstance(nullptr);
+    mSharedMemoryGarbageCollector.reset();
+  }
+
+  lib::MockedSharedMemoryGarbageCollector::Ptr mSharedMemoryGarbageCollector;
+};
+
+TEST_F(SharedMemoryFixture, goodCase) {
+  EXPECT_CALL(*mSharedMemoryGarbageCollector, registerSharedMemory).WillOnce(Return());
+  EXPECT_CALL(*mSharedMemoryGarbageCollector, unregisterSharedMemory).WillOnce(Return());
+
   SharedMemory memory("memory", 1000, SharedMemory::CREATE_AND_DELETE);
 
   {

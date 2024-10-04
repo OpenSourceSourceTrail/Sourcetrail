@@ -1,12 +1,12 @@
 #include "TooltipController.h"
 
+#include "../../../scheduling/TaskDecoratorDelay.h"
+#include "../../../scheduling/TaskLambda.h"
 #include "CodeView.h"
 #include "GraphView.h"
 #include "MessageActivateSourceLocations.h"
 #include "StorageAccess.h"
 #include "TabId.h"
-#include "TaskDecoratorDelay.h"
-#include "TaskLambda.h"
 #include "TooltipView.h"
 
 Id TooltipController::TooltipRequest::s_requestId = 1;

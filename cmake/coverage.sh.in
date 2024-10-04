@@ -14,18 +14,18 @@ CORES_COUNT=`nproc --all`
 
 ctest --progress
 cd $BUILD_DIR/coverage
-gcovr -r $SOURCE_DIR/src/                  \
-      -e $SOURCE_DIR/src/app               \
-      -e $SOURCE_DIR/src/core/tests        \
-      -e $SOURCE_DIR/src/external          \
-      -e $SOURCE_DIR/src/indexer           \
-      -e $SOURCE_DIR/src/lib/tests         \
-      -e $SOURCE_DIR/src/lib_cxx/tests     \
-      -e $SOURCE_DIR/src/lib_gui/tests     \
-      -e $SOURCE_DIR/src/lib_utility/tests \
-      -e $SOURCE_DIR/src/messaging/tests   \
-      -e $SOURCE_DIR/src/scheduling/tests  \
-      -e $SOURCE_DIR/src/test              \
-      --html-details index.html            \
+gcovr -r $SOURCE_DIR/src/                       \
+      -e $SOURCE_DIR/src/app                    \
+      -e $SOURCE_DIR/src/core/tests             \
+      -e $SOURCE_DIR/src/external               \
+      -e $SOURCE_DIR/src/indexer                \
+      -e $SOURCE_DIR/src/lib/tests              \
+      -e $SOURCE_DIR/src/lib_cxx/tests          \
+      -e $SOURCE_DIR/src/lib_gui/tests          \
+      -e $SOURCE_DIR/src/lib_utility/tests      \
+      -e $SOURCE_DIR/src/messaging/tests        \
+      -e $SOURCE_DIR/src/scheduling/tests       \
+      -e $SOURCE_DIR/src/test                   \
+      --html-details index.html                 \
       --gcov-ignore-errors=no_working_dir_found \
       -j $CORES_COUNT ..

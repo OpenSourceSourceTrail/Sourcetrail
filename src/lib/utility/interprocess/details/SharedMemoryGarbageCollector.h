@@ -6,43 +6,22 @@
 #include <string>
 #include <thread>
 
+#include "ISharedMemoryGarbageCollector.hpp"
 #include "SharedMemory.h"
 
-struct ISharedMemoryGarbageCollector {
-  static void setInstance(std::shared_ptr<ISharedMemoryGarbageCollector> instance);
-  static bool createInstance();
-  static std::shared_ptr<ISharedMemoryGarbageCollector> getInstance();
-  static ISharedMemoryGarbageCollector* getInstanceRaw();
-
-  ISharedMemoryGarbageCollector();
-  virtual ~ISharedMemoryGarbageCollector();
-
-  virtual void run(const std::string& uuid) = 0;
-  virtual void stop() = 0;
-
-  virtual void registerSharedMemory(const std::string& sharedMemoryName) = 0;
-  virtual void unregisterSharedMemory(const std::string& sharedMemoryName) = 0;
-
-private:
-  static std::shared_ptr<ISharedMemoryGarbageCollector> sInstance;
-};
-
-class SharedMemoryGarbageCollector : public ISharedMemoryGarbageCollector {
+class SharedMemoryGarbageCollector : public lib::ISharedMemoryGarbageCollector {
 public:
-  static SharedMemoryGarbageCollector* createInstance();
-  static SharedMemoryGarbageCollector* getInstance();
+  explicit SharedMemoryGarbageCollector(std::unique_ptr<SharedMemory> memory) noexcept;
+  ~SharedMemoryGarbageCollector() noexcept override;
 
-  SharedMemoryGarbageCollector();
-  ~SharedMemoryGarbageCollector();
+  void run(const std::string& uuid) noexcept override;
+  void stop() noexcept override;
 
-  void run(const std::string& uuid);
-  void stop();
+  void registerSharedMemory(const std::string& sharedMemoryName) noexcept override;
+  void unregisterSharedMemory(const std::string& sharedMemoryName) noexcept override;
 
-  void registerSharedMemory(const std::string& sharedMemoryName);
-  void unregisterSharedMemory(const std::string& sharedMemoryName);
-
-private:
   static std::string getMemoryName();
+private:
   void update();
 
   static std::string s_memoryNamePrefix;
@@ -52,7 +31,7 @@ private:
   static const size_t s_updateIntervalSeconds;
   static const size_t s_deleteThresholdSeconds;
 
-  SharedMemory m_memory;
+  std::unique_ptr<SharedMemory> m_memory;
   volatile bool m_loopIsRunning;
   std::shared_ptr<std::thread> m_thread;
 

@@ -13,35 +13,12 @@ std::string SharedMemoryGarbageCollector::s_timeStampsKeyName = "memory_to_times
 const size_t SharedMemoryGarbageCollector::s_updateIntervalSeconds = 1;
 const size_t SharedMemoryGarbageCollector::s_deleteThresholdSeconds = 10;
 
-std::shared_ptr<SharedMemoryGarbageCollector> SharedMemoryGarbageCollector::s_instance;
+SharedMemoryGarbageCollector::SharedMemoryGarbageCollector(std::unique_ptr<SharedMemory> memory) noexcept
+    : m_memory {std::move(memory)}, m_loopIsRunning(false) {}
 
-SharedMemoryGarbageCollector* SharedMemoryGarbageCollector::createInstance() {
-  try {
-    if(!s_instance) {
-      s_instance = std::shared_ptr<SharedMemoryGarbageCollector>(new SharedMemoryGarbageCollector());
+SharedMemoryGarbageCollector::~SharedMemoryGarbageCollector() noexcept = default;
 
-      if(!s_instance->m_memory.checkSharedMutex()) {
-        LOG_ERROR("Shared memory mutex check failed. Shared memory garbage collection disabled.");
-        s_instance.reset();
-      }
-    }
-  } catch(boost::interprocess::interprocess_exception& e) {
-    LOG_ERROR(fmt::format("boost exception thrown at shared memory garbage collector: {}", e.what()));
-  }
-
-  return s_instance.get();
-}
-
-SharedMemoryGarbageCollector* SharedMemoryGarbageCollector::getInstance() {
-  return s_instance.get();
-}
-
-SharedMemoryGarbageCollector::SharedMemoryGarbageCollector()
-    : m_memory(getMemoryName(), 65536 /* 64 kB */, SharedMemory::OPEN_OR_CREATE), m_loopIsRunning(false) {}
-
-SharedMemoryGarbageCollector::~SharedMemoryGarbageCollector() {}
-
-void SharedMemoryGarbageCollector::run(const std::string& uuid) {
+void SharedMemoryGarbageCollector::run(const std::string& uuid) noexcept {
   LOG_INFO("start shared memory garbage collection");
 
   m_uuid = uuid;
@@ -57,7 +34,7 @@ void SharedMemoryGarbageCollector::run(const std::string& uuid) {
   });
 }
 
-void SharedMemoryGarbageCollector::stop() {
+void SharedMemoryGarbageCollector::stop() noexcept {
   LOG_INFO("stop shared memory garbage collection");
 
   m_loopIsRunning = false;
@@ -76,7 +53,7 @@ void SharedMemoryGarbageCollector::stop() {
   m_removedSharedMemoryNames.clear();
 
 
-  SharedMemory::ScopedAccess access(&m_memory);
+  SharedMemory::ScopedAccess access(m_memory.get());
 
   SharedMemory::Map<SharedMemory::String, SharedMemory::String>* instances =
       access.accessValueWithAllocator<SharedMemory::Map<SharedMemory::String, SharedMemory::String>>(s_instancesKeyName);
@@ -105,12 +82,12 @@ void SharedMemoryGarbageCollector::stop() {
   }
 
   if(!otherRunningInstances) {
-    LOG_INFO(fmt::format("delete garbage collector memory: {}",getMemoryName()));
+    LOG_INFO(fmt::format("delete garbage collector memory: {}", getMemoryName()));
     SharedMemory::deleteSharedMemory(getMemoryName());
   }
 }
 
-void SharedMemoryGarbageCollector::registerSharedMemory(const std::string& sharedMemoryName) {
+void SharedMemoryGarbageCollector::registerSharedMemory(const std::string& sharedMemoryName) noexcept {
   {
     std::lock_guard<std::mutex> lock(m_sharedMemoryNamesMutex);
     m_sharedMemoryNames.insert(sharedMemoryName);
@@ -119,7 +96,7 @@ void SharedMemoryGarbageCollector::registerSharedMemory(const std::string& share
   update();
 }
 
-void SharedMemoryGarbageCollector::unregisterSharedMemory(const std::string& sharedMemoryName) {
+void SharedMemoryGarbageCollector::unregisterSharedMemory(const std::string& sharedMemoryName) noexcept {
   {
     std::lock_guard<std::mutex> lock(m_sharedMemoryNamesMutex);
     size_t removedCount = m_sharedMemoryNames.erase(sharedMemoryName);
@@ -139,7 +116,7 @@ std::string SharedMemoryGarbageCollector::getMemoryName() {
 void SharedMemoryGarbageCollector::update() {
   std::lock_guard<std::mutex> lock(m_sharedMemoryNamesMutex);
 
-  SharedMemory::ScopedAccess access(&m_memory);
+  SharedMemory::ScopedAccess access(m_memory.get());
 
   if(access.getFreeMemorySize() * 2 < access.getMemorySize()) {
     access.growMemory(access.getMemorySize());

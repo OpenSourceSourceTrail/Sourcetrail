@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "AppPath.h"
 #include "Application.h"
@@ -19,6 +20,8 @@
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
 #  include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
+#  include "../../../src/lib/tests/mocks/MockedMessageQueue.hpp"
+#  include "ITaskManager.hpp"
 #  include "IndexerCommandCxx.h"
 #  include "SourceGroupCxxCdb.h"
 #  include "SourceGroupCxxCodeblocks.h"
@@ -27,6 +30,7 @@
 #  include "SourceGroupSettingsCppEmpty.h"
 #  include "SourceGroupSettingsCxxCdb.h"
 #  include "SourceGroupSettingsCxxCodeblocks.h"
+#  include "mocks/MockedTaskManager.hpp"
 #  include "utilityFile.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
@@ -149,16 +153,28 @@ void generateAndCompareExpectedOutput(const std::wstring& projectName, std::shar
 
 struct SourceGroupFix : testing::Test {
   void SetUp() override {
-    IApplicationSettings::setInstance(mMocked);
+    mMockedApplicationSettings = std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
+    IApplicationSettings::setInstance(mMockedApplicationSettings);
+
+    mMockedMessageQueue = std::make_shared<testing::StrictMock<MockedMessageQueue>>();
+    IMessageQueue::setInstance(mMockedMessageQueue);
+
+    mMockedTaskManager = std::make_shared<testing::StrictMock<scheduling::mocks::MockedTaskManager>>();
+    scheduling::ITaskManager::setInstance(mMockedTaskManager);
   }
 
   void TearDown() override {
     IApplicationSettings::setInstance(nullptr);
-    mMocked.reset();
+    mMockedApplicationSettings.reset();
+    IMessageQueue::setInstance(nullptr);
+    mMockedMessageQueue.reset();
+    scheduling::ITaskManager::setInstance(nullptr);
+    mMockedTaskManager.reset();
   }
 
-  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMocked =
-      std::make_shared<testing::StrictMock<MockedApplicationSettings>>();
+  std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMockedApplicationSettings;
+  std::shared_ptr<testing::StrictMock<MockedMessageQueue>> mMockedMessageQueue;
+  std::shared_ptr<testing::StrictMock<scheduling::mocks::MockedTaskManager>> mMockedTaskManager;
 };
 
 #ifdef DISABLED
@@ -172,9 +188,9 @@ TEST(SourceGroupFix, can create application instance) {
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
 TEST_F(SourceGroupFix, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
-  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
-  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_c_empty";
@@ -201,9 +217,9 @@ TEST_F(SourceGroupFix, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
 }
 
 TEST_F(SourceGroupFix, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
-  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
-  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_cpp_empty";
@@ -230,9 +246,9 @@ TEST_F(SourceGroupFix, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
 }
 
 TEST_F(SourceGroupFix, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
-  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
-  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_codeblocks";
@@ -271,9 +287,9 @@ TEST_F(SourceGroupFix, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
 }
 
 TEST_F(SourceGroupFix, sourceGroupCxxCdbGeneratesExpectedOutput) {
-  EXPECT_CALL(*mMocked, getHeaderSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
-  EXPECT_CALL(*mMocked, getFrameworkSearchPathsExpanded)
+  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
       .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_cdb";
@@ -311,6 +327,9 @@ TEST_F(SourceGroupFix, sourceGroupCustomCommandGeneratesExpectedOutput) {
 }
 
 TEST_F(SourceGroupFix, canDestroyApplicationInstance) {
+  EXPECT_CALL(*mMockedMessageQueue, stopMessageLoop).WillOnce(testing::Return());
+  EXPECT_CALL(*mMockedTaskManager, destroyScheduler).Times(2);
+
   Application::destroyInstance();
   EXPECT_TRUE(0 == Application::getInstance().use_count());
 }

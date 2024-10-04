@@ -2,6 +2,7 @@
 
 #include <clang/Tooling/JSONCompilationDatabase.h>
 
+#include "../../scheduling/TaskLambda.h"
 #include "CanonicalFilePathCache.h"
 #include "CxxCompilationDatabaseSingle.h"
 #include "CxxDiagnosticConsumer.h"
@@ -15,7 +16,6 @@
 #include "SingleFrontendActionFactory.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"
 #include "StorageProvider.h"
-#include "TaskLambda.h"
 #include "logging.h"
 #include "utility.h"
 

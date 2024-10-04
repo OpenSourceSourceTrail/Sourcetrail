@@ -1,6 +1,6 @@
 #include "TaskParseWrapper.h"
 
-#include "Blackboard.h"
+#include "../../../scheduling/Blackboard.h"
 #include "DialogView.h"
 #include "PersistentStorage.h"
 

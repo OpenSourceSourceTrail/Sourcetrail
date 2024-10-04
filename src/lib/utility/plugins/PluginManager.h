@@ -15,7 +15,7 @@ struct IPlugin;
 using IPluginPtr = boost::shared_ptr<IPlugin>;
 
 /**
- * @brief Plugin manager system
+ * @brief Plugin mManager system
  *
  * Load and cache plugins
  */

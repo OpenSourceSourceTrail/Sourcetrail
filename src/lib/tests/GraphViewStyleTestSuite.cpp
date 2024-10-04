@@ -14,9 +14,9 @@ struct MockedGraphViewStyleImpl : GraphViewStyleImpl {
 };
 
 TEST(GraphViewStyle, Impl) {
-  // No impl found
+  // No impls found
   ASSERT_EQ(nullptr, GraphViewStyle::getImpl());
-  // Set impl
+  // Set impls
   auto graphViewStyle = std::make_shared<MockedGraphViewStyleImpl>();
   GraphViewStyle::setImpl(graphViewStyle);
   ASSERT_EQ(graphViewStyle, GraphViewStyle::getImpl());

@@ -2,8 +2,8 @@
 
 #include <utility>
 
+#include "../../scheduling/Blackboard.h"
 #include "Application.h"
-#include "Blackboard.h"
 #include "DialogView.h"
 #include "FilePath.h"
 #include "PersistentStorage.h"

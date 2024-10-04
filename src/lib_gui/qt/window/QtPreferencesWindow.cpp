@@ -91,7 +91,7 @@ void QtPreferencesWindow::handleNext() {
   app->loadSettings();
 
   if(appSettingsChanged) {
-    std::shared_ptr<const Project> currentProject = Application::getInstance()->getCurrentProject();
+    auto currentProject = Application::getInstance()->getCurrentProject();
     if(currentProject) {
       MessageLoadProject(currentProject->getProjectSettingsFilePath(), true).dispatch();
     }

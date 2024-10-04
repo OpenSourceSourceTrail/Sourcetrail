@@ -94,7 +94,7 @@ void ErrorController::handleMessage(MessageErrorsAll* /*pMessage*/) {
 }
 
 void ErrorController::handleMessage(MessageErrorsForFile* pMessage) {
-  std::shared_ptr<const Project> project = Application::getInstance()->getCurrentProject();
+  auto project = Application::getInstance()->getCurrentProject();
   if(project && project->isIndexing()) {
     Application::getInstance()->handleDialog(L"Showing errors for a file is not possible while indexing.");
     return;

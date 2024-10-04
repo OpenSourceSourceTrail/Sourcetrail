@@ -418,7 +418,7 @@ void UndoRedoController::replayCommand(std::list<Command>::iterator it) {
       }
     }
   } else if(m->getType() == MessageActivateErrors::getStaticType()) {
-    std::shared_ptr<const Project> currentProject = Application::getInstance()->getCurrentProject();
+    auto currentProject = Application::getInstance()->getCurrentProject();
     if(currentProject && currentProject->isIndexing()) {
       Application::getInstance()->handleDialog(L"Errors cannot be activated while indexing.");
 

@@ -20,7 +20,6 @@ RUN apt-get update        \
     cmake                 \
     ninja-build           \
     python3-pip           \
-    libboost-all-dev      \
     qtbase5-dev           \
     libqt5svg5-dev        \
     graphviz              \
@@ -32,9 +31,15 @@ RUN apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install \
-  conan==1.59.0  \
+  conan          \
   cmakelint      \
   gcovr
+
+RUN conan install . \                                                                                                                                                                 SOUR-60 *2 +4 !37 ?14 
+-s build_type=Debug \
+-of .conan/gcc/ \
+-b missing \
+-pr:a .conan/gcc/profile
 
 RUN useradd -ms /bin/bash sourcetrail
 USER sourcetrail

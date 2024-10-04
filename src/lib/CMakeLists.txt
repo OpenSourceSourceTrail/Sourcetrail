@@ -1,6 +1,12 @@
 # ${CMAKE_SOURCE_DIR}/src/lib/CMakeLists.txt
 add_files(
   LIB
+  # Base Factory {
+  factory/IFactory.hpp
+  factory/IFactory.cpp
+        factory/impls/Factory.hpp
+        factory/impls/Factory.cpp
+  # }
   app/paths/AppPath.cpp
   app/paths/AppPath.h
   app/paths/ResourcePaths.cpp
@@ -297,6 +303,8 @@ add_files(
   data/TaskMergeStorages.h
   project/Project.cpp
   project/Project.h
+  project/IProject.cpp
+  project/IProject.hpp
   project/RefreshInfo.h
   project/RefreshInfoGenerator.h
   project/RefreshInfoGenerator.cpp
@@ -364,8 +372,12 @@ add_files(
   utility/commandline/commands/CommandlineCommandIndex.h
   utility/interprocess/SharedMemory.cpp
   utility/interprocess/SharedMemory.h
-  utility/interprocess/SharedMemoryGarbageCollector.cpp
-  utility/interprocess/SharedMemoryGarbageCollector.h
+  # Base Factory {
+  utility/interprocess/ISharedMemoryGarbageCollector.cpp
+  utility/interprocess/ISharedMemoryGarbageCollector.hpp
+  utility/interprocess/details/SharedMemoryGarbageCollector.cpp
+  utility/interprocess/details/SharedMemoryGarbageCollector.h
+  # }
   utility/math/Color.h
   utility/math/MatrixBase.h
   utility/math/MatrixDynamicBase.h

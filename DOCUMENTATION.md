@@ -661,7 +661,7 @@ This dialog is shown after indexing was stopped, giving you information about in
     * Opens the [Bookmark Creator](#bookmark-creator) dialog create a new bookmark.
 * **Bookmark Manager**
     * Shortcut: Bookmark Manager](#shortcuts)
-    * Opens the [Bookmark Manager](#bookmark-manager) dialog for viewing all bookmarks.
+    * Opens the [Bookmark Manager](#bookmark-mManager) dialog for viewing all bookmarks.
 * **Recent Bookmarks**
     * List of recently added bookmarks for quick activation.
 
@@ -1067,7 +1067,7 @@ Search for a certain string in all indexed files by putting `?` at the front of 
 
 ### Bookmarking Buttons
 
-The `Bookmark Active Symbol` button on the left opens the [Bookmark Creator](#bookmark-creator) to create a new bookmark. The `Bookmark Manager` button on the right is used to display the [Bookmark Manager](#bookmark-manager) for activating and editing your bookmarks.
+The `Bookmark Active Symbol` button on the left opens the [Bookmark Creator](#bookmark-creator) to create a new bookmark. The `Bookmark Manager` button on the right is used to display the [Bookmark Manager](#bookmark-mManager) for activating and editing your bookmarks.
 
 !["Bookmark Buttons"](docs/documentation/bookmark_buttons.png "Bookmark Buttons")
 
@@ -1086,7 +1086,7 @@ Use the `Bookmark Creator` to create or edit bookmarks.
 | --- | ---
 | **Name** | The name of the bookmark. Initially the name of the node or edge is used.
 | **Comment** | Add an optional comment to the bookmark.
-| **Category** | Add the bookmark to a certain category. Bookmarks with the same category are grouped together in the [Bookmark Manager](#bookmark-manager).
+| **Category** | Add the bookmark to a certain category. Bookmarks with the same category are grouped together in the [Bookmark Manager](#bookmark-mManager).
 
 **Interactions:**
 

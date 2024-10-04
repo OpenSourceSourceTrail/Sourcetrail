@@ -4,11 +4,11 @@
 #include <set>
 #include <vector>
 
+#include "../../../scheduling/Task.h"
 #include "ErrorCountInfo.h"
 #include "FilePath.h"
 #include "MessageIndexingInterrupted.h"
 #include "MessageListener.h"
-#include "Task.h"
 #include "TimeStamp.h"
 
 class DialogView;

@@ -6,6 +6,7 @@
 #include "ComponentManager.h"
 #include "IApplicationSettings.hpp"
 #include "MockedApplicationSetting.hpp"
+#include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
@@ -22,6 +23,8 @@ using namespace testing;
 
 struct SetupMainFix : Test {
   void SetUp() override {
+    mMessageQueue = std::make_shared<MockedMessageQueue>();
+    IMessageQueue::setInstance(mMessageQueue);
     IApplicationSettings::setInstance(mMocked);
 
     EXPECT_CALL(factory, createCompositeView(_, _, _, _)).WillOnce(Return(nullptr));
@@ -63,10 +66,16 @@ struct SetupMainFix : Test {
   }
 
   void TearDown() override {
+    manager.reset();
+
     IApplicationSettings::setInstance(nullptr);
     mMocked.reset();
+
+    IMessageQueue::setInstance(nullptr);
+    mMessageQueue.reset();
   }
 
+  std::shared_ptr<MockedMessageQueue> mMessageQueue;
   StrictMock<MockedViewFactory> factory;
   MockedViewLayout mockedLayout;
   MockedStorageAccess mockedStorageAccess;
@@ -88,6 +97,9 @@ TEST_F(SetupMainFix, goodCase) {
 
 struct SetupTabFix : Test {
   void SetUp() override {
+    mMessageQueue = std::make_shared<MockedMessageQueue>();
+    IMessageQueue::setInstance(mMessageQueue);
+
     EXPECT_CALL(factory, createCompositeView(_, _, _, _)).WillOnce(Return(nullptr));
 
     EXPECT_CALL(factory, createUndoRedoView(_)).WillOnce(Return(nullptr));
@@ -105,12 +117,19 @@ struct SetupTabFix : Test {
     EXPECT_CALL(sender, addResponder(_)).Times(2);
   }
 
+  void TearDown() override {
+    mManager.reset();
+    IMessageQueue::setInstance(nullptr);
+    mMessageQueue.reset();
+  }
+
+  std::shared_ptr<MockedMessageQueue> mMessageQueue;
   MockedScreenSearchSender sender;
   StrictMock<MockedViewFactory> factory;
   MockedViewLayout mockedLayout;
-  std::unique_ptr<ComponentManager> manager = std::make_unique<ComponentManager>(&factory, nullptr);
+  std::unique_ptr<ComponentManager> mManager = std::make_unique<ComponentManager>(&factory, nullptr);
 };
 
 TEST_F(SetupTabFix, goodCase) {
-  manager->setupTab(&mockedLayout, Id {0}, &sender);
+  mManager->setupTab(&mockedLayout, Id {0}, &sender);
 }

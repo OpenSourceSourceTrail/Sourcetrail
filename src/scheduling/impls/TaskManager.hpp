@@ -22,4 +22,4 @@ private:
   std::mutex mSchedulersMutex;
 };
 
-}    // namespace lib::detail
+}    // namespace scheduling::impls

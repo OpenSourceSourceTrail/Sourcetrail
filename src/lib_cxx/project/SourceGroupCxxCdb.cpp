@@ -6,6 +6,7 @@
 #include <clang/Tooling/JSONCompilationDatabase.h>
 #include <clang/Tooling/Tooling.h>
 
+#include "../../scheduling/TaskLambda.h"
 #include "Application.h"
 #include "ClangInvocationInfo.h"
 #include "CxxCompilationDatabaseSingle.h"
@@ -14,7 +15,6 @@
 #include "IndexerCommandCxx.h"
 #include "MessageStatus.h"
 #include "SourceGroupSettingsCxxCdb.h"
-#include "TaskLambda.h"
 #include "logging.h"
 #include "utility.h"
 #include "utilitySourceGroupCxx.h"

@@ -3,10 +3,10 @@
 
 #include <queue>
 
+#include "../../../scheduling/Task.h"
 #include "InterprocessIndexerCommandManager.h"
 #include "MessageIndexingInterrupted.h"
 #include "MessageListener.h"
-#include "Task.h"
 
 class IndexerCommandProvider;
 

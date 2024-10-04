@@ -8,29 +8,27 @@
 #include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/algorithm/for_each.hpp>
 
+#include "../../../scheduling/TaskGroupParallel.h"
+#include "../../../scheduling/TaskGroupSequence.h"
+#include "../../../scheduling/TaskLambda.h"
 #include "MessageBase.h"
 #include "MessageFilter.h"
 #include "MessageListenerBase.h"
 #include "TabId.h"
-#include "TaskGroupParallel.h"
-#include "TaskGroupSequence.h"
-#include "TaskLambda.h"
 #include "logging.h"
 
-MessageQueue::Ptr MessageQueue::getInstance() {
-  if(!sInstance) {
-    sInstance = std::shared_ptr<MessageQueue>(new MessageQueue);
-  }
-  return sInstance;
-}
+IMessageQueue::Ptr IMessageQueue::sInstance;
 
-MessageQueue::~MessageQueue() {
+namespace details {
+MessageQueue::MessageQueue() noexcept = default;
+
+MessageQueue::~MessageQueue() noexcept {
   std::scoped_lock<std::mutex> lock(mListenersMutex);
   ranges::for_each(mListeners, [](auto& listener) { listener->removedListener(); });
   mListeners.clear();
 }
 
-void MessageQueue::registerListener(MessageListenerBase* listener) {
+void MessageQueue::registerListener(MessageListenerBase* listener) noexcept{
   std::scoped_lock<std::mutex> lock(mListenersMutex);
   if(ranges::find(mListeners, listener) != mListeners.end()) {
     return;
@@ -38,7 +36,7 @@ void MessageQueue::registerListener(MessageListenerBase* listener) {
   mListeners.push_back(listener);
 }
 
-void MessageQueue::unregisterListener(MessageListenerBase* listener) {
+void MessageQueue::unregisterListener(MessageListenerBase* listener) noexcept {
   std::scoped_lock<std::mutex> lock(mListenersMutex);
   if(auto found = ranges::find(mListeners, listener); found != mListeners.end()) {
     mListeners.erase(found);
@@ -59,20 +57,20 @@ void MessageQueue::unregisterListener(MessageListenerBase* listener) {
   LOG_ERROR("Listener was not found");
 }
 
-MessageListenerBase* MessageQueue::getListenerById(Id listenerId) const {
+MessageListenerBase* MessageQueue::getListenerById(Id listenerId) const noexcept {
   std::scoped_lock<std::mutex> lock(mListenersMutex);
   auto found = ranges::find_if(mListeners, [listenerId](auto* listener) { return listener->getId() == listenerId; });
   return found == mListeners.end() ? nullptr : *found;
 }
 
-void MessageQueue::addMessageFilter(std::shared_ptr<MessageFilter> filter) {
+void MessageQueue::addMessageFilter(std::shared_ptr<MessageFilter> filter) noexcept {
   if(ranges::find(mFilters, filter) != mFilters.end()) {
     return;
   }
   mFilters.push_back(std::move(filter));
 }
 
-void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) {
+void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) noexcept {
   std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
   if(ranges::find(mMessageBuffer, message) != mMessageBuffer.end()) {
     return;
@@ -80,7 +78,7 @@ void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) {
   mMessageBuffer.push_back(std::move(message));
 }
 
-void MessageQueue::processMessage(const std::shared_ptr<MessageBase>& message, bool asNextTask) {
+void MessageQueue::processMessage(const std::shared_ptr<MessageBase>& message, bool asNextTask) noexcept {
   if(message->isLogged()) {
     LOG_INFO_W(L"send " + message->str());
   }
@@ -93,13 +91,13 @@ void MessageQueue::processMessage(const std::shared_ptr<MessageBase>& message, b
   sendMessage(message);
 }
 
-void MessageQueue::startMessageLoopThreaded() {
+void MessageQueue::startMessageLoopThreaded() noexcept {
   // TODO(Hussein): Remove `detach()`
   std::thread(&MessageQueue::startMessageLoop, this).detach();
   mThreadIsRunning = true;
 }
 
-void MessageQueue::startMessageLoop() {
+void MessageQueue::startMessageLoop() noexcept {
   if(mLoopIsRunning) {
     LOG_ERROR("Loop is already running");
     return;
@@ -122,7 +120,7 @@ void MessageQueue::startMessageLoop() {
   }
 }
 
-void MessageQueue::stopMessageLoop() {
+void MessageQueue::stopMessageLoop() noexcept {
   if(!mLoopIsRunning) {
     LOG_WARNING("Loop is not running");
   }
@@ -139,22 +137,18 @@ void MessageQueue::stopMessageLoop() {
   }
 }
 
-bool MessageQueue::loopIsRunning() const {
+bool MessageQueue::loopIsRunning() const noexcept {
   return mLoopIsRunning;
 }
 
-bool MessageQueue::hasMessagesQueued() const {
+bool MessageQueue::hasMessagesQueued() const noexcept {
   std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
   return !mMessageBuffer.empty();
 }
 
-void MessageQueue::setSendMessagesAsTasks(bool sendMessagesAsTasks) {
+void MessageQueue::setSendMessagesAsTasks(bool sendMessagesAsTasks) noexcept {
   mSendMessagesAsTasks = sendMessagesAsTasks;
 }
-
-MessageQueue::Ptr MessageQueue::sInstance;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-
-MessageQueue::MessageQueue() = default;
 
 void MessageQueue::processMessages() {
   while(true) {
@@ -240,4 +234,5 @@ void MessageQueue::sendMessageAsTask(const std::shared_ptr<MessageBase>& message
   } else {
     Task::dispatch(schedulerId, taskGroup);
   }
+}
 }

@@ -75,8 +75,9 @@
                 "ENABLE_UNIT_TEST": "ON",
                 "ENABLE_GUI_TEST": "ON",
                 "ENABLE_INTEGRATION_TEST": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "OFF",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Debug/generators/conan_toolchain.cmake"
+                "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
+                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Debug/generators/conan_toolchain.cmake",
+                "Clang_DIR": "$env{CLANG_DIR}/lib/cmake/clang/"
             },
             "inherits": [
                 "ninja",
