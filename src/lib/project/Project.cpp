@@ -2,10 +2,19 @@
 
 #include <utility>
 
+#include "../../scheduling/TaskDecoratorRepeat.h"
+#include "../../scheduling/TaskFindKeyOnBlackboard.h"
+#include "../../scheduling/TaskGroupParallel.h"
+#include "../../scheduling/TaskGroupSelector.h"
+#include "../../scheduling/TaskGroupSequence.h"
+#include "../../scheduling/TaskLambda.h"
+#include "../../scheduling/TaskReturnSuccessIf.h"
+#include "../../scheduling/TaskSetValue.h"
 #include "CombinedIndexerCommandProvider.h"
 #include "DialogView.h"
 #include "FilePath.h"
 #include "FileSystem.h"
+#include "IApplicationSettings.hpp"
 #include "MessageErrorCountClear.h"
 #include "MessageIndexingFinished.h"
 #include "MessageIndexingShowDialog.h"
@@ -24,22 +33,13 @@
 #include "TabId.h"
 #include "TaskBuildIndex.h"
 #include "TaskCleanStorage.h"
-#include "TaskDecoratorRepeat.h"
 #include "TaskExecuteCustomCommands.h"
 #include "TaskFillIndexerCommandQueue.h"
-#include "TaskFindKeyOnBlackboard.h"
 #include "TaskFinishParsing.h"
-#include "TaskGroupParallel.h"
-#include "TaskGroupSelector.h"
-#include "TaskGroupSequence.h"
 #include "TaskInjectStorage.h"
-#include "TaskLambda.h"
 #include "TaskMergeStorages.h"
 #include "TaskParseWrapper.h"
-#include "TaskReturnSuccessIf.h"
-#include "TaskSetValue.h"
 #include "TextAccess.h"
-#include "IApplicationSettings.hpp"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityString.h"
@@ -86,7 +86,7 @@ bool Project::settingsEqualExceptNameAndLocation(const ProjectSettings& otherSet
 }
 
 void Project::setStateOutdated() {
-  if(m_state == ProjectStateType::LOADED) {
+  if(ProjectStateType::LOADED == m_state) {
     m_state = ProjectStateType::OUTDATED;
   }
 }

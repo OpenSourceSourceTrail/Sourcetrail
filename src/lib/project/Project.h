@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 
+#include "IProject.hpp"
 #include "RefreshInfo.h"
 #include "SourceGroup.h"
 
@@ -22,7 +23,7 @@ struct ProjectFix;
 /**
  * @brief Project object
  */
-class Project final {
+class Project final : public IProject {
 public:
   /**
    * @brief Constructor
@@ -41,24 +42,24 @@ public:
   Project& operator=(Project&&) = delete;
   /**  @} */
 
-  ~Project();
+  ~Project() override;
 
-  [[nodiscard]] FilePath getProjectSettingsFilePath() const;
-  [[nodiscard]] std::string getDescription() const;
+  [[nodiscard]] FilePath getProjectSettingsFilePath() const override;
+  [[nodiscard]] std::string getDescription() const override;
 
-  [[nodiscard]] bool isLoaded() const;
-  [[nodiscard]] bool isIndexing() const;
+  [[nodiscard]] bool isLoaded() const override;
+  [[nodiscard]] bool isIndexing() const override;
 
-  [[nodiscard]] bool settingsEqualExceptNameAndLocation(const ProjectSettings& otherSettings) const;
-  void setStateOutdated();
+  [[nodiscard]] bool settingsEqualExceptNameAndLocation(const ProjectSettings& otherSettings) const override;
+  void setStateOutdated() override;
 
-  void load(const std::shared_ptr<DialogView>& dialogView);
+  void load(const std::shared_ptr<DialogView>& dialogView) override;
 
-  void refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested);
+  void refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested) override;
 
-  [[nodiscard]] RefreshInfo getRefreshInfo(RefreshMode mode) const;
+  [[nodiscard]] RefreshInfo getRefreshInfo(RefreshMode mode) const override;
 
-  void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView);
+  void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) override;
 
 private:
   enum class ProjectStateType { NOT_LOADED, EMPTY, LOADED, OUTDATED, OUTVERSIONED, NEEDS_MIGRATION, DB_CORRUPTED };

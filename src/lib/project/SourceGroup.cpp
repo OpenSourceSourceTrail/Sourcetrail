@@ -1,11 +1,11 @@
 #include "SourceGroup.h"
 
+#include "../../scheduling/TaskLambda.h"
 #include "FilePath.h"
 #include "FilePathFilter.h"
 #include "MemoryIndexerCommandProvider.h"
 #include "ProjectSettings.h"
 #include "SourceGroupSettings.h"
-#include "TaskLambda.h"
 
 SourceGroup::~SourceGroup() = default;
 
