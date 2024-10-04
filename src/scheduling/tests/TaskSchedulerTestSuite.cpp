@@ -3,11 +3,11 @@
 
 #include <gtest/gtest.h>
 
-#include "Blackboard.h"
-#include "Task.h"
-#include "TaskGroupSelector.h"
-#include "TaskGroupSequence.h"
-#include "TaskScheduler.h"
+#include "../Blackboard.h"
+#include "../Task.h"
+#include "../TaskGroupSelector.h"
+#include "../TaskGroupSequence.h"
+#include "../TaskScheduler.h"
 
 namespace {
 void executeTask(Task& task) {

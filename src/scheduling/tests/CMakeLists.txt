@@ -1,5 +1,5 @@
 # ${CMAKE_SOURCE_DIR}/src/scheduling/tests/CMakeLists.txt
-set(test_lib_names TaskSchedulerTestSuite)
+set(test_lib_names TaskSchedulerTestSuite TaskManagerTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
   add_executable(${test_name} ${test_name}.cpp)

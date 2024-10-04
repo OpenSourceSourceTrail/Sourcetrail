@@ -8,7 +8,7 @@
 #include "TaskRunner.h"
 #include "types.h"
 
-class TaskScheduler {
+class TaskScheduler final {
 public:
   explicit TaskScheduler(Id schedulerId);
   ~TaskScheduler();

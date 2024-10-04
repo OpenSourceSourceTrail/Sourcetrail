@@ -1,11 +1,13 @@
 #include "TaskRunner.h"
 
+#include <utility>
+
 #include "Blackboard.h"
-#include "TaskManager.h"
+#include "ITaskManager.hpp"
 #include "TaskScheduler.h"
 #include "logging.h"
 
-TaskRunner::TaskRunner(std::shared_ptr<Task> task) : m_task(task), m_reset(false) {}
+TaskRunner::TaskRunner(std::shared_ptr<Task> task) : m_task(std::move(task)), m_reset(false) {}
 
 Task::TaskState TaskRunner::update(Id schedulerId) {
   if(!m_blackboard) {
@@ -40,7 +42,7 @@ Task::TaskState TaskRunner::update(std::shared_ptr<Blackboard> blackboard) {
 
   Id schedulerId = 0;
   if(blackboard->get<Id>("scheduler_id", schedulerId)) {
-    TaskManager::getScheduler(schedulerId)->terminateRunningTasks();
+    scheduling::ITaskManager::getInstanceRaw()->getScheduler(schedulerId)->terminateRunningTasks();
   }
 
   return Task::STATE_FAILURE;

@@ -1,5 +1,4 @@
-#ifndef SHARED_MEMORY_GARBAGE_COLLECTOR_H
-#define SHARED_MEMORY_GARBAGE_COLLECTOR_H
+#pragma once
 
 #include <memory>
 #include <mutex>
@@ -9,7 +8,26 @@
 
 #include "SharedMemory.h"
 
-class SharedMemoryGarbageCollector {
+struct ISharedMemoryGarbageCollector {
+  static void setInstance(std::shared_ptr<ISharedMemoryGarbageCollector> instance);
+  static bool createInstance();
+  static std::shared_ptr<ISharedMemoryGarbageCollector> getInstance();
+  static ISharedMemoryGarbageCollector* getInstanceRaw();
+
+  ISharedMemoryGarbageCollector();
+  virtual ~ISharedMemoryGarbageCollector();
+
+  virtual void run(const std::string& uuid) = 0;
+  virtual void stop() = 0;
+
+  virtual void registerSharedMemory(const std::string& sharedMemoryName) = 0;
+  virtual void unregisterSharedMemory(const std::string& sharedMemoryName) = 0;
+
+private:
+  static std::shared_ptr<ISharedMemoryGarbageCollector> sInstance;
+};
+
+class SharedMemoryGarbageCollector : public ISharedMemoryGarbageCollector {
 public:
   static SharedMemoryGarbageCollector* createInstance();
   static SharedMemoryGarbageCollector* getInstance();
@@ -34,8 +52,6 @@ private:
   static const size_t s_updateIntervalSeconds;
   static const size_t s_deleteThresholdSeconds;
 
-  static std::shared_ptr<SharedMemoryGarbageCollector> s_instance;
-
   SharedMemory m_memory;
   volatile bool m_loopIsRunning;
   std::shared_ptr<std::thread> m_thread;
@@ -46,5 +62,3 @@ private:
   std::set<std::string> m_sharedMemoryNames;
   std::set<std::string> m_removedSharedMemoryNames;
 };
-
-#endif    // SHARED_MEMORY_GARBAGE_COLLECTOR_H
