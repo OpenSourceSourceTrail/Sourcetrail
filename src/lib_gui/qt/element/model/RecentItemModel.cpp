@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 
-#include "MessageLoadProject.h"
+#include "type/MessageLoadProject.h"
 #include "ProjectSettings.h"
 
 namespace {

@@ -2,12 +2,12 @@
 
 #include "FilePath.h"
 #include "GraphFocusHandler.h"
-#include "MessageActivateNodes.h"
-#include "MessageDeactivateEdge.h"
-#include "MessageFocusIn.h"
-#include "MessageFocusOut.h"
-#include "MessageTabOpenWith.h"
-#include "MessageTooltipShow.h"
+#include "type/graph/MessageActivateNodes.h"
+#include "type/graph/MessageDeactivateEdge.h"
+#include "type/focus/MessageFocusIn.h"
+#include "type/focus/MessageFocusOut.h"
+#include "type/tab/MessageTabOpenWith.h"
+#include "type/MessageTooltipShow.h"
 #include "ResourcePaths.h"
 #include "TokenComponentFilePath.h"
 

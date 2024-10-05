@@ -11,7 +11,7 @@
 
 #include "ColorScheme.h"
 #include "GraphViewStyle.h"
-#include "MessageFocusedSearchView.h"
+#include "type/focus/MessageFocusedSearchView.h"
 #include "NodeTypeSet.h"
 #include "utility.h"
 #include "utilityString.h"

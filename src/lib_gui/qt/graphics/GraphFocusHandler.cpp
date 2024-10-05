@@ -1,6 +1,6 @@
 #include "GraphFocusHandler.h"
 
-#include "MessageFocusChanged.h"
+#include "type/focus/MessageFocusChanged.h"
 #include "QtGraphEdge.h"
 #include "QtGraphNode.h"
 #include "utility.h"

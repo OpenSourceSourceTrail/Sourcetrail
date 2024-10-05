@@ -2,17 +2,17 @@
 #define TOOLTIP_CONTROLLER_H
 
 #include "Controller.h"
-#include "MessageActivateLocalSymbols.h"
-#include "MessageActivateTokens.h"
-#include "MessageFocusIn.h"
-#include "MessageFocusOut.h"
-#include "MessageGraphNodeExpand.h"
+#include "type/code/MessageActivateLocalSymbols.h"
+#include "type/activation/MessageActivateTokens.h"
+#include "type/focus/MessageFocusIn.h"
+#include "type/focus/MessageFocusOut.h"
+#include "type/graph/MessageGraphNodeExpand.h"
 #include "MessageListener.h"
-#include "MessageScrollCode.h"
-#include "MessageScrollGraph.h"
-#include "MessageTooltipHide.h"
-#include "MessageTooltipShow.h"
-#include "MessageWindowFocus.h"
+#include "type/code/MessageScrollCode.h"
+#include "type/graph/MessageScrollGraph.h"
+#include "type/MessageTooltipHide.h"
+#include "type/MessageTooltipShow.h"
+#include "type/MessageWindowFocus.h"
 
 class StorageAccess;
 class TooltipView;

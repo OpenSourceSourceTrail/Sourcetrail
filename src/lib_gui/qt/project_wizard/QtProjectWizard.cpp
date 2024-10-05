@@ -9,8 +9,8 @@
 //
 #include "language_packages.h"
 // internal
-#include "MessageLoadProject.h"
-#include "MessageStatus.h"
+#include "type/MessageLoadProject.h"
+#include "type/MessageStatus.h"
 #include "ProjectSettings.h"
 #include "ProjectWizardModel.hpp"
 #include "QtProjectWizardContent.h"

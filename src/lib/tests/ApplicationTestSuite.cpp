@@ -14,7 +14,7 @@
 #include "Project.h"
 #include "ProjectSettings.h"
 #undef private
-#include "MessageStatus.h"
+#include "type/MessageStatus.h"
 #include "MockedFactory.hpp"
 #include "MockedProject.hpp"
 #include "MockedSharedMemoryGarbageCollector.hpp"

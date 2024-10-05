@@ -7,8 +7,8 @@
 #include <QStandardItemModel>
 
 #include "ColorScheme.h"
-#include "MessageClearStatusView.h"
-#include "MessageStatusFilterChanged.h"
+#include "type/MessageClearStatusView.h"
+#include "type/MessageStatusFilterChanged.h"
 #include "QtTable.h"
 #include "QtViewWidgetWrapper.h"
 #include "IApplicationSettings.hpp"

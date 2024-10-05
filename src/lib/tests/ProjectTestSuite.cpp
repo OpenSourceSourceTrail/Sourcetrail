@@ -6,7 +6,7 @@
 
 #include "FilePath.h"
 #include "MessageListener.h"
-#include "MessageStatus.h"
+#include "type/MessageStatus.h"
 #define private public
 #include "Project.h"
 #undef private

@@ -6,16 +6,16 @@
 
 #include "ActivationListener.h"
 #include "Controller.h"
-#include "MessageActivateLocalSymbols.h"
-#include "MessageActivateTrailEdge.h"
-#include "MessageChangeFileView.h"
-#include "MessageCodeShowDefinition.h"
-#include "MessageDeactivateEdge.h"
-#include "MessageGraphNodeBundleSplit.h"
-#include "MessageGraphNodeExpand.h"
-#include "MessageGraphNodeHide.h"
 #include "MessageListener.h"
 #include "ScreenSearchInterfaces.h"
+#include "type/code/MessageActivateLocalSymbols.h"
+#include "type/code/MessageChangeFileView.h"
+#include "type/code/MessageCodeShowDefinition.h"
+#include "type/graph/MessageActivateTrailEdge.h"
+#include "type/graph/MessageDeactivateEdge.h"
+#include "type/graph/MessageGraphNodeBundleSplit.h"
+#include "type/graph/MessageGraphNodeExpand.h"
+#include "type/graph/MessageGraphNodeHide.h"
 
 class ScreenSearchController
     : public Controller

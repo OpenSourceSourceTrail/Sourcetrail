@@ -16,7 +16,7 @@
 #include "ColorScheme.h"
 #include "ErrorController.h"
 #include "ErrorFilter.h"
-#include "MessageProjectEdit.h"
+#include "type/MessageProjectEdit.h"
 #include "QtHelpButton.h"
 #include "QtSelfRefreshIconButton.h"
 #include "QtTable.h"

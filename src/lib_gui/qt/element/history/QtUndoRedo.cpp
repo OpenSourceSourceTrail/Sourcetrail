@@ -3,8 +3,8 @@
 #include <QHBoxLayout>
 #include <QTimer>
 
-#include "MessageHistoryRedo.h"
-#include "MessageHistoryUndo.h"
+#include "type/history/MessageHistoryRedo.h"
+#include "type/history/MessageHistoryUndo.h"
 #include "QtContextMenu.h"
 #include "QtHistoryList.h"
 #include "QtSearchBarButton.h"

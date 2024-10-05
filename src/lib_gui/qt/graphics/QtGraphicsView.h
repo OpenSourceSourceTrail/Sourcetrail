@@ -4,7 +4,7 @@
 #include <QGraphicsView>
 
 #include "MessageListener.h"
-#include "MessageSaveAsImage.h"
+#include "type/graph/MessageSaveAsImage.h"
 #include "types.h"
 
 

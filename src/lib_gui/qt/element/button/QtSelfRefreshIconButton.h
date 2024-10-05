@@ -5,7 +5,7 @@
 
 #include "FilePath.h"
 #include "MessageListener.h"
-#include "MessageRefreshUI.h"
+#include "type/MessageRefreshUI.h"
 #include "QtThreadedFunctor.h"
 
 class QtSelfRefreshIconButton

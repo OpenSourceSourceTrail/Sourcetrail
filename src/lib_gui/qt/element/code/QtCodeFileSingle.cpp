@@ -7,7 +7,7 @@
 #include <QVBoxLayout>
 
 #include "FilePath.h"
-#include "MessageChangeFileView.h"
+#include "type/code/MessageChangeFileView.h"
 #include "QtCodeArea.h"
 #include "QtCodeFileTitleBar.h"
 #include "QtCodeFileTitleButton.h"

@@ -4,9 +4,9 @@
 #include <QMovie>
 #include <QProgressBar>
 
-#include "MessageErrorsAll.h"
-#include "MessageIndexingShowDialog.h"
-#include "MessageShowStatus.h"
+#include "type/error/MessageErrorsAll.h"
+#include "type/indexing/MessageIndexingShowDialog.h"
+#include "type/MessageShowStatus.h"
 #include "ResourcePaths.h"
 #include "utilityQt.h"
 

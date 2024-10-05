@@ -136,6 +136,7 @@ target_link_libraries(
           Sourcetrail::core
           Sourcetrail::lib
           Sourcetrail::lib_utility
+          Sourcetrail::messaging
           Sourcetrail::scheduling
           ${REQ_LLVM_LIBS}
           ${CLANG_LIBRARIES}

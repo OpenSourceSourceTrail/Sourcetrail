@@ -11,7 +11,7 @@
 #include <QSlider>
 
 #include "ColorScheme.h"
-#include "MessageActivateTrail.h"
+#include "type/activation/MessageActivateTrail.h"
 #include "NodeTypeSet.h"
 #include "QtMainWindow.h"
 #include "QtSmartSearchBox.h"

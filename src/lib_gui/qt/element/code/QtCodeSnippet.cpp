@@ -6,7 +6,7 @@
 
 #include <qmenu.h>
 
-#include "MessageShowScope.h"
+#include "type/code/MessageShowScope.h"
 #include "QtCodeFile.h"
 #include "QtCodeNavigator.h"
 #include "QtHoverButton.h"

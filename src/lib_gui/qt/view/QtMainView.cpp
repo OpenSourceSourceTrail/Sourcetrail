@@ -1,6 +1,6 @@
 #include "QtMainView.h"
 
-#include "MessageRefreshUIState.h"
+#include "type/MessageRefreshUIState.h"
 #include "QtMainWindow.h"
 #include "QtViewWidgetWrapper.h"
 #include "utilityApp.h"

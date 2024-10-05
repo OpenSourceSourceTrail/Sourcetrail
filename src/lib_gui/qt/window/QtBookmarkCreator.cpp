@@ -7,13 +7,13 @@
 #include <QVBoxLayout>
 
 #include "BookmarkCategory.h"
-#include "MessageStatus.h"
+#include "type/MessageStatus.h"
 #include "utilityQt.h"
 
 QtBookmarkCreator::QtBookmarkCreator(ControllerProxy<BookmarkController>* controllerProxy, QWidget* parent, Id bookmarkId)
     : QtWindow(false, parent), m_controllerProxy(controllerProxy), m_editBookmarkId(bookmarkId), m_nodeId(0) {}
 
-QtBookmarkCreator::~QtBookmarkCreator() {}
+QtBookmarkCreator::~QtBookmarkCreator() = default;
 
 void QtBookmarkCreator::setupBookmarkCreator() {
   QVBoxLayout* mainLayout = new QVBoxLayout(this);

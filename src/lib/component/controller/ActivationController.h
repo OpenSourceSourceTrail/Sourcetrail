@@ -4,15 +4,15 @@
 // internal
 #include "Controller.h"
 // message
-#include "MessageActivateEdge.h"
-#include "MessageActivateFile.h"
-#include "MessageActivateNodes.h"
-#include "MessageActivateSourceLocations.h"
-#include "MessageActivateTokenIds.h"
+#include "type/graph/MessageActivateEdge.h"
+#include "type/code/MessageActivateFile.h"
+#include "type/graph/MessageActivateNodes.h"
+#include "type/code/MessageActivateSourceLocations.h"
+#include "type/code/MessageActivateTokenIds.h"
 #include "MessageListener.h"
-#include "MessageResetZoom.h"
-#include "MessageSearch.h"
-#include "MessageZoom.h"
+#include "type/MessageResetZoom.h"
+#include "type/search/MessageSearch.h"
+#include "type/MessageZoom.h"
 
 class StorageAccess;
 

@@ -4,7 +4,7 @@
 #include <QPen>
 
 #include "GraphViewStyle.h"
-#include "MessageGraphNodeBundleSplit.h"
+#include "type/graph/MessageGraphNodeBundleSplit.h"
 #include "QtCountCircleItem.h"
 
 QtGraphNodeBundle::QtGraphNodeBundle(

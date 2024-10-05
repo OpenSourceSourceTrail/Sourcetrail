@@ -1,7 +1,6 @@
-#ifndef MESSAGE_FILTER_ERROR_COUNT_UPDATE_H
-#define MESSAGE_FILTER_ERROR_COUNT_UPDATE_H
+#pragma once
 
-#include "MessageErrorCountUpdate.h"
+#include "type/error/MessageErrorCountUpdate.h"
 #include "MessageFilter.h"
 
 class MessageFilterErrorCountUpdate : public MessageFilter {
@@ -27,5 +26,3 @@ class MessageFilterErrorCountUpdate : public MessageFilter {
     }
   }
 };
-
-#endif    // MESSAGE_FILTER_ERROR_COUNT_UPDATE_H

@@ -1,9 +1,9 @@
 #include "CodeFocusHandler.h"
 
-#include "MessageFocusChanged.h"
-#include "MessageFocusIn.h"
-#include "MessageFocusOut.h"
-#include "MessageFocusView.h"
+#include "type/focus/MessageFocusChanged.h"
+#include "type/focus/MessageFocusIn.h"
+#include "type/focus/MessageFocusOut.h"
+#include "type/focus/MessageFocusView.h"
 
 CodeFocusHandler::~CodeFocusHandler() = default;
 

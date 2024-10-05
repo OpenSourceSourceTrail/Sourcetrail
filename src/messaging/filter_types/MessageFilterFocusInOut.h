@@ -2,8 +2,8 @@
 #define MESSAGE_FILTER_FOCUS_IN_OUT_H
 
 #include "MessageFilter.h"
-#include "MessageFocusIn.h"
-#include "MessageFocusOut.h"
+#include "type/focus/MessageFocusIn.h"
+#include "type/focus/MessageFocusOut.h"
 
 class MessageFilterFocusInOut : public MessageFilter {
   void filter(IMessageQueue::MessageBufferType* messageBuffer) override {

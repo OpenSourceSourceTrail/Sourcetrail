@@ -5,10 +5,10 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-#include "MessageBookmarkBrowse.h"
-#include "MessageBookmarkCreate.h"
-#include "MessageBookmarkDelete.h"
-#include "MessageBookmarkEdit.h"
+#include "type/bookmark/MessageBookmarkBrowse.h"
+#include "type/bookmark/MessageBookmarkCreate.h"
+#include "type/bookmark/MessageBookmarkDelete.h"
+#include "type/bookmark/MessageBookmarkEdit.h"
 #include "QtSearchBarButton.h"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"

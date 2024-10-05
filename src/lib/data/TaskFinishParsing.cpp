@@ -4,9 +4,9 @@
 
 #include "../../scheduling/Blackboard.h"
 #include "DialogView.h"
-#include "MessageIndexingFinished.h"
-#include "MessageIndexingStatus.h"
-#include "MessageStatus.h"
+#include "type/indexing/MessageIndexingFinished.h"
+#include "type/indexing/MessageIndexingStatus.h"
+#include "type/MessageStatus.h"
 #include "PersistentStorage.h"
 #include "TimeStamp.h"
 #include "utilityString.h"

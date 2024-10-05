@@ -3,8 +3,8 @@
 #include <QFrame>
 #include <QHBoxLayout>
 
-#include "MessageIndexingShowDialog.h"
-#include "MessageRefresh.h"
+#include "type/indexing/MessageIndexingShowDialog.h"
+#include "type/MessageRefresh.h"
 #include "QtSearchBarButton.h"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"

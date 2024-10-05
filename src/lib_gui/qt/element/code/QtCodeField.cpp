@@ -7,11 +7,11 @@
 #include <QWindow>
 
 #include "ColorScheme.h"
-#include "MessageActivateLocalSymbols.h"
-#include "MessageActivateSourceLocations.h"
-#include "MessageActivateTokenIds.h"
-#include "MessageTabOpenWith.h"
-#include "MessageTooltipShow.h"
+#include "type/code/MessageActivateLocalSymbols.h"
+#include "type/code/MessageActivateSourceLocations.h"
+#include "type/code/MessageActivateTokenIds.h"
+#include "type/tab/MessageTabOpenWith.h"
+#include "type/MessageTooltipShow.h"
 #include "QtContextMenu.h"
 #include "QtHighlighter.h"
 #include "SourceLocation.h"

@@ -6,7 +6,7 @@
 #include <QVariant>
 
 #include "Application.h"
-#include "MessageErrorsForFile.h"
+#include "type/error/MessageErrorsForFile.h"
 #include "Project.h"
 #include "QtIconStateButton.h"
 #include "QtSelfRefreshIconButton.h"

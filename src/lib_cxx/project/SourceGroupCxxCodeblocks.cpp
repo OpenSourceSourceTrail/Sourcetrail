@@ -1,16 +1,18 @@
 #include "SourceGroupCxxCodeblocks.h"
 
+#include <utility>
+
 #include "Application.h"
 #include "CodeblocksProject.h"
 #include "CxxIndexerCommandProvider.h"
 #include "IndexerCommandCxx.h"
-#include "MessageStatus.h"
+#include "type/MessageStatus.h"
 #include "SourceGroupSettingsCxxCodeblocks.h"
 #include "IApplicationSettings.hpp"
 #include "utility.h"
 
 SourceGroupCxxCodeblocks::SourceGroupCxxCodeblocks(std::shared_ptr<SourceGroupSettingsCxxCodeblocks> settings)
-    : m_settings(settings) {}
+    : m_settings(std::move(settings)) {}
 
 bool SourceGroupCxxCodeblocks::prepareIndexing() {
   FilePath codeblocksProjectPath = m_settings->getCodeblocksProjectPathExpandedAndAbsolute();

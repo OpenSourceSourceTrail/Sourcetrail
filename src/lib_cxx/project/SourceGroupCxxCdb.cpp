@@ -13,13 +13,13 @@
 #include "CxxIndexerCommandProvider.h"
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandCxx.h"
-#include "MessageStatus.h"
+#include "type/MessageStatus.h"
 #include "SourceGroupSettingsCxxCdb.h"
 #include "logging.h"
 #include "utility.h"
 #include "utilitySourceGroupCxx.h"
 
-SourceGroupCxxCdb::SourceGroupCxxCdb(std::shared_ptr<SourceGroupSettingsCxxCdb> settings) : m_settings(settings) {}
+SourceGroupCxxCdb::SourceGroupCxxCdb(std::shared_ptr<SourceGroupSettingsCxxCdb> settings) : m_settings(std::move(settings)) {}
 
 bool SourceGroupCxxCdb::prepareIndexing() {
   FilePath cdbPath = m_settings->getCompilationDatabasePathExpandedAndAbsolute();

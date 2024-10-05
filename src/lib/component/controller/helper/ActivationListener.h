@@ -1,11 +1,11 @@
 #pragma once
 // internal
-#include "MessageActivateErrors.h"
-#include "MessageActivateFullTextSearch.h"
-#include "MessageActivateLegend.h"
-#include "MessageActivateOverview.h"
-#include "MessageActivateTokens.h"
-#include "MessageActivateTrail.h"
+#include "type/activation/MessageActivateErrors.h"
+#include "type/activation/MessageActivateFullTextSearch.h"
+#include "type/activation/MessageActivateLegend.h"
+#include "type/activation/MessageActivateOverview.h"
+#include "type/activation/MessageActivateTokens.h"
+#include "type/activation/MessageActivateTrail.h"
 #include "MessageListener.h"
 
 class ActivationListener

@@ -2,7 +2,7 @@
 
 #include <QFontMetrics>
 
-#include "MessageGraphNodeExpand.h"
+#include "type/graph/MessageGraphNodeExpand.h"
 #include "QtDeviceScaledPixmap.h"
 #include "QtRoundedRectItem.h"
 #include "ResourcePaths.h"

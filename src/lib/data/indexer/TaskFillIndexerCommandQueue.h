@@ -5,7 +5,7 @@
 
 #include "../../../scheduling/Task.h"
 #include "InterprocessIndexerCommandManager.h"
-#include "MessageIndexingInterrupted.h"
+#include "type/indexing/MessageIndexingInterrupted.h"
 #include "MessageListener.h"
 
 class IndexerCommandProvider;

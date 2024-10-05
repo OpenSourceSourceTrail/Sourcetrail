@@ -8,9 +8,9 @@
 #include <QPen>
 
 #include "GraphFocusHandler.h"
-#include "MessageCodeShowDefinition.h"
-#include "MessageGraphNodeHide.h"
-#include "MessageGraphNodeMove.h"
+#include "type/code/MessageCodeShowDefinition.h"
+#include "type/graph/MessageGraphNodeHide.h"
+#include "type/graph/MessageGraphNodeMove.h"
 #include "QtDeviceScaledPixmap.h"
 #include "QtGraphEdge.h"
 #include "QtGraphNodeComponent.h"

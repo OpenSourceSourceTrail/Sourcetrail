@@ -18,12 +18,12 @@
 #include <QToolTip>
 
 #include "ColorScheme.h"
-#include "MessageActivateLocalSymbols.h"
-#include "MessageActivateTokenIds.h"
-#include "MessageFocusIn.h"
-#include "MessageFocusOut.h"
-#include "MessageMoveIDECursor.h"
-#include "MessageShowError.h"
+#include "type/code/MessageActivateLocalSymbols.h"
+#include "type/code/MessageActivateTokenIds.h"
+#include "type/focus/MessageFocusIn.h"
+#include "type/focus/MessageFocusOut.h"
+#include "type/plugin/MessageMoveIDECursor.h"
+#include "type/error/MessageShowError.h"
 #include "QtCodeNavigator.h"
 #include "QtContextMenu.h"
 #include "SourceLocationFile.h"

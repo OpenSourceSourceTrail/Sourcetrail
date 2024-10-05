@@ -3,7 +3,7 @@
 #include <QStyle>
 #include <QVBoxLayout>
 
-#include "MessageChangeFileView.h"
+#include "type/code/MessageChangeFileView.h"
 #include "QtCodeFileTitleBar.h"
 #include "QtCodeNavigator.h"
 #include "QtCodeSnippet.h"

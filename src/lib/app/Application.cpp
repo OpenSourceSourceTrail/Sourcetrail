@@ -17,12 +17,12 @@
 #include "IDECommunicationController.h"
 #include "ISharedMemoryGarbageCollector.hpp"
 #include "MainView.h"
-#include "MessageFilterErrorCountUpdate.h"
-#include "MessageFilterFocusInOut.h"
-#include "MessageFilterSearchAutocomplete.h"
+#include "filter_types/MessageFilterErrorCountUpdate.h"
+#include "filter_types/MessageFilterFocusInOut.h"
+#include "filter_types/MessageFilterSearchAutocomplete.h"
 #include "MessageQueue.h"
-#include "MessageQuitApplication.h"
-#include "MessageStatus.h"
+#include "type/MessageQuitApplication.h"
+#include "type/MessageStatus.h"
 #include "NetworkFactory.h"
 #include "ProjectSettings.h"
 #include "SharedMemory.h"
@@ -80,7 +80,7 @@ std::wstring generateDatedFileName(const std::wstring& prefix, const std::wstrin
 }    // namespace
 
 Application::Ptr Application::sInstance;
-std::string Application::s_uuid;
+std::string Application::sUuid;
 
 void Application::createInstance(const Version& version,
                                  std::shared_ptr<lib::IFactory> factory,
@@ -111,13 +111,13 @@ void Application::createInstance(const Version& version,
   sInstance->mStorageCache = std::make_shared<StorageCache>();
 
   if(hasGui) {
-    sInstance->m_mainView = viewFactory->createMainView(sInstance->mStorageCache.get());
-    sInstance->m_mainView->setup();
+    sInstance->mMainView = viewFactory->createMainView(sInstance->mStorageCache.get());
+    sInstance->mMainView->setup();
   }
 
   if(nullptr != networkFactory) {
-    sInstance->m_ideCommunicationController = networkFactory->createIDECommunicationController(sInstance->mStorageCache.get());
-    sInstance->m_ideCommunicationController->startListening();
+    sInstance->mIdeCommunicationController = networkFactory->createIDECommunicationController(sInstance->mStorageCache.get());
+    sInstance->mIdeCommunicationController->startListening();
   }
 
   sInstance->startMessagingAndScheduling();
@@ -133,11 +133,11 @@ void Application::destroyInstance() {
 }
 
 std::string Application::getUUID() {
-  if(s_uuid.empty()) {
-    s_uuid = utility::getUuidString();
+  if(sUuid.empty()) {
+    sUuid = utility::getUuidString();
   }
 
-  return s_uuid;
+  return sUuid;
 }
 
 void Application::loadSettings() {
@@ -176,7 +176,7 @@ Application::Application(std::shared_ptr<lib::IFactory> factory, bool withGUI)
 
 Application::~Application() {
   if(mHasGui) {
-    m_mainView->saveLayout();
+    mMainView->saveLayout();
   }
 
   if(auto* collector = lib::ISharedMemoryGarbageCollector::getInstanceRaw(); collector) {
@@ -193,8 +193,8 @@ int Application::handleDialog(const std::wstring& message, const std::vector<std
 }
 
 std::shared_ptr<DialogView> Application::getDialogView(DialogView::UseCase useCase) {
-  if(m_mainView) {
-    return m_mainView->getDialogView(useCase);
+  if(mMainView) {
+    return mMainView->getDialogView(useCase);
   }
 
   return std::make_shared<DialogView>(useCase, nullptr);
@@ -204,14 +204,14 @@ void Application::updateHistoryMenu(std::shared_ptr<MessageBase> message) {
   if(!message) {
     LOG_INFO("The message is empty");
   }
-  if(m_mainView) {
-    m_mainView->updateHistoryMenu(std::move(message));
+  if(mMainView) {
+    mMainView->updateHistoryMenu(std::move(message));
   }
 }
 
 void Application::handleMessage(MessageActivateWindow* /*pMessage*/) {
   if(mHasGui) {
-    m_mainView->activateWindow();
+    mMainView->activateWindow();
   }
 }
 
@@ -223,7 +223,7 @@ void Application::handleMessage(MessageCloseProject* /*pMessage*/) {
 
   mProject.reset();
   updateTitle();
-  m_mainView->clear();
+  mMainView->clear();
 }
 
 void Application::handleMessage(MessageIndexingFinished* /*pMessage*/) {
@@ -265,7 +265,7 @@ void Application::handleMessage(MessageLoadProject* message) {
     mProject.reset();
 
     if(mHasGui) {
-      m_mainView->clear();
+      mMainView->clear();
     }
 
     try {
@@ -326,9 +326,9 @@ void Application::handleMessage(MessageRefreshUI* pMessage) {
       loadStyle(IApplicationSettings::getInstanceRaw()->getColorSchemePath());
     }
 
-    m_mainView->refreshViews();
+    mMainView->refreshViews();
 
-    m_mainView->refreshUIState(pMessage->isAfterIndexing);
+    mMainView->refreshUIState(pMessage->isAfterIndexing);
   }
 }
 
@@ -341,11 +341,11 @@ void Application::handleMessage(MessageSwitchColorScheme* pMessage) {
 
 void Application::handleMessage(MessageBookmarkUpdate* message) {
   assert(message != nullptr);
-  if(!m_mainView) {
+  if(!mMainView) {
     LOG_WARNING("MainView isn't initialized");
     return;
   }
-  m_mainView->updateBookmarksMenu(message->mBookmarks);
+  mMainView->updateBookmarksMenu(message->mBookmarks);
 }
 
 void Application::startMessagingAndScheduling() {
@@ -366,15 +366,15 @@ void Application::loadWindow(bool showStartWindow) {
     return;
   }
 
-  if(!m_loadedWindow) {
+  if(!mLoadedWindow) {
     [[maybe_unused]] IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
     updateTitle();
 
-    m_mainView->loadWindow(showStartWindow);
-    m_loadedWindow = true;
+    mMainView->loadWindow(showStartWindow);
+    mLoadedWindow = true;
   } else if(!showStartWindow) {
-    m_mainView->hideStartScreen();
+    mMainView->hideStartScreen();
   }
 }
 
@@ -405,7 +405,7 @@ void Application::updateRecentProjects(const fs::path& projectSettingsFilePath) 
     appSettings->setRecentProjects(recentProjects);
     appSettings->save(UserPaths::getAppSettingsFilePath());
 
-    m_mainView->updateRecentProjectMenu();
+    mMainView->updateRecentProjectMenu();
   }
 }
 
@@ -447,7 +447,7 @@ void Application::updateTitle() {
       }
     }
 
-    m_mainView->setTitle(title);
+    mMainView->setTitle(title);
   }
 }
 

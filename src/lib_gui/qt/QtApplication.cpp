@@ -3,8 +3,8 @@
 #include <QFileOpenEvent>
 
 #include "FilePath.h"
-#include "MessageLoadProject.h"
-#include "MessageWindowFocus.h"
+#include "type/MessageLoadProject.h"
+#include "type/MessageWindowFocus.h"
 
 QtApplication::QtApplication(int& argc, char** argv) : QApplication(argc, argv) {
   connect(this, &QGuiApplication::applicationStateChanged, [](auto state) {

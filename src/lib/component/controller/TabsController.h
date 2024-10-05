@@ -2,14 +2,14 @@
 #define TABS_CONTROLLER_H
 
 #include "Controller.h"
-#include "MessageActivateErrors.h"
-#include "MessageIndexingFinished.h"
+#include "type/activation/MessageActivateErrors.h"
+#include "type/indexing/MessageIndexingFinished.h"
 #include "MessageListener.h"
-#include "MessageTabClose.h"
-#include "MessageTabOpen.h"
-#include "MessageTabOpenWith.h"
-#include "MessageTabSelect.h"
-#include "MessageTabState.h"
+#include "type/tab/MessageTabClose.h"
+#include "type/tab/MessageTabOpen.h"
+#include "type/tab/MessageTabOpenWith.h"
+#include "type/tab/MessageTabSelect.h"
+#include "type/tab/MessageTabState.h"
 #include "Tab.h"
 #include "TabsView.h"
 

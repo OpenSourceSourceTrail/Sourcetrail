@@ -2,7 +2,7 @@
 #define MESSAGE_FILTER_SEARCH_AUTOCOMPLETE_H
 
 #include "MessageFilter.h"
-#include "MessageSearchAutocomplete.h"
+#include "type/search/MessageSearchAutocomplete.h"
 
 class MessageFilterSearchAutocomplete : public MessageFilter {
   void filter(IMessageQueue::MessageBufferType* messageBuffer) override {

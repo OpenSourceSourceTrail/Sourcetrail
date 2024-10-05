@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 
 #include "FilePath.h"
-#include "MessageIndexingInterrupted.h"
+#include "type/indexing/MessageIndexingInterrupted.h"
 
 QtIndexingProgressDialog::QtIndexingProgressDialog(bool /*hideable*/, QWidget* parent)
     : QtProgressBarDialog(0.38F, parent)

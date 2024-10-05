@@ -4,7 +4,7 @@
 #include "../../../scheduling/TaskLambda.h"
 #include "CodeView.h"
 #include "GraphView.h"
-#include "MessageActivateSourceLocations.h"
+#include "type/code/MessageActivateSourceLocations.h"
 #include "StorageAccess.h"
 #include "TabId.h"
 #include "TooltipView.h"

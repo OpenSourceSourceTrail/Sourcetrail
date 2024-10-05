@@ -7,7 +7,7 @@
 #include "../../../scheduling/Task.h"
 #include "ErrorCountInfo.h"
 #include "FilePath.h"
-#include "MessageIndexingInterrupted.h"
+#include "type/indexing/MessageIndexingInterrupted.h"
 #include "MessageListener.h"
 #include "TimeStamp.h"
 

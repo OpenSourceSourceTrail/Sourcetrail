@@ -7,7 +7,7 @@
 #include "ErrorInfo.h"
 #include "LocationType.h"
 #include "MessageListener.h"
-#include "MessageWindowFocus.h"
+#include "type/MessageWindowFocus.h"
 #include "QtCodeFileList.h"
 #include "QtCodeFileSingle.h"
 #include "QtThreadedFunctor.h"

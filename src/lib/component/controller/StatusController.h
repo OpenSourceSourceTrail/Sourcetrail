@@ -3,11 +3,11 @@
 #include "Controller.h"
 #include "Status.h"
 // Messages
-#include "MessageClearStatusView.h"
+#include "type/MessageClearStatusView.h"
 #include "MessageListener.h"
-#include "MessageShowStatus.h"
-#include "MessageStatus.h"
-#include "MessageStatusFilterChanged.h"
+#include "type/MessageShowStatus.h"
+#include "type/MessageStatus.h"
+#include "type/MessageStatusFilterChanged.h"
 
 class StatusView;
 

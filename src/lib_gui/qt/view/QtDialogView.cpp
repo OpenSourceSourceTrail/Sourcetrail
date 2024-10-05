@@ -8,8 +8,8 @@
 #include <QTimer>
 
 #include "../../../scheduling/TaskLambda.h"
-#include "MessageIndexingStatus.h"
-#include "MessageStatus.h"
+#include "type/indexing/MessageIndexingStatus.h"
+#include "type/MessageStatus.h"
 #include "Project.h"
 #include "QtIndexingDialog.h"
 #include "QtIndexingProgressDialog.h"

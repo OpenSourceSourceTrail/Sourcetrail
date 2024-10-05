@@ -3,8 +3,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "MessageFocusView.h"
-#include "MessageRefreshUI.h"
+#include "type/focus/MessageFocusView.h"
+#include "type/MessageRefreshUI.h"
 #include "MockedMessageQueue.hpp"
 #include "Tab.h"
 #include "mocks/MockedBookmarkButtonsView.hpp"

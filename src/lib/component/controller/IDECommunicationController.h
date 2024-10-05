@@ -4,11 +4,11 @@
 #include <string>
 
 #include "Controller.h"
-#include "MessageIDECreateCDB.h"
+#include "type/plugin/MessageIDECreateCDB.h"
 #include "MessageListener.h"
-#include "MessageMoveIDECursor.h"
-#include "MessagePluginPortChange.h"
-#include "MessageWindowFocus.h"
+#include "type/plugin/MessageMoveIDECursor.h"
+#include "type/plugin/MessagePluginPortChange.h"
+#include "type/MessageWindowFocus.h"
 #include "NetworkProtocolHelper.h"
 
 class StorageAccess;

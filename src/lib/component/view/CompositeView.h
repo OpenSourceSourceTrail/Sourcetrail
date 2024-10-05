@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "MessageFocusedSearchView.h"
+#include "type/focus/MessageFocusedSearchView.h"
 #include "MessageListener.h"
 #include "View.h"
 #include "ViewLayout.h"

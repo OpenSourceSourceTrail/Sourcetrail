@@ -7,7 +7,7 @@
 #include <QThread>
 // internal
 #include "MessageListener.h"
-#include "MessageWindowClosed.h"
+#include "type/MessageWindowClosed.h"
 
 class QtThreadedFunctorHelper
     : public QObject

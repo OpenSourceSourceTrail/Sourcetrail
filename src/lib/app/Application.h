@@ -7,15 +7,15 @@
 #include "FilePath.h"
 #include "Project.h"
 // messages
-#include "MessageActivateWindow.h"
-#include "MessageBookmarkUpdate.hpp"
-#include "MessageCloseProject.h"
-#include "MessageIndexingFinished.h"
+#include "type/MessageActivateWindow.h"
+#include "type/bookmark/MessageBookmarkUpdate.hpp"
+#include "type/MessageCloseProject.h"
+#include "type/indexing/MessageIndexingFinished.h"
 #include "MessageListener.h"
-#include "MessageLoadProject.h"
-#include "MessageRefresh.h"
-#include "MessageRefreshUI.h"
-#include "MessageSwitchColorScheme.h"
+#include "type/MessageLoadProject.h"
+#include "type/MessageRefresh.h"
+#include "type/MessageRefreshUI.h"
+#include "type/MessageSwitchColorScheme.h"
 
 class Bookmark;
 class IDECommunicationController;
@@ -43,6 +43,7 @@ public:
   /**
    * @brief Creates the singleton instance of the Application.
    * @param version The version of the application.
+   * @param factory Base factory object.
    * @param viewFactory Pointer to the ViewFactory.
    * @param networkFactory Pointer to the NetworkFactory.
    */
@@ -56,8 +57,8 @@ public:
    * @return Shared pointer to the Application instance.
    */
   static Ptr getInstance() {
-    // TODO(Hussein): It breaks alot of tests
-    // assert(s_instance);
+    // TODO(Hussein): It breaks a lot of tests
+    // assert(sInstance);
     return sInstance;
   }
 
@@ -156,7 +157,7 @@ public:
 
 private:
   static std::shared_ptr<Application> sInstance;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-  static std::string s_uuid;                        // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+  static std::string sUuid;                        // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
   Application(std::shared_ptr<lib::IFactory> factory, bool withGUI = true);
 
@@ -193,13 +194,13 @@ private:
   bool checkSharedMemory();
 
   const bool mHasGui;
-  std::shared_ptr<lib::IFactory> mFactory = nullptr;
-  bool m_loadedWindow = false;
+  std::shared_ptr<lib::IFactory> mFactory;
+  bool mLoadedWindow = false;
 
   std::shared_ptr<IProject> mProject;
   std::shared_ptr<StorageCache> mStorageCache;
 
-  std::shared_ptr<MainView> m_mainView;
+  std::shared_ptr<MainView> mMainView;
 
-  std::shared_ptr<IDECommunicationController> m_ideCommunicationController;
+  std::shared_ptr<IDECommunicationController> mIdeCommunicationController;
 };

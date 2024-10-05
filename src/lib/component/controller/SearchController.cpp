@@ -1,6 +1,6 @@
 #include "SearchController.h"
 
-#include "MessageTabState.h"
+#include "type/tab/MessageTabState.h"
 #include "SearchView.h"
 #include "StorageAccess.h"
 #include "logging.h"

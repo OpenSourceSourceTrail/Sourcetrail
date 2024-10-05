@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "MessageErrorsHelpMessage.h"
+#include "type/error/MessageErrorsHelpMessage.h"
 #include "TimeStamp.h"
 
 QtIndexingReportDialog::QtIndexingReportDialog(size_t indexedFileCount,

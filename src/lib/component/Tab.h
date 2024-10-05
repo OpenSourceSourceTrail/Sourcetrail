@@ -3,9 +3,9 @@
 #include <vector>
 // internal
 #include "ComponentManager.h"
-#include "MessageFocusView.h"
+#include "type/focus/MessageFocusView.h"
 #include "MessageListener.h"
-#include "MessageRefreshUI.h"
+#include "type/MessageRefreshUI.h"
 #include "View.h"
 #include "ViewLayout.h"
 

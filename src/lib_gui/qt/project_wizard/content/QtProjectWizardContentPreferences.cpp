@@ -15,7 +15,7 @@
 #include <spdlog/spdlog.h>
 
 #include "FileSystem.h"
-#include "MessageSwitchColorScheme.h"
+#include "type/MessageSwitchColorScheme.h"
 #include "ResourcePaths.h"
 #include "IApplicationSettings.hpp"
 #include "logging.h"

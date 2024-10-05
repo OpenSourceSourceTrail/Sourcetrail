@@ -7,7 +7,7 @@
 #include "InterprocessIndexerCommandManager.h"
 #include "InterprocessIndexingStatusManager.h"
 #include "InterprocessIntermediateStorageManager.h"
-#include "MessageIndexingInterrupted.h"
+#include "type/indexing/MessageIndexingInterrupted.h"
 #include "MessageListener.h"
 
 class DialogView;

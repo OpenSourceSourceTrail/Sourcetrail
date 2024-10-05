@@ -6,7 +6,7 @@
 #include <clang/Tooling/CompilationDatabase.h>
 #include <clang/Tooling/JSONCompilationDatabase.h>
 
-#include "MessageStatus.h"
+#include "type/MessageStatus.h"
 #include "OrderedCache.h"
 #include "ResourcePaths.h"
 #include "logging.h"

@@ -7,8 +7,8 @@
 
 #include "ColorScheme.h"
 #include "GraphViewStyle.h"
-#include "MessageHistoryToPosition.h"
-#include "MessageTabOpenWith.h"
+#include "type/history/MessageHistoryToPosition.h"
+#include "type/tab/MessageTabOpenWith.h"
 #include "QtDeviceScaledPixmap.h"
 #include "ResourcePaths.h"
 #include "utilityQt.h"

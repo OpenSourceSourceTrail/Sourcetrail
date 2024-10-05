@@ -6,7 +6,7 @@
 #include "BookmarkController.h"
 #include "BookmarkView.h"
 #include "ComponentFactory.h"
-#include "MessageBookmarkUpdate.hpp"
+#include "type/bookmark/MessageBookmarkUpdate.hpp"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
