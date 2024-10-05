@@ -1,7 +1,7 @@
 #include <fstream>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "AppPath.h"
 #include "Application.h"
@@ -9,18 +9,20 @@
 #include "FileSystem.h"
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandCustom.h"
+#include "MockedApplicationSetting.hpp"
+#include "MockedMessageQueue.hpp"
 #include "ProjectSettings.h"
 #include "SourceGroupCustomCommand.h"
 #include "SourceGroupSettingsCustomCommand.h"
 #include "TextAccess.h"
 #include "Version.h"
 #include "language_packages.h"
+#include "mocks/MockedTaskManager.hpp"
+#include "utilityFile.h"
 #include "utilityPathDetection.h"
 #include "utilityString.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
-#  include "../../../src/lib/tests/mocks/MockedMessageQueue.hpp"
 #  include "ITaskManager.hpp"
 #  include "IndexerCommandCxx.h"
 #  include "SourceGroupCxxCdb.h"
@@ -30,8 +32,6 @@
 #  include "SourceGroupSettingsCppEmpty.h"
 #  include "SourceGroupSettingsCxxCdb.h"
 #  include "SourceGroupSettingsCxxCodeblocks.h"
-#  include "mocks/MockedTaskManager.hpp"
-#  include "utilityFile.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 

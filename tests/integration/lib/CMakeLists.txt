@@ -17,6 +17,7 @@ foreach(test_name IN LISTS test_lib_names)
            Qt5::Core
            Sourcetrail::messaging
            Sourcetrail::gtest_main
+           lib::mocks
            $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
