@@ -368,12 +368,7 @@ void ApplicationSettings::setCodeViewModeSingle(bool enabled) noexcept {
 
 std::vector<std::filesystem::path> ApplicationSettings::getRecentProjects() const noexcept {
   constexpr auto RecentProjectKey = "user/recent_projects/recent_project";
-  auto loadedRecentProjects = getPathValuesStl(RecentProjectKey);
-
-  return loadedRecentProjects | ranges::views::transform([](auto project) -> std::filesystem::path {
-           return project.is_absolute() ? project : UserPaths::getUserDataDirectoryPath().concatenate(project.wstring()).wstr();
-         }) |
-      ranges::to<std::vector>();
+  return getPathValuesStl(RecentProjectKey);
 }
 
 bool ApplicationSettings::setRecentProjects(const std::vector<fs::path>& recentProjects) noexcept {

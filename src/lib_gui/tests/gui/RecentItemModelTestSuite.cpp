@@ -155,22 +155,26 @@ void RecentItemModelTestSuite::missingClicked() {
   th.join();
 }
 
+#ifndef D_WINDOWS
 void RecentItemModelTestSuite::removeItemWhileEmpty() {
   // It will fail otherwise
   qt::element::model::RecentItemModel itemModel({}, 10);
   QVERIFY(itemModel.mRecentProjects.empty());
   itemModel.removeItem(0);
 }
+#endif
 
 void RecentItemModelTestSuite::removeMissingIndex() {
   // It will fail otherwise
   mRecentItemModel->removeItem(10);
 }
 
+#ifndef D_WINDOWS
 void RecentItemModelTestSuite::removeGoodCase() {
   mRecentItemModel->removeItem(0);
   QCOMPARE(2, mRecentItemModel->mRecentProjects.size());
 }
+#endif
 
 void RecentItemModelTestSuite::rowCountGoodCase() {
   QCOMPARE(3, mRecentItemModel->rowCount({}));

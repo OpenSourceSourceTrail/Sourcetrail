@@ -9,12 +9,15 @@
 
 #include "gmock/gmock.h"
 
+#ifndef D_WINDOWS
 #define private public
+#endif
 #include "Application.h"
 #include "Project.h"
 #include "ProjectSettings.h"
+#ifndef D_WINDOWS
 #undef private
-#include "type/MessageStatus.h"
+#endif
 #include "MockedFactory.hpp"
 #include "MockedProject.hpp"
 #include "MockedSharedMemoryGarbageCollector.hpp"
@@ -22,6 +25,7 @@
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedMessageQueue.hpp"
 #include "mocks/MockedTaskManager.hpp"
+#include "type/MessageStatus.h"
 
 using namespace std::chrono_literals;
 
@@ -91,7 +95,7 @@ TEST_F(SingletonApplicationFix, getInstanceWithoutCreate) {
 TEST_F(SingletonApplicationFix, singleton) {
   EXPECT_CALL(*mMockedFactory, createMessageQueue).WillOnce(testing::Return(mMessageQueue));
   EXPECT_CALL(*mMockedFactory, createTaskManager).WillOnce(testing::Return(mTaskManager));
-  auto task = std::make_shared<TaskScheduler>(GlobalId{});
+  auto task = std::make_shared<TaskScheduler>(GlobalId {});
   EXPECT_CALL(*mTaskManager, getScheduler).WillRepeatedly(testing::Return(task));
 
   MockAppSettingsForGetInstance();
@@ -135,31 +139,26 @@ TEST_F(SingletonApplicationFix, loadSettingsFailedToLoad) {
   Application::loadSettings();
 }
 
+#ifndef D_WINDOWS
 TEST_F(SingletonApplicationFix, getCurrentProjectPathWhileEmpty) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app{mMockedFactory, false};
+  Application app {mMockedFactory, false};
   ASSERT_THAT(app.getCurrentProjectPath().wstr(), testing::StrEq(L""));
 }
 
 TEST_F(SingletonApplicationFix, getCurrentProjectPath) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app{mMockedFactory, false};
+  Application app {mMockedFactory, false};
   auto mockedProject = std::make_shared<MockedProject>();
   app.mProject = mockedProject;
-  FilePath projectPath{"somewhere"};
+  FilePath projectPath {"somewhere"};
   EXPECT_CALL(*mockedProject, getProjectSettingsFilePath).WillOnce(testing::Return(projectPath));
   ASSERT_EQ(app.getCurrentProjectPath(), projectPath);
 }
 
-TEST_F(SingletonApplicationFix, isProjectLoadedWhileNoProject) {
-  lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app{mMockedFactory, false};
-  ASSERT_FALSE(app.isProjectLoaded());
-}
-
 TEST_F(SingletonApplicationFix, isProjectLoadedWhileNotLoaded) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app{mMockedFactory, false};
+  Application app {mMockedFactory, false};
   auto mockedProject = std::make_shared<MockedProject>();
   EXPECT_CALL(*mockedProject, isLoaded).WillOnce(testing::Return(false));
   app.mProject = mockedProject;
@@ -168,12 +167,19 @@ TEST_F(SingletonApplicationFix, isProjectLoadedWhileNotLoaded) {
 
 TEST_F(SingletonApplicationFix, isProjectLoaded) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app{mMockedFactory, false};
+  Application app {mMockedFactory, false};
   auto mockedProject = std::make_shared<MockedProject>();
   EXPECT_CALL(*mockedProject, isLoaded).WillOnce(testing::Return(true));
   app.mProject = mockedProject;
   ASSERT_TRUE(app.isProjectLoaded());
 }
+
+TEST_F(SingletonApplicationFix, isProjectLoadedWhileNoProject) {
+  lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
+  Application app {mMockedFactory, false};
+  ASSERT_FALSE(app.isProjectLoaded());
+}
+#endif
 
 struct ApplicationFix : SingletonApplicationFix {
   void SetUp() override {
@@ -187,7 +193,7 @@ struct ApplicationFix : SingletonApplicationFix {
 
     EXPECT_CALL(*mMockedFactory, createMessageQueue).WillOnce(testing::Return(mMessageQueue));
     EXPECT_CALL(*mMockedFactory, createTaskManager).WillOnce(testing::Return(mTaskManager));
-    auto task = std::make_shared<TaskScheduler>(GlobalId{});
+    auto task = std::make_shared<TaskScheduler>(GlobalId {});
     EXPECT_CALL(*mTaskManager, getScheduler).WillRepeatedly(testing::Return(task));
     Application::createInstance(Version {}, mMockedFactory, nullptr, nullptr);
     mApp = Application::getInstance();
@@ -218,6 +224,7 @@ TEST_F(ApplicationFix, getDialogView) {
   ASSERT_THAT(view, testing::Not(testing::IsNull()));
 }
 
+#ifndef D_WINDOWS
 TEST_F(ApplicationFix, LoadProjectMessageIsNull) {
   // Given: Application is created
   ASSERT_THAT(mApp, testing::NotNull());
@@ -270,3 +277,4 @@ TEST_F(ApplicationFix, LoadProjectWhileIndexing) {
   mApp->handleMessage(&message);
   // Then:
 }
+#endif

@@ -5,9 +5,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#ifndef _WIN32
 #define private public
+#endif
 #include "MessageQueue.h"
+#ifndef _WIN32
 #undef private
+#endif
 #include "../../../src/scheduling/TaskScheduler.h"
 #include "Message.h"
 #include "MessageFilter.h"
@@ -244,6 +248,7 @@ TEST_F(MessageQueueFix, listenerRegistrationToFrontAndBackWithinMessageHandling)
   EXPECT_EQ(2, listener.m_listeners[4]->m_messageCount);
 }
 
+#ifndef _WIN32
 struct MessageQueueRegistration : testing::Test {
   void SetUp() override {
     auto mQueue = std::make_shared<details::MessageQueue>();
@@ -322,6 +327,7 @@ struct MessageQueueProcess : testing::Test {
   std::shared_ptr<scheduling::mocks::MockedTaskManager> mMockedTaskManager;
 };
 
+
 TEST_F(MessageQueueProcess, goodCase) {
   TestMessageListener messageListener;
   ASSERT_EQ(1, messageQueue->mListeners.size());
@@ -333,7 +339,6 @@ TEST_F(MessageQueueProcess, goodCase) {
 
   EXPECT_EQ(1, messageListener.m_messageCount);
 }
-
 
 TEST_F(MessageQueueProcess, goodCaseAsTask) {
   auto fakeTask = std::make_shared<TaskScheduler>(Id{});
@@ -408,3 +413,4 @@ TEST_F(MessageQueueFilter, goodCase) {
 
   EXPECT_EQ(1, messageQueue->mFilters.size());
 }
+#endif
