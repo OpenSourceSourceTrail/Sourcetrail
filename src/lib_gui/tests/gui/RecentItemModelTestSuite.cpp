@@ -8,7 +8,10 @@
 #include <QTest>
 #include <QTimer>
 
+#include <gmock/gmock.h>
+
 #define private public
+#include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
 #include "RecentItemModel.hpp"
 #undef private
 
@@ -47,6 +50,7 @@ RecentItemModelTestSuite::~RecentItemModelTestSuite() = default;
 
 void RecentItemModelTestSuite::initTestCase() {
   Q_INIT_RESOURCE(resources);
+  IMessageQueue::setInstance(std::make_shared<MockedMessageQueue>());
 }
 
 void RecentItemModelTestSuite::init() {
@@ -180,6 +184,11 @@ void RecentItemModelTestSuite::rowCountEmpty() {
 
 void RecentItemModelTestSuite::cleanup() {}
 
-void RecentItemModelTestSuite::cleanupTestCase() {}
+void RecentItemModelTestSuite::cleanupTestCase() {
+  IMessageQueue::setInstance(nullptr);
+}
 
-QTEST_MAIN(RecentItemModelTestSuite)
+int main(int argc, char *argv[]) {
+  testing::InitGoogleMock(&argc, argv);
+  QTEST_MAIN_IMPL(RecentItemModelTestSuite)
+}

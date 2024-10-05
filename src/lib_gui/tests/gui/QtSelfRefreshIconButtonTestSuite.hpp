@@ -21,5 +21,7 @@ private slots:
 
   void setIconPath();
 
+  void cleanupTestCase();
+
   void setIconPathWithEmptyString();
 };

@@ -2,11 +2,26 @@
 
 #include <QTest>
 
+#include <gmock/gmock.h>
+
+#include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
+#include "MessageQueue.h"
 #include "QtNetworkFactory.h"
+
+void QtNetworkFactoryTestSuite::init() {
+  IMessageQueue::setInstance(std::make_shared<MockedMessageQueue>());
+}
 
 void QtNetworkFactoryTestSuite::goodCase() {
   const QtNetworkFactory mFactory;
   QVERIFY(mFactory.createIDECommunicationController(nullptr) != nullptr);
 }
 
-QTEST_MAIN(QtNetworkFactoryTestSuite)
+void QtNetworkFactoryTestSuite::cleanup() {
+  IMessageQueue::setInstance(nullptr);
+}
+
+int main(int argc, char *argv[]) {
+  testing::InitGoogleMock(&argc, argv);
+  QTEST_MAIN_IMPL(QtNetworkFactoryTestSuite)
+}

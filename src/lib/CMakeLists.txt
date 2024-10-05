@@ -4,8 +4,8 @@ add_files(
   # Base Factory {
   factory/IFactory.hpp
   factory/IFactory.cpp
-        factory/impls/Factory.hpp
-        factory/impls/Factory.cpp
+  factory/impls/Factory.hpp
+  factory/impls/Factory.cpp
   # }
   app/paths/AppPath.cpp
   app/paths/AppPath.h

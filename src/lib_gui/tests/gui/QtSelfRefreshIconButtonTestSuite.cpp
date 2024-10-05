@@ -3,6 +3,9 @@
 #include <QApplication>
 #include <QTest>
 
+#include <gmock/gmock.h>
+
+#include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
 #include "QtSelfRefreshIconButton.h"
 
 QtSelfRefreshIconButtonTestSuite::QtSelfRefreshIconButtonTestSuite() = default;
@@ -11,6 +14,7 @@ QtSelfRefreshIconButtonTestSuite::~QtSelfRefreshIconButtonTestSuite() = default;
 
 void QtSelfRefreshIconButtonTestSuite::initTestCase() {
   Q_INIT_RESOURCE(resources);
+  IMessageQueue::setInstance(std::make_shared<MockedMessageQueue>());
 }
 
 void QtSelfRefreshIconButtonTestSuite::constructWithEmptyString() {
@@ -71,4 +75,11 @@ void QtSelfRefreshIconButtonTestSuite::setIconPathWithEmptyString() {
   QVERIFY(button.icon().isNull());
 }
 
-QTEST_MAIN(QtSelfRefreshIconButtonTestSuite)
+void QtSelfRefreshIconButtonTestSuite::cleanupTestCase() {
+  IMessageQueue::setInstance(nullptr);
+}
+
+int main(int argc, char *argv[]) {
+  testing::InitGoogleMock(&argc, argv);
+  QTEST_MAIN_IMPL(QtSelfRefreshIconButtonTestSuite)
+}

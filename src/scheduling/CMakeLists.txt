@@ -18,7 +18,7 @@ target_sources(
           ${CMAKE_CURRENT_LIST_DIR}/TaskLambda.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskRunner.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskScheduler.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/impls/TaskManager.cpp)
+          ${CMAKE_CURRENT_LIST_DIR}/impls/TaskManager.cpp)
 
 target_include_directories(Sourcetrail_scheduling PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
