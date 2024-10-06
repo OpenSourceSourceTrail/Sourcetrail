@@ -1,45 +1,72 @@
 FROM ubuntu:22.04
 
-RUN echo 'APT::Install-Suggests "0";'   >> /etc/apt/apt.conf.d/00-docker
-RUN echo 'APT::Install-Recommends "0";' >> /etc/apt/apt.conf.d/00-docker
+# Configure apt to not install suggested or recommended packages
+RUN echo 'APT::Install-Suggests "0";' >> /etc/apt/apt.conf.d/00-docker && \
+    echo 'APT::Install-Recommends "0";' >> /etc/apt/apt.conf.d/00-docker
 
+# Set the ARG for non-interactive apt
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Install
-RUN apt-get update        \
-    && apt-get install -y \
-    build-essential       \
-    wget                  \
-    curl                  \
-    clang                 \
-    mold                  \
-    gdb                   \
-    valgrind              \
-    git                   \
-    git-lfs               \
-    cmake                 \
-    ninja-build           \
-    python3-pip           \
-    qtbase5-dev           \
-    libqt5svg5-dev        \
-    graphviz              \
-    doxygen
+# Install all dependencies in one step to reduce layers
+RUN apt-get update &&                                                    \
+    apt-get install -y                                                   \
+    build-essential                                                      \
+    wget                                                                 \
+    curl                                                                 \
+    locales                                                              \
+    gcc-12                                                               \
+    g++-12                                                               \
+    mold                                                                 \
+    gdb                                                                  \
+    valgrind                                                             \
+    git                                                                  \
+    git-lfs                                                              \
+    ninja-build                                                          \
+    python3-pip                                                          \
+    qtbase5-dev                                                          \
+    libqt5svg5-dev                                                       \
+    graphviz                                                             \
+    doxygen &&                                                           \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 10 && \
+    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Clean ups
-RUN apt-get autoremove -y \
-    && apt-get clean -y   \
-    && rm -rf /var/lib/apt/lists/*
+# Generate en_US.UTF-8 locale on the system
+RUN locale-gen en_US.UTF-8
 
-RUN pip3 install \
-  conan          \
-  cmakelint      \
-  gcovr
+# Install CMake in one step
+RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.24.0/cmake-3.24.0-linux-x86_64.tar.gz -O /tmp/cmake.tar.gz && \
+    tar -xzf /tmp/cmake.tar.gz -C /usr/local --strip-components=1 &&                                                            \
+    rm /tmp/cmake.tar.gz
 
-RUN conan install . \                                                                                                                                                                 SOUR-60 *2 +4 !37 ?14 
--s build_type=Debug \
--of .conan/gcc/ \
--b missing \
--pr:a .conan/gcc/profile
+# Remove older version of Clang & LLVM specially 14
+RUN apt-get remove libclang-cpp14 libclang1-14 -y
 
+RUN apt remove --purge libllvm14 -y
+
+RUN ldconfig
+
+# Build Clang from source
+RUN wget -q https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-15.0.7.tar.gz -O /tmp/llvmorg-15.0.7.tar.gz && \
+    tar -xzf /tmp/llvmorg-15.0.7.tar.gz -C /tmp/ &&                                                                       \
+    cmake -G Ninja                                                                                                        \
+          -DCMAKE_BUILD_TYPE=Release                                                                                      \
+          -DLLVM_ENABLE_PROJECTS=clang                                                                                    \
+          -DLLVM_ENABLE_RTTI=ON                                                                                           \
+          -DCLANG_LINK_CLANG_DYLIB=ON                                                                                     \
+          -DLLVM_LINK_LLVM_DYLIB=ON                                                                                       \
+          -DLLVM_BUILD_LLVM_DYLIB=ON                                                                                      \
+          -DLLVM_TARGETS_TO_BUILD=host                                                                                    \
+          /tmp/llvm-project-llvmorg-15.0.7/llvm -B /tmp/build &&                                                          \
+    cmake --build /tmp/build &&                                                                                           \
+    cmake --install /tmp/build &&                                                                                         \
+    rm -rf /tmp/llvmorg-15.0.7.tar.gz /tmp/llvm-project-llvmorg-15.0.7 /tmp/build
+
+# Install Python packages in one step
+RUN pip3 install --no-cache-dir conan==2.5.0 cmakelint gcovr
+
+# Add a non-root user in one step
 RUN useradd -ms /bin/bash sourcetrail
+
+# Switch to the non-root user
 USER sourcetrail

@@ -15,8 +15,8 @@
             "name": "gcc",
             "hidden": true,
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++"
+                "CMAKE_C_COMPILER": "gcc-12",
+                "CMAKE_CXX_COMPILER": "g++-12"
             }
         },
         {
@@ -44,115 +44,6 @@
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
             }
-        },
-        {
-            "name": "gnu_release",
-            "displayName": "GNU Release",
-            "binaryDir": "${sourceDir}/../build/Release/GNU",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "USE_ALTERNATE_LINKER": "mold",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake",
-                "Clang_DIR": "$env{CLANG_DIR}/lib/cmake/clang/"
-            },
-            "inherits": [
-                "ninja",
-                "gcc",
-                "linux"
-            ]
-        },
-        {
-            "name": "coverage",
-            "displayName": "Coverage",
-            "binaryDir": "${sourceDir}/../build/Coverage/GNU",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "USE_ALTERNATE_LINKER": "mold",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "ENABLE_COVERAGE": "ON",
-                "ENABLE_UNIT_TEST": "ON",
-                "ENABLE_GUI_TEST": "ON",
-                "ENABLE_INTEGRATION_TEST": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Debug/generators/conan_toolchain.cmake",
-                "Clang_DIR": "$env{CLANG_DIR}/lib/cmake/clang/"
-            },
-            "inherits": [
-                "ninja",
-                "gcc",
-                "linux"
-            ]
-        },
-        {
-            "name": "clang_release",
-            "displayName": "CLang Release",
-            "binaryDir": "${sourceDir}/../build/Release/CLang",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "USE_ALTERNATE_LINKER": "mold",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake",
-                "Clang_DIR": "$env{CLANG_DIR}/lib/cmake/clang/"
-            },
-            "inherits": [
-                "ninja",
-                "clang",
-                "linux"
-            ]
-        },
-        {
-            "name": "vc_release",
-            "displayName": "VC++ Release",
-            "binaryDir": "${sourceDir}/../build/Release/",
-            "generator": "Ninja",
-            "toolset": {
-                "value": "v143",
-                "strategy": "external"
-            },
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "OFF",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/msvc/build/Release/generators/conan_toolchain.cmake",
-                "Qt5_DIR": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
-                "ENABLE_UNIT_TEST": "ON"
-            },
-            "inherits": [
-                "window"
-            ]
-        },
-        {
-            "name": "vc_debug",
-            "displayName": "VC++ Debug",
-            "binaryDir": "${sourceDir}/../build/Debug/",
-            "generator": "Ninja",
-            "toolset": {
-                "value": "v143",
-                "strategy": "external"
-            },
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "OFF",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/msvc/build/Release/generators/conan_toolchain.cmake",
-                "Qt5_DIR": "C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5"
-            },
-            "inherits": [
-                "window"
-            ]
         },
         {
             "name": "ci_gnu_release",

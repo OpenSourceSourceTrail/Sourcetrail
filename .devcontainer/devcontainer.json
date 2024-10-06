@@ -5,6 +5,18 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
+	"mounts": [
+  		"source=${localWorkspaceFolder},target=/home/sourcetrail/workspace,type=bind",
+		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,readonly"
+	],
+	"containerEnv": {
+		"DISPLAY": "${env:DISPLAY}",
+		"LANG": "en_US.UTF-8",
+		"LANGUAGE": "en_US:en",
+		"LC_ALL": "en_US.UTF-8"
+	},
+	"workspaceFolder": "/home/sourcetrail/workspace",
+	"postCreateCommand": "chmod +x ./scripts/run_conan.sh && ./scripts/run_conan.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -15,10 +27,7 @@
 				"ms-vscode.cmake-tools",
 				"cheshirekow.cmake-format",
 				"cschlosser.doxdocgen"
-			],
-			"settings": {
-				"cmake.buildDirectory": "/home/sourcetrail/build/Debug"
-			}
+			]
 		}
 	}
 }
