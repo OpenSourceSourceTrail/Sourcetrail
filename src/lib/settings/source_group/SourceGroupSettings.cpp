@@ -1,6 +1,6 @@
 #include "SourceGroupSettings.h"
 
-#include "ConfigManager.h"
+#include "ConfigManager.hpp"
 #include "ProjectSettings.h"
 #include "utilityString.h"
 

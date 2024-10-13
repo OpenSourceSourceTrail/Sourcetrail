@@ -4,7 +4,8 @@ add_library(Sourcetrail::core ALIAS Sourcetrail_core)
 
 target_sources(
   Sourcetrail_core
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileInfo.cpp
+  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/utility/ConfigManager.cpp
+          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileInfo.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileManager.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FilePath.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FilePathFilter.cpp
@@ -13,7 +14,6 @@ target_sources(
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileTree.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/ScopedTemporaryFile.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/utilityFile.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/ConfigManager.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/ScopedFunctor.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/TimeStamp.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/tracing.cpp
@@ -24,7 +24,8 @@ target_sources(
 
 target_include_directories(
   Sourcetrail_core
-  PUBLIC ${CMAKE_SOURCE_DIR}/src/lib/utility/
+  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/utility/
+         ${CMAKE_SOURCE_DIR}/src/lib/utility/
          ${CMAKE_SOURCE_DIR}/src/lib/app/paths/
          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/
          ${CMAKE_SOURCE_DIR}/src/lib/utility/logging/
@@ -41,6 +42,7 @@ target_link_libraries(
   PRIVATE Boost::filesystem
           Sourcetrail::lib_utility
           tinyxml::tinyxml
+          Qt5::Core
           fmt::fmt)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>

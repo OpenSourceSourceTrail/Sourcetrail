@@ -31,8 +31,6 @@ std::string ColorScheme::getNodeTypeColor(NodeType type, const std::string& key,
 }
 
 std::string ColorScheme::getNodeTypeColor(const std::string& typeStr, const std::string& key, bool highlight) const {
-  disableWarnings();
-
   const auto type = getValue<std::string>("graph/node/" + typeStr + "/like", typeStr);
   auto color = getValue<std::string>("graph/node/" + type + "/" + key + "/" + (highlight ? "highlight" : "normal"), "");
 
@@ -43,8 +41,6 @@ std::string ColorScheme::getNodeTypeColor(const std::string& typeStr, const std:
   if(color.empty()) {
     color = getValue<std::string>("graph/node/default/" + key + "/" + (highlight ? "highlight" : "normal"), "");
   }
-
-  enableWarnings();
 
   if(color.empty() && highlight) {
     color = getValue<std::string>("graph/node/default/" + key + "/normal", "#FF1493");
@@ -58,11 +54,7 @@ std::string ColorScheme::getEdgeTypeColor(Edge::EdgeType type) const {
 }
 
 std::string ColorScheme::getEdgeTypeColor(const std::string& type) const {
-  disableWarnings();
-
   auto color = getValue<std::string>("graph/edge/" + type, "");
-
-  enableWarnings();
 
   if(color.empty()) {
     color = getValue<std::string>("graph/edge/default", "#FF1493");
@@ -83,7 +75,6 @@ std::string ColorScheme::getSyntaxColor(const std::string& key) const {
 }
 
 std::string ColorScheme::getCodeAnnotationTypeColor(const std::string& typeStr, const std::string& key, ColorState state) const {
-  disableWarnings();
   auto color = getValue<std::string>("code/snippet/annotation/" + typeStr + "/" + stateToString(state) + "/" + key, "");
 
   if(color.empty() && state == ACTIVE) {
@@ -97,8 +88,6 @@ std::string ColorScheme::getCodeAnnotationTypeColor(const std::string& typeStr, 
   if(color.empty()) {
     color = "transparent";
   }
-
-  enableWarnings();
 
   return color;
 }

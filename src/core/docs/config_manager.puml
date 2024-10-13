@@ -1,0 +1,60 @@
+@startuml
+class ConfigManager {
+    -std::multimap<std::string, std::string> m_values
+    -bool m_warnOnEmptyKey
+
+    +static Ptr createEmpty()
+    +static Ptr createAndLoad(std::shared_ptr<TextAccess> textAccess)
+    +void clear()
+    +Ptr createCopy()
+
+    +std::optional<T> getValue<T>(const std::string& key)
+    +T getValueOrDefault<T>(const std::string& key, T defaultValue)
+    +std::optional<std::vector<T>> getValues<T>(const std::string& key)
+    +std::vector<T> getValuesOrDefaults<T>(const std::string& key, std::vector<T> defaultValues)
+    +void setValue<T>(const std::string& key, const T& value)
+    +void setValues<T>(const std::string& key, const std::vector<T>& values)
+    +void removeValues(const std::string& key)
+    +bool isValueDefined(const std::string& key)
+    +std::vector<std::string> getSublevelKeys(const std::string& key)
+
+    +bool load(std::shared_ptr<TextAccess> textAccess)
+    +bool save(std::string_view filepath)
+    +std::string toString()
+    +void setWarnOnEmptyKey(bool warnOnEmptyKey)
+
+    -void parseSubtree(TiXmlNode* parentElement, const std::string& currentPath)
+    -bool createXmlDocument(bool saveAsFile, std::string_view filepath, std::string& output)
+}
+@enduml
+
+@startuml
+actor User
+
+User -> ConfigManager: createAndLoad(textAccess)
+ConfigManager -> TextAccess: Read Data
+TextAccess --> ConfigManager: Return Data
+
+ConfigManager -> ConfigManager: parseSubtree(TiXmlNode*, std::string)
+ConfigManager --> User: Return ConfigManager instance
+@enduml
+
+@startuml
+actor User
+
+rectangle ConfigManager {
+    usecase "Load Configuration" as UC1
+    usecase "Save Configuration" as UC2
+    usecase "Get Value" as UC3
+    usecase "Set Value" as UC4
+    usecase "Remove Values" as UC5
+    usecase "Check if Value Defined" as UC6
+}
+
+User --> UC1
+User --> UC2
+User --> UC3
+User --> UC4
+User --> UC5
+User --> UC6
+@enduml

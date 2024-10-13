@@ -5,7 +5,7 @@
 
 #include "CommandlineCommandConfig.h"
 #include "CommandlineCommandIndex.h"
-#include "ConfigManager.h"
+#include "ConfigManager.hpp"
 #include "TextAccess.h"
 
 namespace po = boost::program_options;

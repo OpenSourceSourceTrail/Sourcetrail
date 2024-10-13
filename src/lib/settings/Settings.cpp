@@ -123,11 +123,3 @@ bool Settings::isValueDefined(const std::string& key) const {
 void Settings::removeValues(const std::string& key) {
   m_config->removeValues(key);
 }
-
-void Settings::enableWarnings() const {
-  m_config->setWarnOnEmptyKey(true);
-}
-
-void Settings::disableWarnings() const {
-  m_config->setWarnOnEmptyKey(false);
-}

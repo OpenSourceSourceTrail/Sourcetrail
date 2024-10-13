@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "ConfigManager.h"
+#include "ConfigManager.hpp"
 #include "FilePath.h"
 
 class SettingsMigration;
@@ -65,9 +65,6 @@ protected:
   bool isValueDefined(const std::string& key) const;
 
   void removeValues(const std::string& key);
-
-  void enableWarnings() const;
-  void disableWarnings() const;
 
   std::shared_ptr<ConfigManager> m_config;
 
