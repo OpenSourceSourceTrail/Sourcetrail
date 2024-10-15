@@ -59,17 +59,17 @@ public:
     } else if constexpr(std::is_same_v<T, int>) {
       try {
         return std::stoi(value);
-      } catch(const std::invalid_argument& ex) {
+      } catch([[maybe_unused]] const std::invalid_argument& ex) {    // NOLINT
       }
     } else if constexpr(std::is_same_v<T, float>) {
       try {
         return std::stof(value);
-      } catch(const std::invalid_argument& ex) {
+      } catch([[maybe_unused]] const std::invalid_argument& ex) {    // NOLINT
       }
     } else if constexpr(std::is_same_v<T, bool>) {
       try {
         return std::stoi(value) != 0;
-      } catch(const std::invalid_argument& ex) {
+      } catch([[maybe_unused]] const std::invalid_argument& ex) {    // NOLINT
       }
     } else if constexpr(std::is_same_v<T, FilePath>) {
       return FilePath {value};

@@ -48,6 +48,16 @@ struct ConfigManagerFix : testing::Test {
   ConfigManager::Ptr configManager;
 };
 
+TEST_F(ConfigManagerFix, DISABLED_loadIsCorrect) {
+  // Given: configManager is created and loaded successfully
+  ASSERT_TRUE(configManager);
+  // When: get value with valid path
+  const auto result = configManager->toString();
+  // Then: a valid result
+  ASSERT_THAT(result, testing::Not(testing::IsEmpty()));
+  EXPECT_THAT(result, testing::StrEq(kTestingXml));
+}
+
 TEST_F(ConfigManagerFix, returnsTrueWhenKeyIsFound) {
   // Given: configManager is created and loaded successfully
   ASSERT_TRUE(configManager);
