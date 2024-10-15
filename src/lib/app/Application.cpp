@@ -17,12 +17,7 @@
 #include "IDECommunicationController.h"
 #include "ISharedMemoryGarbageCollector.hpp"
 #include "MainView.h"
-#include "filter_types/MessageFilterErrorCountUpdate.h"
-#include "filter_types/MessageFilterFocusInOut.h"
-#include "filter_types/MessageFilterSearchAutocomplete.h"
 #include "MessageQueue.h"
-#include "type/MessageQuitApplication.h"
-#include "type/MessageStatus.h"
 #include "NetworkFactory.h"
 #include "ProjectSettings.h"
 #include "SharedMemory.h"
@@ -32,11 +27,17 @@
 #include "UserPaths.h"
 #include "Version.h"
 #include "ViewFactory.h"
+#include "filter_types/MessageFilterErrorCountUpdate.h"
+#include "filter_types/MessageFilterFocusInOut.h"
+#include "filter_types/MessageFilterSearchAutocomplete.h"
 #include "impls/Factory.hpp"
 #include "logging.h"
 #include "tracing.h"
+#include "type/MessageQuitApplication.h"
+#include "type/MessageStatus.h"
 #include "utilityString.h"
 #include "utilityUuid.h"
+
 
 namespace fs = std::filesystem;
 
@@ -150,7 +151,12 @@ void Application::loadSettings() {
 
   if(settings->getLoggingEnabled()) {
     namespace fs = std::filesystem;
-    auto loggerPath = fs::path {settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log");
+    auto loggerPath =
+#if WIN32
+        (fs::path {settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).wstring();
+#else
+        (fs::path {settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
+#endif
     auto dLogger = spdlog::default_logger_raw();
     if(nullptr == dLogger) {
       return;
