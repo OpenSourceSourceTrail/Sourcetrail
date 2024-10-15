@@ -26,10 +26,7 @@ foreach(test_name IN LISTS test_lib_names)
   set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
 
   # TODO(Hussein): Missing from some library
-  target_link_libraries(
-    ${test_name}
-    PRIVATE
-    Boost::date_time)
+  target_link_libraries(${test_name} PRIVATE Boost::date_time)
 
   gtest_discover_tests(
     ${test_name}
@@ -37,9 +34,5 @@ foreach(test_name IN LISTS test_lib_names)
     TEST_PREFIX "integration.")
 endforeach()
 
-
-target_link_libraries(
-  SourceGroupTestSuite
-  PRIVATE
-  Boost::date_time # TODO(Hussein): Missing from some library
+target_link_libraries(SourceGroupTestSuite PRIVATE Boost::date_time # TODO(Hussein): Missing from some library
 )
