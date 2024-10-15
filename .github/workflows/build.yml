@@ -147,19 +147,12 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           call "${{ matrix.config.environment_script }}"
-          cmake --build ${{github.workspace}}/build | tee ${{github.workspace}}/build/build.log
+          cmake --build ${{github.workspace}}/build
         shell: cmd
 
       - name: Count warnings (Ubuntu)
         if: runner.os == 'Linux'
         run: grep -c "warning:" ${{github.workspace}}/build/build.log
-
-      - name: Count warnings (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          $Matches = Select-String -Path ${{github.workspace}}/build/build.log -Pattern 'warning'
-          echo $Matches.Matches.Count
-        shell: pwsh
 
       - name: Test
         run: ctest -Q --test-dir ${{github.workspace}}/build --output-junit ${{github.workspace}}/build/report.xml
