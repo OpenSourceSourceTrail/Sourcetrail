@@ -9,16 +9,17 @@ on:
 
 jobs:
   clang-format:
+    name: Formatting Check
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: sudo apt install -y clang-format-15
+      - name: Run clang-format style check for C/C++/Protobuf programs.
+        uses: jidicula/clang-format-action@v4.13.0
 
-      - name: Run clang-format
-        run: find . -type f -name "*.cpp" -or -name "*.h" -or -name "*.hpp" -exec clang-format -n --Werror {} \;
+        with:
+          clang-format-version: '15'
 
   cmake-format:
     runs-on: ubuntu-22.04
@@ -26,14 +27,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: sudo apt install -y python3-pip
-
-      - name: Install cmake-format
-        run: sudo pip install cmakelang
-
-      - name: Run clang-format
-        run: find . -type f -name "CMakeLists.txt" -exec cmake-format --check {} \;
+      - name: Format CMake files
+        id: cmake-format
+        uses: PuneetMatharu/cmake-format-lint-action@v1.0.4
+        with:
+          args: --check
 
   build:
     strategy:
