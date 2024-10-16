@@ -3,6 +3,7 @@
 Sourcetrail is a free and open-source cross-platform source explorer that helps you get productive on unfamiliar source code.
 
 [![Build](https://github.com/OpenSourceSourceTrail/Sourcetrail/actions/workflows/build.yml/badge.svg)](https://github.com/OpenSourceSourceTrail/Sourcetrail/actions/workflows/build.yml)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/01bfc8f1428b40f7bc674369cdba1b93)](https://app.codacy.com/gh/OpenSourceSourceTrail/Sourcetrail/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 __Links__
 * [Download](https://github.com/OpenSourceSourceTrail/Sourcetrail/releases)
