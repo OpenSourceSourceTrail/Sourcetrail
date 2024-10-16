@@ -7,6 +7,8 @@ macro(set_alternate_linker linker)
       add_link_options("-fuse-ld=${USE_ALTERNATE_LINKER}")
     endif()
   else()
-    set(USE_ALTERNATE_LINKER "" CACHE STRING "Use alternate linker" FORCE)
+    set(USE_ALTERNATE_LINKER
+        ""
+        CACHE STRING "Use alternate linker" FORCE)
   endif()
 endmacro()

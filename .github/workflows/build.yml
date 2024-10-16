@@ -9,7 +9,6 @@ on:
 
 jobs:
   clang-format:
-    name: Formatting Check
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -19,7 +18,7 @@ jobs:
         uses: jidicula/clang-format-action@v4.13.0
 
         with:
-          clang-format-version: '15'
+          clang-format-version: '18'
 
   cmake-format:
     runs-on: ubuntu-22.04
@@ -31,7 +30,7 @@ jobs:
         id: cmake-format
         uses: PuneetMatharu/cmake-format-lint-action@v1.0.4
         with:
-          args: --check
+          args: --config-files .cmake-format.yaml --check
 
   build:
     strategy:

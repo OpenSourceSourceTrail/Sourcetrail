@@ -77,8 +77,7 @@ function(
         -Wunreachable-code
         -Wuninitialized
         -Wthread-safety
-        -Wswitch
-    )
+        -Wswitch)
   endif()
 
   if("${GCC_WARNINGS}" STREQUAL "")
@@ -90,8 +89,7 @@ function(
         -Wlogical-op # warn about logical operations being used where bitwise were probably wanted
         -Wuseless-cast # warn if you perform a cast to the same type
         -Wundef
-        -Wformat-truncation
-    )
+        -Wformat-truncation)
   endif()
 
   if("${CUDA_WARNINGS}" STREQUAL "")
@@ -138,9 +136,5 @@ function(
               $<$<COMPILE_LANGUAGE:CUDA>:${PROJECT_WARNINGS_CUDA}>)
 
   # Unifiy Debug Marco
-  target_compile_definitions(
-    ${project_name}
-    INTERFACE
-    $<$<CONFIG:Debug>:ST_DEBUG>
-  )
+  target_compile_definitions(${project_name} INTERFACE $<$<CONFIG:Debug>:ST_DEBUG>)
 endfunction()

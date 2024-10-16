@@ -1,3 +1,6 @@
+---
+Language: Cpp
+# BasedOnStyle:  Google
 AccessModifierOffset: -2
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: false
@@ -9,7 +12,7 @@ AlignTrailingComments: true
 AllowAllArgumentsOnNextLine: true
 AllowAllConstructorInitializersOnNextLine: true
 AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Never
@@ -64,7 +67,6 @@ IncludeCategories:
 - Regex:           '.*'
   Priority:        8
   SortPriority:    8
-
 IndentAccessModifiers: false
 IndentCaseLabels: false
 IndentPPDirectives: AfterHash
@@ -83,7 +85,7 @@ PenaltyExcessCharacter:               10
 PenaltyReturnTypeOnItsOwnLine:        1000
 PointerAlignment: Left
 ReflowComments: true
-SortIncludes: true
+SortIncludes: CaseInsensitive
 SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceAfterTemplateKeyword: true
@@ -101,12 +103,6 @@ SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
-Standard: c++20
+Standard: c++17
 TabWidth: 2
 UseTab: Never
----
-Language: Cpp
----
-Language: Java
-#BasedOnStyle: Google
-#BreakAfterJavaFieldAnnotations: true
