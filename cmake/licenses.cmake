@@ -76,11 +76,6 @@ addlicense(
   "5.15"
   "http://qt.io"
   "${LICENSEFOLDER}/license_qt.txt")
-addlicense(
-  "TinyXML"
-  "2.0"
-  "https://sourceforge.net/projects/tinyxml/"
-  "${LICENSEFOLDER}/license_tinyxml.txt")
 
 set(LICENSE_ARRAY "${LICENSE_ARRAY}\n")
 

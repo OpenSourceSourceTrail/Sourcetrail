@@ -45,16 +45,9 @@ target_sources(
           data/parser/cxx/SingleFrontendActionFactory.cpp
           data/parser/cxx/utilityClang.cpp
           project/SourceGroupCxxCdb.cpp
-          project/SourceGroupCxxCodeblocks.cpp
           project/SourceGroupCxxEmpty.cpp
           project/SourceGroupFactoryModuleCxx.cpp
           project/utilitySourceGroupCxx.cpp
-          utility/codeblocks/CodeblocksCompiler.cpp
-          utility/codeblocks/CodeblocksCompilerVarType.cpp
-          utility/codeblocks/CodeblocksProject.cpp
-          utility/codeblocks/CodeblocksTarget.cpp
-          utility/codeblocks/CodeblocksTargetRelationType.cpp
-          utility/codeblocks/CodeblocksUnit.cpp
           utility/CompilationDatabase.cpp
           utility/IncludeDirective.cpp
           utility/IncludeProcessing.cpp
@@ -140,7 +133,6 @@ target_link_libraries(
           Sourcetrail::scheduling
           ${REQ_LLVM_LIBS}
           ${CLANG_LIBRARIES}
-          tinyxml::tinyxml
           Qt5::Core)
 
 if(WIN32)

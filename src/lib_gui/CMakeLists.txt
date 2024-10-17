@@ -284,8 +284,6 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     qt/project_wizard/content/path/ProjectWizardModel.cpp
     qt/project_wizard/content/path/QtProjectWizardContentPathCDB.cpp
     qt/project_wizard/content/path/QtProjectWizardContentPathCDB.h
-    qt/project_wizard/content/path/QtProjectWizardContentPathCodeblocksProject.cpp
-    qt/project_wizard/content/path/QtProjectWizardContentPathCodeblocksProject.h
     qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.cpp
     qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.h
     qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.cpp

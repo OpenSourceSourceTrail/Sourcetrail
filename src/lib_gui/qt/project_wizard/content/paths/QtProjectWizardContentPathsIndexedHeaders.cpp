@@ -3,7 +3,6 @@
 #include <QGridLayout>
 #include <QMessageBox>
 
-#include "CodeblocksProject.h"
 #include "CompilationDatabase.h"
 #include "IndexerCommandCxx.h"
 #include "logging.h"
@@ -12,41 +11,8 @@
 #include "QtSelectPathsDialog.h"
 #include "QtTextEditDialog.h"
 #include "SourceGroupSettingsCxxCdb.h"
-#include "SourceGroupSettingsCxxCodeblocks.h"
 #include "utility.h"
 #include "utilityFile.h"
-
-std::vector<FilePath> QtProjectWizardContentPathsIndexedHeaders::getIndexedPathsDerivedFromCodeblocksProject(
-    std::shared_ptr<const SourceGroupSettingsCxxCodeblocks> settings) {
-  const FilePath projectPath = settings->getProjectDirectoryPath();
-  std::set<FilePath> indexedHeaderPaths;
-  {
-    const FilePath codeblocksProjectPath = settings->getCodeblocksProjectPathExpandedAndAbsolute();
-    if(!codeblocksProjectPath.empty() && codeblocksProjectPath.exists()) {
-      if(std::shared_ptr<Codeblocks::Project> codeblocksProject = Codeblocks::Project::load(codeblocksProjectPath)) {
-        OrderedCache<FilePath, FilePath> canonicalDirectoryPathCache([](const FilePath& path) { return path.getCanonical(); });
-
-        for(const FilePath& path : codeblocksProject->getAllSourceFilePathsCanonical(settings->getSourceExtensions())) {
-          indexedHeaderPaths.insert(canonicalDirectoryPathCache.getValue(path.getParentDirectory()));
-        }
-        utility::append(indexedHeaderPaths, codeblocksProject->getAllCxxHeaderSearchPathsCanonical());
-      }
-    } else {
-      LOG_WARNING(
-          "Unable to fetch indexed header paths. The provided Codeblocks project path does "
-          "not exist.");
-    }
-  }
-
-  std::vector<FilePath> topLevelPaths;
-  for(const FilePath& path : utility::getTopLevelPaths(indexedHeaderPaths)) {
-    if(path.exists()) {
-      topLevelPaths.push_back(path);
-    }
-  }
-
-  return topLevelPaths;
-}
 
 std::vector<FilePath> QtProjectWizardContentPathsIndexedHeaders::getIndexedPathsDerivedFromCDB(
     std::shared_ptr<const SourceGroupSettingsCxxCdb> settings) {
@@ -152,37 +118,7 @@ void QtProjectWizardContentPathsIndexedHeaders::buttonClicked() {
   save();
 
   if(!m_filesDialog) {
-    if(std::shared_ptr<SourceGroupSettingsCxxCodeblocks> codeblocksSettings =
-           std::dynamic_pointer_cast<SourceGroupSettingsCxxCodeblocks>(m_settings)) {
-      const FilePath codeblocksProjectPath = codeblocksSettings->getCodeblocksProjectPathExpandedAndAbsolute();
-      if(!codeblocksProjectPath.exists()) {
-        QMessageBox msgBox(m_window);
-        msgBox.setText(QStringLiteral("The provided Code::Blocks project path does not exist."));
-        msgBox.setDetailedText(QString::fromStdWString(codeblocksProjectPath.wstr()));
-        msgBox.exec();
-        return;
-      }
-
-      m_filesDialog = new QtSelectPathsDialog("Select from Include Paths",
-                                              "The list contains all Include Paths found in the Code::Blocks project. Red paths "
-                                              "do not exist. Select the "
-                                              "paths containing the header files you want to index with Sourcetrail.",
-                                              m_window);
-      m_filesDialog->setup();
-
-      connect(m_filesDialog, &QtSelectPathsDialog::finished, this, &QtProjectWizardContentPathsIndexedHeaders::savedFilesDialog);
-      connect(m_filesDialog, &QtSelectPathsDialog::canceled, this, &QtProjectWizardContentPathsIndexedHeaders::closedFilesDialog);
-
-      const FilePath projectPath = codeblocksSettings->getProjectDirectoryPath();
-
-      dynamic_cast<QtSelectPathsDialog*>(m_filesDialog)
-          ->setPathsList(utility::convert<FilePath, FilePath>(
-                             getIndexedPathsDerivedFromCodeblocksProject(codeblocksSettings),
-                             [&](const FilePath& path) { return utility::getAsRelativeIfShorter(path, projectPath); }),
-                         codeblocksSettings->getIndexedHeaderPaths(),
-                         m_settings->getProjectDirectoryPath());
-    } else if(std::shared_ptr<SourceGroupSettingsCxxCdb> cdbSettings = std::dynamic_pointer_cast<SourceGroupSettingsCxxCdb>(
-                  m_settings)) {
+    if(std::shared_ptr<SourceGroupSettingsCxxCdb> cdbSettings = std::dynamic_pointer_cast<SourceGroupSettingsCxxCdb>(m_settings)) {
       const FilePath cdbPath = cdbSettings->getCompilationDatabasePathExpandedAndAbsolute();
       if(!cdbPath.exists()) {
         QMessageBox msgBox(m_window);

@@ -400,8 +400,6 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.cpp
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.h
-    settings/source_group/component/cxx/SourceGroupSettingsWithCxxCodeblocksPath.cpp
-    settings/source_group/component/cxx/SourceGroupSettingsWithCxxCodeblocksPath.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.cpp
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.cpp
@@ -415,6 +413,5 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     settings/source_group/type/SourceGroupSettingsCEmpty.h
     settings/source_group/type/SourceGroupSettingsCppEmpty.h
     settings/source_group/type/SourceGroupSettingsCustomCommand.h
-    settings/source_group/type/SourceGroupSettingsCxxCdb.h
-    settings/source_group/type/SourceGroupSettingsCxxCodeblocks.h)
+    settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 endif()

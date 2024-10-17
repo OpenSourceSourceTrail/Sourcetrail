@@ -156,7 +156,6 @@ find_package(fmt CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SQLite3 CONFIG REQUIRED)
-find_package(tinyxml CONFIG REQUIRED)
 # Boost ------------------------------------------------------------------------
 set(Boost_USE_MULTITHREAD ON)
 set(Boost_USE_STATIC_LIBS
@@ -264,7 +263,6 @@ target_link_libraries(
           Boost::program_options
           Boost::system
           SQLite::SQLite3
-          tinyxml::tinyxml
           $<$<PLATFORM_ID:Windows>:bcrypt>)
 #configure language package defines
 configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")

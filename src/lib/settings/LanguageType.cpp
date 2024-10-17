@@ -40,8 +40,6 @@ LanguageType getLanguageTypeForSourceGroupType(SourceGroupType type) {
     return LANGUAGE_CPP;
   case SOURCE_GROUP_CXX_CDB:
     return LANGUAGE_CPP;
-  case SOURCE_GROUP_CXX_CODEBLOCKS:
-    return LANGUAGE_CPP;
   case SOURCE_GROUP_CXX_VS:
     return LANGUAGE_CPP;
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE

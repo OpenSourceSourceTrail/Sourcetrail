@@ -26,12 +26,10 @@
 #  include "IndexerCommandCxx.h"
 #  include "ITaskManager.hpp"
 #  include "SourceGroupCxxCdb.h"
-#  include "SourceGroupCxxCodeblocks.h"
 #  include "SourceGroupCxxEmpty.h"
 #  include "SourceGroupSettingsCEmpty.h"
 #  include "SourceGroupSettingsCppEmpty.h"
 #  include "SourceGroupSettingsCxxCdb.h"
-#  include "SourceGroupSettingsCxxCodeblocks.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 
@@ -243,47 +241,6 @@ TEST_F(SourceGroupFix, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
   sourceGroupSettings->setCompilerFlags({L"-local-flag"});
 
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxEmpty>(sourceGroupSettings));
-}
-
-TEST_F(SourceGroupFix, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
-  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/header/search/path"}}));
-  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/framework/search/path"}}));
-
-  const std::wstring projectName = L"cxx_codeblocks";
-  const FilePath cbpPath = getInputDirectoryPath(projectName).concatenate(L"project.cbp");
-  const FilePath sourceCbpPath = getInputDirectoryPath(projectName).concatenate(L"project.cbp.in");
-
-  FileSystem::remove(cbpPath);
-
-  {
-    std::ofstream fileStream;
-    fileStream.open(cbpPath.str(), std::ios::app);
-    fileStream << utility::replace(TextAccess::createFromFile(sourceCbpPath)->getText(),
-                                   "<source_path>",
-                                   getInputDirectoryPath(projectName).concatenate(L"src").getAbsolute().str());
-    fileStream.close();
-  }
-
-  ProjectSettings projectSettings;
-  projectSettings.setProjectFilePath(L"non_existent_project", getInputDirectoryPath(projectName));
-
-  std::shared_ptr<SourceGroupSettingsCxxCodeblocks> sourceGroupSettings = std::make_shared<SourceGroupSettingsCxxCodeblocks>(
-      "fake_id", &projectSettings);
-  sourceGroupSettings->setCodeblocksProjectPath(cbpPath);
-  sourceGroupSettings->setCppStandard(L"c++11");
-  sourceGroupSettings->setCStandard(L"c11");
-  sourceGroupSettings->setExcludeFilterStrings({L"**/excluded/**"});
-  sourceGroupSettings->setIndexedHeaderPaths({FilePath(L"test/indexed/header/path")});
-  sourceGroupSettings->setSourceExtensions({L".cpp", L".c"});
-  sourceGroupSettings->setHeaderSearchPaths({getInputDirectoryPath(projectName).concatenate(L"header_search/local")});
-  sourceGroupSettings->setFrameworkSearchPaths({getInputDirectoryPath(projectName).concatenate(L"framework_search/local")});
-  sourceGroupSettings->setCompilerFlags({L"-local-flag"});
-
-  generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxCodeblocks>(sourceGroupSettings));
-
-  FileSystem::remove(cbpPath);
 }
 
 TEST_F(SourceGroupFix, sourceGroupCxxCdbGeneratesExpectedOutput) {

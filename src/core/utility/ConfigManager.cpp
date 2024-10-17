@@ -55,11 +55,11 @@ std::optional<std::multimap<std::string, std::string>> createStringToXmlDocument
       // output.insert(std::make_pair("", currentItem.data()));
     } else {
       for(auto& [key, child] : currentItem) {
+        auto newKey = currentKey.empty() ? key : fmt::format("{}/{}", currentKey, key);
         if(!child.empty()) {
-          auto newKey = currentKey.empty() ? key : fmt::format("{}/{}", currentKey, key);
           nodeStack.emplace(newKey, child);
         } else {
-          output.emplace(fmt::format("{}/{}", currentKey, key), child.data());
+          output.emplace(newKey, child.data());
         }
       }
     }
@@ -111,8 +111,8 @@ std::vector<std::string> ConfigManager::getSublevelKeys(const std::string& key) 
     if(utility::isPrefix(key, m_value.first)) {
       size_t startPos = m_value.first.find("/", key.size());
       if(startPos == key.size()) {
-        std::string sublevelKey = m_value.first.substr(0, m_value.first.find("/", startPos + 1));
-        keys.insert(sublevelKey);
+        std::string subLevelKey = m_value.first.substr(0, m_value.first.find("/", startPos + 1));
+        keys.insert(subLevelKey);
       }
     }
   }
