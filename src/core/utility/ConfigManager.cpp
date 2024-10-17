@@ -3,9 +3,12 @@
 #include <fstream>
 #include <set>
 #include <vector>
+#include <sstream>
 
-#include <QTextCodec>
-#include <QXmlStreamWriter>
+#include <range/v3/algorithm/replace.hpp>
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <tinyxml.h>
 
@@ -16,36 +19,18 @@
 
 namespace {
 
-std::string createXmlDocumentToString(const std::multimap<std::string, std::string>& values) {
-  QString output;
-  QXmlStreamWriter stream(&output);
-  // NOTE: setCodec is ignored while writing to QString
-  // stream.setCodec("UTF-8");
-  stream.setAutoFormatting(true);
-
-  stream.writeStartDocument();
-  if(!values.empty()) {
-    stream.writeStartElement("config");
-    {
-      for(const auto& [key, value] : values) {
-        if(key.empty() || value.empty()) {
-          continue;
-        }
-        auto tokens = QString::fromStdString(key).split('/');
-        for(auto itr = tokens.begin(); itr != std::prev(tokens.end()); ++itr) {
-          stream.writeStartElement(*itr);
-        }
-        stream.writeTextElement(tokens.back(), QString::fromStdString(value));
-        for(auto index = 0; index < tokens.size() - 1; ++index) {
-          stream.writeEndElement();
-        }
-      }
+void createXmlDocumentToString(const std::multimap<std::string, std::string>& values, std::ostream& outStream) {
+  namespace pt = boost::property_tree;
+  pt::ptree tree;
+  for(const auto& [key, value] : values) {
+    if(key.empty() || value.empty()) {
+      continue;
     }
-    stream.writeEndElement();
+    auto newKey = "config/" + key;
+    ranges::cpp20::replace(newKey, '/', '.');
+    tree.add(newKey, value);
   }
-  stream.writeEndDocument();
-
-  return output.toStdString();
+  pt::write_xml(outStream, tree);
 }
 
 }    // namespace
@@ -121,13 +106,12 @@ bool ConfigManager::load(const std::shared_ptr<TextAccess>& textAccess) {
 }
 
 bool ConfigManager::save(const std::filesystem::path& filepath) const {
-  std::string output = createXmlDocumentToString(mConfigValues);
   std::ofstream outStream{filepath};
   if(!outStream.is_open()) {
     LOG_ERROR_W(fmt::format(L"Failed to open \"{}\"", filepath.wstring()));
     return false;
   }
-  outStream.write(output.data(), static_cast<long>(output.size()));
+  createXmlDocumentToString(mConfigValues, outStream);
   return outStream.good();
 }
 
@@ -143,5 +127,7 @@ void ConfigManager::parseSubtree(TiXmlNode* currentNode, const std::string& curr
 }
 
 std::string ConfigManager::toString() const {
-  return createXmlDocumentToString(mConfigValues);
+  std::stringstream outStream;
+  createXmlDocumentToString(mConfigValues, outStream);
+  return outStream.str();
 }

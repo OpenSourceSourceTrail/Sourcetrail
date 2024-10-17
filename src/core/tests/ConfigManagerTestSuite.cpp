@@ -39,6 +39,13 @@ constexpr std::string_view kRealProjectXml =
 std::shared_ptr<TextAccess> getConfigTextAccess(std::string_view text = kTestingXml) {
   return TextAccess::createFromString(text.data());
 }
+std::string removeSpaces(std::string_view input) {
+  std::string result{input};
+  result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+  result.erase(std::remove(result.begin(), result.end(), '\t'), result.end());
+  result.erase(std::remove(result.begin(), result.end(), ' '), result.end());
+  return result;
+}
 
 struct ConfigManagerFix : testing::Test {
   void SetUp() override {
@@ -48,14 +55,15 @@ struct ConfigManagerFix : testing::Test {
   ConfigManager::Ptr configManager;
 };
 
-TEST_F(ConfigManagerFix, DISABLED_loadIsCorrect) {
+TEST_F(ConfigManagerFix, loadIsCorrect) {
   // Given: configManager is created and loaded successfully
   ASSERT_TRUE(configManager);
   // When: get value with valid path
-  const auto result = configManager->toString();
+  auto result = removeSpaces(configManager->toString());
   // Then: a valid result
+  std::string expectedXml = removeSpaces(kTestingXml);
   ASSERT_THAT(result, testing::Not(testing::IsEmpty()));
-  EXPECT_THAT(result, testing::StrEq(kTestingXml));
+  EXPECT_THAT(result, testing::StrEq(expectedXml));
 }
 
 TEST_F(ConfigManagerFix, returnsTrueWhenKeyIsFound) {

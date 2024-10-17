@@ -162,7 +162,7 @@ public:
    * @return A vector of values associated with the key or the default values.
    */
   template <typename T>
-  [[nodiscard]] std::vector<T> getValuesOrDefaults(const std::string& key, std::vector<T> defaultValues) const;
+  [[nodiscard]] std::vector<T> getValuesOrDefaults(const std::string& key, const std::vector<T>& defaultValues) const;
 
   /**
    * @brief Sets a value for a given key.
@@ -298,7 +298,7 @@ T ConfigManager::getValueOrDefault(const std::string& key, T defaultValue) const
 }
 
 template <typename T>
-std::vector<T> ConfigManager::getValuesOrDefaults(const std::string& key, std::vector<T> defaultValues) const {
+std::vector<T> ConfigManager::getValuesOrDefaults(const std::string& key, const std::vector<T>& defaultValues) const {
   if(auto values = getValues<T>(key); values.has_value()) {
     return values.value();
   }
