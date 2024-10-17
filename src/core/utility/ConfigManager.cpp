@@ -2,15 +2,14 @@
 
 #include <fstream>
 #include <set>
-#include <vector>
 #include <sstream>
-
-#include <range/v3/algorithm/replace.hpp>
+#include <stack>
+#include <vector>
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 
-#include <tinyxml.h>
+#include <range/v3/algorithm/replace.hpp>
 
 #include "logging.h"
 #include "TextAccess.h"
@@ -31,6 +30,41 @@ void createXmlDocumentToString(const std::multimap<std::string, std::string>& va
     tree.add(newKey, value);
   }
   pt::write_xml(outStream, tree);
+}
+
+std::optional<std::multimap<std::string, std::string>> createStringToXmlDocument(std::istream& inStream) {
+  namespace pt = boost::property_tree;
+  pt::ptree tree;
+  pt::read_xml(inStream, tree);
+
+  auto configChild = tree.find("config");
+  if(tree.not_found() == configChild) {
+    return std::nullopt;
+  }
+
+  using NodeItr = decltype(configChild->second);
+
+  std::multimap<std::string, std::string> output;
+  std::stack<std::pair<std::string, NodeItr>> nodeStack{{{"", configChild->second}}};
+
+  while(!nodeStack.empty()) {
+    auto [currentKey, currentItem] = nodeStack.top();
+    nodeStack.pop();
+
+    if(currentItem.empty()) {
+      // output.insert(std::make_pair("", currentItem.data()));
+    } else {
+      for(auto& [key, child] : currentItem) {
+        if(!child.empty()) {
+          auto newKey = currentKey.empty() ? key : fmt::format("{}/{}", currentKey, key);
+          nodeStack.emplace(newKey, child);
+        } else {
+          output.emplace(fmt::format("{}/{}", currentKey, key), child.data());
+        }
+      }
+    }
+  }
+  return output;
 }
 
 }    // namespace
@@ -61,8 +95,8 @@ void ConfigManager::clear() {
 }
 
 void ConfigManager::removeValues(const std::string& key) {
-  for(const std::string& sublevelKey : getSublevelKeys(key)) {
-    removeValues(sublevelKey);
+  for(const std::string& subLevelKey : getSublevelKeys(key)) {
+    removeValues(subLevelKey);
   }
   mConfigValues.erase(key);
 }
@@ -86,23 +120,12 @@ std::vector<std::string> ConfigManager::getSublevelKeys(const std::string& key) 
 }
 
 bool ConfigManager::load(const std::shared_ptr<TextAccess>& textAccess) {
-  TiXmlDocument doc;
-  if(nullptr == doc.Parse(textAccess->getText().c_str(), nullptr, TIXML_ENCODING_UTF8)) {
-    LOG_ERROR("Unable to load a XML");
-    return false;
+  std::stringstream iStream{textAccess->getText()};
+  if(auto result = createStringToXmlDocument(iStream); result.has_value()) {
+    mConfigValues = result.value();
+    return true;
   }
-
-  TiXmlHandle docHandle(&doc);
-  TiXmlNode* rootNode = docHandle.FirstChild("config").ToNode();
-  if(nullptr == rootNode) {
-    LOG_ERROR("No 'config' in the configfile");
-    return false;
-  }
-
-  for(TiXmlNode* childNode = rootNode->FirstChild(); nullptr != childNode; childNode = childNode->NextSibling()) {
-    parseSubtree(childNode, "");
-  }
-  return true;
+  return false;
 }
 
 bool ConfigManager::save(const std::filesystem::path& filepath) const {
@@ -113,17 +136,6 @@ bool ConfigManager::save(const std::filesystem::path& filepath) const {
   }
   createXmlDocumentToString(mConfigValues, outStream);
   return outStream.good();
-}
-
-void ConfigManager::parseSubtree(TiXmlNode* currentNode, const std::string& currentPath) {
-  if(currentNode->Type() == TiXmlNode::TINYXML_TEXT) {
-    std::string key = currentPath.substr(0, currentPath.size() - 1);
-    mConfigValues.insert(std::pair<std::string, std::string>(key, currentNode->ToText()->Value()));
-  } else {
-    for(TiXmlNode* childNode = currentNode->FirstChild(); childNode != nullptr; childNode = childNode->NextSibling()) {
-      parseSubtree(childNode, currentPath + std::string(currentNode->Value()) + "/");
-    }
-  }
 }
 
 std::string ConfigManager::toString() const {

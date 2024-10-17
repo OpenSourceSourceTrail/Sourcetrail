@@ -234,14 +234,6 @@ private:
   ConfigManager();
   ConfigManager(const ConfigManager&);
 
-  /**
-   * @brief Parses an XML subtree and populates the configuration.
-   *
-   * @param parentElement The parent XML element.
-   * @param currentPath The current path within the XML hierarchy.
-   */
-  void parseSubtree(TiXmlNode* parentElement, const std::string& currentPath);
-
   /// Holds the configuration values in a multimap structure.
   std::multimap<std::string, std::string> mConfigValues;
 };

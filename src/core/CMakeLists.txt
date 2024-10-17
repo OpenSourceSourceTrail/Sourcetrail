@@ -41,7 +41,6 @@ target_link_libraries(
          spdlog::spdlog
   PRIVATE Boost::filesystem
           Sourcetrail::lib_utility
-          tinyxml::tinyxml
           Qt5::Core
           fmt::fmt)
 
