@@ -2,9 +2,9 @@
 
 #include <sstream>
 
+#include "logging.h"
 #include "Node.h"
 #include "TokenComponentBundledEdges.h"
-#include "logging.h"
 #include "utilityString.h"
 
 int Edge::typeToInt(EdgeType type) {

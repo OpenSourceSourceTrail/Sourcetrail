@@ -1,10 +1,10 @@
 #include "UndoRedoController.h"
 
 #include "Application.h"
-#include "type/MessageFlushUpdates.h"
-#include "type/search/MessageSearch.h"
 #include "Project.h"
 #include "StorageAccess.h"
+#include "type/MessageFlushUpdates.h"
+#include "type/search/MessageSearch.h"
 #include "UndoRedoView.h"
 #include "utility.h"
 

@@ -24,8 +24,8 @@ struct FileManagerFix : testing::Test {
 
   std::vector<FilePath> filePaths;
   std::vector<FilePathFilter> excludeFilters;
-  std::vector<FilePath> sourcePaths {
-      FilePath {L"./data/FileManagerTestSuite/src/"}, FilePath {L"./data/FileManagerTestSuite/include/"}};
+  std::vector<FilePath> sourcePaths{
+      FilePath{L"./data/FileManagerTestSuite/src/"}, FilePath{L"./data/FileManagerTestSuite/include/"}};
   std::vector<std::wstring> sourceExtensions;
 
   FileManager fileManager;

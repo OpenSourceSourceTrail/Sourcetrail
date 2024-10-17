@@ -4,8 +4,8 @@
 
 #include "FilePath.h"
 #include "FilePathFilter.h"
-#include "SharedMemory.h"
 #include "language_packages.h"
+#include "SharedMemory.h"
 
 class IndexerCommand;
 

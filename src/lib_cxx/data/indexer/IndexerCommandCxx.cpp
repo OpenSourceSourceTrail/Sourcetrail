@@ -6,10 +6,10 @@
 #include <clang/Tooling/CompilationDatabase.h>
 #include <clang/Tooling/JSONCompilationDatabase.h>
 
-#include "type/MessageStatus.h"
+#include "logging.h"
 #include "OrderedCache.h"
 #include "ResourcePaths.h"
-#include "logging.h"
+#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilitySourceGroupCxx.h"
 #include "utilityString.h"
@@ -19,7 +19,8 @@ std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const FilePath& c
   std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
 
   if(!error.empty()) {
-    const auto message = fmt::format(L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
+    const auto message = fmt::format(
+        L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
     LOG_ERROR_W(message);
     MessageStatus(message, true).dispatch();
   }

@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "CommandLineParser.h"
 #include "CommandlineCommandConfig.h"
+#include "CommandLineParser.h"
 #include "IApplicationSettings.hpp"
 #include "MockedApplicationSetting.hpp"
 #include "utilities/CollectOutStream.hpp"
@@ -154,7 +154,7 @@ TEST_F(CommandlineCommandConfigFix, setNumberOfThreads) {
   std::vector<std::string> args = {"-t", "1", "-g", "/usr/include/"};
 
   EXPECT_CALL(*mMockedAppSettings, setIndexerThreadCount(1)).WillOnce(testing::Return());
-  EXPECT_CALL(*mMockedAppSettings, setHeaderSearchPaths(std::vector<std::filesystem::path> {"/usr/include/"}))
+  EXPECT_CALL(*mMockedAppSettings, setHeaderSearchPaths(std::vector<std::filesystem::path>{"/usr/include/"}))
       .WillOnce(testing::Return(true));
   const auto ret = mConfig->parse(args);
 

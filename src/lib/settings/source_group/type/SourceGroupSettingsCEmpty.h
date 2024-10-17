@@ -1,8 +1,8 @@
 #ifndef SOURCE_GROUP_SETTINGS_C_EMPTY_H
 #define SOURCE_GROUP_SETTINGS_C_EMPTY_H
 
-#include "SourceGroupSettingsWithCStandard.h"
 #include "SourceGroupSettingsWithComponents.h"
+#include "SourceGroupSettingsWithCStandard.h"
 #include "SourceGroupSettingsWithCxxCrossCompilationOptions.h"
 #include "SourceGroupSettingsWithCxxPathsAndFlags.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"

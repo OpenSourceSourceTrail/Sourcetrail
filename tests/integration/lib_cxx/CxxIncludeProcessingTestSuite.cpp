@@ -4,8 +4,8 @@
 #include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
 #include "IncludeDirective.h"
 #include "IncludeProcessing.h"
-#include "TextAccess.h"
 #include "language_packages.h"
+#include "TextAccess.h"
 #include "utility.h"
 
 struct CxxIncludeProcessing : testing::Test {

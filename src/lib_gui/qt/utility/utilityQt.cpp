@@ -12,11 +12,11 @@
 #include "ColorScheme.h"
 #include "FilePath.h"
 #include "FileSystem.h"
+#include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "QtMainView.h"
 #include "ResourcePaths.h"
 #include "TextAccess.h"
-#include "IApplicationSettings.hpp"
-#include "logging.h"
 #include "utilityApp.h"
 #include "utilityString.h"
 

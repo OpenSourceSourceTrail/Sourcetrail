@@ -15,10 +15,10 @@
 #include <spdlog/spdlog.h>
 
 #include "FileSystem.h"
-#include "type/MessageSwitchColorScheme.h"
-#include "ResourcePaths.h"
 #include "IApplicationSettings.hpp"
 #include "logging.h"
+#include "ResourcePaths.h"
+#include "type/MessageSwitchColorScheme.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityPathDetection.h"

@@ -13,15 +13,15 @@ TEST(AppPath, CxxIndexer) {
 #endif
 
   EXPECT_EQ(exec, AppPath::getCxxIndexerFilePath().str());
-  EXPECT_FALSE(AppPath::setCxxIndexerDirectoryPath(FilePath {""}));
+  EXPECT_FALSE(AppPath::setCxxIndexerDirectoryPath(FilePath{""}));
 
-  EXPECT_FALSE(AppPath::setSharedDataDirectoryPath(FilePath {""}));
+  EXPECT_FALSE(AppPath::setSharedDataDirectoryPath(FilePath{""}));
   EXPECT_EQ("", AppPath::getSharedDataDirectoryPath().str());
   const auto tempDir = std::filesystem::temp_directory_path();
-  EXPECT_TRUE(AppPath::setSharedDataDirectoryPath(FilePath {tempDir / "shared"}));
+  EXPECT_TRUE(AppPath::setSharedDataDirectoryPath(FilePath{tempDir / "shared"}));
   EXPECT_EQ(tempDir / "shared", AppPath::getSharedDataDirectoryPath().str());
   EXPECT_EQ(tempDir / "shared" / exec, AppPath::getCxxIndexerFilePath().str());
 
-  EXPECT_TRUE(AppPath::setCxxIndexerDirectoryPath(FilePath {tempDir}));
+  EXPECT_TRUE(AppPath::setCxxIndexerDirectoryPath(FilePath{tempDir}));
   EXPECT_EQ(tempDir / exec, AppPath::getCxxIndexerFilePath().str());
 }

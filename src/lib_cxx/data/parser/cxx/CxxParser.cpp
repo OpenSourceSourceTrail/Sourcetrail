@@ -19,12 +19,12 @@
 #include "CxxDiagnosticConsumer.h"
 #include "FilePath.h"
 #include "FileRegister.h"
+#include "IApplicationSettings.hpp"
 #include "IndexerCommandCxx.h"
+#include "logging.h"
 #include "ParserClient.h"
 #include "SingleFrontendActionFactory.h"
 #include "TextAccess.h"
-#include "IApplicationSettings.hpp"
-#include "logging.h"
 #include "utility.h"
 #include "utilityString.h"
 
@@ -157,8 +157,8 @@ void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabas
   ClangInvocationInfo info;
   info = ClangInvocationInfo::getClangInvocationString(pCompilationDatabase);
   LOG_INFO("Clang Invocation: " +
-            info.invocation.substr(
-                0, IApplicationSettings::getInstanceRaw()->getVerboseIndexerLoggingEnabled() ? std::string::npos : 20000));
+           info.invocation.substr(
+               0, IApplicationSettings::getInstanceRaw()->getVerboseIndexerLoggingEnabled() ? std::string::npos : 20000));
 
   if(!info.errors.empty()) {
     LOG_INFO("Clang Invocation errors: " + info.errors);

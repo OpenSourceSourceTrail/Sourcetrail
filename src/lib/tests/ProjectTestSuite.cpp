@@ -206,6 +206,6 @@ TEST_F(ProjectFix, DISABLED_loadFailed) {
 TEST_F(ProjectFix, DISABLED_buildIndex) {
   EXPECT_CALL(*mDialogView, clearDialogs()).WillOnce(Return());
 
-  const RefreshInfo info {{FilePath {"1.cpp"}}, {}, {}, REFRESH_ALL_FILES};
+  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, REFRESH_ALL_FILES};
   mProject->buildIndex(info, mDialogView);
 }

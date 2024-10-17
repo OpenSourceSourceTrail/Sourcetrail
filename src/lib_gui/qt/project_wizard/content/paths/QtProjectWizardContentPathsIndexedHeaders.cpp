@@ -1,18 +1,18 @@
 #include "QtProjectWizardContentPathsIndexedHeaders.h"
 
-#include <QMessageBox>
 #include <QGridLayout>
+#include <QMessageBox>
 
 #include "CodeblocksProject.h"
 #include "CompilationDatabase.h"
 #include "IndexerCommandCxx.h"
+#include "logging.h"
 #include "OrderedCache.h"
 #include "QtPathListDialog.h"
 #include "QtSelectPathsDialog.h"
 #include "QtTextEditDialog.h"
 #include "SourceGroupSettingsCxxCdb.h"
 #include "SourceGroupSettingsCxxCodeblocks.h"
-#include "logging.h"
 #include "utility.h"
 #include "utilityFile.h"
 

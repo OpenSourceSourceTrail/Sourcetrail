@@ -2,10 +2,10 @@
 
 #include <QMessageBox>
 
+#include "language_packages.h"
 #include "SourceGroupCustomCommand.h"
 #include "SourceGroupSettingsCustomCommand.h"
 #include "SourceGroupSettingsWithSourcePaths.h"
-#include "language_packages.h"
 #include "utility.h"
 #include "utilityFile.h"
 

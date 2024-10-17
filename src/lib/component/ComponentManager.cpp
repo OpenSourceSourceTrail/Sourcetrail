@@ -8,13 +8,13 @@
 #include "Controller.h"
 #include "DialogView.h"
 #include "GraphView.h"
+#include "logging.h"
 #include "RefreshView.h"
 #include "ScreenSearchController.h"
 #include "SearchView.h"
 #include "TabbedView.h"
 #include "UndoRedoView.h"
 #include "ViewFactory.h"
-#include "logging.h"
 
 namespace {
 template <class Container>

@@ -6,8 +6,8 @@
 #include <QGraphicsView>
 #include <QPen>
 
-#include "type/graph/MessageActivateNodes.h"
 #include "NameHierarchy.h"
+#include "type/graph/MessageActivateNodes.h"
 
 QtGraphNodeQualifier::QtGraphNodeQualifier(const NameHierarchy& name) : m_qualifierName(name) {
   this->setAcceptHoverEvents(true);

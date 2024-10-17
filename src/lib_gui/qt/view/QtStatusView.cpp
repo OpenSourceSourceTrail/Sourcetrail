@@ -7,11 +7,11 @@
 #include <QStandardItemModel>
 
 #include "ColorScheme.h"
-#include "type/MessageClearStatusView.h"
-#include "type/MessageStatusFilterChanged.h"
+#include "IApplicationSettings.hpp"
 #include "QtTable.h"
 #include "QtViewWidgetWrapper.h"
-#include "IApplicationSettings.hpp"
+#include "type/MessageClearStatusView.h"
+#include "type/MessageStatusFilterChanged.h"
 #include "utilityQt.h"
 
 QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {

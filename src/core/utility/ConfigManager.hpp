@@ -72,7 +72,7 @@ public:
       } catch([[maybe_unused]] const std::invalid_argument& ex) {    // NOLINT
       }
     } else if constexpr(std::is_same_v<T, FilePath>) {
-      return FilePath {value};
+      return FilePath{value};
     }
     return {};
   }

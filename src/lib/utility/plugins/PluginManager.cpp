@@ -39,7 +39,7 @@ void PluginManager::loadPlugins() {
 
   // Call later
   QTimer::singleShot(0, [this, pluginsDir = std::move(pluginsDir)]() {
-    for(auto file : fs::directory_iterator {pluginsDir}) {
+    for(auto file : fs::directory_iterator{pluginsDir}) {
       if(file.is_regular_file()) {
         loadPlugin(file.path().string());
       }
@@ -52,7 +52,7 @@ bool PluginManager::exists(const std::string& plugName) const {
 }
 
 void PluginManager::loadPlugin(std::string_view pluginPath) {
-  const auto pluginName = fs::path {pluginPath}.stem().string();
+  const auto pluginName = fs::path{pluginPath}.stem().string();
   if(exists(pluginName)) {
     LOG_WARNING(fmt::format("{} is loaded.", pluginPath.data()));
     return;

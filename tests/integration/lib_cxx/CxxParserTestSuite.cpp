@@ -5,14 +5,14 @@
 
 #include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
 #include "CxxParser.h"
+#include "gmock/gmock.h"
 #include "IndexerCommandCxx.h"
 #include "IndexerStateInfo.h"
+#include "language_packages.h"
 #include "ParserClientImpl.h"
 #include "TestFileRegister.h"
 #include "TestStorage.h"
 #include "TextAccess.h"
-#include "gmock/gmock.h"
-#include "language_packages.h"
 #include "utility.h"
 #include "utilityString.h"
 
@@ -3420,7 +3420,7 @@ TEST_F(CxxParserTestSuite, cxxParserParsesMultipleFiles) {
       excludeFilters,
       includeFilters,
       workingDirectory,
-      std::vector<std::wstring> {L"--target=x86_64-pc-windows-msvc", L"-std=c++1z", sourceFilePath.wstr()});
+      std::vector<std::wstring>{L"--target=x86_64-pc-windows-msvc", L"-std=c++1z", sourceFilePath.wstr()});
 
   std::shared_ptr<IntermediateStorage> storage = std::make_shared<IntermediateStorage>();
   CxxParser parser(std::make_shared<ParserClientImpl>(storage.get()),

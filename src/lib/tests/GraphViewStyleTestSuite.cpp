@@ -91,7 +91,7 @@ static int toGridGap(int x);
   EXPECT_EQ("#FF1493", GraphViewStyle::getFocusColor());
 
   // fill: #FF1493, text: #FF1493, border: #FF1493, hatching: #FF1493, icon: #FF1493
-  EXPECT_EQ(GraphViewStyle::NodeColor {}, GraphViewStyle::getNodeColor("", true));
+  EXPECT_EQ(GraphViewStyle::NodeColor{}, GraphViewStyle::getNodeColor("", true));
 
   /*
   static const NodeColor& getNodeColor(const std::string& typeStr, bool highlight);

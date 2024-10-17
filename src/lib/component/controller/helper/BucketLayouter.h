@@ -3,8 +3,8 @@
 #include <map>
 // internal
 #include "DummyNode.h"
-#include "Vector2.h"
 #include "types.h"
+#include "Vector2.h"
 
 struct DummyEdge;
 

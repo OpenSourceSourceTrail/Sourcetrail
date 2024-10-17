@@ -2,8 +2,8 @@
 
 #include <QWidget>
 
-#include "View.h"
 #include "logging.h"
+#include "View.h"
 
 QWidget* QtViewWidgetWrapper::getWidgetOfView(const View* pView) {
   if(pView == nullptr) {

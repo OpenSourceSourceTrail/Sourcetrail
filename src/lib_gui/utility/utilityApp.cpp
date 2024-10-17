@@ -15,8 +15,8 @@
 
 #include <QThread>
 
-#include "ScopedFunctor.h"
 #include "logging.h"
+#include "ScopedFunctor.h"
 #include "utilityString.h"
 
 namespace utility {

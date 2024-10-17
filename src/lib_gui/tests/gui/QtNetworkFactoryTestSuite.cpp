@@ -21,7 +21,7 @@ void QtNetworkFactoryTestSuite::cleanup() {
   IMessageQueue::setInstance(nullptr);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   testing::InitGoogleMock(&argc, argv);
   QTEST_MAIN_IMPL(QtNetworkFactoryTestSuite)
 }

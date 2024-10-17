@@ -5,10 +5,10 @@
 #include "Application.h"
 #include "CodeblocksProject.h"
 #include "CxxIndexerCommandProvider.h"
-#include "IndexerCommandCxx.h"
-#include "type/MessageStatus.h"
-#include "SourceGroupSettingsCxxCodeblocks.h"
 #include "IApplicationSettings.hpp"
+#include "IndexerCommandCxx.h"
+#include "SourceGroupSettingsCxxCodeblocks.h"
+#include "type/MessageStatus.h"
 #include "utility.h"
 
 SourceGroupCxxCodeblocks::SourceGroupCxxCodeblocks(std::shared_ptr<SourceGroupSettingsCxxCodeblocks> settings)

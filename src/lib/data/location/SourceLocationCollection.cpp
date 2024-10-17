@@ -4,8 +4,8 @@
 // fmt
 #include <fmt/format.h>
 // internal
-#include "SourceLocationFile.h"
 #include "logging.h"
+#include "SourceLocationFile.h"
 
 SourceLocationCollection::SourceLocationCollection() = default;
 

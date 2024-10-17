@@ -53,7 +53,7 @@ TEST(TimeStamp, emptyTime) {
   }
   {
     boost::posix_time::ptime pTime;
-    const TimeStamp timeStamp {pTime};
+    const TimeStamp timeStamp{pTime};
     ASSERT_FALSE(timeStamp.isValid());
     EXPECT_EQ("not-a-date-time", timeStamp.toString());
     EXPECT_EQ("not-a-date-time", timeStamp.getDDMMYYYYString());

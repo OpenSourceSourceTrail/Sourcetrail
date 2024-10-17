@@ -22,4 +22,4 @@ ITaskManager::RawPtr ITaskManager::getInstanceRaw() noexcept {
 
 ITaskManager::~ITaskManager() noexcept = default;
 
-}    // namespace lib
+}    // namespace scheduling

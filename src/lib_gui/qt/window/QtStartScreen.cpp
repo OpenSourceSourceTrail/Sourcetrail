@@ -17,12 +17,12 @@
 #include <QPushButton>
 #include <QUrl>
 
+#include "globalStrings.h"
+#include "IApplicationSettings.hpp"
 #include "RecentItemModel.hpp"
 #include "UserPaths.h"
-#include "Version.h"
-#include "IApplicationSettings.hpp"
-#include "globalStrings.h"
 #include "utilityQt.h"
+#include "Version.h"
 
 namespace {
 
@@ -56,7 +56,7 @@ void QtStartScreen::setupStartScreen() {
 
   // Create the main layout
   auto* layout = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
-  constexpr QMargins LayoutMargins {15, 170, 15, 0};
+  constexpr QMargins LayoutMargins{15, 170, 15, 0};
   layout->setContentsMargins(LayoutMargins);
   m_content->setLayout(layout);
 
@@ -76,9 +76,8 @@ void QtStartScreen::setupStartScreen() {
 
 void QtStartScreen::hideEvent(QHideEvent* hideEvent) {
   if(mRecentModel->isDirty()) {
-    auto updatedRecentProjects = mRecentModel->getRecentProjects() | ranges::views::transform([](auto item)-> std::filesystem::path {
-                                   return item.path.wstring();
-                                 }) |
+    auto updatedRecentProjects = mRecentModel->getRecentProjects() |
+        ranges::views::transform([](auto item) -> std::filesystem::path { return item.path.wstring(); }) |
         ranges::to<std::vector>();
 
     IApplicationSettings::getInstanceRaw()->setRecentProjects(updatedRecentProjects);
@@ -137,7 +136,7 @@ void QtStartScreen::createRecentProjects(QHBoxLayout* layout) {
   viewList->setMovement(QListView::Snap);
   viewList->setSelectionMode(QAbstractItemView::SingleSelection);
   // Icon size
-  constexpr QSize IconSize {30, 30};
+  constexpr QSize IconSize{30, 30};
   viewList->setIconSize(IconSize);
   viewList->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContentsOnFirstShow);
   viewList->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);

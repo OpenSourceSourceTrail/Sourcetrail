@@ -2,10 +2,10 @@
 
 #include <sstream>
 
+#include "logging.h"
 #include "TokenComponentAccess.h"
 #include "TokenComponentConst.h"
 #include "TokenComponentStatic.h"
-#include "logging.h"
 #include "utilityString.h"
 
 Node::Node(Id id, NodeType type, NameHierarchy nameHierarchy, DefinitionKind definitionKind)
@@ -27,7 +27,7 @@ NodeType Node::getType() const {
 void Node::setType(NodeType type) {
   if(!isType(type.getKind() | NODE_SYMBOL)) {
     LOG_WARNING_W(L"Cannot change NodeType after it was already set from " + getReadableTypeString() + L" to " +
-                type.getReadableTypeWString());
+                  type.getReadableTypeWString());
     return;
   }
   m_type = type;

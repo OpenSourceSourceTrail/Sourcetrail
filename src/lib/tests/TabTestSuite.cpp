@@ -3,10 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "type/focus/MessageFocusView.h"
-#include "type/MessageRefreshUI.h"
 #include "MockedMessageQueue.hpp"
-#include "Tab.h"
 #include "mocks/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedCompositeView.hpp"
@@ -17,6 +14,9 @@
 #include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "Tab.h"
+#include "type/focus/MessageFocusView.h"
+#include "type/MessageRefreshUI.h"
 
 using namespace testing;
 
@@ -95,10 +95,10 @@ TEST_F(TabIdFix, DISABLED_goodCase) {
 
   EXPECT_CALL(*graphView, setNavigationFocus(_)).WillOnce(Return());
   EXPECT_CALL(*codeView, setNavigationFocus(_)).WillOnce(Return());
-  MessageFocusView {MessageFocusView::ViewType::CODE}.dispatchImmediately();
+  MessageFocusView{MessageFocusView::ViewType::CODE}.dispatchImmediately();
 
   mockRefreshViews();
-  MessageRefreshUI {}.dispatchImmediately();
+  MessageRefreshUI{}.dispatchImmediately();
 }
 
 // NOLINTNEXTLINE

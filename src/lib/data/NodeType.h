@@ -18,7 +18,8 @@ public:
   struct BundleInfo {
     BundleInfo() = default;
 
-    explicit BundleInfo(std::wstring bundleName_) : nameMatcher([](const std::wstring&) { return true; }), bundleName(std::move(bundleName_)) {}
+    explicit BundleInfo(std::wstring bundleName_)
+        : nameMatcher([](const std::wstring&) { return true; }), bundleName(std::move(bundleName_)) {}
 
     BundleInfo(std::function<bool(std::wstring)> nameMatcher_, std::wstring bundleName_)
         : nameMatcher(nameMatcher_), bundleName(std::move(bundleName_)) {}

@@ -37,7 +37,7 @@ std::vector<std::shared_ptr<IndexerCommand>> SourceGroupCustomCommand::getIndexe
   for(const FilePath& sourcePath : getAllSourceFilePaths()) {
     if(info.filesToIndex.find(sourcePath) != info.filesToIndex.end()) {
       indexerCommands.push_back(std::make_shared<IndexerCommandCustom>(m_settings->getCustomCommand(),
-                                                                       std::vector<std::wstring> {},
+                                                                       std::vector<std::wstring>{},
                                                                        m_settings->getProjectSettings()->getProjectFilePath(),
                                                                        m_settings->getProjectSettings()->getTempDBFilePath(),
                                                                        std::to_wstring(SqliteIndexStorage::getStorageVersion()),

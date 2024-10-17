@@ -9,8 +9,8 @@
 class SourceLocationsGetCreatedWithOtherEnd : public testing::Test {
 public:
   void SetUp() override {
-    const uint32_t StartLocation[] {2, 3};
-    const uint32_t EndLocation[] {4, 5};
+    const uint32_t StartLocation[]{2, 3};
+    const uint32_t EndLocation[]{4, 5};
 
     FilePath filePath(L"file.c");
 
@@ -150,7 +150,7 @@ TEST_F(FindingSourceLocationsById, goodCase) {
 class CreatingPlainCopyOfAllLocationsInLineRange : public testing::Test {
 public:
   void SetUp() override {
-    const FilePath filePath {L"file.c"};
+    const FilePath filePath{L"file.c"};
     m_pLocation0 = collection.addSourceLocation(LOCATION_TOKEN, 1, {1}, filePath, 2, 3, 4, 5);
     ASSERT_NE(nullptr, m_pLocation0);
     m_pLocation1 = collection.addSourceLocation(LOCATION_TOKEN, 2, {1}, filePath, 3, 3, 4, 5);
@@ -209,7 +209,7 @@ TEST_F(CreatingPlainCopyOfAllLocationsInLineRange, goodCase) {
 class GetSourceLocationsFilteredByLines : public testing::Test {
 public:
   void SetUp() override {
-    const FilePath filePath {L"file.c"};
+    const FilePath filePath{L"file.c"};
     m_pLocation0 = collection.addSourceLocation(LOCATION_TOKEN, 1, {1}, filePath, 1, 3, 1, 5);
     ASSERT_NE(nullptr, m_pLocation0);
     m_pLocation1 = collection.addSourceLocation(LOCATION_TOKEN, 2, {1}, filePath, 1, 3, 2, 5);

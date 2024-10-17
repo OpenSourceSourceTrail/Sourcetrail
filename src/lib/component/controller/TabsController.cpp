@@ -5,14 +5,14 @@
 #include "../../../scheduling/TaskLambda.h"
 #include "../../../scheduling/TaskScheduler.h"
 #include "Application.h"
-#include "type/search/MessageFind.h"
-#include "type/indexing/MessageIndexingFinished.h"
-#include "type/code/MessageScrollToLine.h"
-#include "type/search/MessageSearch.h"
-#include "type/MessageWindowChanged.h"
+#include "ITaskManager.hpp"
 #include "ScreenSearchInterfaces.h"
 #include "TabId.h"
-#include "ITaskManager.hpp"
+#include "type/code/MessageScrollToLine.h"
+#include "type/indexing/MessageIndexingFinished.h"
+#include "type/MessageWindowChanged.h"
+#include "type/search/MessageFind.h"
+#include "type/search/MessageSearch.h"
 
 TabsController::TabsController(ViewLayout* mainLayout,
                                const ViewFactory* viewFactory,

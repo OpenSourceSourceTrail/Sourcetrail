@@ -10,10 +10,10 @@
 #include "CodeblocksUnit.h"
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandCxx.h"
+#include "logging.h"
 #include "OrderedCache.h"
 #include "SourceGroupSettingsCxxCodeblocks.h"
 #include "TextAccess.h"
-#include "logging.h"
 #include "utility.h"
 #include "utilityString.h"
 

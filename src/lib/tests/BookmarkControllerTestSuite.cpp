@@ -6,12 +6,12 @@
 #include "BookmarkController.h"
 #include "BookmarkView.h"
 #include "ComponentFactory.h"
-#include "type/bookmark/MessageBookmarkUpdate.hpp"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "type/bookmark/MessageBookmarkUpdate.hpp"
 
 using namespace testing;
 using testing::Return;
@@ -53,19 +53,19 @@ struct BookmarkControllerFix : public Test {
   void MockUpdate(bool skipNodes = false, bool skipEdges = false) {
     EXPECT_CALL(*mView, bookmarkBrowserIsVisible()).InSequence(mSequence).WillOnce(Return(false));
     if(!skipNodes) {
-      EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks {}));
+      EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
     }
     if(!skipEdges) {
-      EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks {}));
+      EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
     }
   }
 
   void MockCleanBookmarkCategories() {
-    EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks {}));
-    EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks {}));
+    EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+    EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
     EXPECT_CALL(*mStorageAccess, getAllBookmarkCategories())
         .InSequence(mSequence)
-        .WillOnce(Return(MockedStorageAccess::BookmarkCategories {}));
+        .WillOnce(Return(MockedStorageAccess::BookmarkCategories{}));
   }
 
   std::shared_ptr<MockedMessageQueue> mMessageQueue;
@@ -83,22 +83,22 @@ TEST_F(BookmarkControllerFix, clear) {
 }
 
 TEST_F(BookmarkControllerFix, DISABLED_displayBookmarks) {
-  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks {}));
-  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks {}));
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
   EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
   mController->displayBookmarks();
 }
 
 TEST_F(BookmarkControllerFix, DISABLED_displayBookmarksFor) {
-  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks {}));
-  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks {}));
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
   EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
   mController->displayBookmarksFor(Bookmark::Filter::Unknown, Bookmark::Order::None);
 }
 
 TEST_F(BookmarkControllerFix, displayBookmarksFor2) {
-  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks {}));
-  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks {}));
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
   EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
   mController->displayBookmarksFor(Bookmark::Filter::All, Bookmark::Order::DateDescending);
 }
@@ -152,7 +152,7 @@ TEST_F(BookmarkControllerFix, deleteBookmark) {
 
 TEST_F(BookmarkControllerFix, deleteCategory) {
   EXPECT_CALL(*mStorageAccess, removeBookmarkCategory(_)).InSequence(mSequence).WillOnce(Return());
-  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks {}));
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
   MockUpdate(true);
 
   constexpr Id id = 10;

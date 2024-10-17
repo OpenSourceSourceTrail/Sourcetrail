@@ -4,7 +4,7 @@
 #include <string>
 
 struct CollectOutStream final {
-  explicit CollectOutStream(std::ostream& ostream) : mStream {ostream}, mOldBuffer {mStream.rdbuf()} {
+  explicit CollectOutStream(std::ostream& ostream) : mStream{ostream}, mOldBuffer{mStream.rdbuf()} {
     mStream.rdbuf(mBufferStream.rdbuf());
   }
 

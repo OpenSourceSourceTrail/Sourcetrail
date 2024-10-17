@@ -5,13 +5,13 @@
 #include "Application.h"
 #include "ColorScheme.h"
 #include "FileSystem.h"
-#include "type/code/MessageActivateFile.h"
-#include "type/MessageProjectEdit.h"
-#include "type/tab/MessageTabOpenWith.h"
+#include "IApplicationSettings.hpp"
 #include "Project.h"
 #include "QtContextMenu.h"
 #include "ResourcePaths.h"
-#include "IApplicationSettings.hpp"
+#include "type/code/MessageActivateFile.h"
+#include "type/MessageProjectEdit.h"
+#include "type/tab/MessageTabOpenWith.h"
 #include "utilityString.h"
 
 QtCodeFileTitleButton::QtCodeFileTitleButton(QWidget* parent)

@@ -6,10 +6,10 @@
 
 #include "MainView.h"
 #include "MessageListener.h"
+#include "QtThreadedFunctor.h"
 #include "type/MessageProjectEdit.h"
 #include "type/MessageProjectNew.h"
 #include "type/MessageWindowChanged.h"
-#include "QtThreadedFunctor.h"
 
 class QtMainWindow;
 class QStatusBar;

@@ -5,9 +5,9 @@
 
 #include "ColorScheme.h"
 #include "GraphViewStyle.h"
+#include "IApplicationSettings.hpp"
 #include "QtDeviceScaledPixmap.h"
 #include "ResourcePaths.h"
-#include "IApplicationSettings.hpp"
 #include "utilityString.h"
 
 QtAutocompletionModel::QtAutocompletionModel(QObject* parent) : QAbstractTableModel(parent) {}

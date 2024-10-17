@@ -7,9 +7,9 @@
 #include "../../../scheduling/Task.h"
 #include "ErrorCountInfo.h"
 #include "FilePath.h"
-#include "type/indexing/MessageIndexingInterrupted.h"
 #include "MessageListener.h"
 #include "TimeStamp.h"
+#include "type/indexing/MessageIndexingInterrupted.h"
 
 class DialogView;
 class IndexerCommandCustom;

@@ -7,10 +7,10 @@
 
 #include "FilePath.h"
 #include "FileTree.h"
+#include "IApplicationSettings.hpp"
 #include "IncludeDirective.h"
 #include "TextAccess.h"
 #include "TextCodec.h"
-#include "IApplicationSettings.hpp"
 #include "utility.h"
 #include "utilityString.h"
 

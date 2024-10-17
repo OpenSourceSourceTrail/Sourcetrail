@@ -2,8 +2,8 @@
 // internal
 #include "Message.h"
 #include "TabId.h"
-#include "Vector2.h"
 #include "types.h"
+#include "Vector2.h"
 
 class MessageGraphNodeMove final : public Message<MessageGraphNodeMove> {
 public:

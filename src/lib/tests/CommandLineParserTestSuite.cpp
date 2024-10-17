@@ -61,7 +61,7 @@ TEST(CommandLineParser, initStateEmptyArgs) {
 
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, helpOption) {
-  std::vector<std::string> args {"--help"};
+  std::vector<std::string> args{"--help"};
   commandline::CommandLineParser parser({});
   {
     constexpr std::string_view HelpString =
@@ -84,7 +84,7 @@ TEST(CommandLineParserConfig, helpOption) {
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, versionOption) {
   constexpr std::string_view VersionString = "Sourcetrail Version 2023.6.8\n";
-  std::vector<std::string> args {"--version"};
+  std::vector<std::string> args{"--version"};
   commandline::CommandLineParser parser("2023.6.8");
   {
     CollectOutStream collectCout(std::cout);
@@ -105,7 +105,7 @@ TEST(CommandLineParserConfig, projectFileOptionIsEmpty) {
       "ERROR: the required argument for option '--project-file' is missing\n\n\nOptions:\n  -h [ --help ]          Print this "
       "help message\n  -v [ --version ]       Version of Sourcetrail\n  --project-file arg     Open Sourcetrail with this "
       "project (.srctrlprj)\n\n";
-  std::vector<std::string> args {"--project-file"};
+  std::vector<std::string> args{"--project-file"};
   commandline::CommandLineParser parser({});
   {
     CollectOutStream collectCout(std::cout);
@@ -125,7 +125,7 @@ TEST(CommandLineParserConfig, projectFileOptionIsEmpty) {
 
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, projectFileOptionNotExists) {
-  std::vector<std::string> args {"--project-file", "not-exists"};
+  std::vector<std::string> args{"--project-file", "not-exists"};
   commandline::CommandLineParser parser({});
   parser.preparse(args);
   EXPECT_FALSE(parser.runWithoutGUI());
@@ -141,7 +141,7 @@ TEST(CommandLineParserConfig, projectFileOptionNotExists) {
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, projectFileMissingExtention) {
   constexpr auto EmptyProjectPath = "/tmp/empty.proj";
-  std::vector<std::string> args {"--project-file", EmptyProjectPath};
+  std::vector<std::string> args{"--project-file", EmptyProjectPath};
   auto fileHandler = FileHandler::createEmptyFile(args.back());
 
   commandline::CommandLineParser parser({});
@@ -150,7 +150,7 @@ TEST(CommandLineParserConfig, projectFileMissingExtention) {
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_TRUE(parser.hasError());
   const auto ErrorMessage = utility::decodeFromUtf8("Provided Projectfile is not valid:\n* Provided Projectfile('"s +
-                                                    fs::path {EmptyProjectPath}.filename().string() +
+                                                    fs::path{EmptyProjectPath}.filename().string() +
                                                     "')  has a wrong file ending");
   EXPECT_THAT(parser.getError(), StrEq(ErrorMessage));
   EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
@@ -160,7 +160,7 @@ TEST(CommandLineParserConfig, projectFileMissingExtention) {
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, emptyProjectFile) {
   constexpr auto EmptyProjectPath = "/tmp/empty.srctrlprj";
-  std::vector<std::string> args {"--project-file", EmptyProjectPath};
+  std::vector<std::string> args{"--project-file", EmptyProjectPath};
   auto fileHandler = FileHandler::createEmptyFile(args.back());
 
   commandline::CommandLineParser parser({});
@@ -169,7 +169,7 @@ TEST(CommandLineParserConfig, emptyProjectFile) {
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_TRUE(parser.hasError());
   const auto ErrorMessage = utility::decodeFromUtf8("Provided Projectfile is not valid:\n* Provided Projectfile('"s +
-                                                    fs::path {EmptyProjectPath}.filename().string() +
+                                                    fs::path{EmptyProjectPath}.filename().string() +
                                                     "')  could not be loaded (invalid)");
   EXPECT_THAT(parser.getError(), StrEq(ErrorMessage));
   EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
@@ -180,7 +180,7 @@ TEST(CommandLineParserConfig, emptyProjectFile) {
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, loadTutorialProject) {
   constexpr auto ProjectPath = "../app/user/projects/tutorial/tutorial.srctrlprj";
-  std::vector<std::string> args {"--project-file", ProjectPath};
+  std::vector<std::string> args{"--project-file", ProjectPath};
   auto fileHandler = FileHandler::createEmptyFile(args.back());
 
   commandline::CommandLineParser parser({});
@@ -197,7 +197,7 @@ TEST(CommandLineParserConfig, loadTutorialProject) {
 
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, initStateNoRegisitedCommands) {
-  std::vector<std::string> args {"somthing"};
+  std::vector<std::string> args{"somthing"};
   commandline::CommandLineParser parser({});
   parser.preparse(args);
   EXPECT_FALSE(parser.runWithoutGUI());
@@ -209,7 +209,7 @@ TEST(CommandLineParserConfig, initStateNoRegisitedCommands) {
 
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, initStateRegisitedCommands) {
-  std::vector<std::string> args {"config --help"};
+  std::vector<std::string> args{"config --help"};
   commandline::CommandLineParser parser({});
   parser.preparse(args);
   EXPECT_FALSE(parser.runWithoutGUI());

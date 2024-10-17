@@ -4,11 +4,11 @@
 // internal
 #include "Application.h"
 #include "DialogView.h"
+#include "IApplicationSettings.hpp"
 #include "Project.h"
 #include "QtHelpButtonInfo.h"
 #include "StorageAccess.h"
 #include "TabId.h"
-#include "IApplicationSettings.hpp"
 
 ErrorController::ErrorController(StorageAccess* pStorageAccess) : m_storageAccess(pStorageAccess) {}
 

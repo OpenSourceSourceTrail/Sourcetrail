@@ -14,8 +14,8 @@ private:
   std::function<ValType(const KeyType&)> m_calculator;
   std::unordered_map<KeyType, ValType, Hasher> m_map;
 
-  size_t m_hitCount {};
-  size_t m_missCount {};
+  size_t m_hitCount{};
+  size_t m_missCount{};
 };
 
 template <typename KeyType, typename ValType, typename Hasher>

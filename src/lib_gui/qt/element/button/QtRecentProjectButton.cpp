@@ -9,10 +9,10 @@
 #include <QMessageBox>
 #include <QString>
 // internal
+#include "IApplicationSettings.hpp"
 #include "MessageLoadProject.h"
 #include "QtContextMenu.h"
 #include "UserPaths.h"
-#include "IApplicationSettings.hpp"
 
 QtRecentProjectButton::QtRecentProjectButton(QWidget* pParent) : QPushButton(pParent) {}
 

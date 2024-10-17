@@ -5,13 +5,13 @@
 #include <QMessageBox>
 #include <QPushButton>
 
+#include "QtSearchBarButton.h"
+#include "QtViewWidgetWrapper.h"
+#include "ResourcePaths.h"
 #include "type/bookmark/MessageBookmarkBrowse.h"
 #include "type/bookmark/MessageBookmarkCreate.h"
 #include "type/bookmark/MessageBookmarkDelete.h"
 #include "type/bookmark/MessageBookmarkEdit.h"
-#include "QtSearchBarButton.h"
-#include "QtViewWidgetWrapper.h"
-#include "ResourcePaths.h"
 #include "utilityQt.h"
 
 QtBookmarkButtonsView::QtBookmarkButtonsView(ViewLayout* viewLayout)

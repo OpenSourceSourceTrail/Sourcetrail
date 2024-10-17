@@ -25,7 +25,7 @@ NameDelimiterType stringToNameDelimiterType(const std::wstring& s) {
 }
 
 NameDelimiterType detectDelimiterType(const std::wstring& name) {
-  const std::vector<NameDelimiterType> allDelimiters {NAME_DELIMITER_FILE, NAME_DELIMITER_CXX};
+  const std::vector<NameDelimiterType> allDelimiters{NAME_DELIMITER_FILE, NAME_DELIMITER_CXX};
 
   for(NameDelimiterType delimiter : allDelimiters) {
     if(name.find(nameDelimiterTypeToString(delimiter)) != std::wstring::npos) {

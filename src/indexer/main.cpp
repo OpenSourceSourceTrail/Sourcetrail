@@ -4,11 +4,11 @@
 
 #include "ApplicationSettings.h"
 #include "AppPath.h"
-#include "InterprocessIndexer.h"
-#include "LanguagePackageManager.h"
 #include "IApplicationSettings.hpp"
 #include "includes.h"
+#include "InterprocessIndexer.h"
 #include "language_packages.h"
+#include "LanguagePackageManager.h"
 #include "logging.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE

@@ -6,6 +6,7 @@
 
 #include "ActivationController.h"
 #include "ConsoleLogger.h"
+#include "IApplicationSettings.hpp"
 #include "MessageActivateEdge.h"
 #include "MessageActivateTokenIds.h"
 #include "MessageActivateTokens.h"
@@ -14,9 +15,8 @@
 #include "MessageScrollToLine.h"
 #include "MessageSearch.h"
 #include "MessageStatus.h"
-#include "NameHierarchy.h"
-#include "IApplicationSettings.hpp"
 #include "mocks/MockedStorageAccess.hpp"
+#include "NameHierarchy.h"
 
 using namespace std::chrono_literals;
 using namespace testing;
@@ -53,11 +53,11 @@ struct SpyMessageActivateTokens : MessageListener<MessageActivateTokens> {
 TEST_F(ActivationControllerFix, MessageActivateEdge) {
   const ActivationController controller(&storageAccess);
   const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateEdge {
-      Id {0},
+  MessageActivateEdge{
+      Id{0},
       Edge::EdgeType::EDGE_CALL,
-      NameHierarchy {},
-      NameHierarchy {},
+      NameHierarchy{},
+      NameHierarchy{},
   }
       .dispatchImmediately();
   EXPECT_TRUE(spyMessageActivateTokens.mCalled);
@@ -66,11 +66,11 @@ TEST_F(ActivationControllerFix, MessageActivateEdge) {
 TEST_F(ActivationControllerFix, MessageActivateBundleEdge) {
   const ActivationController controller(&storageAccess);
   const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateEdge {
-      Id {0},
+  MessageActivateEdge{
+      Id{0},
       Edge::EdgeType::EDGE_BUNDLED_EDGES,    // isBundledEdges
-      NameHierarchy {},
-      NameHierarchy {},
+      NameHierarchy{},
+      NameHierarchy{},
   }
       .dispatchImmediately();
   EXPECT_TRUE(spyMessageActivateTokens.mCalled);
@@ -80,8 +80,8 @@ TEST_F(ActivationControllerFix, MessageActivateTokens) {
   const ActivationController controller(&storageAccess);
   const SpyMessageActivateTokens spyMessageActivateTokens;
   EXPECT_CALL(storageAccess, getNodeIdForFileNode(_)).WillOnce(Return(1));
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch> {}));
-  MessageActivateFile {FilePath {}}.dispatchImmediately();
+  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
+  MessageActivateFile{FilePath{}}.dispatchImmediately();
   EXPECT_TRUE(spyMessageActivateTokens.mCalled);
 }
 
@@ -102,23 +102,23 @@ TEST_F(ActivationControllerFix, MessageChangeFileView) {
   const ActivationController controller(&storageAccess);
   const SpyMessageChangeFileView spyMessageChangeFileView;
   EXPECT_CALL(storageAccess, getNodeIdForFileNode(_)).WillOnce(Return(0));
-  MessageActivateFile {FilePath {}, 10}.dispatchImmediately();
-  std::this_thread::sleep_for(std::chrono::milliseconds {100});
+  MessageActivateFile{FilePath{}, 10}.dispatchImmediately();
+  std::this_thread::sleep_for(std::chrono::milliseconds{100});
   EXPECT_TRUE(spyMessageChangeFileView.mMessageChangeFileViewCalled);
   EXPECT_TRUE(spyMessageChangeFileView.mMessageScrollToLineCalled);
 }
 
 TEST_F(ActivationControllerFix, EmptyMessageActivateNodes) {
   const ActivationController controller(&storageAccess);
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch> {}));
+  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
   const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateNodes {}.dispatchImmediately();
+  MessageActivateNodes{}.dispatchImmediately();
   EXPECT_TRUE(spyMessageActivateTokens.mCalled);
 }
 
 TEST_F(ActivationControllerFix, MessageActivateNodes) {
   const ActivationController controller(&storageAccess);
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch> {}));
+  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
   EXPECT_CALL(storageAccess, getNodeIdForNameHierarchy(_)).WillOnce(Return(1));
   const SpyMessageActivateTokens spyMessageActivateTokens;
   MessageActivateNodes messageActivateNodes;
@@ -131,8 +131,8 @@ TEST_F(ActivationControllerFix, MessageActivateNodes) {
 TEST_F(ActivationControllerFix, MessageActivateTokenIds) {
   const ActivationController controller(&storageAccess);
   const SpyMessageActivateTokens spyMessageActivateTokens;
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch> {}));
-  MessageActivateTokenIds {{}}.dispatchImmediately();
+  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
+  MessageActivateTokenIds{{}}.dispatchImmediately();
   EXPECT_TRUE(spyMessageActivateTokens.mCalled);
 }
 
@@ -146,10 +146,10 @@ struct SpyMessageActivateNodes : MessageListener<MessageActivateNodes> {
 TEST_F(ActivationControllerFix, DISABLED_ActivateSourceLocations) {
   const ActivationController controller(&storageAccess);
   const SpyMessageActivateNodes spyMessageActivateNodes;
-  EXPECT_CALL(storageAccess, getNodeIdsForLocationIds(_)).WillOnce(Return(std::vector<Id> {}));
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch> {}));
+  EXPECT_CALL(storageAccess, getNodeIdsForLocationIds(_)).WillOnce(Return(std::vector<Id>{}));
+  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
 
-  MessageActivateSourceLocations {{}, false}.dispatchImmediately();
+  MessageActivateSourceLocations{{}, false}.dispatchImmediately();
 
   std::this_thread::sleep_for(1s);
 
@@ -189,7 +189,7 @@ TEST_F(ActivationControllerFix, MessageSearch) {
   const ActivationController controller(&storageAccess);
   const SpyMessageActivateTokens spyMessageActivateTokens;
 
-  MessageSearch {{}, NodeTypeSet {}}.dispatchImmediately();
+  MessageSearch{{}, NodeTypeSet{}}.dispatchImmediately();
   EXPECT_TRUE(spyMessageActivateTokens.mCalled);
 }
 
@@ -197,7 +197,7 @@ TEST_F(ActivationControllerFix, MessageZoom) {
   const ActivationController controller(&storageAccess);
   const SpyMessageRefreshUI spyMessageRefreshUI;
 
-  MessageZoom {true}.dispatchImmediately();
+  MessageZoom{true}.dispatchImmediately();
 
   std::this_thread::sleep_for(100ms);
 

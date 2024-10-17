@@ -4,8 +4,8 @@
 #include <QPen>
 
 #include "GraphViewStyle.h"
-#include "type/graph/MessageGraphNodeBundleSplit.h"
 #include "QtCountCircleItem.h"
+#include "type/graph/MessageGraphNodeBundleSplit.h"
 
 QtGraphNodeBundle::QtGraphNodeBundle(
     GraphFocusHandler* focusHandler, Id tokenId, size_t nodeCount, NodeType type, const std::wstring& name, bool interactive)

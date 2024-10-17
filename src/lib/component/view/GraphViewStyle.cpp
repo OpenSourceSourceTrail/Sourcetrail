@@ -2,9 +2,9 @@
 
 #include "ColorScheme.h"
 #include "GraphViewStyleImpl.h"
-#include "ResourcePaths.h"
 #include "IApplicationSettings.hpp"
 #include "logging.h"
+#include "ResourcePaths.h"
 #include "utilityString.h"
 
 int GraphViewStyle::s_gridCellSize = 5;

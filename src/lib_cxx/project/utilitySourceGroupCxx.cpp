@@ -12,11 +12,11 @@
 #include "FileRegister.h"
 #include "FileSystem.h"
 #include "GeneratePCHAction.h"
+#include "logging.h"
 #include "ParserClientImpl.h"
 #include "SingleFrontendActionFactory.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"
 #include "StorageProvider.h"
-#include "logging.h"
 #include "utility.h"
 
 namespace utility {
@@ -48,7 +48,7 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
   return std::make_shared<TaskLambda>([dialogView, storageProvider, pchInputFilePath, pchOutputFilePath, compilerFlags]() {
     dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Processing Precompiled Headers");
     LOG_INFO_W(L"Generating precompiled header output for input file \"" + pchInputFilePath.wstr() + L"\" at location \"" +
-             pchOutputFilePath.wstr() + L"\"");
+               pchOutputFilePath.wstr() + L"\"");
 
     CxxParser::initializeLLVM();
 
@@ -60,7 +60,7 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
     std::shared_ptr<ParserClientImpl> client = std::make_shared<ParserClientImpl>(storage.get());
 
     std::shared_ptr<FileRegister> fileRegister = std::make_shared<FileRegister>(
-        pchInputFilePath, std::set<FilePath> {pchInputFilePath}, std::set<FilePathFilter> {});
+        pchInputFilePath, std::set<FilePath>{pchInputFilePath}, std::set<FilePathFilter>{});
 
     std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache = std::make_shared<CanonicalFilePathCache>(fileRegister);
 

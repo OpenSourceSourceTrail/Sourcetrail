@@ -56,10 +56,10 @@ public:
   int updateCount;
   TaskState returnState;
 
-  int enterCallOrder {};
-  int updateCallOrder {};
-  int exitCallOrder {};
-  int resetCallOrder {};
+  int enterCallOrder{};
+  int updateCallOrder{};
+  int exitCallOrder{};
+  int resetCallOrder{};
 };
 
 class TestTaskDispatch : public TestTask {

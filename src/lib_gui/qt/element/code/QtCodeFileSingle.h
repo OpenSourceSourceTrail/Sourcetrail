@@ -22,7 +22,7 @@ class QtCodeFileSingle
 
 public:
   explicit QtCodeFileSingle(QtCodeNavigator* navigator, QWidget* parent = nullptr);
-   ~QtCodeFileSingle() override;
+  ~QtCodeFileSingle() override;
 
   void clearFile();
   void clearCache();

@@ -19,7 +19,7 @@ public:
     SourceGroupSettings::load(config, key);
 
     using expand_type = bool[];
-    [[maybe_unused]] expand_type a {false, loadHelper<ComponentTypes>(config, key)...};
+    [[maybe_unused]] expand_type a{false, loadHelper<ComponentTypes>(config, key)...};
   }
 
   void saveSettings(ConfigManager* config) override {
@@ -28,7 +28,7 @@ public:
     SourceGroupSettings::save(config, key);
 
     using expand_type = bool[];
-    [[maybe_unused]] expand_type a {false, saveHelper<ComponentTypes>(config, key)...};
+    [[maybe_unused]] expand_type a{false, saveHelper<ComponentTypes>(config, key)...};
   }
 
   bool equalsSettings(const SourceGroupSettingsBase* other) override {
@@ -43,7 +43,7 @@ public:
     }
 
     using expand_type = bool[];
-    expand_type a {false, equalsHelper<ComponentTypes>(other)...};
+    expand_type a{false, equalsHelper<ComponentTypes>(other)...};
 
     bool r = true;
     for(size_t i = 1; i <= getComponentCount(); ++i) {

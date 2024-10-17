@@ -4,8 +4,8 @@
 
 #include "Blackboard.h"
 #include "ITaskManager.hpp"
-#include "TaskScheduler.h"
 #include "logging.h"
+#include "TaskScheduler.h"
 
 TaskRunner::TaskRunner(std::shared_ptr<Task> task) : m_task(std::move(task)), m_reset(false) {}
 

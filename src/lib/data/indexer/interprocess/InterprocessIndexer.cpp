@@ -5,8 +5,8 @@
 #include "IndexerCommand.h"
 #include "IndexerComposite.h"
 #include "LanguagePackageManager.h"
-#include "ScopedFunctor.h"
 #include "logging.h"
+#include "ScopedFunctor.h"
 
 InterprocessIndexer::InterprocessIndexer(const std::string& uuid, Id processId)
     : m_interprocessIndexerCommandManager(uuid, processId, false)

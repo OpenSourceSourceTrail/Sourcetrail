@@ -7,19 +7,19 @@
 #include <QWindow>
 
 #include "ColorScheme.h"
-#include "type/code/MessageActivateLocalSymbols.h"
-#include "type/code/MessageActivateSourceLocations.h"
-#include "type/code/MessageActivateTokenIds.h"
-#include "type/tab/MessageTabOpenWith.h"
-#include "type/MessageTooltipShow.h"
+#include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "QtContextMenu.h"
 #include "QtHighlighter.h"
 #include "SourceLocation.h"
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
-#include "IApplicationSettings.hpp"
-#include "logging.h"
 #include "tracing.h"
+#include "type/code/MessageActivateLocalSymbols.h"
+#include "type/code/MessageActivateSourceLocations.h"
+#include "type/code/MessageActivateTokenIds.h"
+#include "type/MessageTooltipShow.h"
+#include "type/tab/MessageTabOpenWith.h"
 #include "utility.h"
 
 std::vector<QtCodeField::AnnotationColor> QtCodeField::s_annotationColors;
@@ -63,7 +63,8 @@ QtCodeField::QtCodeField(size_t startLineNumber,
     QString convertedDisplayCode = QString::fromStdWString(codec.decode(displayCode));
     setPlainText(convertedDisplayCode);
     if(displayCode.size() != size_t(convertedDisplayCode.length())) {
-      LOG_INFO(fmt::format("Converting displayed code to {} resulted in offset of source locations. Correcting this now.", codec.getName()));
+      LOG_INFO(fmt::format(
+          "Converting displayed code to {} resulted in offset of source locations. Correcting this now.", codec.getName()));
       createMultibyteCharacterLocationCache(convertedDisplayCode);
     }
   } else {

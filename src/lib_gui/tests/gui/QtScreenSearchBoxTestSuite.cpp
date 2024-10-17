@@ -8,12 +8,12 @@
 #include <gtest/gtest.h>
 
 #include "ControllerProxy.h"
+#include "gui/utilities.hpp"
 #include "MockedView.hpp"
 #include "MockedViewLayout.hpp"
 #include "QtScreenSearchBox.h"
 #include "QtSelfRefreshIconButton.h"
 #include "ScreenSearchController.h"
-#include "gui/utilities.hpp"
 
 struct QtScreenSearchBoxFix : testing::Test {
   void SetUp() override {
@@ -151,7 +151,7 @@ TEST_F(QtScreenSearchBoxFix, testingReturnPressedSignal) {
 }
 
 int main(int argc, char* argv[]) {
-  const QApplication application {argc, argv};
+  const QApplication application{argc, argv};
 
   QTimer::singleShot(0, &application, [&]() {
     testing::InitGoogleTest(&argc, argv);

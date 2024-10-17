@@ -310,16 +310,14 @@ CppSQLite3Query::CppSQLite3Query(sqlite3* pDB, sqlite3_stmt* pVM, bool bEof, boo
 CppSQLite3Query::~CppSQLite3Query() {
   try {
     finalize();
-  } catch(...) {
-  }
+  } catch(...) {}
 }
 
 
 CppSQLite3Query& CppSQLite3Query::operator=(const CppSQLite3Query& rQuery) {
   try {
     finalize();
-  } catch(...) {
-  }
+  } catch(...) {}
   mpVM = rQuery.mpVM;
   // Only one object can own the VM
   const_cast<CppSQLite3Query&>(rQuery).mpVM = 0;
@@ -567,16 +565,14 @@ CppSQLite3Table::CppSQLite3Table(char** paszResults, int nRows, int nCols) {
 CppSQLite3Table::~CppSQLite3Table() {
   try {
     finalize();
-  } catch(...) {
-  }
+  } catch(...) {}
 }
 
 
 CppSQLite3Table& CppSQLite3Table::operator=(const CppSQLite3Table& rTable) {
   try {
     finalize();
-  } catch(...) {
-  }
+  } catch(...) {}
   mpaszResults = rTable.mpaszResults;
   // Only one object can own the results
   const_cast<CppSQLite3Table&>(rTable).mpaszResults = 0;
@@ -755,8 +751,7 @@ CppSQLite3Statement::CppSQLite3Statement(sqlite3* pDB, sqlite3_stmt* pVM) {
 CppSQLite3Statement::~CppSQLite3Statement() {
   try {
     finalize();
-  } catch(...) {
-  }
+  } catch(...) {}
 }
 
 
@@ -969,8 +964,7 @@ CppSQLite3DB::CppSQLite3DB(const CppSQLite3DB& db) {
 CppSQLite3DB::~CppSQLite3DB() {
   try {
     close();
-  } catch(...) {
-  }
+  } catch(...) {}
 }
 
 

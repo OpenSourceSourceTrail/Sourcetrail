@@ -4,9 +4,9 @@
 
 #include "GroupType.h"
 #include "ScreenSearchInterfaces.h"
+#include "types.h"
 #include "Vector2.h"
 #include "View.h"
-#include "types.h"
 
 struct DummyEdge;
 struct DummyNode;

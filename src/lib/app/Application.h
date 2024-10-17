@@ -7,11 +7,11 @@
 #include "FilePath.h"
 #include "Project.h"
 // messages
-#include "type/MessageActivateWindow.h"
-#include "type/bookmark/MessageBookmarkUpdate.hpp"
-#include "type/MessageCloseProject.h"
-#include "type/indexing/MessageIndexingFinished.h"
 #include "MessageListener.h"
+#include "type/bookmark/MessageBookmarkUpdate.hpp"
+#include "type/indexing/MessageIndexingFinished.h"
+#include "type/MessageActivateWindow.h"
+#include "type/MessageCloseProject.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageRefresh.h"
 #include "type/MessageRefreshUI.h"
@@ -108,7 +108,7 @@ public:
    * @return FilePath of the current project.
    */
   [[nodiscard]] FilePath getCurrentProjectPath() const noexcept {
-    return mProject ? mProject->getProjectSettingsFilePath() : FilePath {};
+    return mProject ? mProject->getProjectSettingsFilePath() : FilePath{};
   }
 
   /**
@@ -157,7 +157,7 @@ public:
 
 private:
   static std::shared_ptr<Application> sInstance;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
-  static std::string sUuid;                        // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+  static std::string sUuid;                         // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
   Application(std::shared_ptr<lib::IFactory> factory, bool withGUI = true);
 

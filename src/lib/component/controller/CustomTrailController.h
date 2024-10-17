@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Controller.h"
+#include "MessageListener.h"
 #include "type/activation/MessageActivateTrail.h"
 #include "type/custom_trail/MessageCustomTrailShow.h"
 #include "type/indexing/MessageIndexingFinished.h"
-#include "MessageListener.h"
 #include "type/MessageWindowClosed.h"
 
 class CustomTrailView;

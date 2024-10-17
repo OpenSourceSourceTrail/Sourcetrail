@@ -2,9 +2,9 @@
 
 #include <QMessageBox>
 
+#include "globalStrings.h"
 #include "IApplicationSettings.hpp"
 #include "ResourcePaths.h"
-#include "globalStrings.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityPathDetection.h"
@@ -14,12 +14,12 @@ QtProjectWizardContentPathsHeaderSearchGlobal::QtProjectWizardContentPathsHeader
           std::shared_ptr<SourceGroupSettings>(), window, QtPathListBox::SELECTION_POLICY_DIRECTORIES_ONLY, true) {
   setTitleString(QStringLiteral("Global Include Paths"));
   setHelpString(
-      QString::fromStdString(std::string {"The Global Include Paths will be used in all your projects in addition to the project "
-                                          "specific Include Paths. "
-                                          "These paths are usually passed to the compiler with the '-isystem' flag.<br />"
-                                          "<br />"
-                                          "Use them to add system header paths (See <a "
-                                          "href=\""} +
+      QString::fromStdString(std::string{"The Global Include Paths will be used in all your projects in addition to the project "
+                                         "specific Include Paths. "
+                                         "These paths are usually passed to the compiler with the '-isystem' flag.<br />"
+                                         "<br />"
+                                         "Use them to add system header paths (See <a "
+                                         "href=\""} +
                              "documentation"_g +
                              "#finding-system-header-locations\">"
                              "Finding System Header Locations</a> or use the auto detection below)."));

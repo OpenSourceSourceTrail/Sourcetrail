@@ -106,7 +106,7 @@ public:
 
   void TearDown() override {}
 
-  FilePath filePath = FilePath {L"data/TextAccessTestSuite/text.txt"};
+  FilePath filePath = FilePath{L"data/TextAccessTestSuite/text.txt"};
   std::shared_ptr<TextAccess> mTextAccess;
 };
 

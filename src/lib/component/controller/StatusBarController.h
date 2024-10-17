@@ -3,15 +3,15 @@
 #include <string>
 
 #include "Controller.h"
+#include "MessageListener.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStarted.h"
 #include "type/indexing/MessageIndexingStatus.h"
-#include "MessageListener.h"
-#include "type/plugin/MessagePingReceived.h"
 #include "type/MessageRefresh.h"
 #include "type/MessageStatus.h"
+#include "type/plugin/MessagePingReceived.h"
 
 class StatusBarView;
 class StorageAccess;

@@ -2,13 +2,13 @@
 #define TOOLTIP_CONTROLLER_H
 
 #include "Controller.h"
-#include "type/code/MessageActivateLocalSymbols.h"
+#include "MessageListener.h"
 #include "type/activation/MessageActivateTokens.h"
+#include "type/code/MessageActivateLocalSymbols.h"
+#include "type/code/MessageScrollCode.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageGraphNodeExpand.h"
-#include "MessageListener.h"
-#include "type/code/MessageScrollCode.h"
 #include "type/graph/MessageScrollGraph.h"
 #include "type/MessageTooltipHide.h"
 #include "type/MessageTooltipShow.h"

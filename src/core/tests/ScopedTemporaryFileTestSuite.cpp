@@ -47,7 +47,7 @@ TEST_F(ScopedTemporaryFileFix, emptyArgCreateEmptyFile) {
 TEST_F(ScopedTemporaryFileFix, fileExistsCreateEmptyFile) {
   std::error_code errorCode;
 
-  std::ofstream {tempPath}.flush();
+  std::ofstream{tempPath}.flush();
   ASSERT_TRUE(fs::exists(tempPath, errorCode));
 
   auto scopedTemporaryFile = utility::ScopedTemporaryFile::createEmptyFile(tempPath);
@@ -68,7 +68,7 @@ TEST_F(ScopedTemporaryFileFix, goodCaseCreateFile) {
   {
     auto scopedTemporaryFile = utility::ScopedTemporaryFile::createFile(tempPath, "Something");
     ASSERT_TRUE(fs::exists(tempPath, errorCode));
-    std::ifstream iStream {tempPath};
+    std::ifstream iStream{tempPath};
     ASSERT_TRUE(iStream.is_open());
     std::string buffer;
     const auto fileSize = fs::file_size(tempPath, errorCode);

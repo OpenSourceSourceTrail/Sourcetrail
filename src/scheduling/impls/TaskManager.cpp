@@ -28,4 +28,4 @@ std::shared_ptr<TaskScheduler> TaskManager::getScheduler(GlobalId schedulerId) n
   return scheduler;
 }
 
-}    // namespace lib::detail
+}    // namespace scheduling::impls

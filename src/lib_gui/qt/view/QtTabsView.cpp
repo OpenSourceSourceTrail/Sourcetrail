@@ -8,13 +8,13 @@
 #include "Application.h"
 #include "ColorScheme.h"
 #include "GraphViewStyle.h"
+#include "logging.h"
 #include "QtSelfRefreshIconButton.h"
 #include "QtTabBar.h"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
 #include "TabId.h"
 #include "TabsController.h"
-#include "logging.h"
 #include "utilityQt.h"
 
 QtTabsView::QtTabsView(ViewLayout* viewLayout) : TabsView(viewLayout), m_widget(nullptr), m_insertedTabCount(0) {

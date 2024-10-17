@@ -1,7 +1,7 @@
 #pragma once
 
-#include "type/error/MessageErrorCountUpdate.h"
 #include "MessageFilter.h"
+#include "type/error/MessageErrorCountUpdate.h"
 
 class MessageFilterErrorCountUpdate : public MessageFilter {
   void filter(IMessageQueue::MessageBufferType* messageBuffer) override {

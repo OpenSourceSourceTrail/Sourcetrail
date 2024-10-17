@@ -6,11 +6,11 @@
 
 #include <qmenu.h>
 
-#include "type/code/MessageShowScope.h"
 #include "QtCodeFile.h"
 #include "QtCodeNavigator.h"
 #include "QtHoverButton.h"
 #include "SourceLocationFile.h"
+#include "type/code/MessageShowScope.h"
 
 QtCodeSnippet::QtCodeSnippet(const CodeSnippetParams& params, QtCodeNavigator* navigator, QtCodeFile* file)
     : QFrame(file)

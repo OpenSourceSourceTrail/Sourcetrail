@@ -20,10 +20,10 @@ Version Version::fromString(const std::string& versionString) {
   std::vector<uint32_t> parts(partView.begin(), partView.end());
   if(parts.empty() || parts.size() != 3) {
     LOG_WARNING(fmt::format("Version string is invalid: {}", versionString));
-    return Version {};
+    return Version{};
   }
 
-  return Version {parts[0], parts[1], parts[2]};
+  return Version{parts[0], parts[1], parts[2]};
 }
 
 void Version::setApplicationVersion(const Version& version) {

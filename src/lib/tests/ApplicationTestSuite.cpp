@@ -10,22 +10,22 @@
 #include "gmock/gmock.h"
 
 #ifndef D_WINDOWS
-#define private public
+#  define private public
 #endif
 #include "Application.h"
 #include "Project.h"
 #include "ProjectSettings.h"
 #ifndef D_WINDOWS
-#undef private
+#  undef private
 #endif
 #include "MockedFactory.hpp"
 #include "MockedProject.hpp"
 #include "MockedSharedMemoryGarbageCollector.hpp"
-#include "Version.h"
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedMessageQueue.hpp"
 #include "mocks/MockedTaskManager.hpp"
 #include "type/MessageStatus.h"
+#include "Version.h"
 
 using namespace std::chrono_literals;
 
@@ -64,7 +64,7 @@ struct SingletonApplicationFix : testing::Test {
   void MockAppSettingsForGetInstance() {
     EXPECT_CALL(*mMockedAppSettings, load(testing::_, testing::_)).WillOnce(testing::Return(true));
     EXPECT_CALL(*mMockedAppSettings, getLoggingEnabled()).WillOnce(testing::Return(false));
-    EXPECT_CALL(*mMockedAppSettings, getColorSchemePath()).WillOnce(testing::Return(std::filesystem::path {}));
+    EXPECT_CALL(*mMockedAppSettings, getColorSchemePath()).WillOnce(testing::Return(std::filesystem::path{}));
   }
 
   std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMockedAppSettings =
@@ -95,7 +95,7 @@ TEST_F(SingletonApplicationFix, getInstanceWithoutCreate) {
 TEST_F(SingletonApplicationFix, singleton) {
   EXPECT_CALL(*mMockedFactory, createMessageQueue).WillOnce(testing::Return(mMessageQueue));
   EXPECT_CALL(*mMockedFactory, createTaskManager).WillOnce(testing::Return(mTaskManager));
-  auto task = std::make_shared<TaskScheduler>(GlobalId {});
+  auto task = std::make_shared<TaskScheduler>(GlobalId{});
   EXPECT_CALL(*mTaskManager, getScheduler).WillRepeatedly(testing::Return(task));
 
   MockAppSettingsForGetInstance();
@@ -103,7 +103,7 @@ TEST_F(SingletonApplicationFix, singleton) {
   EXPECT_CALL(*mMockedSharedMemoryGarbageCollector, run).WillOnce(testing::Return());
   EXPECT_CALL(*mMockedSharedMemoryGarbageCollector, stop).WillOnce(testing::Return());
 
-  Application::createInstance(Version {}, mMockedFactory, nullptr, nullptr);
+  Application::createInstance(Version{}, mMockedFactory, nullptr, nullptr);
   auto baseApp = Application::getInstance();
   ASSERT_THAT(Application::getInstance(), testing::NotNull());
 
@@ -126,7 +126,7 @@ TEST_F(SingletonApplicationFix, singleton) {
 
 TEST_F(SingletonApplicationFix, getUUID) {
   auto uuid = Application::getUUID();
-  const std::regex mask {"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"};
+  const std::regex mask{"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"};
   std::smatch base_match;
   std::regex_match(uuid, base_match, mask);
   EXPECT_EQ(1, base_match.size());
@@ -135,30 +135,30 @@ TEST_F(SingletonApplicationFix, getUUID) {
 TEST_F(SingletonApplicationFix, loadSettingsFailedToLoad) {
   EXPECT_CALL(*mMockedAppSettings, load).WillOnce(::testing::Return(false));
   EXPECT_CALL(*mMockedAppSettings, getLoggingEnabled).WillOnce(::testing::Return(false));
-  EXPECT_CALL(*mMockedAppSettings, getColorSchemePath).WillOnce(::testing::Return(std::filesystem::path {}));
+  EXPECT_CALL(*mMockedAppSettings, getColorSchemePath).WillOnce(::testing::Return(std::filesystem::path{}));
   Application::loadSettings();
 }
 
 #ifndef D_WINDOWS
 TEST_F(SingletonApplicationFix, getCurrentProjectPathWhileEmpty) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app {mMockedFactory, false};
+  Application app{mMockedFactory, false};
   ASSERT_THAT(app.getCurrentProjectPath().wstr(), testing::StrEq(L""));
 }
 
 TEST_F(SingletonApplicationFix, getCurrentProjectPath) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app {mMockedFactory, false};
+  Application app{mMockedFactory, false};
   auto mockedProject = std::make_shared<MockedProject>();
   app.mProject = mockedProject;
-  FilePath projectPath {"somewhere"};
+  FilePath projectPath{"somewhere"};
   EXPECT_CALL(*mockedProject, getProjectSettingsFilePath).WillOnce(testing::Return(projectPath));
   ASSERT_EQ(app.getCurrentProjectPath(), projectPath);
 }
 
 TEST_F(SingletonApplicationFix, isProjectLoadedWhileNotLoaded) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app {mMockedFactory, false};
+  Application app{mMockedFactory, false};
   auto mockedProject = std::make_shared<MockedProject>();
   EXPECT_CALL(*mockedProject, isLoaded).WillOnce(testing::Return(false));
   app.mProject = mockedProject;
@@ -167,7 +167,7 @@ TEST_F(SingletonApplicationFix, isProjectLoadedWhileNotLoaded) {
 
 TEST_F(SingletonApplicationFix, isProjectLoaded) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app {mMockedFactory, false};
+  Application app{mMockedFactory, false};
   auto mockedProject = std::make_shared<MockedProject>();
   EXPECT_CALL(*mockedProject, isLoaded).WillOnce(testing::Return(true));
   app.mProject = mockedProject;
@@ -176,7 +176,7 @@ TEST_F(SingletonApplicationFix, isProjectLoaded) {
 
 TEST_F(SingletonApplicationFix, isProjectLoadedWhileNoProject) {
   lib::ISharedMemoryGarbageCollector::setInstance(mMockedSharedMemoryGarbageCollector);
-  Application app {mMockedFactory, false};
+  Application app{mMockedFactory, false};
   ASSERT_FALSE(app.isProjectLoaded());
 }
 #endif
@@ -193,9 +193,9 @@ struct ApplicationFix : SingletonApplicationFix {
 
     EXPECT_CALL(*mMockedFactory, createMessageQueue).WillOnce(testing::Return(mMessageQueue));
     EXPECT_CALL(*mMockedFactory, createTaskManager).WillOnce(testing::Return(mTaskManager));
-    auto task = std::make_shared<TaskScheduler>(GlobalId {});
+    auto task = std::make_shared<TaskScheduler>(GlobalId{});
     EXPECT_CALL(*mTaskManager, getScheduler).WillRepeatedly(testing::Return(task));
-    Application::createInstance(Version {}, mMockedFactory, nullptr, nullptr);
+    Application::createInstance(Version{}, mMockedFactory, nullptr, nullptr);
     mApp = Application::getInstance();
   }
   void TearDown() override {
@@ -241,7 +241,7 @@ TEST_F(ApplicationFix, LoadProjectEmptyProjectSettings) {
   ASSERT_THAT(mApp, testing::NotNull());
 
   // When: Load a new project
-  MessageLoadProject message {FilePath {L""}};
+  MessageLoadProject message{FilePath{L""}};
   mApp->handleMessage(&message);
 
   // Then:
@@ -256,7 +256,7 @@ TEST_F(ApplicationFix, LoadProjectProjectSettings) {
   EXPECT_CALL(*project, load).WillOnce(testing::Return());
 
   // When: Load a new project
-  MessageLoadProject message {FilePath {L"Something"}};
+  MessageLoadProject message{FilePath{L"Something"}};
   mApp->handleMessage(&message);
 
   // Then:
@@ -273,7 +273,7 @@ TEST_F(ApplicationFix, LoadProjectWhileIndexing) {
   mApp->mProject = std::move(project);
 
   // When: Load a new project
-  MessageLoadProject message {FilePath {"Something"}};
+  MessageLoadProject message{FilePath{"Something"}};
   mApp->handleMessage(&message);
   // Then:
 }

@@ -1,7 +1,7 @@
 #include "QtProgressBar.h"
 
-#include <QPaintEvent>
 #include <QPainter>
+#include <QPaintEvent>
 #include <QPixmap>
 #include <QTimer>
 

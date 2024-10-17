@@ -8,11 +8,11 @@
 #include <QStyle>
 #include <QTimer>
 
+#include "IApplicationSettings.hpp"
 #include "QtCodeField.h"
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
 #include "TooltipInfo.h"
-#include "IApplicationSettings.hpp"
 
 QtTooltip::QtTooltip(QWidget* parent) : QFrame(parent), m_parentView(nullptr), m_isHovered(false) {
   QWidget::setWindowFlags(Qt::ToolTip);

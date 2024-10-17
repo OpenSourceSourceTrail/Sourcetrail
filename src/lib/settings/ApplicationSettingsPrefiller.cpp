@@ -4,8 +4,8 @@
 #include <range/v3/view/transform.hpp>
 
 #include "IApplicationSettings.hpp"
-#include "type/MessageStatus.h"
 #include "logging.h"
+#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityPathDetection.h"
 

@@ -18,7 +18,7 @@ void QtSelfRefreshIconButtonTestSuite::initTestCase() {
 }
 
 void QtSelfRefreshIconButtonTestSuite::constructWithEmptyString() {
-  QtSelfRefreshIconButton button({}, FilePath {}, {});
+  QtSelfRefreshIconButton button({}, FilePath{}, {});
 
   QResizeEvent resizeEvent(QSize(800, 600), QSize(400, 300));
   QCoreApplication::sendEvent(&button, &resizeEvent);
@@ -28,7 +28,7 @@ void QtSelfRefreshIconButtonTestSuite::constructWithEmptyString() {
 }
 
 void QtSelfRefreshIconButtonTestSuite::constructGoodCase() {
-  QtSelfRefreshIconButton button("button", FilePath {}, {});
+  QtSelfRefreshIconButton button("button", FilePath{}, {});
 
   QResizeEvent resizeEvent(QSize(800, 600), QSize(400, 300));
   QCoreApplication::sendEvent(&button, &resizeEvent);
@@ -38,15 +38,15 @@ void QtSelfRefreshIconButtonTestSuite::constructGoodCase() {
 }
 
 void QtSelfRefreshIconButtonTestSuite::setTextWithEmptyString() {
-  QtSelfRefreshIconButton button({}, FilePath {}, {});
+  QtSelfRefreshIconButton button({}, FilePath{}, {});
   button.setText({});
   QVERIFY(button.text().isEmpty());
 }
 
 void QtSelfRefreshIconButtonTestSuite::setTextGoodCase() {
-  QtSelfRefreshIconButton button({}, FilePath {}, {});
+  QtSelfRefreshIconButton button({}, FilePath{}, {});
   button.setText("Hello");
-  QCOMPARE(std::string {"Hello"}, button.text().toStdString());
+  QCOMPARE(std::string{"Hello"}, button.text().toStdString());
 
   button.setAutoElide(true);
   button.setText("HelloWorld11111111111111111111111111111111111111111111111111");
@@ -61,7 +61,7 @@ void QtSelfRefreshIconButtonTestSuite::setTextGoodCase() {
 
 void QtSelfRefreshIconButtonTestSuite::setIconPath() {
   QSKIP("Add icon to resources first");
-  QtSelfRefreshIconButton button({}, FilePath {}, "search/button");
+  QtSelfRefreshIconButton button({}, FilePath{}, "search/button");
   // HACK
   // auto iconPath =
   // FilePath{"../app"}.concatenate(ResourcePaths::getGuiDirectoryPath().concatenate(L"graph_view/images/graph_custom.png"));
@@ -70,7 +70,7 @@ void QtSelfRefreshIconButtonTestSuite::setIconPath() {
 }
 
 void QtSelfRefreshIconButtonTestSuite::setIconPathWithEmptyString() {
-  QtSelfRefreshIconButton button({}, FilePath {}, "search/button");
+  QtSelfRefreshIconButton button({}, FilePath{}, "search/button");
   button.setIconPath({});
   QVERIFY(button.icon().isNull());
 }
@@ -79,7 +79,7 @@ void QtSelfRefreshIconButtonTestSuite::cleanupTestCase() {
   IMessageQueue::setInstance(nullptr);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   testing::InitGoogleMock(&argc, argv);
   QTEST_MAIN_IMPL(QtSelfRefreshIconButtonTestSuite)
 }

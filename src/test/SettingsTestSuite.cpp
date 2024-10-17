@@ -120,7 +120,7 @@ TEST(Settings, settingsGetDefaultValueAfterClearing) {
   EXPECT_EQ(-1, settings.getInt());
   EXPECT_FLOAT_EQ(FloatValue, settings.getFloat());
   EXPECT_THAT(settings.getString(), StrEq("<empty>"));
-  EXPECT_THAT(settings.getWString(), StrEq( L"<empty>"));
+  EXPECT_THAT(settings.getWString(), StrEq(L"<empty>"));
 }
 
 TEST(Settings, settingsCanBeSetWhenNotLoaded) {

@@ -6,10 +6,10 @@
 
 #include "FileSystem.h"
 #include "LocationType.h"
+#include "logging.h"
 #include "SourceLocationCollection.h"
 #include "SourceLocationFile.h"
 #include "TextAccess.h"
-#include "logging.h"
 #include "types.h"
 #include "utilityString.h"
 
@@ -838,7 +838,7 @@ std::shared_ptr<SourceLocationCollection> SqliteIndexStorage::getSourceLocations
 }
 
 std::vector<StorageOccurrence> SqliteIndexStorage::getOccurrencesForLocationId(Id locationId) const {
-  std::vector<Id> locationIds {locationId};
+  std::vector<Id> locationIds{locationId};
   return getOccurrencesForLocationIds(locationIds);
 }
 

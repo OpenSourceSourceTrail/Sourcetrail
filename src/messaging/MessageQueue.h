@@ -1,10 +1,10 @@
 #pragma once
 #include <atomic>
+#include <cassert>
 #include <deque>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <cassert>
 
 #include "types.h"
 

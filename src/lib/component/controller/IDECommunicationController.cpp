@@ -1,14 +1,14 @@
 #include "IDECommunicationController.h"
 
 #include "FileSystem.h"
-#include "type/MessageActivateWindow.h"
-#include "type/plugin/MessagePingReceived.h"
-#include "type/MessageProjectNew.h"
-#include "type/MessageStatus.h"
-#include "type/tab/MessageTabOpenWith.h"
+#include "logging.h"
 #include "SourceLocationFile.h"
 #include "StorageAccess.h"
-#include "logging.h"
+#include "type/MessageActivateWindow.h"
+#include "type/MessageProjectNew.h"
+#include "type/MessageStatus.h"
+#include "type/plugin/MessagePingReceived.h"
+#include "type/tab/MessageTabOpenWith.h"
 
 IDECommunicationController::IDECommunicationController(StorageAccess* storageAccess)
     : m_storageAccess(storageAccess), m_enabled(true) {}

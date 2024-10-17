@@ -29,8 +29,7 @@ public:
   std::set<FilePath> getAllCxxHeaderSearchPathsCanonical() const;
 
   std::vector<std::shared_ptr<IndexerCommandCxx>> getIndexerCommands(
-      std::shared_ptr<const SourceGroupSettingsCxxCodeblocks> sourceGroupSettings,
-      const IApplicationSettings* appSettings) const;
+      std::shared_ptr<const SourceGroupSettingsCxxCodeblocks> sourceGroupSettings, const IApplicationSettings* appSettings) const;
 
 private:
   Project(const FilePath& projectFilePath);

@@ -4,8 +4,8 @@
 #include "IndexerComposite.h"
 #include "LanguagePackage.h"
 #include "LanguagePackageManager.h"
-#include "ScopedFunctor.h"
 #include "mocks/MockedIndexer.hpp"
+#include "ScopedFunctor.h"
 
 using namespace testing;
 
@@ -27,7 +27,7 @@ TEST(LanguagePackageManager, emptyIndexers) {
   [[maybe_unused]] ScopedFunctor func([]() { LanguagePackageManager::destroyInstance(); });
 
   auto mockedPackage = std::make_shared<MockedLanguagePackage>();
-  EXPECT_CALL(*mockedPackage, instantiateSupportedIndexers).WillOnce(Return(std::vector<std::shared_ptr<IndexerBase>> {}));
+  EXPECT_CALL(*mockedPackage, instantiateSupportedIndexers).WillOnce(Return(std::vector<std::shared_ptr<IndexerBase>>{}));
   instance->addPackage(mockedPackage);
   auto indexers = instance->instantiateSupportedIndexers();
 }
@@ -39,8 +39,7 @@ TEST(LanguagePackageManager, goodCase) {
 
   auto mockedPackage = std::make_shared<MockedLanguagePackage>();
   auto mockedIndexer = std::make_shared<MockedIndexer>();
-  EXPECT_CALL(*mockedPackage, instantiateSupportedIndexers)
-      .WillOnce(Return(std::vector<std::shared_ptr<IndexerBase>> {mockedIndexer}));
+  EXPECT_CALL(*mockedPackage, instantiateSupportedIndexers).WillOnce(Return(std::vector<std::shared_ptr<IndexerBase>>{mockedIndexer}));
   EXPECT_CALL(*mockedIndexer, getSupportedIndexerCommandType).WillOnce(Return(INDEXER_COMMAND_CXX));
   instance->addPackage(mockedPackage);
   auto indexers = instance->instantiateSupportedIndexers();

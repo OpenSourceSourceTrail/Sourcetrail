@@ -3,11 +3,8 @@
 
 class EdgeBookmark final : public Bookmark {
 public:
-  EdgeBookmark(Id id,
-               const std::wstring& name,
-               const std::wstring& comment,
-               const TimeStamp& timeStamp,
-               const BookmarkCategory& category);
+  EdgeBookmark(
+      Id id, const std::wstring& name, const std::wstring& comment, const TimeStamp& timeStamp, const BookmarkCategory& category);
 
   ~EdgeBookmark() override;
 

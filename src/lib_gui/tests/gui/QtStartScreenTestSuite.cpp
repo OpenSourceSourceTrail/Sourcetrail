@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include <spdlog/spdlog.h>
-
 #include <QTest>
+
+#include <spdlog/spdlog.h>
 
 #include "QtStartScreen.hpp"
 
@@ -32,7 +32,7 @@ void QtStartScreenTestSuite::cleanup() {
   mMocked.reset();
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   testing::InitGoogleMock(&argc, argv);
   auto* logger = spdlog::default_logger_raw();
   logger->set_level(spdlog::level::off);

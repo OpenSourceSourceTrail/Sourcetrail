@@ -2,8 +2,8 @@
 // internal
 #include "Edge.h"
 #include "TokenComponentBundledEdges.h"
-#include "Vector4.h"
 #include "types.h"
+#include "Vector4.h"
 
 class Edge;
 

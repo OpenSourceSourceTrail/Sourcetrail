@@ -14,7 +14,7 @@ TEST(TaskManagerTestSuite, createScheduler) {
   scheduling::impls::TaskManager taskManager;
 
   // When: create a task with id = 100
-  const GlobalId id {100};
+  const GlobalId id{100};
   auto task = taskManager.createScheduler(id);
   ASSERT_THAT(task, Not(IsNull()));
 
@@ -31,7 +31,7 @@ TEST(TaskManagerTestSuite, destroySchedulerNonExistsing) {
   scheduling::impls::TaskManager taskManager;
 
   // When: destroy a non-created task
-  const GlobalId id {100};
+  const GlobalId id{100};
   EXPECT_NO_FATAL_FAILURE(taskManager.destroyScheduler(id));
 
   // Then: One crash should happen
@@ -42,7 +42,7 @@ TEST(TaskManagerTestSuite, destroyScheduler) {
   scheduling::impls::TaskManager taskManager;
 
   // And: A task with 100 is created
-  const GlobalId id {100};
+  const GlobalId id{100};
   auto task = taskManager.createScheduler(id);
   ASSERT_THAT(task, Not(IsNull()));
   ASSERT_EQ(2, task.use_count());

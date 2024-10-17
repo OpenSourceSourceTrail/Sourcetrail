@@ -3,28 +3,28 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "AppPath.h"
 #include "Application.h"
 #include "ApplicationSettings.h"
+#include "AppPath.h"
 #include "FileSystem.h"
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandCustom.h"
+#include "language_packages.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
+#include "mocks/MockedTaskManager.hpp"
 #include "ProjectSettings.h"
 #include "SourceGroupCustomCommand.h"
 #include "SourceGroupSettingsCustomCommand.h"
 #include "TextAccess.h"
-#include "Version.h"
-#include "language_packages.h"
-#include "mocks/MockedTaskManager.hpp"
 #include "utilityFile.h"
 #include "utilityPathDetection.h"
 #include "utilityString.h"
+#include "Version.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "ITaskManager.hpp"
 #  include "IndexerCommandCxx.h"
+#  include "ITaskManager.hpp"
 #  include "SourceGroupCxxCdb.h"
 #  include "SourceGroupCxxCodeblocks.h"
 #  include "SourceGroupCxxEmpty.h"
@@ -189,9 +189,9 @@ TEST(SourceGroupFix, can create application instance) {
 #if BUILD_CXX_LANGUAGE_PACKAGE
 TEST_F(SourceGroupFix, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
   EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/header/search/path"}}));
   EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_c_empty";
 
@@ -218,9 +218,9 @@ TEST_F(SourceGroupFix, sourceGroupCxxCEmptyGeneratesExpectedOutput) {
 
 TEST_F(SourceGroupFix, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
   EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/header/search/path"}}));
   EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_cpp_empty";
 
@@ -247,9 +247,9 @@ TEST_F(SourceGroupFix, sourceGroupCxxCppEmptyGeneratesExpectedOutput) {
 
 TEST_F(SourceGroupFix, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
   EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/header/search/path"}}));
   EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_codeblocks";
   const FilePath cbpPath = getInputDirectoryPath(projectName).concatenate(L"project.cbp");
@@ -288,9 +288,9 @@ TEST_F(SourceGroupFix, sourceGroupCxxCodeblocksGeneratesExpectedOutput) {
 
 TEST_F(SourceGroupFix, sourceGroupCxxCdbGeneratesExpectedOutput) {
   EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/header/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/header/search/path"}}));
   EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
-      .WillOnce(testing::Return(std::vector<std::filesystem::path> {{"test/framework/search/path"}}));
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{{"test/framework/search/path"}}));
 
   const std::wstring projectName = L"cxx_cdb";
 

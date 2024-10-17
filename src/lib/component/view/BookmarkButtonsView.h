@@ -1,7 +1,7 @@
 #pragma once
 
-#include "type/bookmark/MessageBookmarkButtonState.h"
 #include "MessageListener.h"
+#include "type/bookmark/MessageBookmarkButtonState.h"
 #include "View.h"
 
 class BookmarkButtonsView

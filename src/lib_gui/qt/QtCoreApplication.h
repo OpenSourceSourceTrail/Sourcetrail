@@ -2,8 +2,8 @@
 // Qt5
 #include <QCoreApplication>
 // internal
-#include "type/indexing/MessageIndexingStatus.h"
 #include "MessageListener.h"
+#include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageQuitApplication.h"
 #include "type/MessageStatus.h"
 

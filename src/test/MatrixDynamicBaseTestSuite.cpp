@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "MatrixDynamicBase.h"
 #include "logging.h"
+#include "MatrixDynamicBase.h"
 
 namespace {
 std::vector<std::vector<int>> getTestValues(uint32_t numColumns, uint32_t numRows) {

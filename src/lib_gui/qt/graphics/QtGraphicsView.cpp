@@ -11,15 +11,7 @@
 #include <QTimer>
 
 #include "GraphFocusHandler.h"
-#include "type/activation/MessageActivateLegend.h"
-#include "type/bookmark/MessageBookmarkCreate.h"
-#include "type/code/MessageCodeShowDefinition.h"
-#include "type/focus/MessageFocusView.h"
-#include "type/graph/MessageGraphNodeExpand.h"
-#include "type/graph/MessageGraphNodeHide.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryUndo.h"
-#include "type/tab/MessageTabOpenWith.h"
+#include "IApplicationSettings.hpp"
 #include "QtContextMenu.h"
 #include "QtFileDialog.h"
 #include "QtGraphEdge.h"
@@ -29,7 +21,15 @@
 #include "QtGraphNodeExpandToggle.h"
 #include "QtSelfRefreshIconButton.h"
 #include "ResourcePaths.h"
-#include "IApplicationSettings.hpp"
+#include "type/activation/MessageActivateLegend.h"
+#include "type/bookmark/MessageBookmarkCreate.h"
+#include "type/code/MessageCodeShowDefinition.h"
+#include "type/focus/MessageFocusView.h"
+#include "type/graph/MessageGraphNodeExpand.h"
+#include "type/graph/MessageGraphNodeHide.h"
+#include "type/history/MessageHistoryRedo.h"
+#include "type/history/MessageHistoryUndo.h"
+#include "type/tab/MessageTabOpenWith.h"
 #include "utilityApp.h"
 #include "utilityQt.h"
 
@@ -317,7 +317,7 @@ void QtGraphicsView::contextMenuEvent(QContextMenuEvent* event) {
       }
 
       if((m_collapseNodeId == 0U) && (m_expandNodeId == 0U)) {
-        for(auto *subNode : node->getSubNodes()) {
+        for(auto* subNode : node->getSubNodes()) {
           if(subNode->isExpandToggleNode()) {
             if(dynamic_cast<QtGraphNodeExpandToggle*>(subNode)->isExpanded()) {
               m_collapseNodeId = node->getTokenId();

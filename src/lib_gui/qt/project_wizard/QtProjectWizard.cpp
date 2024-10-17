@@ -9,8 +9,6 @@
 //
 #include "language_packages.h"
 // internal
-#include "type/MessageLoadProject.h"
-#include "type/MessageStatus.h"
 #include "ProjectSettings.h"
 #include "ProjectWizardModel.hpp"
 #include "QtProjectWizardContent.h"
@@ -28,6 +26,8 @@
 #include "ResourcePaths.h"
 #include "SourceGroupSettingsCustomCommand.h"
 #include "SourceGroupSettingsUnloadable.h"
+#include "type/MessageLoadProject.h"
+#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityPathDetection.h"
@@ -37,9 +37,9 @@
 #include "Application.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "QtProjectWizardContentCStandard.h"
 #  include "QtProjectWizardContentCppStandard.h"
 #  include "QtProjectWizardContentCrossCompilationOptions.h"
+#  include "QtProjectWizardContentCStandard.h"
 #  include "QtProjectWizardContentCxxPchFlags.h"
 #  include "QtProjectWizardContentFlags.h"
 #  include "QtProjectWizardContentPathCDB.h"

@@ -4,10 +4,10 @@
 #include "../../../scheduling/TaskLambda.h"
 #include "CodeView.h"
 #include "GraphView.h"
-#include "type/code/MessageActivateSourceLocations.h"
 #include "StorageAccess.h"
 #include "TabId.h"
 #include "TooltipView.h"
+#include "type/code/MessageActivateSourceLocations.h"
 
 Id TooltipController::TooltipRequest::s_requestId = 1;
 

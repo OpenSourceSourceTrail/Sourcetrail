@@ -2,8 +2,8 @@
 
 #include <thread>
 
-#include "TimeStamp.h"
 #include "logging.h"
+#include "TimeStamp.h"
 #include "utilityApp.h"
 
 std::string SharedMemoryGarbageCollector::s_memoryNamePrefix = "grbg_cllctr_";
@@ -14,7 +14,7 @@ const size_t SharedMemoryGarbageCollector::s_updateIntervalSeconds = 1;
 const size_t SharedMemoryGarbageCollector::s_deleteThresholdSeconds = 10;
 
 SharedMemoryGarbageCollector::SharedMemoryGarbageCollector(std::unique_ptr<SharedMemory> memory) noexcept
-    : m_memory {std::move(memory)}, m_loopIsRunning(false) {}
+    : m_memory{std::move(memory)}, m_loopIsRunning(false) {}
 
 SharedMemoryGarbageCollector::~SharedMemoryGarbageCollector() noexcept = default;
 

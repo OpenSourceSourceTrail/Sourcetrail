@@ -13,9 +13,9 @@
 #include "CxxIndexerCommandProvider.h"
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandCxx.h"
-#include "type/MessageStatus.h"
-#include "SourceGroupSettingsCxxCdb.h"
 #include "logging.h"
+#include "SourceGroupSettingsCxxCdb.h"
+#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilitySourceGroupCxx.h"
 
@@ -187,11 +187,13 @@ std::vector<std::wstring> SourceGroupCxxCdb::getBaseCompilerFlags() const {
 
   utility::append(compilerFlags,
                   IndexerCommandCxx::getCompilerFlagsForSystemHeaderSearchPaths(
-                      utility::concat(m_settings->getHeaderSearchPathsExpandedAndAbsolute(), utility::toFilePath(appSettings->getHeaderSearchPathsExpanded()))));
+                      utility::concat(m_settings->getHeaderSearchPathsExpandedAndAbsolute(),
+                                      utility::toFilePath(appSettings->getHeaderSearchPathsExpanded()))));
 
   utility::append(compilerFlags,
                   IndexerCommandCxx::getCompilerFlagsForFrameworkSearchPaths(
-                      utility::concat(m_settings->getFrameworkSearchPathsExpandedAndAbsolute(), utility::toFilePath(appSettings->getFrameworkSearchPathsExpanded()))));
+                      utility::concat(m_settings->getFrameworkSearchPathsExpandedAndAbsolute(),
+                                      utility::toFilePath(appSettings->getFrameworkSearchPathsExpanded()))));
 
   return compilerFlags;
 }

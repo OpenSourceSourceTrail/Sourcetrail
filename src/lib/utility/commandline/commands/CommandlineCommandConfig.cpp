@@ -4,8 +4,8 @@
 #include <iostream>
 #include <utility>
 
-#include "CommandLineParser.h"
 #include "CommandlineHelper.h"
+#include "CommandLineParser.h"
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
 #include "logging.h"

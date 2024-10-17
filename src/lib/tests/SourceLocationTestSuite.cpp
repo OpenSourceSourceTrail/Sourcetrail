@@ -13,7 +13,7 @@ using namespace std::string_literals;
 
 // NOLINTNEXTLINE
 TEST(SourceLocation, createStartSourceLocation) {
-  const SourceLocation sourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  const SourceLocation sourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
   EXPECT_EQ(sourceLocation.getSourceLocationFile(), nullptr);
   EXPECT_EQ(sourceLocation.getStartLocation(), &sourceLocation);
   EXPECT_EQ(sourceLocation.getEndLocation(), nullptr);
@@ -33,9 +33,9 @@ TEST(SourceLocation, createStartSourceLocation) {
 
 // NOLINTNEXTLINE
 TEST(SourceLocation, createEndSourceLocation) {
-  SourceLocation startSourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  SourceLocation startSourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
 
-  const SourceLocationFile sourceFile {FilePath {"main.cpp"}, L".cpp", true, true, true};
+  const SourceLocationFile sourceFile{FilePath{"main.cpp"}, L".cpp", true, true, true};
   const auto endSourceLocation = SourceLocation::createEndSourceLocation(&startSourceLocation, 1, 2);
   EXPECT_EQ(endSourceLocation->getSourceLocationFile(), nullptr);
   EXPECT_EQ(endSourceLocation->getStartLocation(), &startSourceLocation);
@@ -51,9 +51,9 @@ TEST(SourceLocation, createEndSourceLocation) {
 // NOLINTNEXTLINE
 TEST(SourceLocation, createEndSourceLocationSameAsStart) {
   // NOTE(Hussein): Should shaw some warning?
-  SourceLocation startSourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  SourceLocation startSourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
 
-  const SourceLocationFile sourceFile {FilePath {"main.cpp"}, L".cpp", true, true, true};
+  const SourceLocationFile sourceFile{FilePath{"main.cpp"}, L".cpp", true, true, true};
   const auto endSourceLocation = SourceLocation::createEndSourceLocation(&startSourceLocation, 1, 1);
   EXPECT_EQ(endSourceLocation->getSourceLocationFile(), nullptr);
   EXPECT_EQ(endSourceLocation->getStartLocation(), &startSourceLocation);
@@ -68,9 +68,9 @@ TEST(SourceLocation, createEndSourceLocationSameAsStart) {
 
 // NOLINTNEXTLINE
 TEST(SourceLocation, createSourceLocationFromAnother) {
-  SourceLocation sourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  SourceLocation sourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
 
-  SourceLocationFile sourceFile {FilePath {"main.cpp"}, L".cpp", true, true, true};
+  SourceLocationFile sourceFile{FilePath{"main.cpp"}, L".cpp", true, true, true};
   auto newStartSourceLocation = SourceLocation::createSourceLocationFromAnother(&sourceLocation, &sourceFile);
   EXPECT_EQ(newStartSourceLocation->getSourceLocationFile(), &sourceFile);
   EXPECT_EQ(newStartSourceLocation->getStartLocation(), newStartSourceLocation.get());
@@ -85,7 +85,7 @@ TEST(SourceLocation, createSourceLocationFromAnother) {
 
 // NOLINTNEXTLINE
 TEST(SourceLocation, serializeStartSourceLocation) {
-  const SourceLocation sourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  const SourceLocation sourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
   std::wstringstream wStream;
   wStream << sourceLocation;
 
@@ -95,9 +95,9 @@ TEST(SourceLocation, serializeStartSourceLocation) {
 
 // NOLINTNEXTLINE
 TEST(SourceLocation, serializeEndSourceLocation) {
-  SourceLocation startSourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {2, 3, 4}, 1, 1, true);
+  SourceLocation startSourceLocation(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{2, 3, 4}, 1, 1, true);
 
-  const SourceLocationFile sourceFile {FilePath {"main.cpp"}, L".cpp", true, true, true};
+  const SourceLocationFile sourceFile{FilePath{"main.cpp"}, L".cpp", true, true, true};
   const auto endSourceLocation = SourceLocation::createEndSourceLocation(&startSourceLocation, 1, 2);
 
   std::wstringstream wStream;
@@ -117,13 +117,13 @@ TEST(SourceLocation, serializeEndSourceLocation) {
 
 // NOLINTNEXTLINE
 TEST(SourceLocation, equalOperator) {
-  SourceLocation sourceLocation0(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  SourceLocation sourceLocation0(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
 
-  SourceLocation sourceLocation1(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 1, true);
+  SourceLocation sourceLocation1(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 1, true);
 
   EXPECT_EQ(sourceLocation0, sourceLocation1);
 
-  SourceLocation sourceLocation2(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id> {}, 1, 2, true);
+  SourceLocation sourceLocation2(nullptr, LocationType::LOCATION_FULLTEXT_SEARCH, 1, std::vector<Id>{}, 1, 2, true);
 
   EXPECT_FALSE(sourceLocation0 == sourceLocation2);
 }

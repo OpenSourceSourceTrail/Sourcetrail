@@ -49,5 +49,5 @@ private:
 }
 
 inline constexpr GlobalId operator"" _gi(unsigned long long int index) noexcept {
-  return GlobalId {index};
+  return GlobalId{index};
 }

@@ -773,7 +773,7 @@ Id CxxAstVisitorComponentIndexer::getOrCreateSymbolId(const CxxContext* context)
     }
   }
 
-  const clang::NamedDecl* decl {nullptr};
+  const clang::NamedDecl* decl{nullptr};
   return getOrCreateSymbolId(decl);
 }
 

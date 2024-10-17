@@ -1,9 +1,9 @@
 #ifndef SOURCE_GROUP_SETTINGS_CXX_CODEBLOCKS_H
 #define SOURCE_GROUP_SETTINGS_CXX_CODEBLOCKS_H
 
-#include "SourceGroupSettingsWithCStandard.h"
 #include "SourceGroupSettingsWithComponents.h"
 #include "SourceGroupSettingsWithCppStandard.h"
+#include "SourceGroupSettingsWithCStandard.h"
 #include "SourceGroupSettingsWithCxxCodeblocksPath.h"
 #include "SourceGroupSettingsWithCxxPathsAndFlags.h"
 #include "SourceGroupSettingsWithExcludeFilters.h"

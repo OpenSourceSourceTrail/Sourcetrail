@@ -5,9 +5,9 @@
 // interal
 #include "CanonicalFilePathCache.h"
 #include "IndexerStateInfo.h"
+#include "logging.h"
 #include "ParseLocation.h"
 #include "ParserClient.h"
-#include "logging.h"
 #include "utilityClang.h"
 
 CxxAstVisitor::CxxAstVisitor(clang::ASTContext* astContext,

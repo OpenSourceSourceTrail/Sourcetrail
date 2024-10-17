@@ -141,7 +141,7 @@ TEST_F(ConfigManagerFix, saveAndLoadConfigurationAndCompare) {
   // When: get value
   ASSERT_TRUE(configManager->save(path));
   // And: Load the config successfully
-  const auto config2 = ConfigManager::createAndLoad(TextAccess::createFromFile(FilePath {path.data()}));
+  const auto config2 = ConfigManager::createAndLoad(TextAccess::createFromFile(FilePath{path.data()}));
   // Then: the config us created
   ASSERT_TRUE(config2);
   EXPECT_THAT(configManager->toString(), testing::StrEq(config2->toString()));
@@ -162,7 +162,7 @@ TEST(ConfigManager, loadsSpecialCharacter) {
 
 TEST(ConfigManager, saveAndLoadSpecialCharacterAndCompare) {
   const FilePath path(L"data/ConfigManagerTestSuite/temp.xml");
-  const std::wstring specialCharacter {wchar_t(252)};
+  const std::wstring specialCharacter{wchar_t(252)};
 
   // Given: configManager is created successfully
   auto config = ConfigManager::createEmpty();

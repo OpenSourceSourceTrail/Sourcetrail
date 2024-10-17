@@ -1,9 +1,10 @@
 #include <memory>
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
-#include "SharedMemoryGarbageCollector.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include "gmock/gmock.h"
+#include "SharedMemoryGarbageCollector.h"
 
 struct MockedSharedMemory : ISharedMemory {};
 

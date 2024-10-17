@@ -1,10 +1,7 @@
 #include "Bookmark.h"
 
-Bookmark::Bookmark(Id id,
-                   const std::wstring& name,
-                   const std::wstring& comment,
-                   const TimeStamp& timeStamp,
-                   const BookmarkCategory& category)
+Bookmark::Bookmark(
+    Id id, const std::wstring& name, const std::wstring& comment, const TimeStamp& timeStamp, const BookmarkCategory& category)
     : mId(id), mName(name), mComment(comment), mTimeStamp(timeStamp), mCategory(category) {}
 
 Bookmark::~Bookmark() = default;

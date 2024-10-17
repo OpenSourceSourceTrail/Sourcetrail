@@ -2,8 +2,8 @@
 
 #include "ActivationListener.h"
 #include "Controller.h"
-#include "type/search/MessageFind.h"
 #include "MessageListener.h"
+#include "type/search/MessageFind.h"
 #include "type/search/MessageSearchAutocomplete.h"
 
 class StorageAccess;

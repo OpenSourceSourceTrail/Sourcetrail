@@ -3,8 +3,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "CommandLineParser.h"
 #include "CommandlineCommand.h"
+#include "CommandLineParser.h"
 #include "mocks/MockedCommandlineCommand.hpp"
 #include "utilities/CollectOutStream.hpp"
 

@@ -18,30 +18,9 @@
 #include "Bookmark.h"
 #include "CompositeView.h"
 #include "FileSystem.h"
-#include "type/activation/MessageActivateBase.h"
-#include "type/activation/MessageActivateOverview.h"
-#include "type/bookmark/MessageBookmarkActivate.h"
-#include "type/bookmark/MessageBookmarkBrowse.h"
-#include "type/bookmark/MessageBookmarkCreate.h"
-#include "type/MessageCloseProject.h"
-#include "type/code/MessageCodeReference.h"
-#include "type/custom_trail/MessageCustomTrailShow.h"
-#include "type/error/MessageErrorsHelpMessage.h"
-#include "type/search/MessageFind.h"
-#include "type/focus/MessageFocusView.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryUndo.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
-#include "type/MessageLoadProject.h"
-#include "type/MessageRefresh.h"
-#include "type/MessageRefreshUI.h"
-#include "type/MessageResetZoom.h"
-#include "type/graph/MessageSaveAsImage.h"
-#include "type/tab/MessageTabClose.h"
-#include "type/tab/MessageTabOpen.h"
-#include "type/tab/MessageTabSelect.h"
-#include "type/MessageWindowClosed.h"
-#include "type/MessageZoom.h"
+#include "globalStrings.h"
+#include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "QtAbout.h"
 #include "QtContextMenu.h"
 #include "QtFileDialog.h"
@@ -53,15 +32,36 @@
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
 #include "TabbedView.h"
-#include "UserPaths.h"
-#include "View.h"
-#include "IApplicationSettings.hpp"
-#include "globalStrings.h"
-#include "logging.h"
 #include "tracing.h"
+#include "type/activation/MessageActivateBase.h"
+#include "type/activation/MessageActivateOverview.h"
+#include "type/bookmark/MessageBookmarkActivate.h"
+#include "type/bookmark/MessageBookmarkBrowse.h"
+#include "type/bookmark/MessageBookmarkCreate.h"
+#include "type/code/MessageCodeReference.h"
+#include "type/custom_trail/MessageCustomTrailShow.h"
+#include "type/error/MessageErrorsHelpMessage.h"
+#include "type/focus/MessageFocusView.h"
+#include "type/graph/MessageSaveAsImage.h"
+#include "type/history/MessageHistoryRedo.h"
+#include "type/history/MessageHistoryUndo.h"
+#include "type/indexing/MessageIndexingShowDialog.h"
+#include "type/MessageCloseProject.h"
+#include "type/MessageLoadProject.h"
+#include "type/MessageRefresh.h"
+#include "type/MessageRefreshUI.h"
+#include "type/MessageResetZoom.h"
+#include "type/MessageWindowClosed.h"
+#include "type/MessageZoom.h"
+#include "type/search/MessageFind.h"
+#include "type/tab/MessageTabClose.h"
+#include "type/tab/MessageTabOpen.h"
+#include "type/tab/MessageTabSelect.h"
+#include "UserPaths.h"
 #include "utilityApp.h"
 #include "utilityQt.h"
 #include "utilityString.h"
+#include "View.h"
 
 QtViewToggle::QtViewToggle(View* view, QWidget* parent) : QWidget(parent), m_view(view) {}
 
@@ -188,7 +188,7 @@ void QtMainWindow::addView(View* view) {
   connect(action, &QAction::triggered, toggle, &QtViewToggle::toggledByAction);
   m_viewMenu->insertAction(m_viewSeparator, action);
 
-  DockWidget dockWidget {};
+  DockWidget dockWidget{};
   dockWidget.widget = dock;
   dockWidget.view = view;
   dockWidget.action = action;
@@ -469,8 +469,9 @@ void QtMainWindow::showDataFolder() {
 }
 
 void QtMainWindow::showLogFolder() {
-  QDesktopServices::openUrl(QUrl(
-      QString::fromStdWString(L"file:///" + IApplicationSettings::getInstanceRaw()->getLogDirectoryPath().wstring()), QUrl::TolerantMode));
+  QDesktopServices::openUrl(
+      QUrl(QString::fromStdWString(L"file:///" + IApplicationSettings::getInstanceRaw()->getLogDirectoryPath().wstring()),
+           QUrl::TolerantMode));
 }
 
 void QtMainWindow::openTab() {

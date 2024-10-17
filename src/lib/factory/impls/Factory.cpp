@@ -1,12 +1,12 @@
 #include "Factory.hpp"
 
+#include "details/SharedMemoryGarbageCollector.h"
+#include "impls/TaskManager.hpp"
+#include "logging.h"
 #include "MessageQueue.h"
 #include "Project.h"
 #include "ProjectSettings.h"
 #include "StorageCache.h"
-#include "details/SharedMemoryGarbageCollector.h"
-#include "impls/TaskManager.hpp"
-#include "logging.h"
 #include "utilityApp.h"
 
 namespace {

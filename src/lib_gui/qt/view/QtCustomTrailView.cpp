@@ -11,12 +11,12 @@
 #include <QSlider>
 
 #include "ColorScheme.h"
-#include "type/activation/MessageActivateTrail.h"
 #include "NodeTypeSet.h"
 #include "QtMainWindow.h"
 #include "QtSmartSearchBox.h"
 #include "ResourcePaths.h"
 #include "TabId.h"
+#include "type/activation/MessageActivateTrail.h"
 #include "utilityQt.h"
 
 QtCustomTrailView::QtCustomTrailView(ViewLayout* viewLayout)

@@ -81,7 +81,7 @@ TEST(CommandLineHelper, goodCaseExtractPaths) {
       std::cbegin(inputs0), std::cend(inputs0), std::back_inserter(inputsString0), [](const std::filesystem::path& value) {
         return value.string();
       });
-  EXPECT_THAT(inputsString0, Eq(std::vector<std::string> {"/usr/include/", "/usr/share/Catch2"}));
+  EXPECT_THAT(inputsString0, Eq(std::vector<std::string>{"/usr/include/", "/usr/share/Catch2"}));
 
   const auto inputs1 = commandline::extractPaths({"/usr/include/", "/usr/share/Catch2"});
   std::vector<std::string> inputsString1;
@@ -89,5 +89,5 @@ TEST(CommandLineHelper, goodCaseExtractPaths) {
       std::cbegin(inputs1), std::cend(inputs1), std::back_inserter(inputsString1), [](const std::filesystem::path& value) {
         return value.string();
       });
-  EXPECT_THAT(inputsString1, Eq(std::vector<std::string> {"/usr/include/", "/usr/share/Catch2"}));
+  EXPECT_THAT(inputsString1, Eq(std::vector<std::string>{"/usr/include/", "/usr/share/Catch2"}));
 }

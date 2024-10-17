@@ -10,12 +10,12 @@
 #include <QToolButton>
 #include <QVariant>
 
+#include "globalStrings.h"
 #include "LanguageType.h"
 #include "QtFlowLayout.h"
 #include "QtProjectWizardWindow.h"
 #include "ResourcePaths.h"
 #include "SqliteIndexStorage.h"
-#include "globalStrings.h"
 #include "utilityString.h"
 
 QtProjectWizardContentSelect::QtProjectWizardContentSelect(QtProjectWizardWindow* window) : QtProjectWizardContent(window) {}
@@ -57,14 +57,14 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_CPP_EMPTY] =
       "Create a new Source Group by defining which C++ files will be indexed.";
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_CXX_CDB] =
-      std::string {
+      std::string{
           "Create a Source Group from an existing Compilation Database file (compile_commands.json). "
           "It can be exported from CMake<br />(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON) and Make projects "
           "or from the Qt Creator since version 4.8. Have a look at the "
           "<a href=\""} +
       "documentation"_g + "#cc-source-group-from-compilation-database\">documentation</a>.";
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_CXX_VS] =
-      std::string {
+      std::string{
           "<p>Create a new Source Group from an existing Visual Studio Solution file.</p>"
           "<p><b>Note</b>: Requires a running Visual Studio instance with the "
           "<a href=\""} +

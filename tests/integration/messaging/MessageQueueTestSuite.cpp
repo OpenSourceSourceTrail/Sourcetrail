@@ -6,20 +6,19 @@
 #include <gtest/gtest.h>
 
 #ifndef _WIN32
-#define private public
+#  define private public
 #endif
 #include "MessageQueue.h"
 #ifndef _WIN32
-#undef private
+#  undef private
 #endif
 #include "../../../src/scheduling/TaskScheduler.h"
+#include "ITaskManager.hpp"
 #include "Message.h"
 #include "MessageFilter.h"
 #include "MessageListener.h"
-#include "TabId.h"
-#include "ITaskManager.hpp"
-
 #include "mocks/MockedTaskManager.hpp"
+#include "TabId.h"
 
 
 namespace {
@@ -285,7 +284,7 @@ TEST_F(MessageQueueRegistration, registerGoodCase) {
 
   messageQueue->startMessageLoopThreaded();
 
-  TestMessage {}.dispatch();
+  TestMessage{}.dispatch();
 
   waitForThread();
   messageQueue->stopMessageLoop();
@@ -295,7 +294,7 @@ TEST_F(MessageQueueRegistration, registerGoodCase) {
   messageQueue->unregisterListener(&messageListener);
   EXPECT_THAT(messageQueue->mListeners, testing::IsEmpty());
 
-  TestMessage {}.dispatch();
+  TestMessage{}.dispatch();
 
   EXPECT_EQ(1, messageListener.m_messageCount);
 }
@@ -361,7 +360,7 @@ TEST_F(MessageQueueProcess, goodCaseAsTask) {
   EXPECT_EQ(0, messageListener.m_messageCount);
 }
 
-#if !defined (_WIN32)
+#  if !defined(_WIN32)
 struct MessageQueueSendMessage : testing::Test {
   void SetUp() override {
     auto mQueue = std::make_shared<details::MessageQueue>();
@@ -387,7 +386,7 @@ TEST_F(MessageQueueSendMessage, goodCase) {
   messageQueue->sendMessage(message);
   EXPECT_EQ(1, messageListener.m_messageCount);
 }
-#endif
+#  endif
 
 struct MockedMessageFilter : MessageFilter {
   MOCK_METHOD(void, filter, (IMessageQueue::MessageBufferType*), (override));

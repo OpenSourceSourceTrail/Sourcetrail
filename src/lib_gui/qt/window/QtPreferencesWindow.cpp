@@ -2,15 +2,15 @@
 
 #include "Application.h"
 #include "DialogView.h"
-#include "type/MessageLoadProject.h"
-#include "type/plugin/MessagePluginPortChange.h"
-#include "type/MessageRefreshUI.h"
-#include "type/MessageScrollSpeedChange.h"
+#include "language_packages.h"
 #include "QtProjectWizardContentGroup.h"
 #include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
 #include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
 #include "QtProjectWizardContentPreferences.h"
-#include "language_packages.h"
+#include "type/MessageLoadProject.h"
+#include "type/MessageRefreshUI.h"
+#include "type/MessageScrollSpeedChange.h"
+#include "type/plugin/MessagePluginPortChange.h"
 #include "utilityApp.h"
 
 QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindow(parent) {

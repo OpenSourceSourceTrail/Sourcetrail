@@ -4,8 +4,7 @@
 
 class MessageBookmarkBrowse : public Message<MessageBookmarkBrowse> {
 public:
-  MessageBookmarkBrowse(Bookmark::Filter filter_ = Bookmark::Filter::Unknown,
-                        Bookmark::Order order_ = Bookmark::Order::None)
+  MessageBookmarkBrowse(Bookmark::Filter filter_ = Bookmark::Filter::Unknown, Bookmark::Order order_ = Bookmark::Order::None)
       : filter(filter_), order(order_) {}
 
   static const std::string getStaticType() {

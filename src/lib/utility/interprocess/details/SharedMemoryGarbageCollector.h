@@ -21,6 +21,7 @@ public:
   void unregisterSharedMemory(const std::string& sharedMemoryName) noexcept override;
 
   static std::string getMemoryName();
+
 private:
   void update();
 

@@ -6,11 +6,11 @@
 #include "AppPath.h"
 #include "DialogView.h"
 #include "InterprocessIndexer.h"
-#include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageStatus.h"
 #include "ParserClientImpl.h"
 #include "StorageProvider.h"
 #include "TimeStamp.h"
+#include "type/indexing/MessageIndexingStatus.h"
+#include "type/MessageStatus.h"
 #include "UserPaths.h"
 #include "utilityApp.h"
 

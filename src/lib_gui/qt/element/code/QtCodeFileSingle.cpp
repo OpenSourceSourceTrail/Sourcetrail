@@ -7,13 +7,13 @@
 #include <QVBoxLayout>
 
 #include "FilePath.h"
-#include "type/code/MessageChangeFileView.h"
+#include "logging.h"
 #include "QtCodeArea.h"
 #include "QtCodeFileTitleBar.h"
 #include "QtCodeFileTitleButton.h"
 #include "QtCodeNavigator.h"
 #include "SourceLocationFile.h"
-#include "logging.h"
+#include "type/code/MessageChangeFileView.h"
 
 QtCodeFileSingle::QtCodeFileSingle(QtCodeNavigator* navigator, QWidget* /*parent*/)
     : m_navigator(navigator), m_areaWrapper(new QWidget()), m_titleBar(new QtCodeFileTitleBar(this, false, true)), m_area(nullptr) {

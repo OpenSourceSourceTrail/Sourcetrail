@@ -107,7 +107,7 @@ std::vector<FileInfo> FileSystem::getFileInfosFromPaths(const std::vector<FilePa
 }
 
 std::set<FilePath> FileSystem::getSymLinkedDirectories(const FilePath& path) {
-  return getSymLinkedDirectories(std::vector<FilePath> {path});
+  return getSymLinkedDirectories(std::vector<FilePath>{path});
 }
 
 std::set<FilePath> FileSystem::getSymLinkedDirectories(const std::vector<FilePath>& paths) {

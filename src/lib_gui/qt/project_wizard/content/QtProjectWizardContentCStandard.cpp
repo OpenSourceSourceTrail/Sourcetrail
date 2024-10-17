@@ -1,8 +1,8 @@
 #include "QtProjectWizardContentCStandard.h"
 
 #include <QComboBox>
-#include <QLabel>
 #include <QGridLayout>
+#include <QLabel>
 
 #include "SourceGroupSettingsWithCStandard.h"
 

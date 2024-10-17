@@ -3,10 +3,10 @@
 #include "FileInfo.h"
 #include "FilePath.h"
 #include "Graph.h"
+#include "logging.h"
 #include "NodeTypeSet.h"
 #include "SourceLocationCollection.h"
 #include "SourceLocationFile.h"
-#include "logging.h"
 
 void StorageAccessProxy::setSubject(std::weak_ptr<StorageAccess> subject) {
   m_subject = subject;

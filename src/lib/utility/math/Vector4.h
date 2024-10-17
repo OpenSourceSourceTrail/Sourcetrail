@@ -1,7 +1,7 @@
 #pragma once
 // internal
-#include "Property.h"
 #include "logging.h"
+#include "Property.h"
 //
 #include "VectorBase.h"
 

@@ -37,7 +37,7 @@ NameHierarchy NameHierarchy::deserialize(const std::wstring& serializedName) {
   size_t mpos = serializedName.find(META_DELIMITER);
   if(mpos == std::wstring::npos) {
     LOG_ERROR_W(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate
-                                                                              // serializedName!
+                                                                                // serializedName!
     return NameHierarchy(NAME_DELIMITER_UNKNOWN);
   }
 

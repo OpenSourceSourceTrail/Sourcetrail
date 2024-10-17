@@ -7,8 +7,8 @@
 #include <QMessageBox>
 #include <QMimeData>
 
-#include "type/MessageLoadProject.h"
 #include "ProjectSettings.h"
+#include "type/MessageLoadProject.h"
 
 namespace {
 
@@ -104,14 +104,18 @@ bool RecentItemModel::canDropMimeData(const QMimeData* data,
   return true;
 }
 
-bool RecentItemModel::dropMimeData(const QMimeData* data, [[maybe_unused]] Qt::DropAction action, int row, [[maybe_unused]] int column, const QModelIndex& parent) {
+bool RecentItemModel::dropMimeData(const QMimeData* data,
+                                   [[maybe_unused]] Qt::DropAction action,
+                                   int row,
+                                   [[maybe_unused]] int column,
+                                   const QModelIndex& parent) {
   int beginRow;
   if(row != -1) {
     beginRow = row;
   } else if(parent.isValid()) {
     beginRow = parent.row();
   } else {
-    beginRow = rowCount(QModelIndex {});
+    beginRow = rowCount(QModelIndex{});
   }
 
   QByteArray encodedData = data->data(MIME_TYPE);
@@ -141,11 +145,11 @@ QVariant RecentItemModel::data(const QModelIndex& index, int role) const {
   case Qt::DecorationRole:
     return item.icon;
   case Qt::ToolTipRole:
-    return item.exists ? QVariant {} : QString("\"%0\" is missed").arg(QString::fromStdWString(item.path.wstring()));
+    return item.exists ? QVariant{} : QString("\"%0\" is missed").arg(QString::fromStdWString(item.path.wstring()));
   case Qt::FontRole: {
     QFont font;
     font.setStrikeOut(true);
-    return item.exists ? QVariant {} : font;
+    return item.exists ? QVariant{} : font;
   }
   default:
     break;

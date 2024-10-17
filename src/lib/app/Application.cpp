@@ -12,10 +12,15 @@
 #include "ColorScheme.h"
 #include "CppSQLite3.h"
 #include "DialogView.h"
+#include "filter_types/MessageFilterErrorCountUpdate.h"
+#include "filter_types/MessageFilterFocusInOut.h"
+#include "filter_types/MessageFilterSearchAutocomplete.h"
 #include "GraphViewStyle.h"
 #include "IApplicationSettings.hpp"
 #include "IDECommunicationController.h"
+#include "impls/Factory.hpp"
 #include "ISharedMemoryGarbageCollector.hpp"
+#include "logging.h"
 #include "MainView.h"
 #include "MessageQueue.h"
 #include "NetworkFactory.h"
@@ -24,19 +29,14 @@
 #include "StorageCache.h"
 #include "TabId.h"
 #include "TaskScheduler.h"
-#include "UserPaths.h"
-#include "Version.h"
-#include "ViewFactory.h"
-#include "filter_types/MessageFilterErrorCountUpdate.h"
-#include "filter_types/MessageFilterFocusInOut.h"
-#include "filter_types/MessageFilterSearchAutocomplete.h"
-#include "impls/Factory.hpp"
-#include "logging.h"
 #include "tracing.h"
 #include "type/MessageQuitApplication.h"
 #include "type/MessageStatus.h"
+#include "UserPaths.h"
 #include "utilityString.h"
 #include "utilityUuid.h"
+#include "Version.h"
+#include "ViewFactory.h"
 
 
 namespace fs = std::filesystem;
@@ -153,9 +153,9 @@ void Application::loadSettings() {
     namespace fs = std::filesystem;
     auto loggerPath =
 #if WIN32
-        (fs::path {settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).wstring();
+        (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).wstring();
 #else
-        (fs::path {settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
+        (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
 #endif
     auto dLogger = spdlog::default_logger_raw();
     if(nullptr == dLogger) {
@@ -171,14 +171,13 @@ void Application::loadSettings() {
 }
 
 void Application::loadStyle(const fs::path& colorSchemePath) {
-  if(!ColorScheme::getInstance()->load(FilePath {colorSchemePath.wstring()})) {
+  if(!ColorScheme::getInstance()->load(FilePath{colorSchemePath.wstring()})) {
     LOG_WARNING_W(fmt::format(L"Failed to load Style from the following path \"{}\"", colorSchemePath.wstring()));
   }
   GraphViewStyle::loadStyleSettings();
 }
 
-Application::Application(std::shared_ptr<lib::IFactory> factory, bool withGUI)
-    : mHasGui(withGUI), mFactory {std::move(factory)} {}
+Application::Application(std::shared_ptr<lib::IFactory> factory, bool withGUI) : mHasGui(withGUI), mFactory{std::move(factory)} {}
 
 Application::~Application() {
   if(mHasGui) {
@@ -275,7 +274,7 @@ void Application::handleMessage(MessageLoadProject* message) {
     }
 
     try {
-      updateRecentProjects(fs::path {projectSettingsFilePath.wstr()});
+      updateRecentProjects(fs::path{projectSettingsFilePath.wstr()});
 
       mStorageCache->clear();
       // TODO: check if this is really required.

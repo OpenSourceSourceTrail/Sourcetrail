@@ -3,8 +3,8 @@
 #include <utility>
 
 #include "Controller.h"
-#include "View.h"
 #include "logging.h"
+#include "View.h"
 
 Component::Component(std::shared_ptr<View> view, std::shared_ptr<Controller> controller)
     : m_controller(std::move(controller)), m_view(std::move(view)) {

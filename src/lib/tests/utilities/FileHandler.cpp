@@ -68,4 +68,4 @@ FileHandler::~FileHandler() {
   }
 }
 
-FileHandler::FileHandler(fs::path filePath, size_t bufferSize) : mFilePath {std::move(filePath)}, mFileSize {bufferSize} {}
+FileHandler::FileHandler(fs::path filePath, size_t bufferSize) : mFilePath{std::move(filePath)}, mFileSize{bufferSize} {}

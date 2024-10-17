@@ -131,5 +131,5 @@ struct SetupTabFix : Test {
 };
 
 TEST_F(SetupTabFix, goodCase) {
-  mManager->setupTab(&mockedLayout, Id {0}, &sender);
+  mManager->setupTab(&mockedLayout, Id{0}, &sender);
 }

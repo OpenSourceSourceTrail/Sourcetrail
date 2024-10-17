@@ -3,16 +3,16 @@
 #include <map>
 // internal
 #include "ActivationListener.h"
+#include "MessageListener.h"
+#include "QtThreadedFunctor.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"
 #include "type/error/MessageErrorsAll.h"
 #include "type/error/MessageErrorsForFile.h"
 #include "type/error/MessageErrorsHelpMessage.h"
+#include "type/error/MessageShowError.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStarted.h"
-#include "MessageListener.h"
-#include "type/error/MessageShowError.h"
-#include "QtThreadedFunctor.h"
 //
 #include "Controller.h"
 #include "ErrorView.h"

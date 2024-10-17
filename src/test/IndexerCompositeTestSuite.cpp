@@ -9,15 +9,14 @@
 using namespace testing;
 
 struct MockedIndexerCommand final : public IndexerCommand {
-  MockedIndexerCommand() : IndexerCommand(FilePath {}) {}
+  MockedIndexerCommand() : IndexerCommand(FilePath{}) {}
   MOCK_METHOD(IndexerCommandType, getIndexerCommandType, (), (const, override));
 };
 
-struct IndexerCompositeFix : testing::Test {
-};
+struct IndexerCompositeFix : testing::Test {};
 
 TEST(IndexerComposite, getSupportedIndexerCommandType) {
-  EXPECT_EQ(INDEXER_COMMAND_UNKNOWN, IndexerComposite {}.getSupportedIndexerCommandType());
+  EXPECT_EQ(INDEXER_COMMAND_UNKNOWN, IndexerComposite{}.getSupportedIndexerCommandType());
 }
 
 #if BUILD_CXX_LANGUAGE_PACKAGE

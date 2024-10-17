@@ -9,7 +9,7 @@
 
 
 ProjectWizardModel::ProjectWizardModel(std::shared_ptr<SourceGroupSettingsCxxCdb> settings) noexcept
-    : m_settings {std::move(settings)}, m_filePaths([&]() {
+    : m_settings{std::move(settings)}, m_filePaths([&]() {
       return utility::getAsRelativeIfShorter(
           utility::toVector(SourceGroupCxxCdb(m_settings).getAllSourceFilePaths()), m_settings->getProjectDirectoryPath());
     }) {}

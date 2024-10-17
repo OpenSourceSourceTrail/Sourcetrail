@@ -12,14 +12,14 @@ TEST(Split, splitWithCharDelimiter) {
   const auto result = utility::split("A,B,C", ',');
 
   ASSERT_EQ(3, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"A", "B", "C"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"A", "B", "C"}));
 }
 
 TEST(Split, splitWithStringDelimiter) {
   const auto result = utility::split("A->B>C", "->");
 
   ASSERT_EQ(2, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"A", "B>C"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"A", "B>C"}));
 }
 
 TEST(Split, splitOnEmptyString) {
@@ -40,21 +40,21 @@ TEST(Split, splitWithDelimitersNextToEach) {
   const auto result = utility::split("A::B:C", ':');
 
   ASSERT_EQ(4, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"A", "", "B", "C"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"A", "", "B", "C"}));
 }
 
 TEST(Split, splitWithDelimiterAtStart) {
   const auto result = utility::split(":B:C", ':');
 
   ASSERT_EQ(3, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"", "B", "C"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"", "B", "C"}));
 }
 
 TEST(Split, splitWithDelimiterAtEnd) {
   const auto result = utility::split("B:C:", ':');
 
   ASSERT_EQ(3, result.size());
-  ASSERT_THAT(result, Eq(std::deque<std::string> {"B", "C", ""}));
+  ASSERT_THAT(result, Eq(std::deque<std::string>{"B", "C", ""}));
 }
 
 TEST(Join, joinWithCharDelimiter) {
@@ -98,21 +98,21 @@ TEST(Tokenize, tokenizeWithString) {
   const auto result = utility::tokenize("A->B->C", "->");
 
   ASSERT_EQ(5, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"A", "->", "B", "->", "C"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"A", "->", "B", "->", "C"}));
 }
 
 TEST(Tokenize, tokenizeWithStringAndDelimiterAtStart) {
   const auto result = utility::tokenize("->B", "->");
 
   ASSERT_EQ(2, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"->", "B"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"->", "B"}));
 }
 
 TEST(Tokenize, tokenizeWithStringAndDelimiterAtEnd) {
   const auto result = utility::tokenize("C+", '+');
 
   ASSERT_EQ(2, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"C", "+"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"C", "+"}));
 }
 
 TEST(Tokenize, tokenizeWithDeque) {
@@ -120,7 +120,7 @@ TEST(Tokenize, tokenizeWithDeque) {
   result = utility::tokenize(result, "=");
 
   ASSERT_EQ(7, result.size());
-  EXPECT_THAT(result, Eq(std::deque<std::string> {"A", "->", "B", "=", "C", "->", "D"}));
+  EXPECT_THAT(result, Eq(std::deque<std::string>{"A", "->", "B", "=", "C", "->", "D"}));
 }
 
 TEST(Substr, substrBeforeFirstWithSingleDelimiterOccurrence) {

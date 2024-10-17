@@ -9,8 +9,8 @@
 
 #include <tinyxml.h>
 
-#include "TextAccess.h"
 #include "logging.h"
+#include "TextAccess.h"
 #include "utility.h"
 #include "utilityString.h"
 
@@ -122,7 +122,7 @@ bool ConfigManager::load(const std::shared_ptr<TextAccess>& textAccess) {
 
 bool ConfigManager::save(const std::filesystem::path& filepath) const {
   std::string output = createXmlDocumentToString(mConfigValues);
-  std::ofstream outStream {filepath};
+  std::ofstream outStream{filepath};
   if(!outStream.is_open()) {
     LOG_ERROR_W(fmt::format(L"Failed to open \"{}\"", filepath.wstring()));
     return false;

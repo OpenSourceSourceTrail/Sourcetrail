@@ -2,14 +2,14 @@
 
 #include "FilePath.h"
 #include "GraphFocusHandler.h"
-#include "type/graph/MessageActivateNodes.h"
-#include "type/graph/MessageDeactivateEdge.h"
-#include "type/focus/MessageFocusIn.h"
-#include "type/focus/MessageFocusOut.h"
-#include "type/tab/MessageTabOpenWith.h"
-#include "type/MessageTooltipShow.h"
 #include "ResourcePaths.h"
 #include "TokenComponentFilePath.h"
+#include "type/focus/MessageFocusIn.h"
+#include "type/focus/MessageFocusOut.h"
+#include "type/graph/MessageActivateNodes.h"
+#include "type/graph/MessageDeactivateEdge.h"
+#include "type/MessageTooltipShow.h"
+#include "type/tab/MessageTabOpenWith.h"
 
 QtGraphNodeData::QtGraphNodeData(GraphFocusHandler* focusHandler,
                                  const Node* data,

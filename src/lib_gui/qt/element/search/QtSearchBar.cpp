@@ -2,13 +2,13 @@
 
 #include <QHBoxLayout>
 
+#include "QtSearchBarButton.h"
+#include "QtSmartSearchBox.h"
+#include "ResourcePaths.h"
 #include "type/activation/MessageActivateFullTextSearch.h"
 #include "type/activation/MessageActivateOverview.h"
 #include "type/search/MessageSearch.h"
 #include "type/search/MessageSearchAutocomplete.h"
-#include "QtSearchBarButton.h"
-#include "QtSmartSearchBox.h"
-#include "ResourcePaths.h"
 
 QtSearchBar::QtSearchBar() {
   setObjectName(QStringLiteral("search_bar"));

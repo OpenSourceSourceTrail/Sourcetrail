@@ -8,9 +8,9 @@
 #include "QtDeviceScaledPixmap.h"
 #include "ResourcePaths.h"
 #include "SqliteIndexStorage.h"
-#include "Version.h"
 #include "utilityApp.h"
 #include "utilityQt.h"
+#include "Version.h"
 
 QtAbout::QtAbout(QWidget* parent) : QtWindow(false, parent) {}
 

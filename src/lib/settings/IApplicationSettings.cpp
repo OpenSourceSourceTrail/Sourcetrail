@@ -1,4 +1,5 @@
 #include "IApplicationSettings.hpp"
+
 #include "utility.h"
 
 IApplicationSettings::Ptr IApplicationSettings::mInstance;

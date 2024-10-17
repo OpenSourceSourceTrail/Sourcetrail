@@ -36,7 +36,7 @@ QModelIndex createModelIndex(int index, const QAbstractListModel* input) {
 
 }    // namespace
 
-const std::vector<std::filesystem::path> RecentItemModelTestSuite::RecentItems = std::vector<std::filesystem::path> {
+const std::vector<std::filesystem::path> RecentItemModelTestSuite::RecentItems = std::vector<std::filesystem::path>{
     std::filesystem::path{"data/RecentItemModelTestSuite/test00.srctrlprj"},
     std::filesystem::path{"data/RecentItemModelTestSuite/test01.srctrlprj"},
     std::filesystem::path{"data/RecentItemModelTestSuite/missing.srctrlprj"},
@@ -116,7 +116,7 @@ void RecentItemModelTestSuite::indexInvalid() {
 }
 
 void RecentItemModelTestSuite::invalidClicked() {
-  mRecentItemModel->clicked(QModelIndex {});
+  mRecentItemModel->clicked(QModelIndex{});
 }
 
 void RecentItemModelTestSuite::outOfBoundaryClicked() {
@@ -192,7 +192,7 @@ void RecentItemModelTestSuite::cleanupTestCase() {
   IMessageQueue::setInstance(nullptr);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
   testing::InitGoogleMock(&argc, argv);
   QTEST_MAIN_IMPL(RecentItemModelTestSuite)
 }

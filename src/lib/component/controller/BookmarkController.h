@@ -3,14 +3,14 @@
 #include "Bookmark.h"
 #include "Controller.h"
 #include "EdgeBookmark.h"
+#include "MessageListener.h"
+#include "NodeBookmark.h"
 #include "type/bookmark/MessageBookmarkActivate.h"
 #include "type/bookmark/MessageBookmarkBrowse.h"
 #include "type/bookmark/MessageBookmarkCreate.h"
 #include "type/bookmark/MessageBookmarkDelete.h"
 #include "type/bookmark/MessageBookmarkEdit.h"
 #include "type/indexing/MessageIndexingFinished.h"
-#include "MessageListener.h"
-#include "NodeBookmark.h"
 
 class StorageAccess;
 

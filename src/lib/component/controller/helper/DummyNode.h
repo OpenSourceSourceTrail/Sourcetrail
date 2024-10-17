@@ -4,11 +4,11 @@
 #include "GroupType.h"
 #include "NameHierarchy.h"
 #include "Node.h"
-#include "Vector2.h"
-#include "Vector4.h"
 #include "types.h"
 #include "utility.h"
 #include "utilityString.h"
+#include "Vector2.h"
+#include "Vector4.h"
 
 // temporary data structure for (visual) graph creation process
 struct DummyNode {

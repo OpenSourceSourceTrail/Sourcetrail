@@ -60,8 +60,8 @@ FilePath utility::getExpandedPath(const FilePath& path) {
   std::vector<FilePath> paths = path.expandEnvironmentVariables();
   if(!paths.empty()) {
     if(paths.size() > 1) {
-      LOG_WARNING_W(L"Environment variable in path \"" + path.wstr() + L"\" has been expanded to " + std::to_wstring(paths.size()) +
-                  L"paths, but only \"" + paths.front().wstr() + L"\" will be used.");
+      LOG_WARNING_W(L"Environment variable in path \"" + path.wstr() + L"\" has been expanded to " +
+                    std::to_wstring(paths.size()) + L"paths, but only \"" + paths.front().wstr() + L"\" will be used.");
     }
     return paths.front();
   }

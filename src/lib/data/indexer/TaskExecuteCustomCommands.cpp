@@ -7,15 +7,15 @@
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandCustom.h"
 #include "IndexerCommandProvider.h"
+#include "PersistentStorage.h"
+#include "SourceLocationCollection.h"
+#include "SourceLocationFile.h"
+#include "TextAccess.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageShowStatus.h"
 #include "type/MessageStatus.h"
-#include "PersistentStorage.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
-#include "TextAccess.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityFile.h"
@@ -153,8 +153,8 @@ void TaskExecuteCustomCommands::executeParallelIndexerCommands(int threadId, std
       if(!databaseFilePathKnown) {
         if(databaseFilePath.exists()) {
           LOG_WARNING_W(L"Temporary storage \"" + databaseFilePath.wstr() +
-                      L"\" already exists on file system. File will be removed to avoid "
-                      L"conflicts.");
+                        L"\" already exists on file system. File will be removed to avoid "
+                        L"conflicts.");
           FileSystem::remove(databaseFilePath);
         }
         storage = std::make_shared<PersistentStorage>(databaseFilePath, FilePath());

@@ -16,13 +16,13 @@
 #include "ColorScheme.h"
 #include "ErrorController.h"
 #include "ErrorFilter.h"
-#include "type/MessageProjectEdit.h"
 #include "QtHelpButton.h"
 #include "QtSelfRefreshIconButton.h"
 #include "QtTable.h"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
 #include "TabId.h"
+#include "type/MessageProjectEdit.h"
 #include "utilityQt.h"
 
 QIcon QtErrorView::s_errorIcon;

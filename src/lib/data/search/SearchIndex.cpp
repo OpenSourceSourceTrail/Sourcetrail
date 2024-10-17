@@ -161,7 +161,7 @@ void SearchIndex::searchRecursive(const SearchPath& path,
 
     // consume characters for edge
     const std::wstring& edgeString = currentEdge->s;
-    SearchPath currentPath {path.text + edgeString, path.indices, currentEdge->target};
+    SearchPath currentPath{path.text + edgeString, path.indices, currentEdge->target};
 
     size_t j = 0;
     for(size_t i = 0; i < edgeString.size() && j < remainingQuery.size(); i++) {

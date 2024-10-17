@@ -7,10 +7,10 @@
 #include "ErrorInfo.h"
 #include "LocationType.h"
 #include "MessageListener.h"
-#include "type/MessageWindowFocus.h"
 #include "QtCodeFileList.h"
 #include "QtCodeFileSingle.h"
 #include "QtThreadedFunctor.h"
+#include "type/MessageWindowFocus.h"
 
 class QLabel;
 class QPushButton;

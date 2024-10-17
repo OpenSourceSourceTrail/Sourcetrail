@@ -8,15 +8,15 @@
 #include <QPen>
 
 #include "GraphFocusHandler.h"
-#include "type/code/MessageCodeShowDefinition.h"
-#include "type/graph/MessageGraphNodeHide.h"
-#include "type/graph/MessageGraphNodeMove.h"
 #include "QtDeviceScaledPixmap.h"
 #include "QtGraphEdge.h"
 #include "QtGraphNodeComponent.h"
 #include "QtGraphNodeExpandToggle.h"
 #include "QtRoundedRectItem.h"
 #include "ResourcePaths.h"
+#include "type/code/MessageCodeShowDefinition.h"
+#include "type/graph/MessageGraphNodeHide.h"
+#include "type/graph/MessageGraphNodeMove.h"
 #include "utilityQt.h"
 #include "utilityString.h"
 

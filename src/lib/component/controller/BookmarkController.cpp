@@ -7,15 +7,15 @@
 #include "Bookmark.h"
 #include "BookmarkView.h"
 #include "EdgeBookmark.h"
-#include "type/graph/MessageActivateEdge.h"
-#include "type/graph/MessageActivateNodes.h"
-#include "type/bookmark/MessageBookmarkButtonState.h"
-#include "type/bookmark/MessageBookmarkUpdate.hpp"
+#include "logging.h"
 #include "NodeBookmark.h"
 #include "StorageAccess.h"
 #include "StorageEdge.h"
 #include "TabId.h"
-#include "logging.h"
+#include "type/bookmark/MessageBookmarkButtonState.h"
+#include "type/bookmark/MessageBookmarkUpdate.hpp"
+#include "type/graph/MessageActivateEdge.h"
+#include "type/graph/MessageActivateNodes.h"
 #include "utility.h"
 #include "utilityString.h"
 
@@ -23,8 +23,7 @@ const std::wstring BookmarkController::sEdgeSeparatorToken = L" => ";
 const std::wstring BookmarkController::sDefaultCategoryName = L"default";
 
 BookmarkController::BookmarkController(StorageAccess* storageAccess)
-    : mStorageAccess(storageAccess)
-    , mBookmarkCache(storageAccess) {
+    : mStorageAccess(storageAccess), mBookmarkCache(storageAccess) {
   assert(storageAccess != nullptr);
 }
 

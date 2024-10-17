@@ -11,11 +11,11 @@
 #include "../../../scheduling/TaskGroupParallel.h"
 #include "../../../scheduling/TaskGroupSequence.h"
 #include "../../../scheduling/TaskLambda.h"
+#include "logging.h"
 #include "MessageBase.h"
 #include "MessageFilter.h"
 #include "MessageListenerBase.h"
 #include "TabId.h"
-#include "logging.h"
 
 IMessageQueue::Ptr IMessageQueue::sInstance;
 
@@ -28,7 +28,7 @@ MessageQueue::~MessageQueue() noexcept {
   mListeners.clear();
 }
 
-void MessageQueue::registerListener(MessageListenerBase* listener) noexcept{
+void MessageQueue::registerListener(MessageListenerBase* listener) noexcept {
   std::scoped_lock<std::mutex> lock(mListenersMutex);
   if(ranges::find(mListeners, listener) != mListeners.end()) {
     return;
@@ -235,4 +235,4 @@ void MessageQueue::sendMessageAsTask(const std::shared_ptr<MessageBase>& message
     Task::dispatch(schedulerId, taskGroup);
   }
 }
-}
+}    // namespace details

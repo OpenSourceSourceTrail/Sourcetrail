@@ -7,12 +7,12 @@
 #include <type_traits>
 #include <windows.h>
 
-#include "AppPath.h"
 #include "Application.h"
+#include "AppPath.h"
 #include "FileSystem.h"
+#include "logging.h"
 #include "ResourcePaths.h"
 #include "UserPaths.h"
-#include "logging.h"
 #include "utility.h"
 #include "utilityApp.h"
 
@@ -58,7 +58,7 @@ void setupApp([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
       } else {
         userDataPath = AppPath::getSharedDataDirectoryPath().concatenate(L"user_fallback/");
         LOG_ERROR_W(L"The \"%LOCALAPPDATA%\" path could not be found. Falling back to \"" + userDataPath.wstr() +
-                  L"\" to store settings data.");
+                    L"\" to store settings data.");
         FileSystem::createDirectory(userDataPath);
       }
     }

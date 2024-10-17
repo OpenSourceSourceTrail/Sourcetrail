@@ -8,9 +8,9 @@
 #include <QDir>
 #include <QUrl>
 
+#include "logging.h"
 #include "type/history/MessageHistoryRedo.h"
 #include "type/history/MessageHistoryUndo.h"
-#include "logging.h"
 
 QtContextMenu* QtContextMenu::s_instance = nullptr;
 
