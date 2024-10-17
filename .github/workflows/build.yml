@@ -19,6 +19,7 @@ jobs:
 
         with:
           clang-format-version: '18'
+          fallback-style: 'Google'
 
   cmake-format:
     runs-on: ubuntu-22.04
