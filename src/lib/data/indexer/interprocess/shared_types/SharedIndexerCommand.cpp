@@ -13,7 +13,7 @@ void SharedIndexerCommand::fromLocal(IndexerCommand* indexerCommand) {
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
   if(dynamic_cast<IndexerCommandCxx*>(indexerCommand) != nullptr) {
-    IndexerCommandCxx* cmd = dynamic_cast<IndexerCommandCxx*>(indexerCommand);
+    auto* cmd = dynamic_cast<IndexerCommandCxx*>(indexerCommand);
 
     setType(CXX);
     setIndexedPaths(cmd->getIndexedPaths());
@@ -63,7 +63,7 @@ SharedIndexerCommand::SharedIndexerCommand(SharedMemory::Allocator* allocator)
 {
 }
 
-SharedIndexerCommand::~SharedIndexerCommand() {}
+SharedIndexerCommand::~SharedIndexerCommand() = default;
 
 FilePath SharedIndexerCommand::getSourceFilePath() const {
   return FilePath(utility::decodeFromUtf8(m_sourceFilePath.c_str()));
@@ -98,8 +98,8 @@ void SharedIndexerCommand::setIndexedPaths(const std::set<FilePath>& indexedPath
 std::set<FilePathFilter> SharedIndexerCommand::getExcludeFilters() const {
   std::set<FilePathFilter> result;
 
-  for(unsigned int i = 0; i < m_excludeFilters.size(); i++) {
-    result.insert(FilePathFilter(utility::decodeFromUtf8(m_excludeFilters[i].c_str())));
+  for(const auto& m_excludeFilter : m_excludeFilters) {
+    result.insert(FilePathFilter(utility::decodeFromUtf8(m_excludeFilter.c_str())));
   }
 
   return result;
@@ -118,8 +118,8 @@ void SharedIndexerCommand::setExcludeFilters(const std::set<FilePathFilter>& exc
 std::set<FilePathFilter> SharedIndexerCommand::getIncludeFilters() const {
   std::set<FilePathFilter> result;
 
-  for(unsigned int i = 0; i < m_includeFilters.size(); i++) {
-    result.insert(FilePathFilter(utility::decodeFromUtf8(m_includeFilters[i].c_str())));
+  for(const auto& m_includeFilter : m_includeFilters) {
+    result.insert(FilePathFilter(utility::decodeFromUtf8(m_includeFilter.c_str())));
   }
 
   return result;
@@ -147,8 +147,8 @@ std::vector<std::wstring> SharedIndexerCommand::getCompilerFlags() const {
   std::vector<std::wstring> result;
   result.reserve(m_compilerFlags.size());
 
-  for(unsigned int i = 0; i < m_compilerFlags.size(); i++) {
-    result.push_back(utility::decodeFromUtf8(m_compilerFlags[i].c_str()));
+  for(const auto& m_compilerFlag : m_compilerFlags) {
+    result.push_back(utility::decodeFromUtf8(m_compilerFlag.c_str()));
   }
 
   return result;

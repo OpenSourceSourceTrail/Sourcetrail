@@ -1,5 +1,4 @@
-#ifndef BASE_INTERPROCESS_DATA_MANAGER_H
-#define BASE_INTERPROCESS_DATA_MANAGER_H
+#pragma once
 
 #include <string>
 
@@ -8,21 +7,16 @@
 
 class BaseInterprocessDataManager {
 public:
-  BaseInterprocessDataManager(const std::string& sharedMemoryName,
-                              size_t initialSharedMemorySize,
-                              const std::string& instanceUuid,
-                              Id processId,
-                              bool isOwner);
+  BaseInterprocessDataManager(
+      const std::string& sharedMemoryName, size_t initialSharedMemorySize, std::string instanceUuid, Id processId, bool isOwner);
 
   virtual ~BaseInterprocessDataManager() = default;
 
-  Id getProcessId() const;
+  [[nodiscard]] Id getProcessId() const;
 
 protected:
-  SharedMemory m_sharedMemory;
+  SharedMemory mSharedMemory;
 
-  const std::string m_instanceUuid;
-  const Id m_processId;
+  const std::string mInstanceUuid;
+  const Id mProcessId;
 };
-
-#endif    // BASE_INTERPROCESS_DATA_MANAGER_H

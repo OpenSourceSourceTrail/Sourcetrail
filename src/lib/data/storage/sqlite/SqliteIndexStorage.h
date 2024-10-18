@@ -34,11 +34,11 @@ public:
 
   enum StorageModeType { STORAGE_MODE_READ = 1, STORAGE_MODE_WRITE = 2, STORAGE_MODE_CLEAR = 4 };
 
-  SqliteIndexStorage(const FilePath& dbFilePath);
+  explicit SqliteIndexStorage(const FilePath& dbFilePath);
 
-  virtual size_t getStaticVersion() const;
+  size_t getStaticVersion() const override;
 
-  void setMode(const StorageModeType mode);
+  void setMode(StorageModeType mode);
 
   std::string getProjectSettingsText() const;
   void setProjectSettingsText(std::string text);
@@ -140,7 +140,7 @@ public:
 
   template <typename ResultType>
   std::vector<ResultType> getAllByIds(const std::vector<Id>& ids) const {
-    if(ids.size()) {
+    if(!ids.empty()) {
       return doGetAll<ResultType>("WHERE id IN (" + utility::join(utility::toStrings(ids), ',') + ")");
     }
     return std::vector<ResultType>();
@@ -157,8 +157,8 @@ public:
   }
 
   template <typename StorageType>
-  void forEachByIds(const std::vector<Id> ids, std::function<void(StorageType&&)> func) const {
-    if(ids.size()) {
+  void forEachByIds(const std::vector<Id>& ids, std::function<void(StorageType&&)> func) const {
+    if(!ids.empty()) {
       forEach("WHERE id IN (" + utility::join(utility::toStrings(ids), ',') + ")", func);
     }
   }
@@ -172,7 +172,7 @@ public:
   int getErrorCount() const;
 
 private:
-  static const size_t s_storageVersion;
+  static const size_t sStorageVersion;
 
   struct TempSourceLocation {
     TempSourceLocation(uint32_t startLine_, uint16_t lineDiff_, uint16_t startCol_, uint16_t endCol_, uint8_t type_)
@@ -201,9 +201,9 @@ private:
 
   std::vector<std::pair<int, SqliteDatabaseIndex>> getIndices() const;
 
-  virtual void clearTables();
-  virtual void setupTables();
-  virtual void setupPrecompiledStatements();
+  void clearTables() override;
+  void setupTables() override;
+  void setupPrecompiledStatements() override;
 
   template <typename ResultType>
   std::vector<ResultType> doGetAll(const std::string& query) const {
@@ -215,7 +215,7 @@ private:
   template <typename ResultType>
   ResultType doGetFirst(const std::string& query) const {
     std::vector<ResultType> results = doGetAll<ResultType>(query + " LIMIT 1");
-    if(results.size() > 0) {
+    if(!results.empty()) {
       return results[0];
     }
     return ResultType();
@@ -234,7 +234,7 @@ private:
   template <typename StorageType>
   class InsertBatchStatement {
   public:
-    void compile(const std::string header,
+    void compile(const std::string& header,
                  size_t valueCount,
                  std::function<void(CppSQLite3Statement& stmt, const StorageType&, size_t)> bindValuesFunc,
                  CppSQLite3DB& database) {
@@ -257,7 +257,7 @@ private:
         }
         stmt << ';';
 
-        m_stmts.emplace_back(std::make_pair(batchSize, database.compileStatement(stmt.str().c_str())));
+        m_stmts.emplace_back(batchSize, database.compileStatement(stmt.str().c_str()));
 
         if(batchSize == 1) {
           break;

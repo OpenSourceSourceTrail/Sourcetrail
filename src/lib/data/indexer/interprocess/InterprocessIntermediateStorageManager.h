@@ -1,5 +1,4 @@
-#ifndef INTERPROCESS_INTERMEDIATE_STORAGE_MANAGER_H
-#define INTERPROCESS_INTERMEDIATE_STORAGE_MANAGER_H
+#pragma once
 
 #include "BaseInterprocessDataManager.h"
 
@@ -8,7 +7,7 @@ class IntermediateStorage;
 class InterprocessIntermediateStorageManager : public BaseInterprocessDataManager {
 public:
   InterprocessIntermediateStorageManager(const std::string& instanceUuid, Id processId, bool isOwner);
-  virtual ~InterprocessIntermediateStorageManager() = default;
+  ~InterprocessIntermediateStorageManager() override;
 
   void pushIntermediateStorage(const std::shared_ptr<IntermediateStorage>& intermediateStorage);
   std::shared_ptr<IntermediateStorage> popIntermediateStorage();
@@ -16,10 +15,8 @@ public:
   size_t getIntermediateStorageCount();
 
 private:
-  static const char* s_sharedMemoryNamePrefix;
-  static const char* s_intermediateStoragesKeyName;
+  static const char* sSharedMemoryNamePrefix;
+  static const char* sIntermediateStoragesKeyName;
 
-  size_t m_insertsWithoutGrowth;
+  size_t mInsertsWithoutGrowth = 0;
 };
-
-#endif    // INTERPROCESS_INTERMEDIATE_STORAGE_MANAGER_H

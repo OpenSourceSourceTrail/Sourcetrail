@@ -6,8 +6,10 @@
 
 Storage::Storage() = default;
 
+Storage::~Storage() = default;
+
 void Storage::inject(Storage* injected) {
-  std::lock_guard<std::mutex> lock(m_dataMutex);
+  std::lock_guard<std::mutex> lock(mDataMutex);
 
   std::map<Id, Id> injectedIdToOwnElementId;
   std::map<Id, Id> injectedIdToOwnSourceLocationId;
