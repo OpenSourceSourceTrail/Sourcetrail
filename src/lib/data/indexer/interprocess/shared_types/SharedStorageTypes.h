@@ -1,5 +1,4 @@
-#ifndef SHARED_STORAGE_TYPES_H
-#define SHARED_STORAGE_TYPES_H
+#pragma once
 
 #include "SharedMemory.h"
 #include "StorageComponentAccess.h"
@@ -146,5 +145,3 @@ inline StorageError fromShared(const SharedStorageError& error) {
                       error.fatal,
                       error.indexed);
 }
-
-#endif    // SHARED_STORAGE_TYPES_H

@@ -1,5 +1,4 @@
-#ifndef SHARED_INTERMEDIATE_STORAGE_H
-#define SHARED_INTERMEDIATE_STORAGE_H
+#pragma once
 
 #include <set>
 #include <vector>
@@ -43,19 +42,17 @@ public:
   void setNextId(const Id nextId);
 
 private:
-  SharedMemory::Vector<SharedStorageFile> m_storageFiles;
-  SharedMemory::Vector<SharedStorageSymbol> m_storageSymbols;
-  SharedMemory::Vector<SharedStorageOccurrence> m_storageOccurrences;
-  SharedMemory::Vector<SharedStorageComponentAccess> m_storageComponentAccesses;
-  SharedMemory::Vector<SharedStorageNode> m_storageNodes;
-  SharedMemory::Vector<SharedStorageEdge> m_storageEdges;
-  SharedMemory::Vector<SharedStorageLocalSymbol> m_storageLocalSymbols;
-  SharedMemory::Vector<SharedStorageSourceLocation> m_storageSourceLocations;
-  SharedMemory::Vector<SharedStorageError> m_storageErrors;
+  SharedMemory::Vector<SharedStorageFile> mStorageFiles;
+  SharedMemory::Vector<SharedStorageSymbol> mStorageSymbols;
+  SharedMemory::Vector<SharedStorageOccurrence> mStorageOccurrences;
+  SharedMemory::Vector<SharedStorageComponentAccess> mStorageComponentAccesses;
+  SharedMemory::Vector<SharedStorageNode> mStorageNodes;
+  SharedMemory::Vector<SharedStorageEdge> mStorageEdges;
+  SharedMemory::Vector<SharedStorageLocalSymbol> mStorageLocalSymbols;
+  SharedMemory::Vector<SharedStorageSourceLocation> mStorageSourceLocations;
+  SharedMemory::Vector<SharedStorageError> mStorageErrors;
 
-  SharedMemory::Allocator* m_allocator;
+  SharedMemory::Allocator* mAllocator;
 
-  int m_nextId;
+  int mNextId;
 };
-
-#endif    // SHARED_INTERMEDIATE_STORAGE_H
