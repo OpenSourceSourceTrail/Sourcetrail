@@ -19,6 +19,7 @@ set(test_lib_names
     GraphViewStyleTestSuite # TODO(SOUR-97)
     HierarchyCacheTestSuite
     IndexerCompositeTestSuite
+    IntermediateStorageTestSuite
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite
     NetworkProtocolHelperTestSuite
