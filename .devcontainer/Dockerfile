@@ -7,6 +7,10 @@ RUN echo 'APT::Install-Suggests "0";' >> /etc/apt/apt.conf.d/00-docker && \
 # Set the ARG for non-interactive apt
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Remove existing Clang or LLVM installations
+RUN apt-get update && apt-get purge -y 'llvm-*' 'clang-*' \
+    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+
 # Install all dependencies in one step to reduce layers
 RUN apt-get update &&                                                    \
     apt-get install -y                                                   \
@@ -39,28 +43,25 @@ RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.24.0/cmake-3.2
     tar -xzf /tmp/cmake.tar.gz -C /usr/local --strip-components=1 &&                                                            \
     rm /tmp/cmake.tar.gz
 
-# Remove older version of Clang & LLVM specially 14
-RUN apt-get remove libclang-cpp14 libclang1-14 -y
-
-RUN apt remove --purge libllvm14 -y
-
-RUN ldconfig
-
 # Build Clang from source
-RUN wget -q https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-15.0.7.tar.gz -O /tmp/llvmorg-15.0.7.tar.gz && \
+RUN INSTALL_PREFIX="/opt/llvm-15.0.7" && \
+    wget -q https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-15.0.7.tar.gz -O /tmp/llvmorg-15.0.7.tar.gz && \
     tar -xzf /tmp/llvmorg-15.0.7.tar.gz -C /tmp/ &&                                                                       \
     cmake -G Ninja                                                                                                        \
           -DCMAKE_BUILD_TYPE=Release                                                                                      \
           -DLLVM_ENABLE_PROJECTS=clang                                                                                    \
           -DLLVM_ENABLE_RTTI=ON                                                                                           \
-          -DCLANG_LINK_CLANG_DYLIB=ON                                                                                     \
-          -DLLVM_LINK_LLVM_DYLIB=ON                                                                                       \
-          -DLLVM_BUILD_LLVM_DYLIB=ON                                                                                      \
           -DLLVM_TARGETS_TO_BUILD=host                                                                                    \
+          -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}                                                                        \
           /tmp/llvm-project-llvmorg-15.0.7/llvm -B /tmp/build &&                                                          \
     cmake --build /tmp/build &&                                                                                           \
     cmake --install /tmp/build &&                                                                                         \
     rm -rf /tmp/llvmorg-15.0.7.tar.gz /tmp/llvm-project-llvmorg-15.0.7 /tmp/build
+
+# Update environment variables
+ENV PATH="/opt/llvm-15.0.7/bin:$PATH"
+ENV LD_LIBRARY_PATH="/opt/llvm-15.0.7/lib:$LD_LIBRARY_PATH"
+ENV CMAKE_PREFIX_PATH="/opt/llvm-15.0.7:$CMAKE_PREFIX_PATH"
 
 # Install Python packages in one step
 RUN pip3 install --no-cache-dir conan==2.5.0 cmakelint gcovr

@@ -100,8 +100,7 @@ else()
   list(APPEND REQ_LLVM_LIBS "LLVMX86AsmParser")
 endif()
 
-# Should be CLANG_LINK_CLANG_DYLIB in future LLVM release
-if(LLVM_LINK_LLVM_DYLIB)
+if(CLANG_LINK_CLANG_DYLIB)
   set(CLANG_LIBRARIES clang-cpp)
 else()
   set(CLANG_LIBRARIES
