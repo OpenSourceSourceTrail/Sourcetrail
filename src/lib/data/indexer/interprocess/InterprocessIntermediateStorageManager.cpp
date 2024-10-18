@@ -4,19 +4,20 @@
 #include "logging.h"
 #include "SharedIntermediateStorage.h"
 
-const char* InterprocessIntermediateStorageManager::s_sharedMemoryNamePrefix = "iist_";
+const char* InterprocessIntermediateStorageManager::sSharedMemoryNamePrefix = "iist_";
 
-const char* InterprocessIntermediateStorageManager::s_intermediateStoragesKeyName = "intermediate_storages";
+const char* InterprocessIntermediateStorageManager::sIntermediateStoragesKeyName = "intermediate_storages";
 
 InterprocessIntermediateStorageManager::InterprocessIntermediateStorageManager(const std::string& instanceUuid,
                                                                                Id processId,
                                                                                bool isOwner)
-    : BaseInterprocessDataManager(s_sharedMemoryNamePrefix + std::to_string(processId) + "_" + instanceUuid,
+    : BaseInterprocessDataManager(sSharedMemoryNamePrefix + std::to_string(processId) + "_" + instanceUuid,
                                   3 * 1048576 /* 3 MB */,
                                   instanceUuid,
                                   processId,
-                                  isOwner)
-    , m_insertsWithoutGrowth(0) {}
+                                  isOwner) {}
+
+InterprocessIntermediateStorageManager::~InterprocessIntermediateStorageManager() = default;
 
 void InterprocessIntermediateStorageManager::pushIntermediateStorage(const std::shared_ptr<IntermediateStorage>& intermediateStorage) {
   const size_t requiredInsertsToShrink = 10;
@@ -26,7 +27,7 @@ void InterprocessIntermediateStorageManager::pushIntermediateStorage(const std::
           overestimationMultiplier +
       1048576 /* 1 MB */;
 
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
 
   const size_t freeMemory = access.getFreeMemorySize();
   if(freeMemory < requiredSize) {
@@ -42,13 +43,12 @@ void InterprocessIntermediateStorageManager::pushIntermediateStorage(const std::
 
     LOG_INFO("growing memory succeeded");
 
-    m_insertsWithoutGrowth = 0;
+    mInsertsWithoutGrowth = 0;
   } else {
-    m_insertsWithoutGrowth++;
+    mInsertsWithoutGrowth++;
   }
 
-  SharedMemory::Queue<SharedIntermediateStorage>* queue =
-      access.accessValueWithAllocator<SharedMemory::Queue<SharedIntermediateStorage>>(s_intermediateStoragesKeyName);
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIntermediateStorage>>(sIntermediateStoragesKeyName);
   if(!queue) {
     return;
   }
@@ -68,8 +68,8 @@ void InterprocessIntermediateStorageManager::pushIntermediateStorage(const std::
 
   storage.setNextId(intermediateStorage->getNextId());
 
-  if(m_insertsWithoutGrowth >= requiredInsertsToShrink) {
-    m_insertsWithoutGrowth = 0;
+  if(mInsertsWithoutGrowth >= requiredInsertsToShrink) {
+    mInsertsWithoutGrowth = 0;
 
     LOG_INFO("shrinking shared memory");
     access.shrinkToFitMemory();
@@ -80,11 +80,10 @@ void InterprocessIntermediateStorageManager::pushIntermediateStorage(const std::
 }
 
 std::shared_ptr<IntermediateStorage> InterprocessIntermediateStorageManager::popIntermediateStorage() {
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
 
-  SharedMemory::Queue<SharedIntermediateStorage>* queue =
-      access.accessValueWithAllocator<SharedMemory::Queue<SharedIntermediateStorage>>(s_intermediateStoragesKeyName);
-  if(!queue || !queue->size()) {
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIntermediateStorage>>(sIntermediateStoragesKeyName);
+  if(!queue || queue->empty()) {
     return nullptr;
   }
 
@@ -111,10 +110,9 @@ std::shared_ptr<IntermediateStorage> InterprocessIntermediateStorageManager::pop
 }
 
 size_t InterprocessIntermediateStorageManager::getIntermediateStorageCount() {
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
 
-  SharedMemory::Queue<SharedIntermediateStorage>* queue =
-      access.accessValueWithAllocator<SharedMemory::Queue<SharedIntermediateStorage>>(s_intermediateStoragesKeyName);
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIntermediateStorage>>(sIntermediateStoragesKeyName);
   if(!queue) {
     return 0;
   }

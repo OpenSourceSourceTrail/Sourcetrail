@@ -24,7 +24,7 @@ SqliteStorage::SqliteStorage(const FilePath& dbFilePath) : m_dbFilePath(dbFilePa
 SqliteStorage::~SqliteStorage() {
   try {
     m_database.close();
-  } catch(CppSQLite3Exception e) {
+  } catch(CppSQLite3Exception& e) {
     LOG_ERROR(e.errorMessage());
   }
 }

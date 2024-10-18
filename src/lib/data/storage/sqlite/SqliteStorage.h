@@ -1,5 +1,4 @@
-#ifndef SQLITE_STORAGE_H
-#define SQLITE_STORAGE_H
+#pragma once
 
 #include "CppSQLite3.h"
 #include "FilePath.h"
@@ -10,7 +9,7 @@ class TimeStamp;
 
 class SqliteStorage {
 public:
-  SqliteStorage(const FilePath& dbFilePath);
+  explicit SqliteStorage(const FilePath& dbFilePath);
   virtual ~SqliteStorage();
 
   void setup();
@@ -64,5 +63,3 @@ private:
 
   friend SqliteStorageMigration;
 };
-
-#endif    // SQLITE_STORAGE_H
