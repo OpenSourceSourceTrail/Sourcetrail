@@ -387,12 +387,12 @@ public:
    * @brief Set whether to use the error cache.
    * @param enabled True to enable the error cache, false to disable it.
    */
-  virtual void setUseErrorCache(bool enabled) {}
+  virtual void setUseErrorCache([[maybe_unused]] bool enabled) {}
 
   /**
    * @brief Add errors to the cache.
    * @param newErrors A vector of ErrorInfo objects representing the new errors to add.
    * @param errorCount An ErrorCountInfo object containing the updated error count.
    */
-  virtual void addErrorsToCache(const std::vector<ErrorInfo>& newErrors, const ErrorCountInfo& errorCount) {}
+  virtual void addErrorsToCache([[maybe_unused]] const std::vector<ErrorInfo>& newErrors, [[maybe_unused]] const ErrorCountInfo& errorCount) {}
 };
