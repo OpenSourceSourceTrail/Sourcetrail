@@ -1,9 +1,11 @@
 #pragma once
+
+#include <QVector4D>
+
 // internal
 #include "Edge.h"
 #include "TokenComponentBundledEdges.h"
 #include "types.h"
-#include "Vector4.h"
 
 class Edge;
 
@@ -54,7 +56,7 @@ struct DummyEdge {
   bool hidden = false;
   bool active = false;
 
-  std::vector<Vec4i> path;
+  std::vector<QVector4D> path;
 
   bool layoutHorizontal = true;
 

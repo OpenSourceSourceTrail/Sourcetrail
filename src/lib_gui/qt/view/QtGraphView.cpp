@@ -17,6 +17,7 @@
 #include "DummyNode.h"
 #include "GraphViewStyle.h"
 #include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "QtGraphEdge.h"
 #include "QtGraphicsView.h"
 #include "QtGraphNodeAccess.h"
@@ -328,8 +329,8 @@ void QtGraphView::rebuildGraph(std::shared_ptr<Graph> graph,
 
     // move graph to center
     QPointF center = itemsBoundingRect(m_nodes).center();
-    const Vec2i o = GraphViewStyle::alignOnRaster(Vec2i(static_cast<int>(center.x()), static_cast<int>(center.y())));
-    QPointF offset = QPointF(o.x, o.y);
+    const QVector2D o = GraphViewStyle::alignOnRaster({static_cast<float>(center.x()), static_cast<float>(center.y())});
+    QPointF offset = QPointF(o.x(), o.y());
     m_sceneRectOffset = offset - center;
 
     for(QtGraphNode* node : m_nodes) {
@@ -446,11 +447,11 @@ void QtGraphView::resizeView() {
   m_onQtThread([this]() { doResize(); });
 }
 
-Vec2i QtGraphView::getViewSize() const {
+QVector2D QtGraphView::getViewSize() const {
   QtGraphicsView* view = getView();
 
   const float zoomFactor = view->getZoomFactor();
-  return Vec2i(static_cast<int>((view->width() - 50) / zoomFactor), static_cast<int>((view->height() - 100) / zoomFactor));
+  return {static_cast<float>((view->width() - 50) / zoomFactor), static_cast<float>((view->height() - 100) / zoomFactor)};
 }
 
 GroupType QtGraphView::getGrouping() const {
@@ -465,7 +466,7 @@ GroupType QtGraphView::getGrouping() const {
 
 void QtGraphView::scrollToValues(int xValue, int yValue) {
   m_restoreScroll = true;
-  m_scrollValues = Vec2i(xValue, yValue);
+  m_scrollValues = {static_cast<float>(xValue), static_cast<float>(yValue)};
 }
 
 void QtGraphView::activateEdge(Id edgeId) {
@@ -543,7 +544,7 @@ QtGraphNode* QtGraphView::getActiveNode() const {
 void QtGraphView::ensureNodeVisible(QtGraphNode* node) {
   QtGraphicsView* view = getView();
 
-  Vec4i r = node->getBoundingRect();
+  QVector4D r = node->getBoundingRect();
   QRectF rect(r.x(), r.y(), r.z() - r.x(), r.w() - r.y());
 
   if(rect.width() > view->width() - 100) {
@@ -930,15 +931,15 @@ QtGraphEdge* QtGraphView::createEdge(QGraphicsView* view,
                                           edge->getDirection());
 
     if(trailMode != Graph::TRAIL_NONE) {
-      std::vector<Vec4i> path = edge->path;
+      std::vector<QVector4D> path = edge->path;
       for(size_t i = 0; i < path.size(); i++) {
-        path[i].x = static_cast<int>(path[i].x - pathOffset.x());
-        path[i].z = static_cast<int>(path[i].z - pathOffset.x());
-        path[i].y = static_cast<int>(path[i].y - pathOffset.y());
-        path[i].w = static_cast<int>(path[i].w - pathOffset.y());
+        path[i].setX(path[i].x() - pathOffset.x());
+        path[i].setZ(path[i].z() - pathOffset.x());
+        path[i].setY(path[i].y() - pathOffset.y());
+        path[i].setW(path[i].w() - pathOffset.y());
       }
 
-      for(const Vec4i& rect : path) {
+      for(const QVector4D& rect : path) {
         m_virtualNodeRects.push_back(QRectF(QPointF(rect.x(), rect.y()), QPointF(rect.z(), rect.w())));
       }
 
@@ -1012,10 +1013,10 @@ QRectF QtGraphView::getSceneRect(const std::list<QtGraphNode*>& items) const {
 void QtGraphView::centerNode(QtGraphNode* node) {
   QtGraphicsView* view = getView();
 
-  Vec2i pos = node->getPosition();
-  Vec2i size = node->getSize();
+  QVector2D pos = node->getPosition();
+  QVector2D size = node->getSize();
 
-  QRectF rect(pos.x, pos.y, size.x, size.y);
+  QRectF rect(pos.x(), pos.y(), size.x(), size.y());
 
   if(rect.height() > view->height() - 200) {
     rect.setHeight(view->height() - 200);

@@ -1,5 +1,7 @@
 #include "QtGraphNodeData.h"
 
+#include <QVector2D>
+
 #include "FilePath.h"
 #include "GraphFocusHandler.h"
 #include "ResourcePaths.h"
@@ -82,7 +84,7 @@ void QtGraphNodeData::hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/) {
   if(!m_isInteractive) {
     TooltipInfo info;
     info.title = getReadableNodeKindWString(m_data->getType().getKind());
-    info.offset = Vec2i(10, 20);
+    info.offset = {10, 20};
 
     if(!m_data->isDefined()) {
       info.title = L"non-indexed " + info.title;

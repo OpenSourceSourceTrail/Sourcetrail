@@ -2,10 +2,11 @@
 
 #include <vector>
 
+#include <QVector2D>
+
 #include "GroupType.h"
 #include "ScreenSearchInterfaces.h"
 #include "types.h"
-#include "Vector2.h"
 #include "View.h"
 
 struct DummyEdge;
@@ -44,7 +45,7 @@ public:
 
   virtual void resizeView() = 0;
 
-  [[nodiscard]] virtual Vec2i getViewSize() const = 0;
+  [[nodiscard]] virtual QVector2D getViewSize() const = 0;
   [[nodiscard]] virtual GroupType getGrouping() const = 0;
 
   virtual void scrollToValues(int xValue, int yValue) = 0;

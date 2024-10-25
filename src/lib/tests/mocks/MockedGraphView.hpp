@@ -19,7 +19,7 @@ struct MockedGraphView final : GraphView {
 
   MOCK_METHOD(void, resizeView, (), (override));
 
-  MOCK_METHOD(Vec2i, getViewSize, (), (const, override));
+  MOCK_METHOD(QVector2D, getViewSize, (), (const, override));
   MOCK_METHOD(GroupType, getGrouping, (), (const, override));
 
   MOCK_METHOD(void, scrollToValues, (int, int), (override));

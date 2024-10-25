@@ -75,14 +75,14 @@ void QtGraphNodeAccess::updateStyle() {
   m_text->setFont(font);
 
   if(m_accessIcon != nullptr) {
-    m_text->setPos(static_cast<qreal>(style.textOffset.x + m_accessIconSize + 3),
-                   static_cast<qreal>(style.textOffset.y + m_accessIconSize - static_cast<int>(style.fontSize)));
-    m_accessIcon->setPos(style.textOffset.x, style.textOffset.y);
+    m_text->setPos(static_cast<qreal>(style.textOffset.x() + m_accessIconSize + 3),
+                   static_cast<qreal>(style.textOffset.y() + m_accessIconSize - static_cast<int>(style.fontSize)));
+    m_accessIcon->setPos(style.textOffset.x(), style.textOffset.y());
 
     m_accessIcon->setPixmap(utility::colorizePixmap(m_accessIcon->pixmap(), style.color.icon.c_str()));
   } else {
-    m_text->setPos(static_cast<qreal>(style.textOffset.x),
-                   static_cast<qreal>(style.textOffset.y + m_accessIconSize + 2 - static_cast<int>(style.fontSize)));
+    m_text->setPos(static_cast<qreal>(style.textOffset.x()),
+                   static_cast<qreal>(style.textOffset.y() + m_accessIconSize + 2 - static_cast<int>(style.fontSize)));
   }
 }
 

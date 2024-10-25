@@ -378,12 +378,6 @@ add_files(
   utility/interprocess/details/SharedMemoryGarbageCollector.cpp
   utility/interprocess/details/SharedMemoryGarbageCollector.h
   # }
-  utility/math/Color.h
-  utility/math/MatrixBase.h
-  utility/math/MatrixDynamicBase.h
-  utility/math/Vector2.h
-  utility/math/Vector4.h
-  utility/math/VectorBase.h
   utility/migration/Migration.h
   utility/migration/Migrator.h)
 

@@ -1,8 +1,9 @@
 #ifndef QT_GRAPH_NODE_COMPONENT_MOVEABLE
 #define QT_GRAPH_NODE_COMPONENT_MOVEABLE
 
+#include <QVector2D>
+
 #include "QtGraphNodeComponent.h"
-#include "Vector2.h"
 
 class QtGraphNodeComponentMoveable : public QtGraphNodeComponent {
 public:
@@ -14,8 +15,8 @@ public:
   virtual void nodeMouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 private:
-  Vec2i m_mouseOffset;
-  Vec2i m_oldPos;
+  QVector2D m_mouseOffset;
+  QVector2D m_oldPos;
 };
 
 #endif    // QT_GRAPH_NODE_COMPONENT_MOVEABLE

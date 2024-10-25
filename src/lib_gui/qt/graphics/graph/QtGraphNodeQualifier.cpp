@@ -5,6 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QPen>
+#include <QVector2D>
 
 #include "NameHierarchy.h"
 #include "type/graph/MessageActivateNodes.h"
@@ -33,7 +34,7 @@ bool QtGraphNodeQualifier::isQualifierNode() const {
   return true;
 }
 
-bool QtGraphNodeQualifier::setPosition(const Vec2i& pos) {
+bool QtGraphNodeQualifier::setPosition(const QVector2D& pos) {
   const int width = QFontMetrics(m_name->font()).boundingRect(m_name->text()).width() + 10;
   const int height = QFontMetrics(m_name->font()).height() + 2;
   const int arrowWidth = static_cast<int>(height * 0.85);
@@ -41,24 +42,24 @@ bool QtGraphNodeQualifier::setPosition(const Vec2i& pos) {
   const float smallFactor = 0.5f;
   const int arrowOffset = static_cast<int>(arrowWidth * smallFactor);
 
-  m_background->setRect(pos.x - width - arrowWidth + arrowOffset, pos.y - height / 2, width, height);
+  m_background->setRect(pos.x() - width - arrowWidth + arrowOffset, pos.y() - height / 2, width, height);
 
-  m_name->setPos(pos.x - width - arrowWidth + arrowOffset + 6, pos.y - height / 2 + 1);
-  m_leftBorder->setRect(pos.x - width - arrowWidth + arrowOffset, pos.y - height / 2, 2, height);
+  m_name->setPos(pos.x() - width - arrowWidth + arrowOffset + 6, pos.y() - height / 2 + 1);
+  m_leftBorder->setRect(pos.x() - width - arrowWidth + arrowOffset, pos.y() - height / 2, 2, height);
 
   QPolygonF poly;
   poly.append(QPointF(-arrowWidth, -height / 2 - 0.5));
   poly.append(QPointF(-arrowWidth, height / 2 + 0.5));
   poly.append(QPointF(0, 0));
   m_rightArrow->setPolygon(poly);
-  m_rightArrow->setPos(pos.x + arrowOffset, pos.y);
+  m_rightArrow->setPos(pos.x() + arrowOffset, pos.y());
 
   QPolygonF polySmall;
   polySmall.append(QPointF(-arrowWidth * smallFactor, -height * smallFactor / 2));
   polySmall.append(QPointF(-arrowWidth * smallFactor, height * smallFactor / 2));
   polySmall.append(QPointF(0, 0));
   m_rightArrowSmall->setPolygon(polySmall);
-  m_rightArrowSmall->setPos(pos.x + arrowOffset + 1, pos.y);
+  m_rightArrowSmall->setPos(pos.x() + arrowOffset + 1, pos.y());
 
   m_pos = pos;
 
@@ -108,7 +109,7 @@ void QtGraphNodeQualifier::hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/) 
   const int arrowOffset = static_cast<int>(arrowWidth * smallFactor);
   const int offset = width + arrowWidth - arrowOffset;
 
-  setRect(m_pos.x - offset, m_pos.y - height / 2, width + arrowWidth, height);
+  setRect(m_pos.x() - offset, m_pos.y() - height / 2, width + arrowWidth, height);
 
   m_background->show();
   m_name->show();
@@ -136,7 +137,7 @@ void QtGraphNodeQualifier::hoverLeaveEvent(QGraphicsSceneHoverEvent* /*event*/) 
   const float smallFactor = 0.5f;
   const int arrowOffset = static_cast<int>(arrowWidth * smallFactor);
 
-  setRect(m_pos.x - arrowWidth + arrowOffset, m_pos.y - height / 2, arrowWidth, height);
+  setRect(m_pos.x() - arrowWidth + arrowOffset, m_pos.y() - height / 2, arrowWidth, height);
 
   m_background->hide();
   m_name->hide();

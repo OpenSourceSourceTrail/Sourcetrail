@@ -15,6 +15,7 @@ foreach(test_name IN LISTS test_lib_names)
     PUBLIC GTest::gtest
            GTest::gmock
            Qt5::Core
+           Qt5::Gui
            Sourcetrail::messaging
            Sourcetrail::gtest_main
            lib::mocks

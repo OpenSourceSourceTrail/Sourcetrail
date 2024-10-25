@@ -3,10 +3,10 @@
 #include <memory>
 
 #include <QGraphicsItem>
+#include <QVector2D>
+#include <QVector4D>
 
 #include "TokenComponentBundledEdges.h"
-#include "Vector2.h"
-#include "Vector4.h"
 
 class Edge;
 class GraphFocusHandler;
@@ -62,7 +62,7 @@ public:
   bool isExpandable() const;
 
   bool isTrailEdge() const;
-  void setIsTrailEdge(const std::vector<Vec4i>& path, bool horizontal);
+  void setIsTrailEdge(const std::vector<QVector4D>& path, bool horizontal);
 
   bool isBezierEdge() const;
   void setUseBezier(bool useBezier);
@@ -107,11 +107,11 @@ private:
   TokenComponentBundledEdges::Direction m_direction;
 
   bool m_isTrailEdge = false;
-  std::vector<Vec4i> m_path;
+  std::vector<QVector4D> m_path;
 
   bool m_useBezier = false;
   bool m_isInteractive = false;
 
-  Vec2i m_mousePos;
+  QVector2D m_mousePos;
   bool m_mouseMoved = false;
 };

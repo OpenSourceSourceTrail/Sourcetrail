@@ -4,6 +4,7 @@
 // Qt5
 #include <QGraphicsView>
 #include <QPointF>
+#include <QVector2D>
 // internal
 #include "Graph.h"
 #include "GraphFocusHandler.h"
@@ -58,7 +59,7 @@ public:
 
   void resizeView() override;
 
-  Vec2i getViewSize() const override;
+  QVector2D getViewSize() const override;
   GroupType getGrouping() const override;
 
   void scrollToValues(int xValue, int yValue) override;
@@ -156,7 +157,7 @@ private:
   bool m_centerActiveNode;
   bool m_scrollToTop;
   bool m_restoreScroll;
-  Vec2i m_scrollValues;
+  QVector2D m_scrollValues;
   bool m_isIndexedList;
 
   std::shared_ptr<QSequentialAnimationGroup> m_transition;

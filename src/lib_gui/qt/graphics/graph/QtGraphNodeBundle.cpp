@@ -2,6 +2,7 @@
 
 #include <QBrush>
 #include <QPen>
+#include <QVector2D>
 
 #include "GraphViewStyle.h"
 #include "QtCountCircleItem.h"
@@ -48,9 +49,9 @@ void QtGraphNodeBundle::updateStyle() {
   }
   setStyle(style);
 
-  Vec2f pos(static_cast<float>(m_rect->rect().right()), static_cast<float>(m_rect->rect().top() - 2));
+  QVector2D pos(static_cast<float>(m_rect->rect().right()), static_cast<float>(m_rect->rect().top() - 2));
   if(m_type.getNodeStyle() == NodeType::STYLE_BIG_NODE) {
-    pos += Vec2f(-2, 2);
+    pos += {-2, 2};
   }
   m_circle->setPosition(pos);
 

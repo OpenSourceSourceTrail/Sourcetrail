@@ -5,6 +5,8 @@
 #include <set>
 #include <vector>
 
+#include <QVector2D>
+
 #include "DummyEdge.h"
 #include "DummyNode.h"
 
@@ -28,8 +30,8 @@ private:
     int level;
     std::wstring name;
 
-    Vec2i pos;
-    Vec2i size;
+    QVector2D pos;
+    QVector2D size;
 
     std::set<TrailEdge*> incomingEdges;
     std::set<TrailEdge*> outgoingEdges;

@@ -1,5 +1,7 @@
 #include "GraphFocusHandler.h"
 
+#include <QVector2D>
+
 #include "QtGraphEdge.h"
 #include "QtGraphNode.h"
 #include "type/focus/MessageFocusChanged.h"
@@ -357,8 +359,8 @@ QtGraphNode* GraphFocusHandler::findChildNodeRecursive(const std::list<QtGraphNo
 
 QtGraphNode* GraphFocusHandler::findSibling(const QtGraphNode* node, Direction direction) {
   QtGraphNode* nextSibling = nullptr;
-  Vec2i pos = node->getPosition();
-  Vec4i rect = node->getBoundingRect();
+  QVector2D pos = node->getPosition();
+  QVector4D rect = node->getBoundingRect();
   int minDist = 0;
 
   for(auto siblings : getSiblingsHierarchyRecursive(node)) {
@@ -367,7 +369,7 @@ QtGraphNode* GraphFocusHandler::findSibling(const QtGraphNode* node, Direction d
         continue;
       }
 
-      Vec4i rectS = sibling->getBoundingRect();
+      QVector4D rectS = sibling->getBoundingRect();
 
       const bool top = rectS.w() < rect.y();
       const bool bottom = rectS.y() > rect.w();

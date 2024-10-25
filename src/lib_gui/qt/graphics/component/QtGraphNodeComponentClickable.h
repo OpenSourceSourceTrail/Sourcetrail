@@ -1,8 +1,9 @@
 #ifndef QT_GRAPH_NODE_COMPONENT_CLICKABLE
 #define QT_GRAPH_NODE_COMPONENT_CLICKABLE
 
+#include <QVector2D>
+
 #include "QtGraphNodeComponent.h"
-#include "Vector2.h"
 
 class QtGraphNodeComponentClickable : public QtGraphNodeComponent {
 public:
@@ -14,7 +15,7 @@ public:
   virtual void nodeMouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 
 private:
-  Vec2i m_mousePos;
+  QVector2D m_mousePos;
   bool m_mouseMoved;
 };
 

@@ -1,5 +1,8 @@
 #include "QtGraphNode.h"
 
+#include <cmath>
+#include <limits>
+
 #include <QBrush>
 #include <QCursor>
 #include <QFont>
@@ -95,17 +98,18 @@ const std::list<QtGraphNode*>& QtGraphNode::getSubNodes() const {
   return m_subNodes;
 }
 
-Vec2i QtGraphNode::getPosition() const {
-  return Vec2i(static_cast<int>(this->scenePos().x()), static_cast<int>(this->scenePos().y()));
+QVector2D QtGraphNode::getPosition() const {
+  return {static_cast<float>(this->scenePos().x()), static_cast<float>(this->scenePos().y())};
 }
 
-bool QtGraphNode::setPosition(const Vec2i& position) {
-  Vec2i currentPosition = getPosition();
-  Vec2i offset = position - currentPosition;
+bool QtGraphNode::setPosition(const QVector2D& position) {
+  QVector2D currentPosition = getPosition();
+  QVector2D offset = position - currentPosition;
 
-  if(offset.x != 0 || offset.y != 0) {
-    this->moveBy(offset.x, offset.y);
-    setColumnSize(Vec2i());
+  if(std::fabs(offset.x()) >= std::numeric_limits<float>::epsilon() ||
+     std::fabs(offset.y()) >= std::numeric_limits<float>::epsilon()) {
+    this->moveBy(offset.x(), offset.y());
+    setColumnSize({});
     notifyEdgesAfterMove();
     return true;
   }
@@ -113,38 +117,38 @@ bool QtGraphNode::setPosition(const Vec2i& position) {
   return false;
 }
 
-const Vec2i& QtGraphNode::getSize() const {
+const QVector2D& QtGraphNode::getSize() const {
   return m_size;
 }
 
-void QtGraphNode::setSize(const Vec2i& size) {
+void QtGraphNode::setSize(const QVector2D& size) {
   m_size = size;
 
-  this->setRect(0, 0, size.x, size.y);
-  m_rect->setRect(0, 0, size.x, size.y);
-  m_undefinedRect->setRect(1, 1, size.x - 2, size.y - 2);
+  this->setRect(0, 0, size.x(), size.y());
+  m_rect->setRect(0, 0, size.x(), size.y());
+  m_undefinedRect->setRect(1, 1, size.x() - 2, size.y() - 2);
 }
 
-const Vec2i& QtGraphNode::getColumnSize() const {
+const QVector2D& QtGraphNode::getColumnSize() const {
   return m_columnSize;
 }
 
-void QtGraphNode::setColumnSize(const Vec2i& size) {
+void QtGraphNode::setColumnSize(const QVector2D& size) {
   m_columnSize = size;
 }
 
 QSize QtGraphNode::size() const {
-  return QSize(m_size.x, m_size.y);
+  return QSize(m_size.x(), m_size.y());
 }
 
 void QtGraphNode::setSize(QSize size) {
-  setSize(Vec2i(size.width(), size.height()));
+  setSize(QVector2D{static_cast<float>(size.width()), static_cast<float>(size.height())});
 }
 
-Vec4i QtGraphNode::getBoundingRect() const {
-  Vec2i pos = getPosition();
-  Vec2i size = getSize();
-  return Vec4i(pos.x, pos.y, pos.x + size.x, pos.y + size.y);
+QVector4D QtGraphNode::getBoundingRect() const {
+  QVector2D pos = getPosition();
+  QVector2D size = getSize();
+  return {pos.x(), pos.y(), pos.x() + size.x(), pos.y() + size.y()};
 }
 
 void QtGraphNode::addOutEdge(QtGraphEdge* edge) {
@@ -362,7 +366,7 @@ void QtGraphNode::addSubNode(QtGraphNode* node) {
   }
 }
 
-void QtGraphNode::moved(const Vec2i& oldPosition) {
+void QtGraphNode::moved(const QVector2D& oldPosition) {
   setPosition(GraphViewStyle::alignOnRaster(getPosition()));
 
   if(isDataNode() || isGroupNode() || isBundleNode()) {
@@ -542,7 +546,7 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style) {
     m_icon = new QGraphicsPixmapItem(utility::colorizePixmap(pixmap.pixmap(), style.color.icon.c_str()), this);
     m_icon->setTransformationMode(Qt::SmoothTransformation);
     m_icon->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    m_icon->setPos(style.iconOffset.x, style.iconOffset.y);
+    m_icon->setPos(style.iconOffset.x(), style.iconOffset.y());
   }
 
   QFont font(style.fontName.c_str());
@@ -554,21 +558,21 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style) {
   m_text->setFont(font);
   m_text->setBrush(QBrush(style.color.text.c_str()));
   m_text->setPos(
-      static_cast<qreal>(style.iconOffset.x + style.iconSize + style.textOffset.x), static_cast<qreal>(style.textOffset.y));
+      static_cast<qreal>(style.iconOffset.x() + style.iconSize + style.textOffset.x()), static_cast<qreal>(style.textOffset.y()));
 
   if(m_matchLength) {
     GraphViewStyle::NodeColor color = GraphViewStyle::getScreenMatchColor(m_isActiveMatch);
 
     m_matchText->setFont(font);
     m_matchText->setBrush(QBrush(color.text.c_str()));
-    m_matchText->setPos(
-        static_cast<qreal>(style.iconOffset.x + style.iconSize + style.textOffset.x), static_cast<qreal>(style.textOffset.y));
+    m_matchText->setPos(static_cast<qreal>(style.iconOffset.x() + style.iconSize + style.textOffset.x()),
+                        static_cast<qreal>(style.textOffset.y()));
 
     const float charWidth = QFontMetrics(font).boundingRect(QStringLiteral("QtGraphNode::QtGraphNode::QtGraphNode")).width() /
         37.0f;
     const float charHeight = static_cast<float>(QFontMetrics(font).height());
-    m_matchRect->setRect(static_cast<qreal>(style.iconOffset.x + style.iconSize + style.textOffset.x + m_matchPos * charWidth),
-                         static_cast<qreal>(style.textOffset.y),
+    m_matchRect->setRect(static_cast<qreal>(style.iconOffset.x() + style.iconSize + style.textOffset.x() + m_matchPos * charWidth),
+                         static_cast<qreal>(style.textOffset.y()),
                          static_cast<qreal>(m_matchLength * charWidth),
                          static_cast<qreal>(charHeight));
     m_matchRect->setPen(QPen(color.border.c_str()));

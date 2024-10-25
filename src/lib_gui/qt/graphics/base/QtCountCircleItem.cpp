@@ -21,16 +21,16 @@ QtCountCircleItem::QtCountCircleItem(QGraphicsItem* parent) : QtRoundedRectItem(
 
 QtCountCircleItem::~QtCountCircleItem() {}
 
-void QtCountCircleItem::setPosition(const Vec2f& pos) {
+void QtCountCircleItem::setPosition(const QVector2D& pos) {
   qreal width = QFontMetrics(m_number->font()).boundingRect(m_number->text()).width();
   qreal height = QFontMetrics(m_number->font()).height();
 
   this->setRadius(height / 2 + 1);
-  this->setRect(pos.x - std::max(width / 2.0 + 4.0, height / 2.0 + 1.0),
-                pos.y - height / 2.0 - 1.0,
+  this->setRect(pos.x() - std::max(width / 2.0 + 4.0, height / 2.0 + 1.0),
+                pos.y() - height / 2.0 - 1.0,
                 std::max(width + 8.0, height + 2.0),
                 height + 2);
-  m_number->setPos(pos.x - width / 2.0, pos.y - height / 2.0);
+  m_number->setPos(pos.x() - width / 2.0, pos.y() - height / 2.0);
 }
 
 void QtCountCircleItem::setNumber(size_t number) {
@@ -38,7 +38,7 @@ void QtCountCircleItem::setNumber(size_t number) {
   m_number->setText(numberStr);
 
   const QPointF center = this->rect().center();
-  this->setPosition(Vec2f(static_cast<float>(center.x()), static_cast<float>(center.y())));
+  this->setPosition({static_cast<float>(center.x()), static_cast<float>(center.y())});
 }
 
 void QtCountCircleItem::setStyle(QColor color, QColor fontColor, QColor borderColor, size_t borderWidth) {
