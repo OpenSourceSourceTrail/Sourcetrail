@@ -24,12 +24,12 @@ std::map<std::string, GraphViewStyle::NodeColor> GraphViewStyle::s_nodeColors;
 std::map<std::string, std::string> GraphViewStyle::s_edgeColors;
 std::map<bool, GraphViewStyle::NodeColor> GraphViewStyle::s_screenMatchColors;
 
-Vec2i GraphViewStyle::alignOnRaster(Vec2i position) {
+QVector2D GraphViewStyle::alignOnRaster(QVector2D position) {
   int rasterPosDivisor = s_gridCellSize + s_gridCellPadding;
 
-  if(position.x % rasterPosDivisor != 0) {
-    int t = position.x / rasterPosDivisor;
-    int r = position.x % rasterPosDivisor;
+  if(static_cast<int>(position.x()) % rasterPosDivisor != 0) {
+    int t = position.x() / rasterPosDivisor;
+    int r = static_cast<int>(position.x()) % rasterPosDivisor;
 
     if(std::abs(r) > rasterPosDivisor / 2) {
       if(t != 0) {
@@ -39,12 +39,12 @@ Vec2i GraphViewStyle::alignOnRaster(Vec2i position) {
       }
     }
 
-    position.x = t * rasterPosDivisor;
+    position.setX(t * rasterPosDivisor);
   }
 
-  if(position.y % rasterPosDivisor != 0) {
-    int t = position.y / rasterPosDivisor;
-    int r = position.y % rasterPosDivisor;
+  if(static_cast<int>(position.y()) % rasterPosDivisor != 0) {
+    int t = position.y() / rasterPosDivisor;
+    int r = static_cast<int>(position.y()) % rasterPosDivisor;
 
     if(std::abs(r) > rasterPosDivisor / 2) {
       if(t != 0) {
@@ -54,7 +54,7 @@ Vec2i GraphViewStyle::alignOnRaster(Vec2i position) {
       }
     }
 
-    position.y = t * rasterPosDivisor;
+    position.setY(t * rasterPosDivisor);
   }
 
   return position;
@@ -348,26 +348,26 @@ GraphViewStyle::NodeStyle GraphViewStyle::getStyleForNodeType(NodeType::StyleTyp
   case NodeType::STYLE_PACKAGE:
   case NodeType::STYLE_GROUP:
     style.cornerRadius = 0;
-    style.textOffset.x = 5;
-    style.textOffset.y = 3;
+    style.textOffset.setX(5);
+    style.textOffset.setY(3);
     break;
 
   case NodeType::STYLE_BIG_NODE:
     if(hasChildren) {
       style.cornerRadius = 20;
-      style.textOffset.x = 10;
-      style.textOffset.y = 8;
+      style.textOffset.setX(10);
+      style.textOffset.setY(8);
     } else {
       style.cornerRadius = 10;
-      style.textOffset.x = 8;
-      style.textOffset.y = 8;
+      style.textOffset.setX(8);
+      style.textOffset.setY(8);
     }
     break;
 
   case NodeType::STYLE_SMALL_NODE:
     style.cornerRadius = 8;
-    style.textOffset.x = 5;
-    style.textOffset.y = 3;
+    style.textOffset.setX(5);
+    style.textOffset.setY(3);
     break;
   }
 
@@ -377,27 +377,27 @@ GraphViewStyle::NodeStyle GraphViewStyle::getStyleForNodeType(NodeType::StyleTyp
     style.iconPath = iconPath;
     if(type == NodeType::STYLE_PACKAGE) {
       style.iconSize = static_cast<size_t>(s_fontSize - 4);
-      style.iconOffset.x = -1;
-      style.iconOffset.y = 5;
+      style.iconOffset.setX(-1);
+      style.iconOffset.setY(5);
     } else {
       style.iconSize = static_cast<size_t>(s_fontSize + 2);
 
       if(hasChildren) {
-        style.iconOffset.x = 11;
-        style.textOffset.x = 6;
+        style.iconOffset.setX(11);
+        style.textOffset.setX(6);
       } else {
-        style.iconOffset.x = 9;
+        style.iconOffset.setX(9);
       }
 
-      style.iconOffset.y = 9;
+      style.iconOffset.setY(9);
     }
   }
 
   if(hasQualifier) {
     if(!style.iconPath.empty()) {
-      style.iconOffset.x = style.iconOffset.x + 5;
+      style.iconOffset.setX(style.iconOffset.x() + 5);
     } else {
-      style.textOffset.x = style.textOffset.x + 5;
+      style.textOffset.setX(style.textOffset.x() + 5);
     }
   }
 
@@ -420,8 +420,8 @@ GraphViewStyle::NodeStyle GraphViewStyle::getStyleOfAccessNode() {
   style.fontSize = getFontSizeOfAccessNode();
   style.fontBold = true;
 
-  style.textOffset.x = 10;
-  style.textOffset.y = 10;
+  style.textOffset.setX(10);
+  style.textOffset.setY(10);
 
   return style;
 }
@@ -480,7 +480,7 @@ GraphViewStyle::NodeStyle GraphViewStyle::getStyleOfTextNode(int fontSizeDiff) {
   style.fontSize = getFontSizeOfTextNode(fontSizeDiff);
   style.fontBold = true;
 
-  style.textOffset.y = 10;
+  style.textOffset.setY(10);
 
   return style;
 }
@@ -514,8 +514,8 @@ GraphViewStyle::NodeStyle GraphViewStyle::getStyleOfGroupNode(GroupType type, bo
   style.fontSize = getFontSizeOfGroupNode();
   style.fontBold = true;
 
-  style.textOffset.x = 12;
-  style.textOffset.y = 5;
+  style.textOffset.setX(12);
+  style.textOffset.setY(5);
 
   return style;
 }
@@ -539,11 +539,11 @@ GraphViewStyle::EdgeStyle GraphViewStyle::getStyleForEdgeType(
   style.cornerRadius = 10;
   style.verticalOffset = 2;
 
-  style.originOffset.x = 17;
-  style.targetOffset.x = 17;
+  style.originOffset.setX(17);
+  style.targetOffset.setX(17);
 
-  style.originOffset.y = 5;
-  style.targetOffset.y = -5;
+  style.originOffset.setY(5);
+  style.targetOffset.setY(-5);
 
   if(isFocused) {
     style.color = getFocusColor();
@@ -556,17 +556,17 @@ GraphViewStyle::EdgeStyle GraphViewStyle::getStyleForEdgeType(
     style.width = 3;
     style.arrowLength = 7;
     style.arrowWidth = 10;
-    style.originOffset.x = 24;
-    style.targetOffset.x = 24;
-    style.originOffset.y = 0;
-    style.targetOffset.y = 0;
+    style.originOffset.setX(24);
+    style.targetOffset.setX(24);
+    style.originOffset.setY(0);
+    style.targetOffset.setY(0);
     style.verticalOffset = 0;
     style.zValue = active ? 1 : -5;
     break;
 
   case Edge::EDGE_CALL:
-    style.originOffset.y = 3;
-    style.targetOffset.y = -3;
+    style.originOffset.setY(3);
+    style.targetOffset.setY(-3);
     style.verticalOffset = 4;
 
     if(isTrailEdge && isActive) {
@@ -577,8 +577,8 @@ GraphViewStyle::EdgeStyle GraphViewStyle::getStyleForEdgeType(
 
   case Edge::EDGE_USAGE:
   case Edge::EDGE_OVERRIDE:
-    style.originOffset.y = 1;
-    style.targetOffset.y = -1;
+    style.originOffset.setY(1);
+    style.targetOffset.setY(-1);
     style.verticalOffset = 6;
     break;
 
@@ -586,10 +586,10 @@ GraphViewStyle::EdgeStyle GraphViewStyle::getStyleForEdgeType(
     style.arrowLength = 17;
     style.arrowWidth = 14;
     style.arrowClosed = true;
-    style.originOffset.x = 7;
-    style.targetOffset.x = 34;
-    style.originOffset.y = 10;
-    style.targetOffset.y = -10;
+    style.originOffset.setX(7);
+    style.targetOffset.setX(34);
+    style.originOffset.setY(10);
+    style.targetOffset.setY(-10);
     style.verticalOffset = 0;
     style.cornerRadius = 7;
     style.zValue = active ? 2 : -3;
@@ -605,15 +605,15 @@ GraphViewStyle::EdgeStyle GraphViewStyle::getStyleForEdgeType(
     style.arrowLength = 10;
     style.arrowWidth = 13;
     style.arrowClosed = true;
-    style.targetOffset.x = 25;
+    style.targetOffset.setX(25);
     break;
 
   case Edge::EDGE_INCLUDE:
     style.zValue = active ? 2 : -3;
     [[fallthrough]];
   case Edge::EDGE_MACRO_USAGE:
-    style.originOffset.y = 0;
-    style.targetOffset.y = 0;
+    style.originOffset.setY(0);
+    style.targetOffset.setY(0);
     [[fallthrough]];
   default:
     break;

@@ -2,19 +2,21 @@
 // STL
 #include <map>
 #include <memory>
+
+#include <QVector2D>
+
 // internal
 #include "AccessKind.h"
 #include "Edge.h"
 #include "FilePath.h"
 #include "GroupType.h"
 #include "NodeType.h"
-#include "Vector2.h"
 
 class GraphViewStyleImpl;
 
 class GraphViewStyle {
 public:
-  static Vec2i alignOnRaster(Vec2i position);
+  static QVector2D alignOnRaster(QVector2D position);
 
   struct NodeMargins {
     NodeMargins();
@@ -62,10 +64,10 @@ public:
     size_t fontSize;
     bool fontBold;
 
-    Vec2i textOffset;
+    QVector2D textOffset;
 
     FilePath iconPath;
-    Vec2i iconOffset;
+    QVector2D iconOffset;
     size_t iconSize;
 
     bool hasHatching;
@@ -86,8 +88,8 @@ public:
     int cornerRadius;
     int verticalOffset;
 
-    Vec2i originOffset;
-    Vec2i targetOffset;
+    QVector2D originOffset;
+    QVector2D targetOffset;
 
     bool dashed;
   };

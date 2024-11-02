@@ -2,6 +2,7 @@
 
 #include <QGraphicsPolygonItem>
 #include <QGraphicsRectItem>
+#include <QVector2D>
 
 #include "NameHierarchy.h"
 #include "QtGraphNode.h"
@@ -15,7 +16,7 @@ public:
   // QtGraphNode implementation
   virtual bool isQualifierNode() const;
 
-  virtual bool setPosition(const Vec2i& pos);
+  virtual bool setPosition(const QVector2D& pos);
 
   virtual void onClick();
   virtual void updateStyle();
@@ -35,5 +36,5 @@ private:
   QGraphicsPolygonItem* m_rightArrowSmall;
   QGraphicsSimpleTextItem* m_name;
 
-  Vec2i m_pos;
+  QVector2D m_pos;
 };

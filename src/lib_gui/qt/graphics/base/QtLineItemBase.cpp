@@ -1,5 +1,7 @@
 #include "QtLineItemBase.h"
 
+#include <cmath>
+
 #include <QBrush>
 #include <QCursor>
 #include <QPen>
@@ -12,10 +14,10 @@ QtLineItemBase::QtLineItemBase(QGraphicsItem* parent)
 
 QtLineItemBase::~QtLineItemBase() {}
 
-void QtLineItemBase::updateLine(const Vec4i& ownerRect,
-                                const Vec4i& targetRect,
-                                const Vec4i& ownerParentRect,
-                                const Vec4i& targetParentRect,
+void QtLineItemBase::updateLine(const QVector4D& ownerRect,
+                                const QVector4D& targetRect,
+                                const QVector4D& ownerParentRect,
+                                const QVector4D& targetParentRect,
                                 const GraphViewStyle::EdgeStyle& style,
                                 size_t weight,
                                 bool showArrow) {
@@ -27,10 +29,10 @@ void QtLineItemBase::updateLine(const Vec4i& ownerRect,
   m_ownerParentRect = ownerParentRect;
   m_targetParentRect = targetParentRect;
 
-  m_ownerRect.x = m_ownerRect.x - 1;
-  m_ownerRect.z = m_ownerRect.z + 1;
-  m_targetRect.x = m_targetRect.x - 1;
-  m_targetRect.z = m_targetRect.z + 1;
+  m_ownerRect.setX(m_ownerRect.x() - 1);
+  m_ownerRect.setZ(m_ownerRect.z() + 1);
+  m_targetRect.setX(m_targetRect.x() - 1);
+  m_targetRect.setZ(m_targetRect.z() + 1);
 
   m_style = style;
   m_showArrow = showArrow;
@@ -62,19 +64,19 @@ QPolygon QtLineItemBase::getPath() const {
     return m_polygon;
   }
 
-  const Vec4i& oR = m_ownerRect;
-  const Vec4i& oPR = m_ownerParentRect;
-  const Vec4i& tR = m_targetRect;
-  const Vec4i& tPR = m_targetParentRect;
+  const QVector4D& oR = m_ownerRect;
+  const QVector4D& oPR = m_ownerParentRect;
+  const QVector4D& tR = m_targetRect;
+  const QVector4D& tPR = m_targetParentRect;
 
-  const Vec2i& oOff = m_style.originOffset;
-  const Vec2i& tOff = m_style.targetOffset;
+  const QVector2D& oOff = m_style.originOffset;
+  const QVector2D& tOff = m_style.targetOffset;
 
-  Vec2f oP[4];
-  getPivotPoints(oP, oR, oPR, oOff.y, false);
+  QVector2D oP[4];
+  getPivotPoints(oP, oR, oPR, oOff.y(), false);
 
-  Vec2f tP[4];
-  getPivotPoints(tP, tR, tPR, tOff.y, true);
+  QVector2D tP[4];
+  getPivotPoints(tP, tR, tPR, tOff.y(), true);
 
   int io = -1;
   int it = -1;
@@ -100,8 +102,8 @@ QPolygon QtLineItemBase::getPath() const {
           continue;
         }
 
-        Vec2f diff = oP[i] - tP[j];
-        float d = diff.getLength();
+        QVector2D diff = oP[i] - tP[j];
+        float d = diff.length();
         dists.emplace((i << 2) + j, d);
 
         if(dist < 0 || d < dist) {
@@ -114,45 +116,45 @@ QPolygon QtLineItemBase::getPath() const {
   }
 
   // start/end and offsetted start/end points
-  Vec2f o[4];
-  getPivotPoints(o, oR, oR, oOff.y, false);
+  QVector2D o[4];
+  getPivotPoints(o, oR, oR, oOff.y(), false);
 
-  Vec2f t[4];
-  getPivotPoints(t, tR, tR, tOff.y, true);
+  QVector2D t[4];
+  getPivotPoints(t, tR, tR, tOff.y(), true);
 
-  QPoint a(static_cast<int>(t[it].x), static_cast<int>(t[it].y));
-  QPoint d(static_cast<int>(o[io].x), static_cast<int>(o[io].y));
+  QPoint a(static_cast<int>(t[it].x()), static_cast<int>(t[it].y()));
+  QPoint d(static_cast<int>(o[io].x()), static_cast<int>(o[io].y()));
 
-  QPoint b(static_cast<int>(tP[it].x), static_cast<int>(tP[it].y));
-  QPoint c(static_cast<int>(oP[io].x), static_cast<int>(oP[io].y));
+  QPoint b(static_cast<int>(tP[it].x()), static_cast<int>(tP[it].y()));
+  QPoint c(static_cast<int>(oP[io].x()), static_cast<int>(oP[io].y()));
 
   switch(it) {
   case 0:
-    b.setY(b.y() - tOff.x);
+    b.setY(b.y() - tOff.x());
     break;
   case 1:
-    b.setX(b.x() + tOff.x);
+    b.setX(b.x() + tOff.x());
     break;
   case 2:
-    b.setY(b.y() + tOff.x);
+    b.setY(b.y() + tOff.x());
     break;
   case 3:
-    b.setX(b.x() - tOff.x);
+    b.setX(b.x() - tOff.x());
     break;
   }
 
   switch(io) {
   case 0:
-    c.setY(c.y() - oOff.x);
+    c.setY(c.y() - oOff.x());
     break;
   case 1:
-    c.setX(c.x() + oOff.x);
+    c.setX(c.x() + oOff.x());
     break;
   case 2:
-    c.setY(c.y() + oOff.x);
+    c.setY(c.y() + oOff.x());
     break;
   case 3:
-    c.setX(c.x() - oOff.x);
+    c.setX(c.x() - oOff.x());
     break;
   }
 
@@ -177,41 +179,41 @@ QPolygon QtLineItemBase::getPath() const {
       if(dist1 < dist2) {
         it = (it + 2) % 4;
 
-        a = QPoint(static_cast<int>(t[it].x), static_cast<int>(t[it].y));
-        b = QPoint(static_cast<int>(tP[it].x), static_cast<int>(tP[it].y));
+        a = QPoint(static_cast<int>(t[it].x()), static_cast<int>(t[it].y()));
+        b = QPoint(static_cast<int>(tP[it].x()), static_cast<int>(tP[it].y()));
 
         switch(it) {
         case 0:
-          b.setY(b.y() - tOff.x);
+          b.setY(b.y() - tOff.x());
           break;
         case 1:
-          b.setX(b.x() + tOff.x);
+          b.setX(b.x() + tOff.x());
           break;
         case 2:
-          b.setY(b.y() + tOff.x);
+          b.setY(b.y() + tOff.x());
           break;
         case 3:
-          b.setX(b.x() - tOff.x);
+          b.setX(b.x() - tOff.x());
           break;
         }
       } else {
         io = (io + 2) % 4;
 
-        d = QPoint(static_cast<int>(o[io].x), static_cast<int>(o[io].y));
-        c = QPoint(static_cast<int>(oP[io].x), static_cast<int>(oP[io].y));
+        d = QPoint(static_cast<int>(o[io].x()), static_cast<int>(o[io].y()));
+        c = QPoint(static_cast<int>(oP[io].x()), static_cast<int>(oP[io].y()));
 
         switch(io) {
         case 0:
-          c.setY(c.y() - oOff.x);
+          c.setY(c.y() - oOff.x());
           break;
         case 1:
-          c.setX(c.x() + oOff.x);
+          c.setX(c.x() + oOff.x());
           break;
         case 2:
-          c.setY(c.y() + oOff.x);
+          c.setY(c.y() + oOff.x());
           break;
         case 3:
-          c.setX(c.x() - oOff.x);
+          c.setX(c.x() - oOff.x());
           break;
         }
       }
@@ -351,12 +353,12 @@ void QtLineItemBase::drawArrow(const QPolygon& poly, QPainterPath* path, QPainte
   path->lineTo(tip);
 }
 
-void QtLineItemBase::getPivotPoints(Vec2f* p, const Vec4i& in, const Vec4i& out, int offset, bool /*target*/) const {
+void QtLineItemBase::getPivotPoints(QVector2D* p, const QVector4D& in, const QVector4D& out, int offset, bool /*target*/) const {
   float f = 1 / 2.f;
 
-  p[0] = Vec2f(static_cast<float>(in.x + (in.z - in.x) * f + offset), static_cast<float>(out.y));
-  p[2] = Vec2f(static_cast<float>(in.x + (in.z - in.x) * f + offset), static_cast<float>(out.w));
+  p[0] = {static_cast<float>(in.x() + (in.z() - in.x()) * f + offset), static_cast<float>(out.y())};
+  p[2] = {static_cast<float>(in.x() + (in.z() - in.x()) * f + offset), static_cast<float>(out.w())};
 
-  p[1] = Vec2f(static_cast<float>(out.z), static_cast<float>(in.y + (in.w - in.y) * f + offset));
-  p[3] = Vec2f(static_cast<float>(out.x), static_cast<float>(in.y + (in.w - in.y) * f + offset));
+  p[1] = {static_cast<float>(out.z()), static_cast<float>(in.y() + (in.w() - in.y()) * f + offset)};
+  p[3] = {static_cast<float>(out.x()), static_cast<float>(in.y() + (in.w() - in.y()) * f + offset)};
 }

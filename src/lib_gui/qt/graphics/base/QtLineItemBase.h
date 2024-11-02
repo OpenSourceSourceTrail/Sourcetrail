@@ -2,9 +2,10 @@
 #define QT_LINE_ITEM_BASE_H
 
 #include <QGraphicsItem>
+#include <QVector2D>
+#include <QVector4D>
 
 #include "GraphViewStyle.h"
-#include "Vector4.h"
 
 class QtLineItemBase : public QGraphicsLineItem {
 public:
@@ -13,10 +14,10 @@ public:
   QtLineItemBase(QGraphicsItem* parent);
   virtual ~QtLineItemBase();
 
-  void updateLine(const Vec4i& ownerRect,
-                  const Vec4i& targetRect,
-                  const Vec4i& ownerParentRect,
-                  const Vec4i& targetParentRect,
+  void updateLine(const QVector4D& ownerRect,
+                  const QVector4D& targetRect,
+                  const QVector4D& ownerParentRect,
+                  const QVector4D& targetParentRect,
                   const GraphViewStyle::EdgeStyle& style,
                   size_t weight,
                   bool showArrow);
@@ -34,7 +35,7 @@ protected:
   QRectF getArrowBoundingRect(const QPolygon& poly) const;
   void drawArrow(const QPolygon& poly, QPainterPath* path, QPainterPath* arrowPath = nullptr) const;
 
-  void getPivotPoints(Vec2f* p, const Vec4i& in, const Vec4i& out, int offset, bool target) const;
+  void getPivotPoints(QVector2D* p, const QVector4D& in, const QVector4D& out, int offset, bool target) const;
 
   GraphViewStyle::EdgeStyle m_style;
   bool m_showArrow;
@@ -46,11 +47,11 @@ protected:
   Route m_route;
 
 private:
-  Vec4i m_ownerRect;
-  Vec4i m_targetRect;
+  QVector4D m_ownerRect;
+  QVector4D m_targetRect;
 
-  Vec4i m_ownerParentRect;
-  Vec4i m_targetParentRect;
+  QVector4D m_ownerParentRect;
+  QVector4D m_targetParentRect;
 
   mutable QPolygon m_polygon;
 };

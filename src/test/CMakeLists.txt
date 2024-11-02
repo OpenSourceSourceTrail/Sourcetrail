@@ -11,8 +11,6 @@ set(test_lib_names
     HierarchyCacheTestSuite
     IndexerCompositeTestSuite
     LowMemoryStringMapTestSuite
-    MatrixBaseTestSuite
-    MatrixDynamicBaseTestSuite
     NetworkProtocolHelperTestSuite
     ProjectSettingsTestSuite
     ResourcePathsTestSuite
@@ -21,9 +19,7 @@ set(test_lib_names
     SettingsTestSuite
     SharedMemoryTestSuite
     UserPathsTestSuite
-    UtilityTestSuite
-    Vector2TestSuite
-    Vector4TestSuite)
+    UtilityTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
   add_executable(${test_name} ${test_name}.cpp)

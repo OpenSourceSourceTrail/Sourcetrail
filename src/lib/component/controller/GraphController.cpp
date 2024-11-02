@@ -2,6 +2,8 @@
 
 #include <set>
 
+#include <QVector2D>
+
 #include "AccessKind.h"
 #include "Application.h"
 #include "BucketLayouter.h"
@@ -1529,9 +1531,9 @@ void GraphController::extendEqualFunctionNames(const std::vector<std::shared_ptr
   }
 }
 
-Vec4i GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAccessMaxWidth) const {
+QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAccessMaxWidth) const {
   if(!node->visible) {
-    return Vec4i(0, 0, 0, 0);
+    return {};
   }
 
   GraphViewStyle::NodeMargins margins;
@@ -1550,7 +1552,7 @@ Vec4i GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAcces
       margins = GraphViewStyle::getMarginsOfBundleNode();
     }
   } else if(node->isQualifierNode()) {
-    return Vec4i(0, 0, 0, 0);
+    return {};
   } else if(node->isTextNode()) {
     margins = GraphViewStyle::getMarginsOfTextNode(node->fontSizeDiff);
   } else if(node->isGroupNode()) {
@@ -1584,15 +1586,15 @@ Vec4i GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAcces
       if(!subNode->visible) {
         continue;
       } else if(subNode->isQualifierNode()) {
-        subNode->position.y = static_cast<int>(margins.top + margins.charHeight / 2);
+        subNode->position.setY(margins.top + margins.charHeight / 2);
         width += 5;
         continue;
       }
 
-      Vec4i rect = layoutNestingRecursive(subNode.get());
+      QVector4D rect = layoutNestingRecursive(subNode.get());
 
       if(subNode->isExpandToggleNode()) {
-        width += margins.spacingX + subNode->size.x;
+        width += margins.spacingX + subNode->size.x();
       } else if(subNode->isAccessNode() && rect.z() > maxAccessWidth) {
         maxAccessWidth = rect.z();
         maxWidthAccessNode = subNode;
@@ -1610,11 +1612,11 @@ Vec4i GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAcces
 
   if(node->subNodes.size()) {
     if(node->isGroupNode()) {
-      Vec2i viewSize = getView()->getViewSize();
+      QVector2D viewSize = getView()->getViewSize();
 
       switch(node->groupLayout) {
       case GroupLayout::LIST:
-        viewSize.x = viewSize.x - 150;    // prevent horizontal scroll
+        viewSize.setX(viewSize.x() - 150);    // prevent horizontal scroll
         ListLayouter::layoutMultiColumn(viewSize, &node->subNodes);
         break;
 
@@ -1644,14 +1646,14 @@ Vec4i GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAcces
     }
   }
 
-  Vec2i size = ListLayouter::offsetNodes(
+  QVector2D size = ListLayouter::offsetNodes(
       node->subNodes, static_cast<int>(margins.top + margins.charHeight + margins.spacingA), margins.left);
 
-  width = std::max(size.x(), width);
+  width = std::max(static_cast<int>(size.x()), width);
   height = size.y();
 
-  node->size.x = margins.left + width + margins.right;
-  node->size.y = static_cast<int>(margins.top + margins.charHeight + margins.spacingA + height + margins.bottom);
+  node->size.setX(margins.left + width + margins.right);
+  node->size.setY(margins.top + margins.charHeight + margins.spacingA + height + margins.bottom);
 
   for(const std::shared_ptr<DummyNode>& subNode : node->subNodes) {
     if(!subNode->visible) {
@@ -1659,10 +1661,10 @@ Vec4i GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAcces
     }
 
     if(subNode->isAccessNode()) {
-      subNode->size.x = width;
+      subNode->size.setX(width);
     } else if(subNode->isExpandToggleNode()) {
-      subNode->position.x = margins.left + width - subNode->size.x;
-      subNode->position.y = 6;
+      subNode->position.setX(margins.left + width - subNode->size.x());
+      subNode->position.setY(6);
     }
   }
 
@@ -1709,11 +1711,11 @@ void GraphController::layoutToGrid(DummyNode* node) const {
 
   // Increase size of nodes with visible children to cover full grid cells
 
-  size_t width = GraphViewStyle::toGridSize(node->size.x);
-  size_t height = GraphViewStyle::toGridSize(node->size.y);
+  size_t width = GraphViewStyle::toGridSize(node->size.x());
+  size_t height = GraphViewStyle::toGridSize(node->size.y());
 
-  size_t incX = width - node->size.x;
-  size_t incY = height - node->size.y;
+  size_t incX = width - node->size.x();
+  size_t incY = height - node->size.y();
 
   DummyNode* lastAccessNode = nullptr;
   DummyNode* expandToggleNode = nullptr;
@@ -1724,7 +1726,7 @@ void GraphController::layoutToGrid(DummyNode* node) const {
     }
 
     if(subNode->isAccessNode()) {
-      subNode->size.x = static_cast<int>(subNode->size.x + incX);
+      subNode->size.setX(subNode->size.x() + incX);
       lastAccessNode = subNode.get();
     } else if(subNode->isExpandToggleNode()) {
       expandToggleNode = subNode.get();
@@ -1732,14 +1734,14 @@ void GraphController::layoutToGrid(DummyNode* node) const {
   }
 
   if(lastAccessNode) {
-    lastAccessNode->size.y = static_cast<int>(lastAccessNode->size.y + incY);
+    lastAccessNode->size.setY(lastAccessNode->size.y() + incY);
 
     if(expandToggleNode) {
-      expandToggleNode->position.x = static_cast<int>(expandToggleNode->position.x + incX);
+      expandToggleNode->position.setX(expandToggleNode->position.x() + incX);
     }
 
-    node->size.x = static_cast<int>(width);
-    node->size.y = static_cast<int>(height);
+    node->size.setX(width);
+    node->size.setY(height);
   }
 }
 
@@ -1890,10 +1892,10 @@ void GraphController::forEachDummyEdge(std::function<void(DummyEdge*)> func) {
 
 void GraphController::createLegendGraph() {
   Id id = ~Id(0) >> 1;
-  std::map<Id, Vec2i> nodePositions;
+  std::map<Id, QVector2D> nodePositions;
   const auto& pGraph = std::make_shared<Graph>();
 
-  auto addText = [this](std::wstring text, int fontSizeDiff, Vec2i position) {
+  auto addText = [this](const std::wstring& text, int fontSizeDiff, QVector2D position) {
     std::shared_ptr<DummyNode> node = std::make_shared<DummyNode>(DummyNode::DUMMY_TEXT);
     node->name = text;
     node->visible = true;
@@ -1904,7 +1906,7 @@ void GraphController::createLegendGraph() {
   };
 
   auto addNode = [&id, &pGraph, &nodePositions](
-                     NodeKind kind, const std::wstring& name, Vec2i position, DefinitionKind defKind = DEFINITION_EXPLICIT) {
+                     NodeKind kind, const std::wstring& name, QVector2D position, DefinitionKind defKind = DEFINITION_EXPLICIT) {
     nodePositions.emplace(++id, position);
     return pGraph->createNode(id, NodeType(kind), NameHierarchy(name, NAME_DELIMITER_UNKNOWN), defKind);
   };
@@ -1918,23 +1920,23 @@ void GraphController::createLegendGraph() {
     return pGraph->createEdge(++id, Edge::EDGE_MEMBER, from, to);
   };
 
-  addText(L"Legend", 6, Vec2i(0, 0));
+  addText(L"Legend", 6, {});
 
   int y = 50;
   int x = 0;
 
   // Layout
   {
-    addText(L"Layout", 3, Vec2i(x, y));
+    addText(L"Layout", 3, {static_cast<float>(x), static_cast<float>(y)});
 
     x = 50;
     y = 40;
 
-    Node* base = addNode(NODE_CLASS, L"Base Class", Vec2i(x + 220, y + 50));
-    Node* main = addNode(NODE_CLASS, L"Class", Vec2i(x + 200, y + 130));
-    Node* derived = addNode(NODE_CLASS, L"Derived Class", Vec2i(x + 210, y + 380));
-    Node* user = addNode(NODE_TYPE, L"Referencing Type", Vec2i(x - 10, y + 220));
-    Node* used = addNode(NODE_TYPE, L"Referenced Type", Vec2i(x + 410, y + 220));
+    Node* base = addNode(NODE_CLASS, L"Base Class", {static_cast<float>(x + 220), static_cast<float>(y + 50)});
+    Node* main = addNode(NODE_CLASS, L"Class", {static_cast<float>(x + 200), static_cast<float>(y + 130)});
+    Node* derived = addNode(NODE_CLASS, L"Derived Class", {static_cast<float>(x + 210), static_cast<float>(y + 380)});
+    Node* user = addNode(NODE_TYPE, L"Referencing Type", {static_cast<float>(x - 10), static_cast<float>(y + 220)});
+    Node* used = addNode(NODE_TYPE, L"Referenced Type", {static_cast<float>(x + 410), static_cast<float>(y + 220)});
 
     addEdge(Edge::EDGE_INHERITANCE, main, base);
     addEdge(Edge::EDGE_INHERITANCE, derived, main);
@@ -1957,8 +1959,8 @@ void GraphController::createLegendGraph() {
       pEdge->addComponent(pBundledEdgesComp);
     }
 
-    auto* pPublicMethod = addNode(NODE_METHOD, L"public method", Vec2i());
-    auto* pPrivateField = addNode(NODE_FIELD, L"private field", Vec2i());
+    auto* pPublicMethod = addNode(NODE_METHOD, L"public method", {});
+    auto* pPrivateField = addNode(NODE_FIELD, L"private field", {});
 
     addMember(main, pPublicMethod, ACCESS_PUBLIC);
     addMember(main, pPrivateField, ACCESS_PRIVATE);
@@ -1966,11 +1968,11 @@ void GraphController::createLegendGraph() {
     y += 480;
     x += 10;
 
-    Node* pFunc = addNode(NODE_FUNCTION, L"function", Vec2i(x + 220, y));
-    Node* pCaller = addNode(NODE_FUNCTION, L"calling function", Vec2i(x, y));
-    Node* pVar = addNode(NODE_GLOBAL_VARIABLE, L"accessed variable", Vec2i(x + 410, y - 50));
-    Node* pCalled = addNode(NODE_FUNCTION, L"called function", Vec2i(x + 410, y - 10));
-    Node* pType = addNode(NODE_TYPE, L"Referenced Type", Vec2i(x + 410, y + 30));
+    Node* pFunc = addNode(NODE_FUNCTION, L"function", {static_cast<float>(x + 220), static_cast<float>(y)});
+    Node* pCaller = addNode(NODE_FUNCTION, L"calling function", {static_cast<float>(x), static_cast<float>(y)});
+    Node* pVar = addNode(NODE_GLOBAL_VARIABLE, L"accessed variable", {static_cast<float>(x + 410), static_cast<float>(y - 50)});
+    Node* pCalled = addNode(NODE_FUNCTION, L"called function", {static_cast<float>(x + 410), static_cast<float>(y - 10)});
+    Node* pType = addNode(NODE_TYPE, L"Referenced Type", {static_cast<float>(x + 410), static_cast<float>(y + 30)});
 
     addEdge(Edge::EDGE_CALL, pFunc, pCalled);
     addEdge(Edge::EDGE_CALL, pCaller, pFunc);
@@ -1986,45 +1988,46 @@ void GraphController::createLegendGraph() {
   // Nodes
   {
     int i = 0;
-    addText(L"Nodes", 3, Vec2i(x, y));
+    addText(L"Nodes", 3, {static_cast<float>(x), static_cast<float>(y)});
 
-    addNode(NODE_FILE, L"File", Vec2i(x, y + dy * ++i));
-    addNode(NODE_FILE, L"Non-Indexed File", Vec2i(x, y + dy * ++i), DEFINITION_NONE);
-    Node* pIncompleteFile = addNode(NODE_FILE, L"Incomplete File", Vec2i(x, y + dy * ++i));
+    addNode(NODE_FILE, L"File", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    addNode(NODE_FILE, L"Non-Indexed File", {static_cast<float>(x), static_cast<float>(y + dy * ++i)}, DEFINITION_NONE);
+    Node* pIncompleteFile = addNode(NODE_FILE, L"Incomplete File", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
     pIncompleteFile->addComponent(std::make_shared<TokenComponentFilePath>(FilePath(), false));
 
-    addNode(NODE_MACRO, L"Macro", Vec2i(x, y + dy * ++i));
-    addNode(NODE_ANNOTATION, L"Annotation", Vec2i(x, y + dy * ++i));
+    addNode(NODE_MACRO, L"Macro", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    addNode(NODE_ANNOTATION, L"Annotation", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
 
-    addNode(NODE_MODULE, L"module", Vec2i(x, y + dy * ++i));
+    addNode(NODE_MODULE, L"module", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
     y -= 15;
-    addNode(NODE_NAMESPACE, L"namespace", Vec2i(x, y + dy * ++i));
+    addNode(NODE_NAMESPACE, L"namespace", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
     y -= 15;
-    addNode(NODE_PACKAGE, L"package", Vec2i(x, y + dy * ++i));
-    y -= 15;
-
-    addNode(NODE_TYPE, L"Type", Vec2i(x, y + dy * ++i));
-    addNode(NODE_TYPE, L"Non-indexed Type", Vec2i(x, y + dy * ++i), DEFINITION_NONE);
-
-    addNode(NODE_GLOBAL_VARIABLE, L"variable", Vec2i(x, y + dy * ++i));
-    y -= 15;
-    addNode(NODE_GLOBAL_VARIABLE, L"non-indexed variable", Vec2i(x, y + dy * ++i), DEFINITION_NONE);
+    addNode(NODE_PACKAGE, L"package", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
     y -= 15;
 
-    addNode(NODE_FUNCTION, L"function", Vec2i(x, y + dy * ++i));
+    addNode(NODE_TYPE, L"Type", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    addNode(NODE_TYPE, L"Non-indexed Type", {static_cast<float>(x), static_cast<float>(y + dy * ++i)}, DEFINITION_NONE);
+
+    addNode(NODE_GLOBAL_VARIABLE, L"variable", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
     y -= 15;
-    addNode(NODE_FUNCTION, L"non-indexed function", Vec2i(x, y + dy * ++i), DEFINITION_NONE);
+    addNode(
+        NODE_GLOBAL_VARIABLE, L"non-indexed variable", {static_cast<float>(x), static_cast<float>(y + dy * ++i)}, DEFINITION_NONE);
     y -= 15;
 
-    Node* pTypeNode = addNode(NODE_TYPE, L"Type with Members", Vec2i(x, y + dy * ++i));
-    Node* pPublicMethod = addNode(NODE_METHOD, L"public method", Vec2i());
-    Node* pProtectedMethod = addNode(NODE_METHOD, L"protected method", Vec2i());
-    Node* pPrivateMethod = addNode(NODE_METHOD, L"private method", Vec2i());
-    Node* pDefaultMethod = addNode(NODE_METHOD, L"default method", Vec2i());
-    Node* pPublicField = addNode(NODE_FIELD, L"public field", Vec2i());
-    Node* pProtectedField = addNode(NODE_FIELD, L"protected field", Vec2i());
-    Node* pPrivateField = addNode(NODE_FIELD, L"private field", Vec2i());
-    Node* pDefaultField = addNode(NODE_FIELD, L"default field", Vec2i());
+    addNode(NODE_FUNCTION, L"function", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    y -= 15;
+    addNode(NODE_FUNCTION, L"non-indexed function", {static_cast<float>(x), static_cast<float>(y + dy * ++i)}, DEFINITION_NONE);
+    y -= 15;
+
+    Node* pTypeNode = addNode(NODE_TYPE, L"Type with Members", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    Node* pPublicMethod = addNode(NODE_METHOD, L"public method", {});
+    Node* pProtectedMethod = addNode(NODE_METHOD, L"protected method", {});
+    Node* pPrivateMethod = addNode(NODE_METHOD, L"private method", {});
+    Node* pDefaultMethod = addNode(NODE_METHOD, L"default method", {});
+    Node* pPublicField = addNode(NODE_FIELD, L"public field", {});
+    Node* pProtectedField = addNode(NODE_FIELD, L"protected field", {});
+    Node* pPrivateField = addNode(NODE_FIELD, L"private field", {});
+    Node* pDefaultField = addNode(NODE_FIELD, L"default field", {});
 
     addMember(pTypeNode, pPublicMethod, ACCESS_PUBLIC);
     addMember(pTypeNode, pPublicField, ACCESS_PUBLIC);
@@ -2038,15 +2041,15 @@ void GraphController::createLegendGraph() {
     y -= 15;
     i += 9;
 
-    addNode(NODE_CLASS, L"Class", Vec2i(x, y + dy * ++i));
-    addNode(NODE_INTERFACE, L"Interface", Vec2i(x, y + dy * ++i));
+    addNode(NODE_CLASS, L"Class", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    addNode(NODE_INTERFACE, L"Interface", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
 
-    addNode(NODE_STRUCT, L"Struct", Vec2i(x, y + dy * ++i));
-    addNode(NODE_UNION, L"Union", Vec2i(x, y + dy * ++i));
+    addNode(NODE_STRUCT, L"Struct", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    addNode(NODE_UNION, L"Union", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
 
-    addNode(NODE_TYPEDEF, L"TypeDef", Vec2i(x, y + dy * ++i));
-    Node* enumNode = addNode(NODE_ENUM, L"Enum", Vec2i(x, y + dy * ++i));
-    Node* enumConstantNode = addNode(NODE_ENUM_CONSTANT, L"ENUM_CONSTANT", Vec2i());
+    addNode(NODE_TYPEDEF, L"TypeDef", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    Node* enumNode = addNode(NODE_ENUM, L"Enum", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+    Node* enumConstantNode = addNode(NODE_ENUM_CONSTANT, L"ENUM_CONSTANT", {});
     addMember(enumNode, enumConstantNode);
     y += 10;
     i += 1;
@@ -2057,14 +2060,14 @@ void GraphController::createLegendGraph() {
     pGroupNode->name = L"Group Node";
     pGroupNode->visible = true;
     pGroupNode->groupType = GroupType::DEFAULT;
-    pGroupNode->position = Vec2i(x, y + dy * ++i);
+    pGroupNode->position = {static_cast<float>(x), static_cast<float>(y + dy * ++i)};
     m_dummyNodes.push_back(pGroupNode);
     y += 25;
 
     auto pBundleNode = std::make_shared<DummyNode>(DummyNode::DUMMY_BUNDLE);
     pBundleNode->name = L"Bundle Node";
     pBundleNode->visible = true;
-    pBundleNode->position = Vec2i(x, y + dy * ++i);
+    pBundleNode->position = {static_cast<float>(x), static_cast<float>(y + dy * ++i)};
     m_dummyNodes.push_back(pBundleNode);
   }
 
@@ -2073,41 +2076,41 @@ void GraphController::createLegendGraph() {
 
   // Edges
   {
-    addText(L"Edges", 3, Vec2i(x, y));
+    addText(L"Edges", 3, {static_cast<float>(x), static_cast<float>(y)});
     int i = 0;
 
     {
-      addText(L"file include", 0, Vec2i(x, y + dy * ++i));
-      Node* file = addNode(NODE_FILE, L"File", Vec2i(x, y + dy * ++i));
-      Node* fileB = addNode(NODE_FILE, L"File", Vec2i(x + dx, y + dy * i));
+      addText(L"file include", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* file = addNode(NODE_FILE, L"File", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* fileB = addNode(NODE_FILE, L"File", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_INCLUDE, file, fileB);
     }
 
     {
-      addText(L"class import", 0, Vec2i(x, y + dy * ++i));
-      Node* file = addNode(NODE_FILE, L"File", Vec2i(x, y + dy * ++i));
-      Node* type = addNode(NODE_TYPE, L"Class", Vec2i(x + dx, y + dy * i));
+      addText(L"class import", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* file = addNode(NODE_FILE, L"File", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* type = addNode(NODE_TYPE, L"Class", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_IMPORT, file, type);
     }
 
     {
-      addText(L"macro use", 0, Vec2i(x, y + dy * ++i));
-      Node* file = addNode(NODE_FILE, L"File", Vec2i(x, y + dy * ++i));
-      Node* macro = addNode(NODE_MACRO, L"Macro", Vec2i(x + dx, y + dy * i));
+      addText(L"macro use", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* file = addNode(NODE_FILE, L"File", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* macro = addNode(NODE_MACRO, L"Macro", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_MACRO_USAGE, file, macro);
     }
 
     {
-      addText(L"annotation use", 0, Vec2i(x, y + dy * ++i));
-      Node* type = addNode(NODE_TYPE, L"Type", Vec2i(x, y + dy * ++i));
-      Node* macro = addNode(NODE_ANNOTATION, L"Annotation", Vec2i(x + dx, y + dy * i));
+      addText(L"annotation use", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* type = addNode(NODE_TYPE, L"Type", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* macro = addNode(NODE_ANNOTATION, L"Annotation", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_ANNOTATION_USAGE, type, macro);
     }
 
     {
-      addText(L"bundled edges", 0, Vec2i(x, y + dy * ++i));
-      Node* typeA = addNode(NODE_TYPE, L"Type A", Vec2i(x, y + dy * ++i));
-      Node* typeB = addNode(NODE_TYPE, L"Type B", Vec2i(x + dx, y + dy * i));
+      addText(L"bundled edges", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* typeA = addNode(NODE_TYPE, L"Type A", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* typeB = addNode(NODE_TYPE, L"Type B", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       Edge* edge = addEdge(Edge::EDGE_BUNDLED_EDGES, typeA, typeB);
       std::shared_ptr<TokenComponentBundledEdges> bundledEdgesComp = std::make_shared<TokenComponentBundledEdges>();
       for(size_t idx = 0; idx < 10; idx++) {
@@ -2117,46 +2120,47 @@ void GraphController::createLegendGraph() {
     }
 
     {
-      addText(L"type use", 0, Vec2i(x, y + dy * ++i));
-      Node* function = addNode(NODE_FUNCTION, L"function", Vec2i(x, y + dy * ++i));
-      Node* type = addNode(NODE_TYPE, L"Type", Vec2i(x + dx, y + dy * i));
+      addText(L"type use", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* function = addNode(NODE_FUNCTION, L"function", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* type = addNode(NODE_TYPE, L"Type", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_TYPE_USAGE, function, type);
     }
 
     {
-      addText(L"function call", 0, Vec2i(x, y + dy * ++i));
-      Node* function = addNode(NODE_FUNCTION, L"function", Vec2i(x, y + dy * ++i));
-      Node* functionB = addNode(NODE_FUNCTION, L"function", Vec2i(x + dx, y + dy * i));
+      addText(L"function call", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* function = addNode(NODE_FUNCTION, L"function", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* functionB = addNode(NODE_FUNCTION, L"function", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_CALL, function, functionB);
     }
 
     {
-      addText(L"variable access", 0, Vec2i(x, y + dy * ++i));
-      Node* function = addNode(NODE_FUNCTION, L"function", Vec2i(x, y + dy * ++i));
-      Node* variable = addNode(NODE_GLOBAL_VARIABLE, L"variable", Vec2i(x + dx, y + dy * i));
+      addText(L"variable access", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* function = addNode(NODE_FUNCTION, L"function", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* variable = addNode(NODE_GLOBAL_VARIABLE, L"variable", {static_cast<float>(x + dx), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_USAGE, function, variable);
     }
 
     {
-      addText(L"class inheritance", 0, Vec2i(x, y + dy * ++i));
-      Node* base = addNode(NODE_CLASS, L"Base Class", Vec2i(x, y + dy * (i + 1)));
-      Node* derived = addNode(NODE_CLASS, L"Derived Class", Vec2i(x, y + dy * (i + 3)));
+      addText(L"class inheritance", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* base = addNode(NODE_CLASS, L"Base Class", {static_cast<float>(x), static_cast<float>(y + dy * (i + 1))});
+      Node* derived = addNode(NODE_CLASS, L"Derived Class", {static_cast<float>(x), static_cast<float>(y + dy * (i + 3))});
       addEdge(Edge::EDGE_INHERITANCE, derived, base);
 
-      Node* base2 = addNode(NODE_CLASS, L"Base Class", Vec2i(x + 180, y + dy * (i + 1)));
-      Node* derived2 = addNode(NODE_CLASS, L"Derived Derived Class", Vec2i(x + 180, y + dy * (i + 3)));
+      Node* base2 = addNode(NODE_CLASS, L"Base Class", {static_cast<float>(x + 180), static_cast<float>(y + dy * (i + 1))});
+      Node* derived2 = addNode(
+          NODE_CLASS, L"Derived Derived Class", {static_cast<float>(x + 180), static_cast<float>(y + dy * (i + 3))});
       Edge* edge = addEdge(Edge::EDGE_INHERITANCE, derived2, base2);
       edge->addComponent(std::make_shared<TokenComponentInheritanceChain>(std::vector<Id>({1, 2})));
       i += 3;
     }
 
     {
-      addText(L"method override", 0, Vec2i(x, y + dy * ++i));
-      Node* base = addNode(NODE_CLASS, L"Base Class", Vec2i(x, y + dy * ++i));
+      addText(L"method override", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* base = addNode(NODE_CLASS, L"Base Class", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
       i += 3;
-      Node* derived = addNode(NODE_CLASS, L"Derived Class", Vec2i(x, y + dy * i));
-      Node* baseMethod = addNode(NODE_METHOD, L"method", Vec2i());
-      Node* derivedMethod = addNode(NODE_METHOD, L"method", Vec2i());
+      Node* derived = addNode(NODE_CLASS, L"Derived Class", {static_cast<float>(x), static_cast<float>(y + dy * i)});
+      Node* baseMethod = addNode(NODE_METHOD, L"method", {});
+      Node* derivedMethod = addNode(NODE_METHOD, L"method", {});
       addMember(base, baseMethod, ACCESS_PUBLIC);
       addMember(derived, derivedMethod, ACCESS_PUBLIC);
       addEdge(Edge::EDGE_OVERRIDE, derivedMethod, baseMethod);
@@ -2164,33 +2168,40 @@ void GraphController::createLegendGraph() {
     }
 
     {
-      addText(L"template specialization", 0, Vec2i(x, y + dy * ++i));
-      Node* templateFunctionNode = addNode(NODE_FUNCTION, L"template_function<typename ParameterType>", Vec2i(x, y + dy * ++i));
+      addText(L"template specialization", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* templateFunctionNode = addNode(
+          NODE_FUNCTION, L"template_function<typename ParameterType>", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
       y += 20;
-      Node* templateFunctionSpecializationNode = addNode(
-          NODE_FUNCTION, L"template_function<ArgumentType>", Vec2i(x, y + dy * ++i), DEFINITION_IMPLICIT);
+      Node* templateFunctionSpecializationNode = addNode(NODE_FUNCTION,
+                                                         L"template_function<ArgumentType>",
+                                                         {static_cast<float>(x), static_cast<float>(y + dy * ++i)},
+                                                         DEFINITION_IMPLICIT);
       addEdge(Edge::EDGE_TEMPLATE_SPECIALIZATION, templateFunctionSpecializationNode, templateFunctionNode);
 
-      Node* templateNode = addNode(NODE_TYPE, L"TemplateType<typename ParameterType>", Vec2i(x, y + dy * ++i));
+      Node* templateNode = addNode(
+          NODE_TYPE, L"TemplateType<typename ParameterType>", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
       y += 30;
       Node* templateSpecializationNode = addNode(
-          NODE_TYPE, L"TemplateType<ArgumentType>", Vec2i(x, y + dy * ++i), DEFINITION_IMPLICIT);
-      Node* argumentNode = addNode(NODE_TYPE, L"ArgumentType", Vec2i(x + 270, y + dy * i));
+          NODE_TYPE, L"TemplateType<ArgumentType>", {static_cast<float>(x), static_cast<float>(y + dy * ++i)}, DEFINITION_IMPLICIT);
+      Node* argumentNode = addNode(NODE_TYPE, L"ArgumentType", {static_cast<float>(x + 270), static_cast<float>(y + dy * i)});
       addEdge(Edge::EDGE_TEMPLATE_SPECIALIZATION, templateSpecializationNode, templateNode);
       addEdge(Edge::EDGE_TYPE_USAGE, templateSpecializationNode, argumentNode);
     }
 
     {
-      addText(L"template member specialization", 0, Vec2i(x, y + dy * ++i));
-      Node* templateNode = addNode(NODE_TYPE, L"TemplateType<typename ParameterType>", Vec2i(x, y + dy * ++i));
-      Node* templateMethodNode = addNode(NODE_METHOD, L"method", Vec2i());
+      addText(L"template member specialization", 0, {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* templateNode = addNode(
+          NODE_TYPE, L"TemplateType<typename ParameterType>", {static_cast<float>(x), static_cast<float>(y + dy * ++i)});
+      Node* templateMethodNode = addNode(NODE_METHOD, L"method", {});
       addMember(templateNode, templateMethodNode);
 
       i += 1;
 
-      Node* templateSpecializationNode = addNode(
-          NODE_TYPE, L"TemplateType<ArgumentType>", Vec2i(x, y + dy * ++i + 20), DEFINITION_IMPLICIT);
-      Node* templateSpecializationMethodNode = addNode(NODE_METHOD, L"method", Vec2i(), DEFINITION_IMPLICIT);
+      Node* templateSpecializationNode = addNode(NODE_TYPE,
+                                                 L"TemplateType<ArgumentType>",
+                                                 {static_cast<float>(x), static_cast<float>(y + dy * ++i + 20)},
+                                                 DEFINITION_IMPLICIT);
+      Node* templateSpecializationMethodNode = addNode(NODE_METHOD, L"method", {}, DEFINITION_IMPLICIT);
       addMember(templateSpecializationNode, templateSpecializationMethodNode);
       addEdge(Edge::EDGE_TEMPLATE_SPECIALIZATION, templateSpecializationMethodNode, templateMethodNode);
     }

@@ -1,5 +1,10 @@
 #pragma once
 
+#include <cmath>
+
+#include <QVector2D>
+#include <QVector4D>
+
 #include "AccessKind.h"
 #include "GroupType.h"
 #include "NameHierarchy.h"
@@ -7,8 +12,6 @@
 #include "types.h"
 #include "utility.h"
 #include "utilityString.h"
-#include "Vector2.h"
-#include "Vector4.h"
 
 // temporary data structure for (visual) graph creation process
 struct DummyNode {
@@ -152,21 +155,21 @@ public:
     return false;
   }
 
-  Vec4i getActiveSubNodeRect(Vec2i pos = Vec2i()) const {
+  QVector4D getActiveSubNodeRect(QVector2D pos = {}) const {
     pos += position;
 
     if(active) {
-      return Vec4i(pos.x, pos.y, pos.x + size.x, pos.y + size.y);
+      return {pos.x(), pos.y(), pos.x() + size.x(), pos.y() + size.y()};
     }
 
     for(const std::shared_ptr<DummyNode>& node : subNodes) {
-      Vec4i rect = node->getActiveSubNodeRect(pos);
+      QVector4D rect = node->getActiveSubNodeRect(pos);
       if(rect.w() > 0) {
         return rect;
       }
     }
 
-    return Vec4i();
+    return {};
   }
 
   size_t getActiveSubNodeCount() const {
@@ -355,8 +358,8 @@ public:
 
   Type type;
 
-  Vec2i position;
-  Vec2i size;
+  QVector2D position;
+  QVector2D size;
 
   bool visible;
   bool hidden;
@@ -387,7 +390,7 @@ public:
   Id bundleId;
 
   // Layout
-  Vec2i columnSize;
+  QVector2D columnSize;
 
   // BundleNode
   BundledNodesSet bundledNodes;

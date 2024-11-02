@@ -1,10 +1,12 @@
 #pragma once
 // STL
 #include <map>
+
+#include <QVector2D>
+
 // internal
 #include "DummyNode.h"
 #include "types.h"
-#include "Vector2.h"
 
 struct DummyEdge;
 
@@ -20,7 +22,7 @@ public:
   void addNode(std::shared_ptr<DummyNode> node);
   const DummyNode::BundledNodesSet& getNodes() const;
 
-  void preLayout(Vec2i viewSize, bool addVerticalSplit, bool forceVerticalSplit);
+  void preLayout(QVector2D viewSize, bool addVerticalSplit, bool forceVerticalSplit);
   void layout(int x, int y, int width, int height);
 
   const std::vector<int> getColWidths() const;
@@ -41,7 +43,7 @@ private:
 
 class BucketLayouter {
 public:
-  BucketLayouter(Vec2i viewSize);
+  BucketLayouter(QVector2D viewSize);
   void createBuckets(std::vector<std::shared_ptr<DummyNode>>& nodes, const std::vector<std::shared_ptr<DummyEdge>>& edges);
   void layoutBuckets(bool addVerticalSplit);
 
@@ -55,7 +57,7 @@ private:
   Bucket* getBucket(int i, int j);
   Bucket* getBucket(std::shared_ptr<DummyNode> node);
 
-  Vec2i m_viewSize;
+  QVector2D m_viewSize;
   std::map<int, std::map<int, Bucket>> m_buckets;
 
   int m_i1;

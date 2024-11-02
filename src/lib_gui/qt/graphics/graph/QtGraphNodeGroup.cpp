@@ -37,7 +37,7 @@ QtGraphNodeGroup::QtGraphNodeGroup(
   GraphViewStyle::NodeStyle style = GraphViewStyle::getStyleOfGroupNode(type, false);
   GraphViewStyle::NodeMargins margins = GraphViewStyle::getMarginsOfGroupNode(type, true);
 
-  const int width = static_cast<int>(style.textOffset.x * 2 + style.borderWidth + margins.charWidth * name.size());
+  const int width = static_cast<int>(style.textOffset.x() * 2 + style.borderWidth + margins.charWidth * name.size());
   const int height = static_cast<int>(margins.spacingA + margins.charHeight);
   const int radius = style.cornerRadius;
 

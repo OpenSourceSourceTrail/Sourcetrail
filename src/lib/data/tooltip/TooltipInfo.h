@@ -3,8 +3,9 @@
 
 #include <memory>
 
+#include <QVector2D>
+
 #include "types.h"
-#include "Vector2.h"
 
 class SourceLocationFile;
 
@@ -25,7 +26,7 @@ struct TooltipInfo {
 
   std::vector<TooltipSnippet> snippets;
 
-  Vec2i offset;
+  QVector2D offset;
 };
 
 #endif    // TOOLTIP_INFO_H

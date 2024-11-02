@@ -1,11 +1,12 @@
 #include "QtGraphNodeComponentClickable.h"
 
 #include <QGraphicsSceneEvent>
+#include <QVector2D>
 
 #include "QtGraphNode.h"
 
 QtGraphNodeComponentClickable::QtGraphNodeComponentClickable(QtGraphNode* graphNode)
-    : QtGraphNodeComponent(graphNode), m_mousePos(0, 0), m_mouseMoved(false) {}
+    : QtGraphNodeComponent(graphNode), m_mousePos{}, m_mouseMoved(false) {}
 
 QtGraphNodeComponentClickable::~QtGraphNodeComponentClickable() {}
 
@@ -14,7 +15,7 @@ void QtGraphNodeComponentClickable::nodeMousePressEvent(QGraphicsSceneMouseEvent
     return;
   }
 
-  m_mousePos = Vec2i(static_cast<int>(event->scenePos().x()), static_cast<int>(event->scenePos().y()));
+  m_mousePos = {static_cast<float>(event->scenePos().x()), static_cast<float>(event->scenePos().y())};
   m_mouseMoved = false;
 
   if(event->button() == Qt::MiddleButton) {
@@ -23,9 +24,9 @@ void QtGraphNodeComponentClickable::nodeMousePressEvent(QGraphicsSceneMouseEvent
 }
 
 void QtGraphNodeComponentClickable::nodeMouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-  Vec2i mousePos = Vec2i(static_cast<int>(event->scenePos().x()), static_cast<int>(event->scenePos().y()));
+  QVector2D mousePos{static_cast<float>(event->scenePos().x()), static_cast<float>(event->scenePos().y())};
 
-  if((mousePos - m_mousePos).getLength() > 3.0f) {
+  if((mousePos - m_mousePos).length() > 3.0f) {
     m_mouseMoved = true;
   }
 }

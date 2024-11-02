@@ -4,9 +4,10 @@
 #include <functional>
 
 #include <QGraphicsItem>
+#include <QVector2D>
+#include <QVector4D>
 
 #include "GraphViewStyle.h"
-#include "Vector4.h"
 
 class GraphFocusHandler;
 class QFont;
@@ -42,19 +43,19 @@ public:
 
   const std::list<QtGraphNode*>& getSubNodes() const;
 
-  Vec2i getPosition() const;
-  virtual bool setPosition(const Vec2i& position);
+  QVector2D getPosition() const;
+  virtual bool setPosition(const QVector2D& position);
 
-  const Vec2i& getSize() const;
-  void setSize(const Vec2i& size);
+  const QVector2D& getSize() const;
+  void setSize(const QVector2D& size);
 
-  const Vec2i& getColumnSize() const;
-  void setColumnSize(const Vec2i& size);
+  const QVector2D& getColumnSize() const;
+  void setColumnSize(const QVector2D& size);
 
   QSize size() const;
   void setSize(QSize size);
 
-  Vec4i getBoundingRect() const;
+  QVector4D getBoundingRect() const;
 
   void addOutEdge(QtGraphEdge* edge);
   void addInEdge(QtGraphEdge* edge);
@@ -108,7 +109,7 @@ public:
   Id onCollapseExpand();
   void onShowDefinition(bool inIDE);
 
-  virtual void moved(const Vec2i& oldPosition);
+  virtual void moved(const QVector2D& oldPosition);
 
   virtual void updateStyle() = 0;
 
@@ -136,8 +137,8 @@ protected:
   QtRoundedRectItem* m_undefinedRect = nullptr;
   QGraphicsPixmapItem* m_icon = nullptr;
 
-  Vec2i m_size;
-  Vec2i m_columnSize;
+  QVector2D m_size;
+  QVector2D m_columnSize;
 
   bool m_isActive = false;
   bool m_multipleActive = false;

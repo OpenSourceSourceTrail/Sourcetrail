@@ -96,11 +96,11 @@ void QtGraphEdge::updateLine() {
   GraphViewStyle::EdgeStyle style = GraphViewStyle::getStyleForEdgeType(
       type, m_isActive | m_isCoFocused, m_isFocused, m_isTrailEdge, isAmbiguous());
 
-  Vec4i ownerRect = owner->getBoundingRect();
-  Vec4i targetRect = target->getBoundingRect();
+  QVector4D ownerRect = owner->getBoundingRect();
+  QVector4D targetRect = target->getBoundingRect();
 
-  Vec4i ownerParentRect;
-  Vec4i targetParentRect;
+  QVector4D ownerParentRect;
+  QVector4D targetParentRect;
 
   const QtGraphNode* ownerParent = owner->getLastParent();
   const QtGraphNode* targetParent = target->getLastParent();
@@ -124,19 +124,19 @@ void QtGraphEdge::updateLine() {
       item->setParentItem(nullptr);
     }
 
-    style.originOffset.y() = 0;
-    style.targetOffset.y() = 0;
+    style.originOffset.setY(0);
+    style.targetOffset.setY(0);
 
-    for(const Vec4i& rect : m_path) {
+    for(const QVector4D& rect : m_path) {
       QtLineItemBezier* bezier = new QtLineItemBezier(this);
       bezier->updateLine(ownerRect, rect, ownerParentRect, rect, style, m_weight, false);
       bezier->setRoute(route);
 
       QtLineItemStraight* line = new QtLineItemStraight(this);
       if(route == QtLineItemBase::ROUTE_HORIZONTAL) {
-        line->updateLine(Vec2i(rect.x(), (rect.y() + rect.w()) / 2), Vec2i(rect.z(), (rect.y() + rect.w()) / 2), style);
+        line->updateLine({rect.x(), (rect.y() + rect.w()) / 2}, {rect.z(), (rect.y() + rect.w()) / 2}, style);
       } else {
-        line->updateLine(Vec2i((rect.x() + rect.z()) / 2, rect.y()), Vec2i((rect.x() + rect.z()) / 2, rect.w()), style);
+        line->updateLine({(rect.x() + rect.z()) / 2, rect.y()}, {(rect.x() + rect.z()) / 2, rect.w()}, style);
       }
 
       ownerRect = rect;
@@ -158,8 +158,8 @@ void QtGraphEdge::updateLine() {
       }
     }
   } else {
-    const Vec2i* ownerColumnSize;
-    const Vec2i* targetColumnSize;
+    const QVector2D* ownerColumnSize;
+    const QVector2D* targetColumnSize;
 
     if(ownerParent != targetParent) {
       ownerColumnSize = &ownerParent->getColumnSize();
@@ -169,8 +169,8 @@ void QtGraphEdge::updateLine() {
       targetColumnSize = &targetNonGroupParent->getColumnSize();
     }
 
-    ownerParentRect.z = std::max(ownerParentRect.x + ownerColumnSize->x, ownerParentRect.z());
-    targetParentRect.z = std::max(targetParentRect.x + targetColumnSize->x, targetParentRect.z());
+    ownerParentRect.setZ(std::max(ownerParentRect.x() + ownerColumnSize->x(), ownerParentRect.z()));
+    targetParentRect.setZ(std::max(targetParentRect.x() + targetColumnSize->x(), targetParentRect.z()));
 
     if(!m_child) {
       m_child = new QtLineItemAngled(this);
@@ -186,7 +186,8 @@ void QtGraphEdge::updateLine() {
       child->setEarlyBend(true);
 
       if(ownerNonGroupParent == targetNonGroupParent ||
-         (type == Edge::EDGE_OVERRIDE && targetParentRect.z() + style.targetOffset.x + style.originOffset.x > ownerParentRect.x())) {
+         (type == Edge::EDGE_OVERRIDE &&
+          targetParentRect.z() + style.targetOffset.x() + style.originOffset.x() > ownerParentRect.x())) {
         child->setOnFront(true);
       } else {
         child->setOnFront(false);
@@ -322,7 +323,7 @@ void QtGraphEdge::coFocusIn() {
         info.count = static_cast<int>(m_weight);
         info.countText = "edge";
       }
-      info.offset = Vec2i(10, 20);
+      info.offset = {10, 20};
 
       if(type == Edge::EDGE_INHERITANCE && getData()) {
         TokenComponentInheritanceChain* componentInheritance = getData()->getComponent<TokenComponentInheritanceChain>();
@@ -348,14 +349,14 @@ void QtGraphEdge::coFocusOut() {
 }
 
 void QtGraphEdge::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-  m_mousePos = Vec2i(static_cast<int>(event->scenePos().x()), static_cast<int>(event->scenePos().y()));
+  m_mousePos = {static_cast<float>(event->scenePos().x()), static_cast<float>(event->scenePos().y())};
   m_mouseMoved = false;
 }
 
 void QtGraphEdge::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-  Vec2i mousePos = Vec2i(static_cast<int>(event->scenePos().x()), static_cast<int>(event->scenePos().y()));
+  QVector2D mousePos{static_cast<float>(event->scenePos().x()), static_cast<float>(event->scenePos().y())};
 
-  if((mousePos - m_mousePos).getLength() > 1.0f) {
+  if((mousePos - m_mousePos).length() > 1.0f) {
     m_mouseMoved = true;
   }
 }
@@ -423,7 +424,7 @@ bool QtGraphEdge::isTrailEdge() const {
   return m_isTrailEdge;
 }
 
-void QtGraphEdge::setIsTrailEdge(const std::vector<Vec4i>& path, bool horizontal) {
+void QtGraphEdge::setIsTrailEdge(const std::vector<QVector4D>& path, bool horizontal) {
   m_path = path;
   m_isTrailEdge = true;
   m_useBezier = true;
