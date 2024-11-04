@@ -1,10 +1,14 @@
 #pragma once
 #include <vector>
 
+#include <range/v3/to_container.hpp>
+#include <range/v3/view/transform.hpp>
+
 #include <QAbstractListModel>
 #include <QIcon>
 
 #include "FilePath.h"
+#include "IApplicationSettings.hpp"
 
 namespace qt::element::model {
 
@@ -58,6 +62,7 @@ struct RecentItemModel final : QAbstractListModel {
     }
 
     mRecentProjects.erase(std::begin(mRecentProjects) + index);
+    updateRecentProjects();
   }
 
   bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
@@ -92,6 +97,7 @@ private:
   bool mDirty = false;
   size_t mMaxRecentProjects = 0;
   std::vector<RecentItem> mRecentProjects;
+  void updateRecentProjects();
 };
 
 }    // namespace qt::element::model
