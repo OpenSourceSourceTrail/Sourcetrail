@@ -2,7 +2,6 @@
 
 #include <fmt/format.h>
 
-#include "Application.h"
 #include "logging.h"
 #include "ProjectSettings.h"
 #include "SqliteStorageMigrationLambda.h"
@@ -10,6 +9,8 @@
 #include "utilityString.h"
 
 const size_t SqliteBookmarkStorage::s_storageVersion = 2;
+
+SqliteBookmarkStorage::SqliteBookmarkStorage() : SqliteStorage{} {}
 
 SqliteBookmarkStorage::SqliteBookmarkStorage(const FilePath& dbFilePath) : SqliteStorage(dbFilePath) {}
 
@@ -23,13 +24,6 @@ void SqliteBookmarkStorage::migrateIfNecessary() {
   migrator.addMigration(
       2, std::make_shared<SqliteStorageMigrationLambda>([](const SqliteStorageMigration* migration, SqliteStorage* storage) {
         std::string separator = "::";
-        if(Application::getInstance()) {
-          auto currentProject = Application::getInstance()->getCurrentProject();
-          {
-            [[maybe_unused]] LanguageType currentLanguage = ProjectSettings::getLanguageOfProject(
-                currentProject->getProjectSettingsFilePath());
-          }
-        }
         migration->executeStatementInStorage(
             storage, "UPDATE bookmarked_node SET serialized_node_name = '" + separator + "\tm' || serialized_node_name");
         migration->executeStatementInStorage(
