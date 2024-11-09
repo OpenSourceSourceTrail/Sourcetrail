@@ -11,16 +11,6 @@ public:
   TestStorage() : PersistentStorage(FilePath(L"data/test.sqlite"), FilePath(L"data/testBookmarks.sqlite")) {
     clear();
   }
-
-  // const size_t getNodeCount() const
-  //{
-  //	return getGraph().getNodeCount();
-  //}
-
-  // const size_t getEdgeCount() const
-  //{
-  //	return getGraph().getEdgeCount();
-  //}
 };
 
 [[maybe_unused]] ParseLocation validLocation(Id locationId = 0) {
@@ -42,7 +32,6 @@ NameHierarchy createNameHierarchy(std::wstring s) {
   nameHierarchy.push(NameElement(lastName, ret, parameters));
   return nameHierarchy;
 }
-}    // namespace
 
 TEST(Storage, savesFile) {
   TestStorage storage;
@@ -105,153 +94,4 @@ TEST(Storage, savesFieldAsMember) {
   }
   EXPECT_TRUE(foundEdge);
 }
-
-TEST(Storage, savesMethodStatic) {
-  // TestStorage storage;
-  // Id id = storage.onMethodParsed(
-  //	validLocation(1),
-  //	ParseFunction(typeUsage("void"), createNameHierarchy("isMethod"), parameters("bool"), true),
-  //	ParserClient::ACCESS_NONE,
-  //	ParserClient::ABSTRACTION_NONE,
-  //	validLocation(4)
-  //);
-
-  // Node* node = storage.getNodeWithId(id);
-  // TS_ASSERT(node);
-  // TS_ASSERT_EQUALS(node->getQualifiedNameWithSignature(), "isMethod");
-  // TS_ASSERT_EQUALS(node->getType(), NODE_METHOD);
-  // TS_ASSERT(node->getComponent<TokenComponentStatic>());
-}
-
-TEST(Storage, clearsSingleFileDataOfSingleFileStorage) {
-  /*
-  m_filePath = FilePath(L"file.cpp");
-  TestStorage storage;
-  storage.onFunctionParsed(
-    validLocation(), ParseFunction(typeUsage("bool"), createNameHierarchy("isTrue"),
-    parameters("char")), validLocation()
-  );
-
-  EXPECT_TRUE(storage.getNodeCount() == 3);
-  EXPECT_TRUE(storage.getEdgeCount() == 2);
-  EXPECT_TRUE(storage.tokenLocationCollection().getTokenLocations().size() == 4);
-
-  std::set<FilePath> files;
-  files.insert(FilePath(m_filePath));
-  storage.clearFileData(files);
-
-  EXPECT_TRUE(storage.getNodeCount() == 0);
-  EXPECT_TRUE(storage.getEdgeCount() == 0);
-  EXPECT_TRUE(storage.tokenLocationCollection().getTokenLocations().size() == 0);;*/
-}
-
-TEST(Storage, clearsUnreferencedSingleFileDataOfMultiFileStorage) {
-  // m_filePath = "file.h";
-
-  // TestStorage storage;
-
-  // ParseFunction isTrue = ParseFunction(typeUsage("bool"), createNameHierarchy("isTrue"),
-  // parameters("char")); storage.onFunctionParsed(validLocation(), isTrue, validLocation());
-
-  // m_filePath = "file.cpp";
-
-  // ParseFunction main = ParseFunction(typeUsage("int"), createNameHierarchy("main"),
-  // parameters("void")); storage.onFunctionParsed(validLocation(), main, validLocation());
-
-  // storage.onCallParsed(validLocation(), main, isTrue);
-
-  // TS_ASSERT_EQUALS(storage.getNodeCount(), 6);
-  // TS_ASSERT_EQUALS(storage.getEdgeCount(), 5);
-  // TS_ASSERT_EQUALS(storage.tokenLocationCollection().getTokenLocations().size(), 9);
-
-  // std::set<FilePath> files;
-  // files.insert(FilePath("file.cpp"));
-  // storage.clearFileData(files);
-
-  // TS_ASSERT_EQUALS(storage.getNodeCount(), 3);
-  // TS_ASSERT_EQUALS(storage.getEdgeCount(), 2);
-  // TS_ASSERT_EQUALS(storage.tokenLocationCollection().getTokenLocations().size(), 4);*/
-}
-
-TEST(Storage, clearsReferencedSingleFileDataOfMultiFileStorage) {
-  // m_filePath = "file.h";
-
-  // TestStorage storage;
-
-  // ParseFunction isTrue = ParseFunction(typeUsage("bool"), createNameHierarchy("isTrue"),
-  // parameters("void")); storage.onFunctionParsed(validLocation(), isTrue, validLocation());
-
-  // m_filePath = "file.cpp";
-
-  // ParseFunction main = ParseFunction(typeUsage("int"), createNameHierarchy("main"),
-  // parameters("void")); storage.onFunctionParsed(validLocation(), main, validLocation());
-
-  // storage.onCallParsed(validLocation(), main, isTrue);
-
-  // TS_ASSERT_EQUALS(storage.getNodeCount(), 5);
-  // TS_ASSERT_EQUALS(storage.getEdgeCount(), 5);
-  // TS_ASSERT_EQUALS(storage.tokenLocationCollection().getTokenLocations().size(), 9);
-
-  // std::set<FilePath> files;
-  // files.insert(FilePath("file.h"));
-  // storage.clearFileData(files);
-
-  // TS_ASSERT_EQUALS(storage.getNodeCount(), 4);
-  // TS_ASSERT_EQUALS(storage.getEdgeCount(), 3);
-  // TS_ASSERT_EQUALS(storage.tokenLocationCollection().getTokenLocations().size(), 5);
-}
-
-TEST(Storage, clearsMultiFileDataOfMultiFileStorage) {
-  // m_filePath = "file.h";
-
-  // TestStorage storage;
-
-  // ParseFunction isTrue = ParseFunction(typeUsage("bool"), createNameHierarchy("isTrue"),
-  // parameters("void")); storage.onFunctionParsed(validLocation(), isTrue, validLocation());
-
-  // m_filePath = "file.cpp";
-
-  // ParseFunction main = ParseFunction(typeUsage("int"), createNameHierarchy("main"),
-  // parameters("void")); storage.onFunctionParsed(validLocation(), main, validLocation());
-
-  // storage.onCallParsed(validLocation(), main, isTrue);
-
-  // TS_ASSERT_EQUALS(storage.getNodeCount(), 5);
-  // TS_ASSERT_EQUALS(storage.getEdgeCount(), 5);
-  // TS_ASSERT_EQUALS(storage.tokenLocationCollection().getTokenLocations().size(), 9);
-
-  // std::set<FilePath> filePaths;
-  // filePaths.insert(FilePath("file.cpp"));
-  // filePaths.insert(FilePath("file.h"));
-  // storage.clearFileData(filePaths);
-
-  // TS_ASSERT_EQUALS(storage.getNodeCount(), 0);
-  // TS_ASSERT_EQUALS(storage.getEdgeCount(), 0);
-  // TS_ASSERT_EQUALS(storage.tokenLocationCollection().getTokenLocations().size(), 0);
-}
-
-TEST(Storage, findsAndRemovesDependingFileNodes) {
-  // TestStorage storage;
-
-  // Id id1 = storage.onFileParsed("f.h");
-  // Id id2 = storage.onFileParsed("file.h");
-  // Id id3 = storage.onFileParsed("file.cpp");
-  // Id id4 = storage.onFileIncludeParsed(validLocation(), "file.h", "f.h");
-  // Id id5 = storage.onFileIncludeParsed(validLocation(), "file.cpp", "file.h");
-
-  // std::string name1 = storage.getNodeWithId(id2)->getQualifiedNameWithSignature();
-  // std::string name2 = storage.getNodeWithId(id3)->getQualifiedNameWithSignature();
-
-  // std::set<FilePath> filePaths;
-  // filePaths.insert(FilePath(name1));
-  // std::set<FilePath> dependingFilePaths = storage.getDependingFilePathsAndRemoveFileNodes(filePaths);
-
-  // TS_ASSERT_EQUALS(dependingFilePaths.size(), 1);
-  // TS_ASSERT_EQUALS(dependingFilePaths.begin()->str(), name2);
-
-  // TS_ASSERT(storage.getNodeWithId(id1));
-  // TS_ASSERT(!storage.getNodeWithId(id2));
-  // TS_ASSERT(!storage.getNodeWithId(id3));
-  // TS_ASSERT(!storage.getEdgeWithId(id4));
-  // TS_ASSERT(!storage.getEdgeWithId(id5));
-}
+}    // namespace

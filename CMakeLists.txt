@@ -409,7 +409,7 @@ if(ENABLE_UNIT_TEST
 
   find_package(
     Qt5 ${QT_MIN_VERSION}
-    COMPONENTS Test
+    COMPONENTS Test Sql
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)

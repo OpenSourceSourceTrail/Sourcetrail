@@ -4,7 +4,9 @@ set(test_lib_names
     RefreshInfoGeneratorTestSuite
     SourceGroupTestSuite
     SqliteBookmarkStorageTestSuite
+    SqliteDatabaseIndexTestSuite
     SqliteIndexStorageTestSuite
+    SqliteStorageTestSuite
     StorageTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
@@ -16,6 +18,7 @@ foreach(test_name IN LISTS test_lib_names)
            GTest::gmock
            Qt5::Core
            Qt5::Gui
+           Qt5::Sql
            Sourcetrail::messaging
            Sourcetrail::gtest_main
            Sourcetrail::core::utility::TextAccess
