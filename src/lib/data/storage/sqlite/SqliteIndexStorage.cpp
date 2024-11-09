@@ -1,9 +1,5 @@
 #include "SqliteIndexStorage.h"
 
-#include <sstream>
-
-#include <unordered_map>
-
 #include "FileSystem.h"
 #include "GlobalId.hpp"
 #include "LocationType.h"
@@ -29,6 +25,8 @@ std::pair<std::wstring, std::wstring> splitLocalSymbolName(const std::wstring& n
 size_t SqliteIndexStorage::getStorageVersion() {
   return sStorageVersion;
 }
+
+SqliteIndexStorage::SqliteIndexStorage() = default;
 
 SqliteIndexStorage::SqliteIndexStorage(const FilePath& dbFilePath) : SqliteStorage(dbFilePath.getCanonical()) {}
 
@@ -64,7 +62,7 @@ void SqliteIndexStorage::setProjectSettingsText(std::string text) {
 
 Id SqliteIndexStorage::addNode(const StorageNodeData& data) {
   std::vector<Id> ids = addNodes({StorageNode(0, data)});
-  return ids.size() ? ids[0] : 0;
+  return ids.empty() ? 0 : ids.front();
 }
 
 std::vector<Id> SqliteIndexStorage::addNodes(const std::vector<StorageNode>& nodes) {
