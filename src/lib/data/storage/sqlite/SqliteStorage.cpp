@@ -5,6 +5,17 @@
 #include "TimeStamp.h"
 #include "utilityString.h"
 
+SqliteStorage::SqliteStorage() {
+  try {
+    m_database.open(":memory:");
+  } catch(CppSQLite3Exception& e) {
+    LOG_ERROR_W(L"Failed to load database file \":memory:\" with message: " + utility::decodeFromUtf8(e.errorMessage()));
+    throw;
+  }
+
+  executeStatement("PRAGMA foreign_keys=ON;");
+}
+
 SqliteStorage::SqliteStorage(const FilePath& dbFilePath) : m_dbFilePath(dbFilePath.getCanonical()) {
   if(!m_dbFilePath.getParentDirectory().empty() && !m_dbFilePath.getParentDirectory().exists()) {
     FileSystem::createDirectory(m_dbFilePath.getParentDirectory());
@@ -81,10 +92,6 @@ void SqliteStorage::optimizeMemory() const {
   executeStatement("VACUUM;");
 }
 
-FilePath SqliteStorage::getDbFilePath() const {
-  return m_dbFilePath;
-}
-
 bool SqliteStorage::isEmpty() const {
   return getVersion() <= 0;
 }
@@ -156,7 +163,7 @@ int SqliteStorage::executeStatementScalar(const std::string& statement, const in
   int ret = 0;
   try {
     ret = m_database.execScalar(statement.c_str(), nullValue);
-  } catch(CppSQLite3Exception e) {
+  } catch(CppSQLite3Exception& e) {
     LOG_ERROR(std::to_string(e.errorCode()) + ": " + e.errorMessage());
   }
   return ret;
@@ -183,7 +190,7 @@ int SqliteStorage::executeStatementScalar(CppSQLite3Statement& statement, const 
 CppSQLite3Query SqliteStorage::executeQuery(const std::string& statement) const {
   try {
     return m_database.execQuery(statement.c_str());
-  } catch(CppSQLite3Exception e) {
+  } catch(CppSQLite3Exception& e) {
     LOG_ERROR(std::to_string(e.errorCode()) + ": " + e.errorMessage());
   }
   return CppSQLite3Query();
