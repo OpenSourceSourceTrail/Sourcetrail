@@ -222,9 +222,13 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
   add_library(Sourcetrail::gtest_main ALIAS gtest_main)
   target_link_libraries(
     gtest_main
-    PUBLIC GTest::gmock GTest::gtest
-    PRIVATE spdlog::spdlog)
+    PUBLIC GTest::gmock
+           GTest::gtest
+           spdlog::spdlog
+           Sourcetrail::lib_utility)
 endif()
+
+string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
 add_subdirectory(src/external)
 add_subdirectory(src/lib)
@@ -256,14 +260,15 @@ target_link_libraries(
   Sourcetrail_lib
   PUBLIC Sourcetrail::messaging Sourcetrail::scheduling CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
-          Sourcetrail::lib_utility
           Sourcetrail::lib_gui
+          Sourcetrail::utility::logging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
           Boost::system
           SQLite::SQLite3
           $<$<PLATFORM_ID:Windows>:bcrypt>)
+
 #configure language package defines
 configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")
 # Lib gui_utility --------------------------------------------------------------
@@ -286,7 +291,8 @@ target_link_libraries(
           Qt5::Core
           Sourcetrail::core
           Sourcetrail::lib
-          Sourcetrail::lib_utility)
+          Sourcetrail::utility::logging)
+
 # Lib Gui ----------------------------------------------------------------------
 # target for running versionnumber script
 # workaround for running customcommand (ninja dependency cycle)
@@ -298,17 +304,16 @@ add_library(Sourcetrail::lib_gui ALIAS Sourcetrail_lib_gui)
 
 target_link_libraries(
   Sourcetrail_lib_gui
-  PUBLIC Sourcetrail::lib_utility
-         Sourcetrail::lib
+  PUBLIC Sourcetrail::lib
          Qt5::Widgets
          Qt5::Network
          Qt5::Svg
          $<$<PLATFORM_ID:Windows>:Qt5::WinExtras>
-  PRIVATE fmt::fmt
-          Sourcetrail::core
+  PRIVATE Sourcetrail::core
           Sourcetrail::messaging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
-          Sourcetrail::lib_gui::utility)
+          Sourcetrail::lib_gui::utility
+          Sourcetrail::utility::logging)
 
 # command for versioning script
 add_custom_command(

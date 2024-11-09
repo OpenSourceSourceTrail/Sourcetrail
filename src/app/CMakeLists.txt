@@ -30,13 +30,13 @@ endif()
 
 target_link_libraries(
   Sourcetrail
-  PUBLIC fmt::fmt
-         Sourcetrail::core
+  PUBLIC Sourcetrail::core
          Sourcetrail::lib
          Sourcetrail::lib_gui
          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
          Qt5::Widgets
-         Qt5::Network)
+         Qt5::Network
+  PRIVATE Sourcetrail::utility::logging)
 
 target_include_directories(
   Sourcetrail

@@ -36,7 +36,8 @@ target_link_libraries(
           Sourcetrail::core
           Sourcetrail::lib
           Sourcetrail::lib_gui
-          Sourcetrail::messaging)
+          Sourcetrail::messaging
+          Sourcetrail::utility::logging)
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)

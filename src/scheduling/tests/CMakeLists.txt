@@ -6,8 +6,7 @@ foreach(test_name IN LISTS test_lib_names)
 
   target_link_libraries(
     ${test_name}
-    PUBLIC GTest::gtest
-           Sourcetrail::gtest_main
+    PUBLIC Sourcetrail::gtest_main
            Sourcetrail::scheduling
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
