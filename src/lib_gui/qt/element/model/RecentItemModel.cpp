@@ -1,8 +1,5 @@
 #include "RecentItemModel.hpp"
 
-#include <range/v3/to_container.hpp>
-#include <range/v3/view/transform.hpp>
-
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
@@ -204,7 +201,16 @@ void RecentItemModel::clicked(const QModelIndex& index) {
   const auto status = ::showMissingProjectDialog(item.path.wstring());
   if(status == 0) {
     mRecentProjects.erase(std::begin(mRecentProjects) + index.row());
+    updateRecentProjects();
   }
+}
+
+void RecentItemModel::updateRecentProjects() {
+  const auto recentProjects = mRecentProjects |
+      ranges::views::transform([](const RecentItem& item) -> std::filesystem::path { return item.path; }) |
+      ranges::to<std::vector>;
+  IApplicationSettings::getInstanceRaw()->setRecentProjects(recentProjects);
+  IApplicationSettings::getInstanceRaw()->save();
 }
 
 }    // namespace qt::element::model
