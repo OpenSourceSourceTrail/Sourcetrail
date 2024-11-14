@@ -2,11 +2,11 @@
 
 #include "FileSystem.h"
 #ifndef _WIN32
-#define private public
+#  define private public
 #endif
 #include "SqliteIndexStorage.h"
 #ifndef _WIN32
-#undef private
+#  undef private
 #endif
 
 namespace {
