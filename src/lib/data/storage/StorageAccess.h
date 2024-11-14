@@ -394,5 +394,6 @@ public:
    * @param newErrors A vector of ErrorInfo objects representing the new errors to add.
    * @param errorCount An ErrorCountInfo object containing the updated error count.
    */
-  virtual void addErrorsToCache([[maybe_unused]] const std::vector<ErrorInfo>& newErrors, [[maybe_unused]] const ErrorCountInfo& errorCount) {}
+  virtual void addErrorsToCache([[maybe_unused]] const std::vector<ErrorInfo>& newErrors,
+                                [[maybe_unused]] const ErrorCountInfo& errorCount) {}
 };
