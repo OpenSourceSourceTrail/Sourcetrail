@@ -3,6 +3,7 @@
 set(test_lib_names
     RefreshInfoGeneratorTestSuite
     SourceGroupTestSuite
+    PersistentStorageTestSuite
     SqliteBookmarkStorageTestSuite
     SqliteDatabaseIndexTestSuite
     SqliteIndexStorageTestSuite
