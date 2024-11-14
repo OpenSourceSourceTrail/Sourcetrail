@@ -1,9 +1,13 @@
 #include <gtest/gtest.h>
 
 #include "FileSystem.h"
+#ifndef _WIN32
 #define private public
+#endif
 #include "SqliteIndexStorage.h"
+#ifndef _WIN32
 #undef private
+#endif
 
 namespace {
 
@@ -88,7 +92,7 @@ protected:
   std::unique_ptr<SqliteIndexStorage> mStorage;
 };
 
-#ifndef D_WINDOWS
+#ifndef _WIN32
 TEST_F(SqliteIndexStorageTest, DoGetFirst_ReturnsFirstElement) {
   // Given:
   StorageNode node;
@@ -155,7 +159,7 @@ TEST_F(SqliteIndexStorageTest, DoGetAll_EmptyQuery_ReturnsAllNodes) {
   EXPECT_EQ(results[1].serializedName, L"node2");
 }
 
-#ifndef D_WINDOWS
+#ifndef _WIN32
 TEST_F(SqliteIndexStorageTest, DoGetAll_WithQuery_ReturnsFilteredNodes) {
   // Setup test data
   StorageNodeData node1;
@@ -271,7 +275,7 @@ TEST_F(SqliteIndexStorageTest, SetProjectSettingsText_HandlesSpecialCharacters) 
   EXPECT_EQ(mStorage->getProjectSettingsText(), settingsWithSpecialChars);
 }
 
-#ifndef D_WINDOWS
+#ifndef _WIN32
 TEST_F(SqliteIndexStorageTest, SetMode_ClearsAllTemporaryIndices) {
   // given
   mStorage->addNode(StorageNodeData(1, L"test"));    // Populate temp indices
