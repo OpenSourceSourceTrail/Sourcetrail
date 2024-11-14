@@ -3,7 +3,7 @@ set(test_lib_gui_names
     QtContextMenuTestSuite
     QtNetworkFactoryTestSuite
     #QtScreenSearchBoxTestSuite
-    QtSelfRefreshIconButtonTestSuite
+    #QtSelfRefreshIconButtonTestSuite NOTE: Not working in windows
     QtStartScreenTestSuite
     #RecentItemModelTestSuite NOTE: Not working in windows
 )

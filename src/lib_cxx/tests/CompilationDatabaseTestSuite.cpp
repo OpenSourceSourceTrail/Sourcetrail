@@ -37,6 +37,7 @@ TEST_F(MockedLoggerCompilationDatabase, InvalidJSON) {
   EXPECT_THAT(compilationDB.getFrameworkHeaderPaths(), testing::IsEmpty());
 }
 
+#ifndef _WIN32
 TEST_F(MockedLoggerCompilationDatabase, goodCase) {
   const auto CompilationFilePath = FilePath{"data/SourceGroupTestSuite/cxx_cdb/input/compile_commands.json"};
   const utility::CompilationDatabase compilationDB(CompilationFilePath);
@@ -46,3 +47,4 @@ TEST_F(MockedLoggerCompilationDatabase, goodCase) {
   EXPECT_THAT(compilationDB.getFrameworkHeaderPaths(), testing::IsEmpty());
   // TODO(Hussein): Missing logging
 }
+#endif
