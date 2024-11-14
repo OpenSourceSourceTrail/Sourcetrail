@@ -1,4 +1,8 @@
+#include <filesystem>
+
+#include <QCoreApplication>
 #include <QDebug>
+#include <QTimer>
 #include <QtSql/QSql>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
@@ -7,6 +11,8 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+
+#include <spdlog/spdlog.h>
 
 #include "SqliteStorage.h"
 #include "TimeStamp.h"
@@ -32,6 +38,7 @@ bool checkTableExists(const QString& dbFullPath, const QString& tableName) noexc
   QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
   db.setDatabaseName(dbFullPath);
   if(!db.open()) {
+    qDebug() << db.lastError();
     return false;
   }
 
@@ -40,8 +47,9 @@ bool checkTableExists(const QString& dbFullPath, const QString& tableName) noexc
 }
 
 TEST(SqliteStorage, setup_GoodCase) {
+  namespace fs = std::filesystem;
   // Given:
-  const FilePath dbFullPath{"/tmp/setup_GoodCase.sqlite"};
+  const FilePath dbFullPath{(fs::temp_directory_path() / L"setup_GoodCase.sqlite").wstring()};
   MockedSqliteStorage sqliteStorage{dbFullPath};
 
   // And:
@@ -204,3 +212,16 @@ TEST_F(SqliteStorageFix, executeStatement) {
 }
 
 }    // namespace
+
+int main(int argc, char** argv) {
+  auto logger = spdlog::default_logger_raw();
+  logger->set_level(spdlog::level::off);
+  // NOTE(Hussein): Windows platform needs to copy `sqldrivers` folder to test dir.
+  // QSqlDatabase needs QCoreApplication to be called to before discover SQL drivers.
+  QCoreApplication app{argc, argv};
+  QTimer::singleShot(0, &app, [&]() {
+    ::testing::InitGoogleTest(&argc, argv);
+    QCoreApplication::exit(RUN_ALL_TESTS());
+  });
+  QCoreApplication::exec();
+}
