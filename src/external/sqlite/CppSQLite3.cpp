@@ -37,6 +37,8 @@
 
 #include <cstdlib>
 
+#include <fmt/format.h>
+
 #include "sqlite3.h"
 
 
@@ -59,21 +61,14 @@ CppSQLite3Exception::CppSQLite3Exception(const int nErrCode, const char* szErrMe
     : CppSQLite3Exception(nErrCode, const_cast<char*>(szErrMess), bDeleteMsg) {}
 
 CppSQLite3Exception::CppSQLite3Exception(const int nErrCode, char* szErrMess, bool bDeleteMsg /*=true*/) : mnErrCode(nErrCode) {
-  mpszErrMess = sqlite3_mprintf("%s[%d]: %s", errorCodeAsString(nErrCode), nErrCode, szErrMess ? szErrMess : "");
+  mpszErrMess = fmt::format("%s[%d]: %s", errorCodeAsString(nErrCode), nErrCode, szErrMess ? szErrMess : "");
 
   if(bDeleteMsg && szErrMess) {
     sqlite3_free(szErrMess);
   }
 }
 
-
-CppSQLite3Exception::CppSQLite3Exception(const CppSQLite3Exception& e) : mnErrCode(e.mnErrCode) {
-  mpszErrMess = 0;
-  if(e.mpszErrMess) {
-    mpszErrMess = sqlite3_mprintf("%s", e.mpszErrMess);
-  }
-}
-
+CppSQLite3Exception::CppSQLite3Exception(const CppSQLite3Exception& e) : mnErrCode{e.mnErrCode}, mpszErrMess{e.mpszErrMess} {}
 
 const char* CppSQLite3Exception::errorCodeAsString(int nErrCode) {
   switch(nErrCode) {
@@ -140,14 +135,11 @@ const char* CppSQLite3Exception::errorCodeAsString(int nErrCode) {
   }
 }
 
+CppSQLite3Exception::~CppSQLite3Exception() = default;
 
-CppSQLite3Exception::~CppSQLite3Exception() {
-  if(mpszErrMess) {
-    sqlite3_free(mpszErrMess);
-    mpszErrMess = 0;
-  }
+const char* CppSQLite3Exception::what() const noexcept {
+  return mpszErrMess.c_str();
 }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -986,6 +978,16 @@ void CppSQLite3DB::open(const char* szFile) {
   setBusyTimeout(mnBusyTimeoutMs);
 }
 
+void CppSQLite3DB::openReadOnly(const char* szFile) {
+  int nRet = sqlite3_open_v2(szFile, &mpDB, SQLITE_OPEN_READONLY, nullptr);
+
+  if(SQLITE_OK != nRet) {
+    const char* szError = sqlite3_errmsg(mpDB);
+    throw CppSQLite3Exception(nRet, (char*)szError, DONT_DELETE_MSG);
+  }
+
+  setBusyTimeout(mnBusyTimeoutMs);
+}
 
 void CppSQLite3DB::close() {
   if(mpDB) {
