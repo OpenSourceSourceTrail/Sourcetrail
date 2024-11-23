@@ -94,6 +94,7 @@ if(NOT
 endif()
 
 include(cmake/compiler_warnings.cmake)
+include(cmake/add_sourcetrail_library.cmake)
 # Variables --------------------------------------------------------------------
 set(PROJECT_NAME Sourcetrail)
 
