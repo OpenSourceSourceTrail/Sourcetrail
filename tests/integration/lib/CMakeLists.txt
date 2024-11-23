@@ -32,6 +32,20 @@ endforeach()
 
 add_sourcetrail_test(
   NAME
+  ReadSqliteBookmarkStorageTestSuite
+  SOURCES
+  ReadSqliteBookmarkStorageTestSuite.cpp
+  DEPS
+  Sourcetrail::lib
+  Sourcetrail::lib::data::storage::sqlite::impls::ReadSqliteBookmarkStorage
+  Sourcetrail::lib::data::storage::sqlite::factory::impls::SqliteFactory
+  TEST_PREFIX
+  "integration."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
   SqliteFactoryTestSuite
   SOURCES
   SqliteFactoryTestSuite.cpp

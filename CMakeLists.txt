@@ -243,6 +243,7 @@ add_subdirectory(src/lib_utility)
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
 add_subdirectory(src/messaging)
+add_subdirectory(src/lib/data/storage/sqlite)
 # Lib Cxx ----------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_subdirectory(src/lib_cxx)

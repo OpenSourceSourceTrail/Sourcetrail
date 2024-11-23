@@ -1,4 +1,7 @@
-# Sourcetrail_lib_data_storage_sqlite
+# ${CMAKE_CURRENT_LIST_DIR}/src/lib/data/storage/sqlite/CMakeLists.txt
+add_subdirectory(factory)
+add_subdirectory(impls)
+
 add_sourcetrail_library(
   NAME
   lib::data::storage::sqlite::IReadSqliteBookmarkStorage
@@ -7,6 +10,4 @@ add_sourcetrail_library(
   PUBLIC_HEADERS
   IReadSqliteBookmarkStorage.hpp
   PUBLIC_DEPS
-  nonstd::expected-lite
-  WARNING_AS_ERROR
-  ${SOURCETRAIL_WARNING_AS_ERROR})
+  nonstd::expected-lite)
