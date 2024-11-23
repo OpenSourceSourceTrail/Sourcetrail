@@ -35,12 +35,14 @@
 
 #include <cstdio>
 #include <cstring>
+#include <exception>
+#include <string>
 
 #include "sqlite3.h"
 
-#define CPPSQLITE_ERROR 1000
+constexpr auto CPPSQLITE_ERROR = 1000;
 
-class CppSQLite3Exception {
+class CppSQLite3Exception final : public std::exception {
 public:
   CppSQLite3Exception(const int nErrCode, const char* szErrMess, bool bDeleteMsg = true);
 
@@ -48,21 +50,23 @@ public:
 
   CppSQLite3Exception(const CppSQLite3Exception& e);
 
-  virtual ~CppSQLite3Exception();
+  ~CppSQLite3Exception() override;
 
-  const int errorCode() {
+  [[nodiscard]] int errorCode() const {
     return mnErrCode;
   }
 
-  const char* errorMessage() {
-    return mpszErrMess;
+  [[nodiscard]] const char* errorMessage() const {
+    return mpszErrMess.c_str();
   }
 
   static const char* errorCodeAsString(int nErrCode);
 
+  [[nodiscard]] const char* what() const noexcept override;
+
 private:
   int mnErrCode;
-  char* mpszErrMess;
+  std::string mpszErrMess;
 };
 
 
@@ -266,6 +270,8 @@ public:
   virtual ~CppSQLite3DB();
 
   void open(const char* szFile);
+
+  void openReadOnly(const char* szFile);
 
   void close();
 
