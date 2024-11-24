@@ -409,3 +409,10 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     settings/source_group/type/SourceGroupSettingsCustomCommand.h
     settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 endif()
+
+add_library(Sourcetrail_utility_logging INTERFACE)
+add_library(Sourcetrail::utility::logging ALIAS Sourcetrail_utility_logging)
+
+target_link_libraries(Sourcetrail_utility_logging INTERFACE spdlog::spdlog Sourcetrail::lib_utility)
+target_include_directories(Sourcetrail_utility_logging INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/utility/logging)
+target_compile_definitions(Sourcetrail_utility_logging INTERFACE SOURCE_PATH_PREFIX_LEN=${SOURCE_PATH_PREFIX_LEN})

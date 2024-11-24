@@ -28,21 +28,14 @@ target_include_directories(
          ${CMAKE_SOURCE_DIR}/src/lib/utility/
          ${CMAKE_SOURCE_DIR}/src/lib/app/paths/
          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/
-         ${CMAKE_SOURCE_DIR}/src/lib/utility/logging/
          ${CMAKE_SOURCE_DIR}/src/lib/utility/text/)
 
 target_link_libraries(Sourcetrail_core PUBLIC Boost::date_time Boost::system Boost::filesystem)
 
 target_link_libraries(
   Sourcetrail_core
-  PUBLIC fmt::fmt
-         range-v3::range-v3
-         Sourcetrail::lib_utility
-         spdlog::spdlog
-  PRIVATE Boost::filesystem
-          Sourcetrail::lib_utility
-          Qt5::Core
-          fmt::fmt)
+  PUBLIC range-v3::range-v3
+  PRIVATE Sourcetrail::utility::logging Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>
 target_compile_definitions(

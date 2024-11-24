@@ -124,12 +124,11 @@ endif()
 
 target_link_libraries(
   Sourcetrail_lib_cxx
-  PRIVATE fmt::fmt
-          Sourcetrail::core
+  PRIVATE Sourcetrail::core
           Sourcetrail::lib
-          Sourcetrail::lib_utility
           Sourcetrail::messaging
           Sourcetrail::scheduling
+          Sourcetrail::utility::logging
           ${REQ_LLVM_LIBS}
           ${CLANG_LIBRARIES}
           Qt5::Core)
