@@ -163,7 +163,7 @@ set(Boost_USE_STATIC_LIBS
     CACHE BOOL "Set to ON to force the use of the static libraries.")
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(
-  Boost 1.74
+  Boost 1.83
   COMPONENTS date_time
              filesystem
              program_options
