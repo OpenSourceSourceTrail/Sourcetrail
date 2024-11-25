@@ -317,7 +317,8 @@ target_link_libraries(
           Sourcetrail::messaging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Sourcetrail::lib_gui::utility
-          Sourcetrail::core::utility::logging)
+          Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::utility)
 
 # command for versioning script
 add_custom_command(
