@@ -6,8 +6,7 @@ add_library(Sourcetrail::core ALIAS Sourcetrail_core)
 
 target_sources(
   Sourcetrail_core
-  PRIVATE ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileInfo.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileManager.cpp
+  PRIVATE ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileManager.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FilePathFilter.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileRegister.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileSystem.cpp
@@ -15,7 +14,6 @@ target_sources(
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/ScopedTemporaryFile.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/utilityFile.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/ScopedFunctor.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/TimeStamp.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/tracing.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/utility.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/utilityUuid.cpp
@@ -33,7 +31,11 @@ target_link_libraries(Sourcetrail_core PUBLIC Boost::date_time Boost::system Boo
 
 target_link_libraries(
   Sourcetrail_core
-  PUBLIC range-v3::range-v3 Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
+  PUBLIC
+  range-v3::range-v3
+  Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
+  Sourcetrail::core::utility::file::FileInfo # TODO(Hussein): It must be moved to private
+  Sourcetrail::core::utility::TimeStamp # TODO(Hussein): It must be moved to private
   PRIVATE Sourcetrail::core::utility::logging Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>

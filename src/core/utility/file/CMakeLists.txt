@@ -9,3 +9,14 @@ add_sourcetrail_library(
   PRIVATE_DEPS
   Boost::filesystem
   Sourcetrail::core::utility::logging)
+
+add_sourcetrail_library(
+  NAME
+  core::utility::file::FileInfo
+  SOURCES
+  FileInfo.cpp
+  PUBLIC_HEADERS
+  FileInfo.h
+  PUBLIC_DEPS
+  Sourcetrail::core::utility::file::FilePath
+  Sourcetrail::core::utility::TimeStamp)

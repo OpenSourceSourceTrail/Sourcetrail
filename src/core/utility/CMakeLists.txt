@@ -37,3 +37,13 @@ add_sourcetrail_library(
   TextCodec.h
   PRIVATE_DEPS
   Qt5::Core)
+
+add_sourcetrail_library(
+  NAME
+  core::utility::TimeStamp
+  SOURCES
+  TimeStamp.cpp
+  PUBLIC_HEADERS
+  TimeStamp.h
+  PUBLIC_DEPS
+  Boost::date_time)
