@@ -120,13 +120,6 @@ function(add_sourcetrail_library)
     endif()
   endforeach()
 
-  # 3. Validate dependencies
-  foreach(dep ${ARG_PUBLIC_DEPS} ${ARG_PRIVATE_DEPS})
-    if(NOT TARGET ${dep})
-      message(FATAL_ERROR "Dependency target does not exist: ${dep}")
-    endif()
-  endforeach()
-
   # Create the actual library name with the full namespace
   string(
     REPLACE "::"
