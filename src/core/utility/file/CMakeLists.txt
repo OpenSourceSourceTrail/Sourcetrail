@@ -8,4 +8,4 @@ add_sourcetrail_library(
   FilePath.h
   PRIVATE_DEPS
   Boost::filesystem
-  Sourcetrail::utility::logging)
+  Sourcetrail::core::utility::logging)

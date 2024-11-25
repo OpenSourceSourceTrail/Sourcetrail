@@ -15,7 +15,7 @@ target_include_directories(Sourcetrail_messaging PUBLIC ${CMAKE_CURRENT_LIST_DIR
 target_link_libraries(
   Sourcetrail_messaging
   PUBLIC Sourcetrail::lib # TODO(Hussein): Needed for `type.h` It should be removed to Sourcetrail::utility
-  PRIVATE Sourcetrail::core Sourcetrail::scheduling Sourcetrail::utility::logging)
+  PRIVATE Sourcetrail::core Sourcetrail::scheduling Sourcetrail::core::utility::logging)
 
 if(ENABLE_UNIT_TEST)
   add_subdirectory(tests)

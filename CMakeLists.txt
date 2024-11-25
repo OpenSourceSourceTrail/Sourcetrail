@@ -262,7 +262,7 @@ target_link_libraries(
   PUBLIC Sourcetrail::messaging Sourcetrail::scheduling CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
           Sourcetrail::lib_gui
-          Sourcetrail::utility::logging
+          Sourcetrail::core::utility::logging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
@@ -292,7 +292,7 @@ target_link_libraries(
           Qt5::Core
           Sourcetrail::core
           Sourcetrail::lib
-          Sourcetrail::utility::logging)
+          Sourcetrail::core::utility::logging)
 
 # Lib Gui ----------------------------------------------------------------------
 # target for running versionnumber script
@@ -314,7 +314,7 @@ target_link_libraries(
           Sourcetrail::messaging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Sourcetrail::lib_gui::utility
-          Sourcetrail::utility::logging)
+          Sourcetrail::core::utility::logging)
 
 # command for versioning script
 add_custom_command(

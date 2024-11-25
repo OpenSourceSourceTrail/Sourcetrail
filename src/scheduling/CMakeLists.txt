@@ -24,7 +24,7 @@ target_include_directories(Sourcetrail_scheduling PUBLIC ${CMAKE_CURRENT_LIST_DI
 
 target_link_libraries(
   Sourcetrail_scheduling
-  PUBLIC Sourcetrail::core Sourcetrail::utility::logging
+  PUBLIC Sourcetrail::core Sourcetrail::core::utility::logging
   PRIVATE Boost::date_time)
 
 if(ENABLE_UNIT_TEST)

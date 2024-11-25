@@ -128,7 +128,7 @@ target_link_libraries(
           Sourcetrail::lib
           Sourcetrail::messaging
           Sourcetrail::scheduling
-          Sourcetrail::utility::logging
+          Sourcetrail::core::utility::logging
           ${REQ_LLVM_LIBS}
           ${CLANG_LIBRARIES}
           Qt5::Core)
