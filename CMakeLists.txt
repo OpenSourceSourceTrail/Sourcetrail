@@ -65,6 +65,7 @@ include(cmake/version_setup.cmake)
 include(cmake/licenses.cmake)
 include(cmake/create_symlink.cmake)
 include(cmake/add_sourcetrail_library.cmake)
+include(cmake/add_sourcetrail_test.cmake)
 
 if(ENABLE_SANITIZER_ADDRESS
    OR ENABLE_SANITIZER_UNDEFINED_BEHAVIOR

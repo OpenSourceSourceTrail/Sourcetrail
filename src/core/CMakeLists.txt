@@ -17,7 +17,6 @@ target_sources(
           ${CMAKE_SOURCE_DIR}/src/lib/utility/tracing.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/utility.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/utilityUuid.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/Version.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/text/TextAccess.cpp)
 
 target_include_directories(
@@ -36,6 +35,7 @@ target_link_libraries(
   Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
   Sourcetrail::core::utility::file::FileInfo # TODO(Hussein): It must be moved to private
   Sourcetrail::core::utility::TimeStamp # TODO(Hussein): It must be moved to private
+  Sourcetrail::core::utility::Version # TODO(Hussein): It must be moved to private
   PRIVATE Sourcetrail::core::utility::logging Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>
