@@ -83,8 +83,19 @@ add_sourcetrail_library(
   Sourcetrail::core::utility::utilityString
   PRIVATE_DEPS
   range-v3::range-v3)
-
+# ================================================================================================================================
 add_library(Sourcetrail_core_utility_UnorderedCache INTERFACE)
 add_library(Sourcetrail::core::utility::UnorderedCache ALIAS Sourcetrail_core_utility_UnorderedCache)
 
 target_include_directories(Sourcetrail_core_utility_UnorderedCache INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+# ================================================================================================================================
+add_library(Sourcetrail_core_utility_Tree INTERFACE)
+add_library(Sourcetrail::core::utility::Tree ALIAS Sourcetrail_core_utility_Tree)
+
+target_include_directories(Sourcetrail_core_utility_Tree INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+# ================================================================================================================================
+add_library(Sourcetrail_core_utility_GlobalId INTERFACE)
+add_library(Sourcetrail::core::utility::GlobalId ALIAS Sourcetrail_core_utility_GlobalId)
+
+target_include_directories(Sourcetrail_core_utility_GlobalId INTERFACE ${CMAKE_CURRENT_LIST_DIR})
+# ================================================================================================================================

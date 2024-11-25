@@ -2,7 +2,7 @@
 
 #include "LowMemoryStringMap.h"
 #include "TextAccess.h"
-#include "types.h"
+#include "GlobalId.hpp"
 #include "utilityString.h"
 
 TEST(LowMemoryStringMap, roughlyEverything) {

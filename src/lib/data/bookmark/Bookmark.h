@@ -4,7 +4,7 @@
 
 #include "BookmarkCategory.h"
 #include "TimeStamp.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class Bookmark {
 public:

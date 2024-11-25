@@ -4,7 +4,7 @@
 // internal
 #include "MessageBase.h"
 #include "MessageQueue.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageListenerBase {
 public:

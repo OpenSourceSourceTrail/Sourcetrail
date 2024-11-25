@@ -9,7 +9,7 @@
 #include "FilePath.h"
 #include "LocationType.h"
 #include "SourceLocation.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class SourceLocationFile final {
 public:

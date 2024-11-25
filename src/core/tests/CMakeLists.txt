@@ -64,22 +64,37 @@ gtest_discover_tests(
   TEST_PREFIX "unittests.core.")
 # ================================================================================================================================
 add_sourcetrail_test(
-  NAME TextCodecTestSuite
-  SOURCES TextCodecTestSuite.cpp
-  DEPS Sourcetrail::core::utility::TextCodec
-  TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  NAME
+  TextCodecTestSuite
+  SOURCES
+  TextCodecTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::TextCodec
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
-  NAME VersionTestSuite
-  SOURCES VersionTestSuite.cpp
-  DEPS Sourcetrail::core::utility::Version
-  TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  NAME
+  VersionTestSuite
+  SOURCES
+  VersionTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::Version
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
-  NAME UnorderedCacheTestSuite
-  SOURCES UnorderedCacheTestSuite.cpp
-  DEPS Sourcetrail::core::utility::UnorderedCache
-  TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  NAME
+  UnorderedCacheTestSuite
+  SOURCES
+  UnorderedCacheTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::UnorderedCache
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")

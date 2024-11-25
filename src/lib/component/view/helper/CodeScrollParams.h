@@ -1,7 +1,7 @@
 #pragma once
 // internal
 #include "FilePath.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct CodeScrollParams {
   enum class Type { NONE, TO_REFERENCE, TO_FILE, TO_LINE, TO_VALUE };

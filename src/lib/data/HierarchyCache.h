@@ -6,7 +6,7 @@
 #include <set>
 #include <vector>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 class HierarchyCache {
 public:

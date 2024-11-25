@@ -2,7 +2,7 @@
 // internal
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageShowReference final : public Message<MessageShowReference> {
 public:

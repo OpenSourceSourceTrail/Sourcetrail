@@ -7,7 +7,7 @@
 // internal
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageGraphNodeMove final : public Message<MessageGraphNodeMove> {
 public:

@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "TokenComponent.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class TokenComponentInheritanceChain : public TokenComponent {
 public:

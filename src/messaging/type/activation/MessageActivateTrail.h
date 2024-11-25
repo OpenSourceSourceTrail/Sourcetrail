@@ -3,7 +3,7 @@
 #include "Message.h"
 #include "MessageActivateBase.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageActivateTrail
     : public Message<MessageActivateTrail>

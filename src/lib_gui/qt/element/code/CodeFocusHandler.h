@@ -2,7 +2,7 @@
 // STL
 #include <vector>
 // internal
-#include "types.h"
+#include "GlobalId.hpp"
 
 class QPushButton;
 class QtCodeArea;

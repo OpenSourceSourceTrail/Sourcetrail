@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct StorageBookmarkData {
   StorageBookmarkData() = default;

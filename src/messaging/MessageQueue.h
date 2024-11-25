@@ -6,7 +6,7 @@
 #include <mutex>
 #include <vector>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageBase;
 class MessageFilter;

@@ -2,7 +2,7 @@
 // internal
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageActivateTokenIds final : public Message<MessageActivateTokenIds> {
 public:

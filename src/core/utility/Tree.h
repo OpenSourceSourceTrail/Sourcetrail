@@ -1,5 +1,4 @@
 #pragma once
-// STL
 #include <vector>
 
 template <typename T>

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 class View;
 class Controller;

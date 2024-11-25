@@ -6,7 +6,7 @@
 
 #include "Task.h"
 #include "TaskRunner.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class TaskScheduler final {
 public:

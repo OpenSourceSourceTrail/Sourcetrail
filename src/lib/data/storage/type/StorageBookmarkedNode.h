@@ -2,7 +2,7 @@
 // STL
 #include <string>
 // internal
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct StorageBookmarkedNodeData {
   StorageBookmarkedNodeData() : bookmarkId(0), serializedNodeName(L"") {}

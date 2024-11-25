@@ -5,7 +5,7 @@
 //
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageActivateEdge : public Message<MessageActivateEdge> {
 public:

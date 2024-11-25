@@ -5,7 +5,7 @@
 
 #include "MessageListener.h"
 #include "type/graph/MessageSaveAsImage.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 
 class GraphFocusHandler;

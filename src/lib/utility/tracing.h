@@ -6,7 +6,7 @@
 // internal
 #include "FilePath.h"
 #include "TimeStamp.h"
-#include "types.h"
+#include "GlobalId.hpp"
 #include "utilityString.h"
 
 struct TraceEvent {

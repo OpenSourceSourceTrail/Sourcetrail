@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "TimeStamp.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class SourceLocationFile;
 

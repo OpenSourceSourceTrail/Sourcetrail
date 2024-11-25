@@ -8,7 +8,7 @@
 
 #include "FilePath.h"
 #include "LocationType.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class QtHighlighter;
 class SourceLocation;

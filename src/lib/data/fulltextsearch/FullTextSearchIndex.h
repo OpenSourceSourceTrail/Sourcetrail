@@ -6,7 +6,7 @@
 #include <unordered_map>
 // internal
 #include "SuffixArray.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class StorageAccess;
 

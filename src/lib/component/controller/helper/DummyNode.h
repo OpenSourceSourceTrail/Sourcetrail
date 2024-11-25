@@ -9,7 +9,7 @@
 #include "GroupType.h"
 #include "NameHierarchy.h"
 #include "Node.h"
-#include "types.h"
+#include "GlobalId.hpp"
 #include "utility.h"
 #include "utilityString.h"
 

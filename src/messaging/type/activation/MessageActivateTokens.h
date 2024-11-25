@@ -2,7 +2,7 @@
 // internal
 #include "Message.h"
 #include "MessageActivateBase.h"
-#include "types.h"
+#include "GlobalId.hpp"
 //
 #include "SearchMatch.h"
 

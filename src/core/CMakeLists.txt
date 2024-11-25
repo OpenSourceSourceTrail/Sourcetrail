@@ -28,12 +28,11 @@ target_link_libraries(Sourcetrail_core PUBLIC Boost::date_time Boost::system Boo
 
 target_link_libraries(
   Sourcetrail_core
-  PUBLIC
-  range-v3::range-v3
-  Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
-  Sourcetrail::core::utility::file::FileInfo # TODO(Hussein): It must be moved to private
-  Sourcetrail::core::utility::TimeStamp # TODO(Hussein): It must be moved to private
-  Sourcetrail::core::utility::Version # TODO(Hussein): It must be moved to private
+  PUBLIC range-v3::range-v3
+         Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
+         Sourcetrail::core::utility::file::FileInfo # TODO(Hussein): It must be moved to private
+         Sourcetrail::core::utility::TimeStamp # TODO(Hussein): It must be moved to private
+         Sourcetrail::core::utility::Version # TODO(Hussein): It must be moved to private
   PRIVATE Sourcetrail::core::utility::logging Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>

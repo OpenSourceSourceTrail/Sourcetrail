@@ -33,7 +33,7 @@
 #include "type/graph//MessageActivateTrailEdge.h"
 #include "type/graph/MessageDeactivateEdge.h"
 #include "type/MessageFlushUpdates.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class StorageAccess;
 class SourceLocation;

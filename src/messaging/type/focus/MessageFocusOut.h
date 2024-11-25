@@ -4,7 +4,7 @@
 // internal
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageFocusOut final : public Message<MessageFocusOut> {
 public:

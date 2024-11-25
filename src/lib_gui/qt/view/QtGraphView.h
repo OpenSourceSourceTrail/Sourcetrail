@@ -11,7 +11,7 @@
 #include "GraphView.h"
 #include "QtScrollSpeedChangeListener.h"
 #include "QtThreadedFunctor.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct DummyEdge;
 struct DummyNode;

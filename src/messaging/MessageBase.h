@@ -3,7 +3,7 @@
 #include <ostream>
 #include <sstream>
 // internal
-#include "types.h"
+#include "GlobalId.hpp"
 #include "utilityString.h"
 
 class MessageBase {

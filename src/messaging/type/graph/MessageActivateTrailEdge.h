@@ -4,7 +4,7 @@
 #include "Message.h"
 #include "NameHierarchy.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageActivateTrailEdge final : public Message<MessageActivateTrailEdge> {
 public:

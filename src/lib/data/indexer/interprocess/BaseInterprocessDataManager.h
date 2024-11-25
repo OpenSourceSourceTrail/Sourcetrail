@@ -4,7 +4,7 @@
 #include <string>
 
 #include "SharedMemory.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class BaseInterprocessDataManager {
 public:

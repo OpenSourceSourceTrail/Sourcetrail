@@ -10,7 +10,7 @@
 #include <clang/Lex/Token.h>
 
 #include "FilePath.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class CanonicalFilePathCache;
 class ParserClient;

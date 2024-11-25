@@ -6,7 +6,7 @@
 
 #include "GroupType.h"
 #include "ScreenSearchInterfaces.h"
-#include "types.h"
+#include "GlobalId.hpp"
 #include "View.h"
 
 struct DummyEdge;

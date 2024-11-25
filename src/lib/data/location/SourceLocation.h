@@ -6,7 +6,7 @@
 #include <vector>
 // internal
 #include "LocationType.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class FilePath;
 class SourceLocationFile;

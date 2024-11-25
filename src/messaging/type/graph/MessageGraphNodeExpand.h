@@ -2,7 +2,7 @@
 
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class MessageGraphNodeExpand final : public Message<MessageGraphNodeExpand> {
 public:

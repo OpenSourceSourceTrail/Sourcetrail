@@ -6,7 +6,7 @@
 #include <vector>
 // internal
 #include "Node.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class NodeTypeSet;
 
