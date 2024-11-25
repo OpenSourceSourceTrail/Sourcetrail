@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
+#include "GlobalId.hpp"
 #include "LowMemoryStringMap.h"
 #include "TextAccess.h"
-#include "GlobalId.hpp"
 #include "utilityString.h"
 
 TEST(LowMemoryStringMap, roughlyEverything) {

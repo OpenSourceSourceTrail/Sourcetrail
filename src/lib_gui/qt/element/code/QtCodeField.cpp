@@ -14,7 +14,6 @@
 #include "SourceLocation.h"
 #include "SourceLocationFile.h"
 #include "TextCodec.h"
-#include "tracing.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageActivateSourceLocations.h"
 #include "type/code/MessageActivateTokenIds.h"

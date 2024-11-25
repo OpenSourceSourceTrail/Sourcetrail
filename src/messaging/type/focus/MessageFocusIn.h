@@ -2,10 +2,10 @@
 // STL
 #include <vector>
 // internal
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "TabId.h"
 #include "TooltipOrigin.h"
-#include "GlobalId.hpp"
 
 class MessageFocusIn final : public Message<MessageFocusIn> {
 public:

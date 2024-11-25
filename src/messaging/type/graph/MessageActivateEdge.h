@@ -3,9 +3,9 @@
 #include "Edge.h"
 #include "NameHierarchy.h"
 //
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "TabId.h"
-#include "GlobalId.hpp"
 
 class MessageActivateEdge : public Message<MessageActivateEdge> {
 public:

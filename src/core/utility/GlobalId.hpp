@@ -5,7 +5,7 @@ using Id = size_t;    // TODO(Hussein): Replace it with GlobalId
 
 struct GlobalId final {
   constexpr GlobalId() noexcept = default;
-  constexpr GlobalId(size_t index) noexcept : mValue(index) {}
+  constexpr explicit GlobalId(size_t index) noexcept : mValue(index) {}
 
   constexpr operator bool() const noexcept {
     return mInitialized;

@@ -12,7 +12,6 @@
 #include "logging.h"
 #include "ResourcePaths.h"
 #include "TextAccess.h"
-#include "tracing.h"
 #include "utility.h"
 
 std::map<std::wstring, std::vector<QtHighlighter::HighlightingRule>> QtHighlighter::s_highlightingRules;

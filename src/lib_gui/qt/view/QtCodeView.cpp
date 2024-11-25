@@ -7,7 +7,6 @@
 #include "QtHighlighter.h"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
-#include "tracing.h"
 #include "utilityQt.h"
 
 QtCodeView::QtCodeView(ViewLayout* viewLayout) : CodeView(viewLayout) {
@@ -27,8 +26,6 @@ void QtCodeView::refreshView() {
   }
 
   m_onQtThread([=]() {
-    TRACE("refresh");
-
     setStyleSheet();
 
     QtCodeArea::clearAnnotationColors();
@@ -77,8 +74,6 @@ void QtCodeView::showSnippets(const std::vector<CodeFileParams>& files,
                               const CodeParams& params,
                               const CodeScrollParams& scrollParams) {
   m_onQtThread([=]() {
-    TRACE("show snippets");
-
     m_widget->setMode(QtCodeNavigator::MODE_LIST);
 
     if(params.clearSnippets) {
@@ -99,8 +94,6 @@ void QtCodeView::showSnippets(const std::vector<CodeFileParams>& files,
 
 void QtCodeView::showSingleFile(const CodeFileParams& file, const CodeParams& params, const CodeScrollParams& scrollParams) {
   m_onQtThread([=]() {
-    TRACE("show single file");
-
     bool animatedScroll = !m_widget->isInListMode();
 
     m_widget->setMode(QtCodeNavigator::MODE_SINGLE);
@@ -127,8 +120,6 @@ void QtCodeView::showSingleFile(const CodeFileParams& file, const CodeParams& pa
 
 void QtCodeView::updateSourceLocations(const std::vector<CodeFileParams>& files) {
   m_onQtThread([=]() {
-    TRACE("update source locations");
-
     for(const CodeFileParams& file : files) {
       for(const CodeSnippetParams& snippet : file.snippetParams) {
         if(snippet.hasAllSourceLocations) {

@@ -23,7 +23,6 @@
 #include "TokenComponentFilePath.h"
 #include "TokenComponentInheritanceChain.h"
 #include "TokenComponentIsAmbiguous.h"
-#include "tracing.h"
 #include "type/error/MessageErrorCountUpdate.h"
 #include "type/MessageStatus.h"
 #include "UnorderedCache.h"

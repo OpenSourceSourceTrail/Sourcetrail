@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "BookmarkCategory.h"
-#include "TimeStamp.h"
 #include "GlobalId.hpp"
+#include "TimeStamp.h"
 
 class Bookmark {
 public:

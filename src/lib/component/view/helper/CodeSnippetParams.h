@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "TimeStamp.h"
 #include "GlobalId.hpp"
+#include "TimeStamp.h"
 
 class SourceLocationFile;
 

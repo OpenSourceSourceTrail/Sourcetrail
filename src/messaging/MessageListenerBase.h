@@ -2,9 +2,9 @@
 // STL
 #include <string>
 // internal
+#include "GlobalId.hpp"
 #include "MessageBase.h"
 #include "MessageQueue.h"
-#include "GlobalId.hpp"
 
 class MessageListenerBase {
 public:

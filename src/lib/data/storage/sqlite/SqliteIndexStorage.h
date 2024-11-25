@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ErrorInfo.h"
+#include "GlobalId.hpp"
 #include "LocationType.h"
 #include "LowMemoryStringMap.h"
 #include "SqliteDatabaseIndex.h"
@@ -19,7 +20,6 @@
 #include "StorageOccurrence.h"
 #include "StorageSourceLocation.h"
 #include "StorageSymbol.h"
-#include "GlobalId.hpp"
 #include "utility.h"
 #include "utilityString.h"
 

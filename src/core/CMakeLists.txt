@@ -14,7 +14,6 @@ target_sources(
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/ScopedTemporaryFile.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/utilityFile.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/ScopedFunctor.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/tracing.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/text/TextAccess.cpp)
 
 target_include_directories(

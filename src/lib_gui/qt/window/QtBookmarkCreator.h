@@ -5,8 +5,8 @@
 
 #include "BookmarkController.h"
 #include "ControllerProxy.h"
-#include "QtWindow.h"
 #include "GlobalId.hpp"
+#include "QtWindow.h"
 
 class BookmarkCategory;
 class QComboBox;

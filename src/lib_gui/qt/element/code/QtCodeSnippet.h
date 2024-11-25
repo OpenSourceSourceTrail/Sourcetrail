@@ -6,8 +6,8 @@
 
 #include "CodeFocusHandler.h"
 #include "CodeSnippetParams.h"
-#include "QtCodeArea.h"
 #include "GlobalId.hpp"
+#include "QtCodeArea.h"
 
 class QBoxLayout;
 class QPushButton;

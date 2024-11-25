@@ -3,9 +3,9 @@
 
 #include <QGraphicsView>
 
+#include "GlobalId.hpp"
 #include "MessageListener.h"
 #include "type/graph/MessageSaveAsImage.h"
-#include "GlobalId.hpp"
 
 
 class GraphFocusHandler;

@@ -32,7 +32,6 @@
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
 #include "TabbedView.h"
-#include "tracing.h"
 #include "type/activation/MessageActivateBase.h"
 #include "type/activation/MessageActivateOverview.h"
 #include "type/bookmark/MessageBookmarkActivate.h"
@@ -395,10 +394,6 @@ void QtMainWindow::keyPressEvent(QKeyEvent* event) {
     if(utility::getOsType() == OS_WINDOWS && event->modifiers() & Qt::ControlModifier) {
       closeTab();
     }
-    break;
-
-  case Qt::Key_Space:
-    PRINT_TRACES();
     break;
 
   case Qt::Key_Tab:

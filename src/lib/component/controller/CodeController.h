@@ -7,6 +7,7 @@
 #include "CodeView.h"
 #include "Controller.h"
 #include "FilePath.h"
+#include "GlobalId.hpp"
 #include "LocationType.h"
 #include "MessageListener.h"
 #include "SnippetMerger.h"
@@ -33,7 +34,6 @@
 #include "type/graph//MessageActivateTrailEdge.h"
 #include "type/graph/MessageDeactivateEdge.h"
 #include "type/MessageFlushUpdates.h"
-#include "GlobalId.hpp"
 
 class StorageAccess;
 class SourceLocation;

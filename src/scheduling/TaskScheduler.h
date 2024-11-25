@@ -4,9 +4,9 @@
 #include <memory>
 #include <mutex>
 
+#include "GlobalId.hpp"
 #include "Task.h"
 #include "TaskRunner.h"
-#include "GlobalId.hpp"
 
 class TaskScheduler final {
 public:

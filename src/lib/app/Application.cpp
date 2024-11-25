@@ -29,7 +29,6 @@
 #include "StorageCache.h"
 #include "TabId.h"
 #include "TaskScheduler.h"
-#include "tracing.h"
 #include "type/MessageQuitApplication.h"
 #include "type/MessageStatus.h"
 #include "UserPaths.h"
@@ -311,14 +310,10 @@ void Application::handleMessage(MessageLoadProject* message) {
 }
 
 void Application::handleMessage(MessageRefresh* pMessage) {
-  TRACE("app refresh");
-
   refreshProject(pMessage->all ? REFRESH_ALL_FILES : REFRESH_UPDATED_FILES, false);
 }
 
 void Application::handleMessage(MessageRefreshUI* pMessage) {
-  TRACE("ui refresh");
-
   if(mHasGui) {
     updateTitle();
 

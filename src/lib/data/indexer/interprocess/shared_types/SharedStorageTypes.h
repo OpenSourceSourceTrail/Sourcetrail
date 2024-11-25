@@ -1,6 +1,7 @@
 #ifndef SHARED_STORAGE_TYPES_H
 #define SHARED_STORAGE_TYPES_H
 
+#include "GlobalId.hpp"
 #include "SharedMemory.h"
 #include "StorageComponentAccess.h"
 #include "StorageEdge.h"
@@ -11,7 +12,6 @@
 #include "StorageOccurrence.h"
 #include "StorageSourceLocation.h"
 #include "StorageSymbol.h"
-#include "GlobalId.hpp"
 #include "utilityString.h"
 
 // macro creating SharedStorageType from StorageType

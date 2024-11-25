@@ -1,8 +1,8 @@
 #pragma once
 // internal
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "MessageActivateBase.h"
-#include "GlobalId.hpp"
 //
 #include "SearchMatch.h"
 

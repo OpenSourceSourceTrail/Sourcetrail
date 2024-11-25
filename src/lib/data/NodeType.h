@@ -7,9 +7,9 @@
 #include <vector>
 
 #include "FilePath.h"
+#include "GlobalId.hpp"
 #include "NodeKind.h"
 #include "Tree.h"
-#include "GlobalId.hpp"
 
 class NodeType {
 public:
