@@ -4,9 +4,9 @@
 #include <unordered_map>
 
 template <typename KeyType, typename ValType, typename Hasher = std::hash<KeyType>>
-class UnorderedCache {
+class UnorderedCache final {
 public:
-  UnorderedCache(std::function<ValType(const KeyType&)> calculator);
+  explicit UnorderedCache(std::function<ValType(const KeyType&)> calculator);
 
   ValType getValue(const KeyType& key);
 

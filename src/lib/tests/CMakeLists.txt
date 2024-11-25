@@ -29,8 +29,7 @@ set(test_lib_names
     TabIdTestSuite
     TabTestSuite
     TimeStampTestSuite
-    TreeTestSuite
-    UnorderedCacheTestSuite)
+    TreeTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
   add_executable(${test_name} ${test_name}.cpp)

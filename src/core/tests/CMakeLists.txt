@@ -76,3 +76,10 @@ add_sourcetrail_test(
   DEPS Sourcetrail::core::utility::Version
   TEST_PREFIX "unittests.core."
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME UnorderedCacheTestSuite
+  SOURCES UnorderedCacheTestSuite.cpp
+  DEPS Sourcetrail::core::utility::UnorderedCache
+  TEST_PREFIX "unittests.core."
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
