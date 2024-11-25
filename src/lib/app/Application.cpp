@@ -151,12 +151,7 @@ void Application::loadSettings() {
 
   if(settings->getLoggingEnabled()) {
     namespace fs = std::filesystem;
-    auto loggerPath =
-#if WIN32
-        (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).wstring();
-#else
-        (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
-#endif
+    auto loggerPath = (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
     auto dLogger = spdlog::default_logger_raw();
     if(nullptr == dLogger) {
       return;
