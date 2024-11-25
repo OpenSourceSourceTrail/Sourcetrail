@@ -1,8 +1,7 @@
 #pragma once
-// STL
 #include <regex>
 #include <string>
-// internal
+
 #include "FilePath.h"
 
 class FilePathFilter final {

@@ -7,7 +7,6 @@ target_sources(
   PRIVATE ${CMAKE_CURRENT_LIST_DIR}/utility/ConfigManager.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileInfo.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileManager.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FilePath.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FilePathFilter.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileRegister.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileSystem.cpp
@@ -34,7 +33,9 @@ target_link_libraries(Sourcetrail_core PUBLIC Boost::date_time Boost::system Boo
 
 target_link_libraries(
   Sourcetrail_core
-  PUBLIC range-v3::range-v3
+  PUBLIC
+  range-v3::range-v3
+  Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
   PRIVATE Sourcetrail::utility::logging Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>
@@ -56,3 +57,5 @@ myproject_set_project_warnings(
 if(ENABLE_UNIT_TEST)
   add_subdirectory(tests)
 endif()
+
+add_subdirectory(utility/file)

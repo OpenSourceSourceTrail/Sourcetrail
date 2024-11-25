@@ -1,10 +1,10 @@
 #pragma once
-// STL
 #include <set>
-// internal
-#include "FilePath.h"
+#include <string>
+
 #include "UnorderedCache.h"
 
+class FilePath;
 class FilePathFilter;
 
 class FileRegister {
