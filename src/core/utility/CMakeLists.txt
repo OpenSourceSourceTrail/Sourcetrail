@@ -99,3 +99,11 @@ add_library(Sourcetrail::core::utility::GlobalId ALIAS Sourcetrail_core_utility_
 
 target_include_directories(Sourcetrail_core_utility_GlobalId INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 # ================================================================================================================================
+add_sourcetrail_library(
+  NAME
+  core::utility::Status
+  SOURCES
+  Status.cpp
+  PUBLIC_HEADERS
+  Status.h)
+# ================================================================================================================================

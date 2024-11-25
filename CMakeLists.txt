@@ -265,6 +265,7 @@ target_link_libraries(
           Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::ConfigManager
           Sourcetrail::core::utility::utilityUuid
+          Sourcetrail::core::utility::Status
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
