@@ -1,7 +1,6 @@
 # ${CMAKE_SOURCE_DIR}/src/core/tests/CMakeLists.txt
 
 set(gtest_lib_names
-    ConfigManagerTestSuite
     FileManagerTestSuite
     FilePathFilterTestSuite
     FilePathTestSuite
@@ -31,6 +30,23 @@ foreach(test_name IN LISTS gtest_lib_names)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
     TEST_PREFIX "unittests.core.")
 endforeach()
+# ================================================================================================================================
+add_executable(ConfigManagerTestSuite ConfigManagerTestSuite.cpp)
+
+target_link_libraries(
+  ConfigManagerTestSuite
+  PUBLIC Sourcetrail::gtest_main
+         Sourcetrail::core
+         Sourcetrail::core::utility::ConfigManager
+         $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
+         $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
+
+set_target_properties(ConfigManagerTestSuite PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+
+gtest_discover_tests(
+  ConfigManagerTestSuite
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
+  TEST_PREFIX "unittests.core.")
 # ================================================================================================================================
 add_executable(UtilityStringTestSuite UtilityStringTestSuite.cpp)
 

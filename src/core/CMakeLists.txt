@@ -6,8 +6,7 @@ add_library(Sourcetrail::core ALIAS Sourcetrail_core)
 
 target_sources(
   Sourcetrail_core
-  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/utility/ConfigManager.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileInfo.cpp
+  PRIVATE ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileInfo.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileManager.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FilePathFilter.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileRegister.cpp
@@ -25,8 +24,7 @@ target_sources(
 
 target_include_directories(
   Sourcetrail_core
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}/utility/
-         ${CMAKE_SOURCE_DIR}/src/lib/utility/
+  PUBLIC ${CMAKE_SOURCE_DIR}/src/lib/utility/
          ${CMAKE_SOURCE_DIR}/src/lib/app/paths/
          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/
          ${CMAKE_SOURCE_DIR}/src/lib/utility/text/)
