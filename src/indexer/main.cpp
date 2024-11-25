@@ -16,11 +16,7 @@
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 void setupLogging(const std::string& logFilePath) {
-#ifdef D_WINDOWS
-  auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(utility::decodeFromUtf8(logFilePath));
-#else
   auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath);
-#endif
   fileSink->set_level(spdlog::level::trace);
   spdlog::set_default_logger(std::make_shared<spdlog::logger>("indexer", fileSink));
 }

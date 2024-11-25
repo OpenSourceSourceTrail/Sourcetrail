@@ -59,11 +59,7 @@ void setupLogging() {
     }
 
     if(auto logFileEnv = qgetenv("ST_LOG_FILE"); !logFileEnv.isEmpty()) {
-#ifdef D_WINDOWS
-      auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(utility::decodeFromUtf8(logFileEnv.toStdString()), true);
-#else
       auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFileEnv.toStdString(), true);
-#endif
       fileSink->set_level(spdlog::level::trace);
       sinkList.emplace_back(std::move(fileSink));
     }
