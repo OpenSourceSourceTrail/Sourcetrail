@@ -31,7 +31,19 @@ foreach(test_name IN LISTS gtest_lib_names)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
     TEST_PREFIX "unittests.core.")
 endforeach()
+# ================================================================================================================================
+add_executable(UtilityStringTestSuite UtilityStringTestSuite.cpp)
 
-target_link_libraries(FileSystemTestSuite PRIVATE Sourcetrail::lib_utility)
+target_link_libraries(
+  UtilityStringTestSuite
+  PUBLIC Sourcetrail::gtest_main
+         Sourcetrail::core::utility::utilityString
+         $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
+         $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 
-target_link_libraries(FileManagerTestSuite PRIVATE Sourcetrail::lib_utility)
+set_target_properties(UtilityStringTestSuite PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+
+gtest_discover_tests(
+  UtilityStringTestSuite
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
+  TEST_PREFIX "unittests.core.")

@@ -1,6 +1,5 @@
 #${CMAKE_SOURCE_DIR}/src/core/CMakeLists.txt
-add_subdirectory(utility/file)
-add_subdirectory(utility/logging)
+add_subdirectory(utility)
 
 add_library(Sourcetrail_core)
 add_library(Sourcetrail::core ALIAS Sourcetrail_core)
@@ -36,9 +35,7 @@ target_link_libraries(Sourcetrail_core PUBLIC Boost::date_time Boost::system Boo
 
 target_link_libraries(
   Sourcetrail_core
-  PUBLIC
-  range-v3::range-v3
-  Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
+  PUBLIC range-v3::range-v3 Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
   PRIVATE Sourcetrail::core::utility::logging Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>

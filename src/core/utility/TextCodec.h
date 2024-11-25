@@ -1,5 +1,4 @@
-#ifndef TEXT_CODEC_H
-#define TEXT_CODEC_H
+#pragma once
 
 #include <memory>
 #include <string>
@@ -25,5 +24,3 @@ private:
   std::shared_ptr<QTextDecoder> m_decoder;
   std::shared_ptr<QTextEncoder> m_encoder;
 };
-
-#endif    // TEXT_CODEC_H

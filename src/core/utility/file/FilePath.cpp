@@ -185,7 +185,7 @@ FilePath& FilePath::makeCanonical() {
 #else
   try {
     canonicalPath = boost::filesystem::canonical(getPath());
-  } catch(boost::filesystem::filesystem_error e) {
+  } catch(boost::filesystem::filesystem_error& e) {
     LOG_ERROR(e.what());
     return *this;
   }

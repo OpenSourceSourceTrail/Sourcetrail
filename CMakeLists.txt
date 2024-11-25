@@ -226,7 +226,8 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
     PUBLIC GTest::gmock
            GTest::gtest
            spdlog::spdlog
-           Sourcetrail::lib_utility)
+           Sourcetrail::core::utility::utilityString
+           Sourcetrail::core::utility::TextCodec)
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
@@ -235,8 +236,6 @@ add_subdirectory(src/external)
 add_subdirectory(src/lib)
 add_subdirectory(src/lib_gui)
 
-# Lib Utility ------------------------------------------------------------------
-add_subdirectory(src/lib_utility)
 # core -------------------------------------------------------------------------
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
@@ -311,6 +310,7 @@ target_link_libraries(
          Qt5::Svg
          $<$<PLATFORM_ID:Windows>:Qt5::WinExtras>
   PRIVATE Sourcetrail::core
+          Sourcetrail::core::utility::TextCodec
           Sourcetrail::messaging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Sourcetrail::lib_gui::utility
