@@ -103,7 +103,10 @@ function(add_sourcetrail_library)
     message(FATAL_ERROR "NAME argument is required")
   endif()
 
-  if(NOT ARG_NAME MATCHES "^[a-zA-Z0-9_]+::[a-zA-Z0-9_:]+$")
+  if(NOT
+     ARG_NAME
+     MATCHES
+     "^[a-zA-Z0-9_]+::[a-zA-Z0-9_:]+$")
     message(FATAL_ERROR "Invalid library name format: ${ARG_NAME}")
   endif()
 
