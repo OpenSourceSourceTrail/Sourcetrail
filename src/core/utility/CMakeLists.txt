@@ -60,3 +60,13 @@ add_sourcetrail_library(
   range-v3::range-v3
   Sourcetrail::core::utility::utilityString
   Sourcetrail::core::utility::logging)
+
+add_sourcetrail_library(
+  NAME
+  core::utility::utilityUuid
+  SOURCES
+  utilityUuid.cpp
+  PUBLIC_HEADERS
+  utilityUuid.h
+  PRIVATE_DEPS
+  Boost::system)

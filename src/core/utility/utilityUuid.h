@@ -1,5 +1,4 @@
 #pragma once
-// STL
 #include <string>
 
 namespace utility {
