@@ -2,33 +2,35 @@
 
 #include <QTextCodec>
 
-TextCodec::TextCodec(const std::string& name) : m_name(name) {
-  m_codec = QTextCodec::codecForName(m_name.c_str());
-  m_decoder = std::make_shared<QTextDecoder>(m_codec);
-  m_encoder = std::make_shared<QTextEncoder>(m_codec);
+TextCodec::TextCodec(std::string name) : mName(std::move(name)) {
+  mCodec = QTextCodec::codecForName(mName.c_str());
+  if(nullptr != mCodec) {
+    mDecoder = std::make_shared<QTextDecoder>(mCodec);
+    mEncoder = std::make_shared<QTextEncoder>(mCodec);
+  }
 }
 
 std::string TextCodec::getName() const {
-  return m_name;
+  return mName;
 }
 
 bool TextCodec::isValid() const {
-  if(m_codec) {
+  if(mCodec) {
     return true;
   }
   return false;
 }
 
 std::wstring TextCodec::decode(const std::string& unicodeString) const {
-  if(m_decoder) {
-    return m_decoder->toUnicode(unicodeString.c_str()).toStdWString();
+  if(mDecoder) {
+    return mDecoder->toUnicode(unicodeString.c_str()).toStdWString();
   }
   return QString::fromStdString(unicodeString).toStdWString();
 }
 
 std::string TextCodec::encode(const std::wstring& string) const {
-  if(m_encoder) {
-    return m_encoder->fromUnicode(QString::fromStdWString(string)).toStdString();
+  if(mEncoder) {
+    return mEncoder->fromUnicode(QString::fromStdWString(string)).toStdString();
   }
   return QString::fromStdWString(string).toStdString();
 }

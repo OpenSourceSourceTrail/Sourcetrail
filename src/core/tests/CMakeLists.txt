@@ -63,3 +63,19 @@ gtest_discover_tests(
   UtilityStringTestSuite
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
   TEST_PREFIX "unittests.core.")
+# ================================================================================================================================
+add_executable(TextCodecTestSuite TextCodecTestSuite.cpp)
+
+target_link_libraries(
+  TextCodecTestSuite
+  PUBLIC Sourcetrail::gtest_main
+         Sourcetrail::core::utility::TextCodec
+         $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
+         $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
+
+set_target_properties(TextCodecTestSuite PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+
+gtest_discover_tests(
+  TextCodecTestSuite
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
+  TEST_PREFIX "unittests.core.")

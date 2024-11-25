@@ -1,5 +1,4 @@
 #pragma once
-
 #include <memory>
 #include <string>
 
@@ -7,20 +6,20 @@ class QTextCodec;
 class QTextDecoder;
 class QTextEncoder;
 
-class TextCodec {
+class TextCodec final {
 public:
-  TextCodec(const std::string& name);
+  explicit TextCodec(std::string name);
 
-  std::string getName() const;
-  bool isValid() const;
+  [[nodiscard]] std::string getName() const;
+  [[nodiscard]] bool isValid() const;
 
-  std::wstring decode(const std::string& unicodeString) const;
+  [[nodiscard]] std::wstring decode(const std::string& unicodeString) const;
 
-  std::string encode(const std::wstring& string) const;
+  [[nodiscard]] std::string encode(const std::wstring& string) const;
 
 private:
-  const std::string m_name;
-  QTextCodec* m_codec;
-  std::shared_ptr<QTextDecoder> m_decoder;
-  std::shared_ptr<QTextEncoder> m_encoder;
+  const std::string mName;
+  QTextCodec* mCodec = nullptr;
+  std::shared_ptr<QTextDecoder> mDecoder;
+  std::shared_ptr<QTextEncoder> mEncoder;
 };
