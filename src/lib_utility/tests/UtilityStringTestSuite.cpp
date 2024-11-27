@@ -1,3 +1,4 @@
+#include <regex>
 #include <string>
 
 #include <gmock/gmock.h>
@@ -305,10 +306,10 @@ TEST(GenerateRandomString, goodCase) {
   constexpr auto StringLength0 = 16U;
   const auto result0 = utility::createRandomString(StringLength0);
   ASSERT_EQ(StringLength0, result0.size());
-  EXPECT_THAT(result0, MatchesRegex("([A-z]|[0-9]){16}"s));
+  EXPECT_TRUE(std::regex_match(result0, std::regex("([A-z]|[0-9]){16}"s)));
 
   constexpr auto StringLength1 = 32U;
   const auto result1 = utility::createRandomString(StringLength1);
   ASSERT_EQ(StringLength1, result1.size());
-  EXPECT_THAT(result1, MatchesRegex("([A-z]|[0-9]){32}"s));
+  EXPECT_TRUE(std::regex_match(result1, std::regex("([A-z]|[0-9]){32}"s)));
 }

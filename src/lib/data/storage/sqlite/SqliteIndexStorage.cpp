@@ -1,9 +1,5 @@
 #include "SqliteIndexStorage.h"
 
-#include <sstream>
-
-#include <unordered_map>
-
 #include "FileSystem.h"
 #include "LocationType.h"
 #include "logging.h"
@@ -13,13 +9,13 @@
 #include "types.h"
 #include "utilityString.h"
 
-const size_t SqliteIndexStorage::s_storageVersion = 25;
+const size_t SqliteIndexStorage::sStorageVersion = 25;
 
 namespace {
 std::pair<std::wstring, std::wstring> splitLocalSymbolName(const std::wstring& name) {
   size_t pos = name.find_last_of(L'<');
   if(pos == std::wstring::npos || name.back() != L'>') {
-    return std::make_pair(L"", L"");
+    return {};
   }
 
   return std::make_pair(name.substr(0, pos), name.substr(pos + 1, name.size() - pos - 2));
@@ -27,16 +23,18 @@ std::pair<std::wstring, std::wstring> splitLocalSymbolName(const std::wstring& n
 }    // namespace
 
 size_t SqliteIndexStorage::getStorageVersion() {
-  return s_storageVersion;
+  return sStorageVersion;
 }
+
+SqliteIndexStorage::SqliteIndexStorage() = default;
 
 SqliteIndexStorage::SqliteIndexStorage(const FilePath& dbFilePath) : SqliteStorage(dbFilePath.getCanonical()) {}
 
 size_t SqliteIndexStorage::getStaticVersion() const {
-  return s_storageVersion;
+  return sStorageVersion;
 }
 
-void SqliteIndexStorage::setMode(const StorageModeType mode) {
+void SqliteIndexStorage::setMode(StorageModeType mode) {
   m_tempNodeNameIndex.clear();
   m_tempWNodeNameIndex.clear();
   m_tempNodeTypes.clear();
@@ -45,11 +43,11 @@ void SqliteIndexStorage::setMode(const StorageModeType mode) {
   m_tempSourceLocationIndices.clear();
 
   std::vector<std::pair<int, SqliteDatabaseIndex>> indices = getIndices();
-  for(size_t i = 0; i < indices.size(); i++) {
-    if(indices[i].first & mode) {
-      indices[i].second.createOnDatabase(m_database);
+  for(auto& indice : indices) {
+    if(indice.first & mode) {
+      indice.second.createOnDatabase(m_database);
     } else {
-      indices[i].second.removeFromDatabase(m_database);
+      indice.second.removeFromDatabase(m_database);
     }
   }
 }
@@ -64,7 +62,7 @@ void SqliteIndexStorage::setProjectSettingsText(std::string text) {
 
 Id SqliteIndexStorage::addNode(const StorageNodeData& data) {
   std::vector<Id> ids = addNodes({StorageNode(0, data)});
-  return ids.size() ? ids[0] : 0;
+  return ids.empty() ? 0 : ids.front();
 }
 
 std::vector<Id> SqliteIndexStorage::addNodes(const std::vector<StorageNode>& nodes) {
@@ -119,7 +117,7 @@ std::vector<Id> SqliteIndexStorage::addNodes(const std::vector<StorageNode>& nod
     }
   }
 
-  if(nodesToInsert.size()) {
+  if(!nodesToInsert.empty()) {
     m_insertNodeBatchStatement.execute(nodesToInsert, this);
   }
 

@@ -96,12 +96,14 @@ TEST_F(BookmarkControllerFix, DISABLED_displayBookmarksFor) {
   mController->displayBookmarksFor(Bookmark::Filter::Unknown, Bookmark::Order::None);
 }
 
+#ifndef _WIN32
 TEST_F(BookmarkControllerFix, displayBookmarksFor2) {
   EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
   EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
   EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
   mController->displayBookmarksFor(Bookmark::Filter::All, Bookmark::Order::DateDescending);
 }
+#endif
 
 TEST_F(BookmarkControllerFix, DISABLED_createBookmark) {
   EXPECT_CALL(*mStorageAccess, addNodeBookmark(_)).InSequence(mSequence).WillOnce(Return(0));

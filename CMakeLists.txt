@@ -94,6 +94,8 @@ if(NOT
 endif()
 
 include(cmake/compiler_warnings.cmake)
+include(cmake/add_sourcetrail_library.cmake)
+include(cmake/add_sourcetrail_test.cmake)
 # Variables --------------------------------------------------------------------
 set(PROJECT_NAME Sourcetrail)
 
@@ -152,6 +154,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Settings ---------------------------------------------------------------------
+find_package(expected-lite REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
@@ -240,6 +243,7 @@ add_subdirectory(src/lib_utility)
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
 add_subdirectory(src/messaging)
+add_subdirectory(src/lib/data/storage/sqlite)
 # Lib Cxx ----------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_subdirectory(src/lib_cxx)
@@ -363,7 +367,7 @@ if(ENABLE_UNIT_TEST
 
   find_package(
     Qt5 ${QT_MIN_VERSION}
-    COMPONENTS Test
+    COMPONENTS Test Sql
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)

@@ -1,22 +1,52 @@
-#ifndef SQLITE_DATABASE_INDEX_H
-#define SQLITE_DATABASE_INDEX_H
+#pragma once
+/**
+ * @file SqliteDatabaseIndex.hpp
+ * @brief Manages SQLite database index operations.
+ */
 
 #include <string>
 
-#include "CppSQLite3.h"
+class CppSQLite3DB;
 
-class SqliteDatabaseIndex {
+/**
+ * @brief Manages SQLite database index operations.
+ *
+ * This class handles the creation and removal of indexes in a SQLite database.
+ * Each instance represents a single database index with a unique name and target.
+ */
+class SqliteDatabaseIndex final {
 public:
-  SqliteDatabaseIndex(const std::string& indexName, const std::string& indexTarget);
+  /**
+   * @brief Constructs a new SQLite database index.
+   * @param indexName The name of the index to be created/managed.
+   * @param indexTarget The target definition of the index (e.g., table and columns).
+   */
+  SqliteDatabaseIndex(std::string indexName, std::string indexTarget) noexcept;
 
-  std::string getName() const;
+  /**
+   * @brief Gets the name of the index.
+   * @return The index name as a string.
+   */
+  [[nodiscard]] std::string getName() const noexcept {
+    return mIndexName;
+  }
 
-  void createOnDatabase(CppSQLite3DB& database);
-  void removeFromDatabase(CppSQLite3DB& database);
+  /**
+   * @brief Creates the index in the specified database.
+   * @param database Reference to the database connection.
+   * @return true if the index was created successfully, false otherwise.
+   */
+  [[nodiscard]] bool createOnDatabase(CppSQLite3DB& database) noexcept;
+
+  /**
+   * @brief Removes the index from the specified database.
+   * @param database Reference to the database connection.
+   * @return true if the index was removed successfully, false otherwise.
+   * @note The operation is safe to call even if the index doesn't exist (uses IF EXISTS).
+   */
+  [[nodiscard]] bool removeFromDatabase(CppSQLite3DB& database) noexcept;
 
 private:
-  std::string m_indexName;
-  std::string m_indexTarget;
+  std::string mIndexName;      ///< The name of the index
+  std::string mIndexTarget;    ///< The target definition of the index
 };
-
-#endif    // SQLITE_DATABASE_INDEX_H

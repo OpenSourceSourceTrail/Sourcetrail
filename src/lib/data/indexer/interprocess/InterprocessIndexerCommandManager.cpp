@@ -3,14 +3,14 @@
 #include "IndexerCommand.h"
 #include "logging.h"
 
-const char* InterprocessIndexerCommandManager::s_sharedMemoryNamePrefix = "icmd_";
+const char* InterprocessIndexerCommandManager::sSharedMemoryNamePrefix = "icmd_";
 
-const char* InterprocessIndexerCommandManager::s_indexerCommandsKeyName = "indexer_commands";
+const char* InterprocessIndexerCommandManager::sIndexerCommandsKeyName = "indexer_commands";
 
 InterprocessIndexerCommandManager::InterprocessIndexerCommandManager(const std::string& instanceUuid, Id processId, bool isOwner)
-    : BaseInterprocessDataManager(s_sharedMemoryNamePrefix + instanceUuid, 1048576 /* 1 MB */, instanceUuid, processId, isOwner) {}
+    : BaseInterprocessDataManager(sSharedMemoryNamePrefix + instanceUuid, 1048576 /* 1 MB */, instanceUuid, processId, isOwner) {}
 
-InterprocessIndexerCommandManager::~InterprocessIndexerCommandManager() {}
+InterprocessIndexerCommandManager::~InterprocessIndexerCommandManager() = default;
 
 void InterprocessIndexerCommandManager::pushIndexerCommands(const std::vector<std::shared_ptr<IndexerCommand>>& indexerCommands) {
   size_t size = 0;
@@ -22,7 +22,7 @@ void InterprocessIndexerCommandManager::pushIndexerCommands(const std::vector<st
     size *= overestimationMultiplier;
   }
 
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
   while(access.getFreeMemorySize() < size) {
     const size_t currentSize = access.getMemorySize();
     LOG_INFO(fmt::format(
@@ -33,8 +33,7 @@ void InterprocessIndexerCommandManager::pushIndexerCommands(const std::vector<st
     LOG_INFO("growing memory succeeded");
   }
 
-  SharedMemory::Queue<SharedIndexerCommand>* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(
-      s_indexerCommandsKeyName);
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(sIndexerCommandsKeyName);
   if(!queue) {
     return;
   }
@@ -49,10 +48,9 @@ void InterprocessIndexerCommandManager::pushIndexerCommands(const std::vector<st
 }
 
 std::shared_ptr<IndexerCommand> InterprocessIndexerCommandManager::popIndexerCommand() {
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
 
-  SharedMemory::Queue<SharedIndexerCommand>* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(
-      s_indexerCommandsKeyName);
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(sIndexerCommandsKeyName);
   if(!queue || !queue->size()) {
     return nullptr;
   }
@@ -65,10 +63,9 @@ std::shared_ptr<IndexerCommand> InterprocessIndexerCommandManager::popIndexerCom
 }
 
 void InterprocessIndexerCommandManager::clearIndexerCommands() {
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
 
-  SharedMemory::Queue<SharedIndexerCommand>* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(
-      s_indexerCommandsKeyName);
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(sIndexerCommandsKeyName);
   if(!queue) {
     return;
   }
@@ -77,10 +74,9 @@ void InterprocessIndexerCommandManager::clearIndexerCommands() {
 }
 
 size_t InterprocessIndexerCommandManager::indexerCommandCount() {
-  SharedMemory::ScopedAccess access(&m_sharedMemory);
+  SharedMemory::ScopedAccess access(&mSharedMemory);
 
-  SharedMemory::Queue<SharedIndexerCommand>* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(
-      s_indexerCommandsKeyName);
+  auto* queue = access.accessValueWithAllocator<SharedMemory::Queue<SharedIndexerCommand>>(sIndexerCommandsKeyName);
   if(!queue) {
     return 0;
   }

@@ -45,7 +45,11 @@ TEST(FileHandler, emptyFileExists) {
 
 // NOLINTNEXTLINE
 TEST(FileHandler, emptyFileCanNotCreated) {
+#ifdef _WIN32
+  constexpr auto TemptyFilePath = "\\emptyFile2";
+#else
   constexpr auto TemptyFilePath = "/emptyFile2";
+#endif
   auto fileHandler = FileHandler::createEmptyFile(TemptyFilePath);
   ASSERT_FALSE(fileHandler);
 }

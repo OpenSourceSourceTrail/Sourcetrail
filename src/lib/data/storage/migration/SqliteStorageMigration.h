@@ -1,5 +1,4 @@
-#ifndef SQLITE_STORAGE_MIGRATION_H
-#define SQLITE_STORAGE_MIGRATION_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -9,9 +8,7 @@
 
 class SqliteStorageMigration : public Migration<SqliteStorage> {
 public:
-  virtual ~SqliteStorageMigration();
+  ~SqliteStorageMigration() override;
 
   bool executeStatementInStorage(SqliteStorage* storage, const std::string& statement) const;
 };
-
-#endif    // SQLITE_STORAGE_MIGRATION_H

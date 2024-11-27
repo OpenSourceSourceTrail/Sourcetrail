@@ -27,5 +27,6 @@ gcovr -r $SOURCE_DIR/src/                       \
       -e $SOURCE_DIR/src/scheduling/tests       \
       -e $SOURCE_DIR/src/test                   \
       --html-nested=index.html                  \
-      --gcov-ignore-errors=no_working_dir_found \
+      --gcov-delete                             \
       -j $CORES_COUNT ..
+

@@ -1,5 +1,4 @@
 #pragma once
-// internal
 #include "InterprocessIndexerCommandManager.h"
 #include "InterprocessIndexingStatusManager.h"
 #include "InterprocessIntermediateStorageManager.h"
@@ -11,10 +10,10 @@ public:
   void work();
 
 private:
-  InterprocessIndexerCommandManager m_interprocessIndexerCommandManager;
-  InterprocessIndexingStatusManager m_interprocessIndexingStatusManager;
-  InterprocessIntermediateStorageManager m_interprocessIntermediateStorageManager;
+  InterprocessIndexerCommandManager mInterprocessIndexerCommandManager;
+  InterprocessIndexingStatusManager mInterprocessIndexingStatusManager;
+  InterprocessIntermediateStorageManager mInterprocessIntermediateStorageManager;
 
-  const std::string m_uuid;
-  const Id m_processId;
+  const std::string mUuid;
+  const Id mProcessId;
 };
