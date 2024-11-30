@@ -264,23 +264,24 @@ target_include_directories(
 target_link_libraries(
   Sourcetrail_lib
   PUBLIC Sourcetrail::messaging
-         Sourcetrail::scheduling
          Sourcetrail::core::utility::ConfigManager
-         Sourcetrail::core::utility::Status
-         Sourcetrail::core::utility::utility
-         Sourcetrail::core::utility::Tree
          Sourcetrail::core::utility::LowMemoryStringMap
+         Sourcetrail::core::utility::Status
+         Sourcetrail::core::utility::Tree
+         Sourcetrail::core::utility::utility
+         Sourcetrail::scheduling
          CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::ConfigManager
           Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::core::utility::Status
+          Sourcetrail::core::utility::TextAccess
           Sourcetrail::core::utility::TextCodec
-          Sourcetrail::core::utility::utilityUuid
           Sourcetrail::core::utility::toUnderlying
-          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::core::utility::utilityUuid
           Sourcetrail::lib_gui
+          Sourcetrail::libGui::utility::utilityApp
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
@@ -336,12 +337,13 @@ target_link_libraries(
           Sourcetrail::core::utility::OrderedCache
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::core::utility::Status
+          Sourcetrail::core::utility::TextAccess
           Sourcetrail::core::utility::TextCodec
           Sourcetrail::core::utility::toUnderlying
           Sourcetrail::core::utility::utility
           Sourcetrail::core::utility::utilityUuid
-          Sourcetrail::libGui::utility::utilityApp
           Sourcetrail::lib_gui::utility
+          Sourcetrail::libGui::utility::utilityApp
           Sourcetrail::messaging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
 

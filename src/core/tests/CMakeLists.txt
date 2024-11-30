@@ -4,7 +4,6 @@ set(gtest_lib_names
     FilePathFilterTestSuite
     FilePathTestSuite
     FileSystemTestSuite
-    TextAccessTestSuite
     ScopedTemporaryFileTestSuite)
 
 foreach(test_name IN LISTS gtest_lib_names)
@@ -36,6 +35,7 @@ target_link_libraries(
   PUBLIC Sourcetrail::gtest_main
          Sourcetrail::core
          Sourcetrail::core::utility::ConfigManager
+         Sourcetrail::core::utility::TextAccess
          $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
          $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 
@@ -62,6 +62,17 @@ gtest_discover_tests(
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
   TEST_PREFIX "unittests.core.")
 # ================================================================================================================================
+add_sourcetrail_test(
+  NAME
+  TextAccessTestSuite
+  SOURCES
+  TextAccessTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::TextAccess
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
 add_sourcetrail_test(
   NAME
   TextCodecTestSuite
@@ -143,6 +154,7 @@ add_sourcetrail_test(
   Sourcetrail::core
   Sourcetrail::core::utility::GlobalId
   Sourcetrail::core::utility::LowMemoryStringMap
+  Sourcetrail::core::utility::TextAccess
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY

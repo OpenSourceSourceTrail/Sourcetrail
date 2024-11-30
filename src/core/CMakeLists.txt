@@ -12,8 +12,7 @@ target_sources(
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileSystem.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileTree.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/ScopedTemporaryFile.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/utilityFile.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/text/TextAccess.cpp)
+          ${CMAKE_SOURCE_DIR}/src/lib/utility/file/utilityFile.cpp)
 
 target_include_directories(
   Sourcetrail_core

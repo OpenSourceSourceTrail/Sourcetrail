@@ -31,6 +31,7 @@ foreach(test_name IN LISTS test_lib_names)
            GTest::gtest
            Sourcetrail::gtest_main
            Sourcetrail::core::utility::utility
+           Sourcetrail::core::utility::TextAccess
            Sourcetrail::lib)
 
   set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")

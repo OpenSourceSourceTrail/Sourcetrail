@@ -12,6 +12,7 @@ add_sourcetrail_library(
   PRIVATE_DEPS
   Sourcetrail::core::utility::logging
   Sourcetrail::core::utility::utility
+  Sourcetrail::core::utility::TextAccess
   Boost::system
   range-v3::range-v3
   Sourcetrail::core)
