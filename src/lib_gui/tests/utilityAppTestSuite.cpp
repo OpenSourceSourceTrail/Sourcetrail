@@ -26,8 +26,8 @@ TEST(utilityAppTestSuite, emptyPath) {
 
 TEST(utilityAppTestSuite, getOsType) {
 #if defined(D_WINDOWS)
-  EXPECT_EQ(utility::getOsType(), OS_WINDOWS);
+  EXPECT_EQ(utility::getOsType(), OsType::Windows);
 #elif defined(D_LINUX)
-  EXPECT_EQ(utility::getOsType(), OS_LINUX);
+  EXPECT_EQ(utility::getOsType(), OsType::Linux);
 #endif
 }

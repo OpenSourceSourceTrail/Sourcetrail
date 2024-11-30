@@ -10,6 +10,8 @@
 #include "IApplicationSettings.hpp"
 #include "QtTable.h"
 #include "QtViewWidgetWrapper.h"
+#include "Status.h"
+#include "to_underlying.hpp"
 #include "type/MessageClearStatusView.h"
 #include "type/MessageStatusFilterChanged.h"
 #include "utilityQt.h"
@@ -43,9 +45,9 @@ QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
   filters->setContentsMargins(10, 3, 0, 3);
   filters->setSpacing(25);
 
-  const StatusFilter filter = IApplicationSettings::getInstanceRaw()->getStatusFilter();
-  m_showInfo = createFilterCheckbox(QStringLiteral("Info"), filters, filter & StatusType::STATUS_INFO);
-  m_showErrors = createFilterCheckbox(QStringLiteral("Error"), filters, filter & StatusType::STATUS_ERROR);
+  const auto filter = static_cast<StatusFilter>(IApplicationSettings::getInstanceRaw()->getStatusFilter());
+  m_showInfo = createFilterCheckbox(QStringLiteral("Info"), filters, filter & utility::to_underlying(StatusType::Info));
+  m_showErrors = createFilterCheckbox(QStringLiteral("Error"), filters, filter & utility::to_underlying(StatusType::Error));
 
   filters->addStretch();
 
@@ -88,19 +90,19 @@ void QtStatusView::clear() {
   });
 }
 
-void QtStatusView::addStatus(const std::vector<Status>& status) {
+void QtStatusView::addStatus(const std::vector<Status>& listOfStatus) {
   m_onQtThread([=]() {
-    for(const Status& s : status) {
+    for(const Status& status : listOfStatus) {
       const int rowNumber = m_table->getFilledRowCount();
       if(rowNumber < m_model->rowCount()) {
         m_model->insertRow(rowNumber);
       }
 
-      QString statusType = (s.type == StatusType::STATUS_ERROR ? QStringLiteral("ERROR") : QStringLiteral("INFO"));
+      QString statusType = (StatusType::Error == status.type ? QStringLiteral("ERROR") : QStringLiteral("INFO"));
       m_model->setItem(rowNumber, STATUSVIEW_COLUMN::TYPE, new QStandardItem(statusType));
-      m_model->setItem(rowNumber, STATUSVIEW_COLUMN::STATUS, new QStandardItem(QString::fromStdWString(s.message)));
+      m_model->setItem(rowNumber, STATUSVIEW_COLUMN::STATUS, new QStandardItem(QString::fromStdWString(status.message)));
 
-      if(s.type == StatusType::STATUS_ERROR) {
+      if(StatusType::Error == status.type) {
         m_model->item(rowNumber, STATUSVIEW_COLUMN::TYPE)->setForeground(QBrush(Qt::red));
       }
     }
@@ -120,8 +122,9 @@ QCheckBox* QtStatusView::createFilterCheckbox(const QString& name, QBoxLayout* l
   connect(checkbox, &QCheckBox::stateChanged, [=](int) {
     m_table->selectionModel()->clearSelection();
 
-    const StatusFilter statusMask = (m_showInfo->isChecked() ? StatusType::STATUS_INFO : 0) +
-        (m_showErrors->isChecked() ? StatusType::STATUS_ERROR : 0);
+    const StatusFilter statusMask = (m_showInfo->isChecked() ? utility::to_underlying(StatusType::Info) :
+                                                               utility::to_underlying(StatusType::None)) |
+        (m_showErrors->isChecked() ? utility::to_underlying(StatusType::Error) : utility::to_underlying(StatusType::None));
 
     MessageStatusFilterChanged(statusMask).dispatch();
   });

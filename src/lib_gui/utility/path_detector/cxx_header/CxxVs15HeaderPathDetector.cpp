@@ -37,9 +37,9 @@ std::vector<FilePath> CxxVs15HeaderPathDetector::doGetPaths() const {
   }
 
   if(!headerSearchPaths.empty()) {
-    std::vector<FilePath> windowsSdkHeaderSearchPaths = utility::getWindowsSdkHeaderSearchPaths(APPLICATION_ARCHITECTURE_X86_32);
+    std::vector<FilePath> windowsSdkHeaderSearchPaths = utility::getWindowsSdkHeaderSearchPaths(ApplicationArchitectureType::X86_32);
     if(windowsSdkHeaderSearchPaths.empty()) {
-      windowsSdkHeaderSearchPaths = utility::getWindowsSdkHeaderSearchPaths(APPLICATION_ARCHITECTURE_X86_64);
+      windowsSdkHeaderSearchPaths = utility::getWindowsSdkHeaderSearchPaths(ApplicationArchitectureType::X86_64);
     }
     utility::append(headerSearchPaths, windowsSdkHeaderSearchPaths);
   }

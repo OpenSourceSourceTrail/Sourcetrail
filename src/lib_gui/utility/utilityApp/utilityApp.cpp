@@ -191,7 +191,7 @@ void killRunningProcesses() {
 
 int getIdealThreadCount() {
   int threadCount = QThread::idealThreadCount();
-  if(getOsType() == OS_WINDOWS) {
+  if(getOsType() == OsType::Windows) {
     threadCount -= 1;
   }
   return std::max(1, threadCount);

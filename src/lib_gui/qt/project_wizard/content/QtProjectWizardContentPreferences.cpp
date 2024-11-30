@@ -114,7 +114,7 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
 
 
   // Linux UI scale
-  if(utility::getOsType() == OS_LINUX) {
+  if(utility::getOsType() == OsType::Linux) {
     // screen
     addTitle(QStringLiteral("SCREEN"), layout, row);
 
@@ -189,7 +189,7 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
                               row);
 
   // graph zooming
-  QString modifierName = utility::getOsType() == OS_MAC ? QStringLiteral("Cmd") : QStringLiteral("Ctrl");
+  QString modifierName = utility::getOsType() == OsType::Mac ? QStringLiteral("Cmd") : QStringLiteral("Ctrl");
   m_graphZooming = addCheckBox(QStringLiteral("Graph Zoom"),
                                QStringLiteral("Zoom graph on mouse wheel"),
                                QStringLiteral("<p>Enable graph zoom using mouse wheel only, instead of using ") + modifierName +

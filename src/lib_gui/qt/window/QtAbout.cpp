@@ -41,7 +41,7 @@ void QtAbout::setupAbout() {
   {
     QLabel* versionLabel = new QLabel(
         ("Version " + Version::getApplicationVersion().toString() + " - " +
-         std::string(utility::getApplicationArchitectureType() == APPLICATION_ARCHITECTURE_X86_32 ? "32" : "64") + " bit")
+         std::string(utility::getApplicationArchitectureType() == ApplicationArchitectureType::X86_32 ? "32" : "64") + " bit")
             .c_str(),
         this);
     windowLayout->addWidget(versionLabel, 0, Qt::Alignment(Qt::AlignmentFlag::AlignHCenter));

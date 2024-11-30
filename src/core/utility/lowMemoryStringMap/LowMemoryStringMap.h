@@ -1,5 +1,4 @@
 #pragma once
-// STL
 #include <algorithm>
 #include <cstring>
 #include <iostream>
@@ -12,9 +11,8 @@
  *
  * Defines types related to either std::string or std::wstring
  */
-
 template <typename StringT>
-class StringTraits {};
+class StringTraits final {};
 
 template <>
 class StringTraits<std::string> {
@@ -72,7 +70,7 @@ public:
  */
 
 template <typename StringT, typename ValueT, ValueT defaultVal>
-class LowMemoryStringMap {
+class LowMemoryStringMap final {
 public:
   using CharT = typename StringTraits<StringT>::CharT;
   using StreamT = typename StringTraits<StringT>::StreamT;

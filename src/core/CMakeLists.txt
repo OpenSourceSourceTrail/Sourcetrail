@@ -13,7 +13,6 @@ target_sources(
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/FileTree.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/ScopedTemporaryFile.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/file/utilityFile.cpp
-          ${CMAKE_SOURCE_DIR}/src/lib/utility/ScopedFunctor.cpp
           ${CMAKE_SOURCE_DIR}/src/lib/utility/text/TextAccess.cpp)
 
 target_include_directories(
@@ -32,7 +31,8 @@ target_link_libraries(
          Sourcetrail::core::utility::file::FileInfo # TODO(Hussein): It must be moved to private
          Sourcetrail::core::utility::TimeStamp # TODO(Hussein): It must be moved to private
          Sourcetrail::core::utility::Version # TODO(Hussein): It must be moved to private
-  PRIVATE Sourcetrail::core::utility::logging Qt5::Core)
+         Sourcetrail::core::utility::UnorderedCache
+  PRIVATE Sourcetrail::core::utility::logging Sourcetrail::core::utility::utility Qt5::Core)
 
 # $<$<PLATFORM_ID:Windows>:bcrypt>
 target_compile_definitions(

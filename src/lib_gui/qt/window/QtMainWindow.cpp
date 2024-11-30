@@ -121,7 +121,7 @@ QtMainWindow::QtMainWindow()
 
     refreshStyle();
 
-    if(utility::getOsType() != OS_MAC) {
+    if(utility::getOsType() != OsType::Mac) {
       // can only be done once, because resetting the style on the QCoreApplication causes crash
       app->setStyleSheet(utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"main/scrollbar.css")).c_str());
     }
@@ -391,7 +391,7 @@ void QtMainWindow::keyPressEvent(QKeyEvent* event) {
     break;
 
   case Qt::Key_F4:
-    if(utility::getOsType() == OS_WINDOWS && event->modifiers() & Qt::ControlModifier) {
+    if(utility::getOsType() == OsType::Windows && event->modifiers() & Qt::ControlModifier) {
       closeTab();
     }
     break;
@@ -726,7 +726,7 @@ void QtMainWindow::setupEditMenu() {
   menuBar()->addMenu(menu);
 
   menu->addAction(tr("&Refresh"), this, &QtMainWindow::refresh, QKeySequence::Refresh);
-  if(utility::getOsType() == OS_WINDOWS) {
+  if(utility::getOsType() == OsType::Windows) {
     menu->addAction(tr("&Full Refresh"), this, &QtMainWindow::forceRefresh, QKeySequence(tr("Shift+F5")));
   } else {
     menu->addAction(tr("&Full Refresh"), this, &QtMainWindow::forceRefresh, QKeySequence(tr("Shift+Ctrl+R")));
@@ -773,7 +773,7 @@ void QtMainWindow::setupViewMenu() {
   menu->addAction(tr("New Tab"), this, &QtMainWindow::openTab, QKeySequence::AddTab);
   menu->addAction(tr("Close Tab"), this, &QtMainWindow::closeTab, QKeySequence("Ctrl+W"));
 
-  if(utility::getOsType() == OS_MAC) {
+  if(utility::getOsType() == OsType::Mac) {
     menu->addAction(tr("Select Next Tab"), this, &QtMainWindow::nextTab, QKeySequence(Qt::META | Qt::Key_Tab));
     menu->addAction(tr("Select Previous Tab"), this, &QtMainWindow::previousTab, QKeySequence(Qt::SHIFT | Qt::META | Qt::Key_Tab));
   } else {

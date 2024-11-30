@@ -25,7 +25,6 @@ set(test_lib_names
     SourceLocationCollectionTestSuite
     SourceLocationFileTestSuite
     SourceLocationTestSuite
-    StatusTestSuite
     TabIdTestSuite
     TabTestSuite
     TimeStampTestSuite
@@ -56,9 +55,9 @@ foreach(test_name IN LISTS test_lib_names)
     TEST_PREFIX "unittests.lib.")
 endforeach()
 
-if(WIN32)
-  target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
-endif()
+target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::core::utility::ScopedFunctor)
+
+target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::core::utility::SingleValueCache)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_options(CommandlineHelperTestSuite PRIVATE -Wno-write-strings)

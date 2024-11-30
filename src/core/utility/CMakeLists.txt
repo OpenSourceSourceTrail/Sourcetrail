@@ -1,109 +1,22 @@
-# ${CMAKE_SOURCE_DIR}/src/lib_utility/utility/CMakeLists.txt
+# ${CMAKE_SOURCE_DIR}/src/core/utility/CMakeLists.txt
+add_subdirectory(applicationArchitectureType)
+add_subdirectory(configManager)
 add_subdirectory(file)
+add_subdirectory(globalId)
 add_subdirectory(logging)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::ConfigManager
-  SOURCES
-  ConfigManager.cpp
-  PUBLIC_HEADERS
-  ConfigManager.hpp
-  PUBLIC_DEPS
-  Sourcetrail::core::utility::file::FilePath
-  Sourcetrail::core::utility::utilityString
-  Sourcetrail::core::utility::logging
-  PRIVATE_DEPS
-  Boost::system
-  range-v3::range-v3
-  Sourcetrail::core)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::utilityString
-  SOURCES
-  utilityString.cpp
-  PUBLIC_HEADERS
-  utilityString.h
-  PRIVATE_DEPS
-  Boost::system)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::TextCodec
-  SOURCES
-  TextCodec.cpp
-  PUBLIC_HEADERS
-  TextCodec.h
-  PRIVATE_DEPS
-  Qt5::Core)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::TimeStamp
-  SOURCES
-  TimeStamp.cpp
-  PUBLIC_HEADERS
-  TimeStamp.h
-  PUBLIC_DEPS
-  Boost::date_time)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::Version
-  SOURCES
-  Version.cpp
-  PUBLIC_HEADERS
-  Version.h
-  PRIVATE_DEPS
-  fmt::fmt
-  range-v3::range-v3
-  Sourcetrail::core::utility::utilityString
-  Sourcetrail::core::utility::logging)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::utilityUuid
-  SOURCES
-  utilityUuid.cpp
-  PUBLIC_HEADERS
-  utilityUuid.h
-  PRIVATE_DEPS
-  Boost::system)
-
-add_sourcetrail_library(
-  NAME
-  core::utility::utility
-  SOURCES
-  utility.cpp
-  PUBLIC_HEADERS
-  utility.h
-  PUBLIC_DEPS
-  Sourcetrail::core::utility::file::FilePath
-  Sourcetrail::core::utility::utilityString
-  PRIVATE_DEPS
-  range-v3::range-v3)
-# ================================================================================================================================
-add_library(Sourcetrail_core_utility_UnorderedCache INTERFACE)
-add_library(Sourcetrail::core::utility::UnorderedCache ALIAS Sourcetrail_core_utility_UnorderedCache)
-
-target_include_directories(Sourcetrail_core_utility_UnorderedCache INTERFACE ${CMAKE_CURRENT_LIST_DIR})
-# ================================================================================================================================
-add_library(Sourcetrail_core_utility_Tree INTERFACE)
-add_library(Sourcetrail::core::utility::Tree ALIAS Sourcetrail_core_utility_Tree)
-
-target_include_directories(Sourcetrail_core_utility_Tree INTERFACE ${CMAKE_CURRENT_LIST_DIR})
-# ================================================================================================================================
-add_library(Sourcetrail_core_utility_GlobalId INTERFACE)
-add_library(Sourcetrail::core::utility::GlobalId ALIAS Sourcetrail_core_utility_GlobalId)
-
-target_include_directories(Sourcetrail_core_utility_GlobalId INTERFACE ${CMAKE_CURRENT_LIST_DIR})
-# ================================================================================================================================
-add_sourcetrail_library(
-  NAME
-  core::utility::Status
-  SOURCES
-  Status.cpp
-  PUBLIC_HEADERS
-  Status.h)
-# ================================================================================================================================
+add_subdirectory(lowMemoryStringMap)
+add_subdirectory(orderedCache)
+add_subdirectory(osType)
+add_subdirectory(scopedFunctor)
+add_subdirectory(scopedSwitcher)
+add_subdirectory(singleValueCache)
+add_subdirectory(status)
+add_subdirectory(textCodec)
+add_subdirectory(timeStamp)
+add_subdirectory(to_underlying)
+add_subdirectory(tree)
+add_subdirectory(unorderedCache)
+add_subdirectory(utility)
+add_subdirectory(utilityString)
+add_subdirectory(utilityUuid)
+add_subdirectory(version)

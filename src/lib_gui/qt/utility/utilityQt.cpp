@@ -150,13 +150,13 @@ std::string getStyleSheet(const FilePath& path) {
       }
 
       switch(utility::getOsType()) {
-      case OS_WINDOWS:
+      case OsType::Windows:
         val = values[0];
         break;
-      case OS_MAC:
+      case OsType::Mac:
         val = values[1];
         break;
-      case OS_LINUX:
+      case OsType::Linux:
         val = values[2];
         break;
       default:
@@ -267,13 +267,13 @@ QString getStyleSheet(const QString& resource) {
       }
 
       switch(utility::getOsType()) {
-      case OS_WINDOWS:
+      case OsType::Windows:
         val = values[0];
         break;
-      case OS_MAC:
+      case OsType::Mac:
         val = values[1];
         break;
-      case OS_LINUX:
+      case OsType::Linux:
         val = values[2];
         break;
       default:

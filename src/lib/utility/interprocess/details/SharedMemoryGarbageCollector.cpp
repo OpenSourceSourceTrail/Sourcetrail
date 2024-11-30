@@ -110,7 +110,7 @@ void SharedMemoryGarbageCollector::unregisterSharedMemory(const std::string& sha
 }
 
 std::string SharedMemoryGarbageCollector::getMemoryName() {
-  return s_memoryNamePrefix + (utility::getApplicationArchitectureType() == APPLICATION_ARCHITECTURE_X86_32 ? "32" : "64");
+  return s_memoryNamePrefix + (utility::getApplicationArchitectureType() == ApplicationArchitectureType::X86_32 ? "32" : "64");
 }
 
 void SharedMemoryGarbageCollector::update() {

@@ -8,5 +8,5 @@ public:
   ~ScopedFunctor();
 
 private:
-  std::function<void(void)> m_onDestroy;
+  std::function<void(void)> mOnDestroy;
 };

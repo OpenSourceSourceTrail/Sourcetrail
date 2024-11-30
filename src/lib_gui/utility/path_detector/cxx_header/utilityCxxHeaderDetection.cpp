@@ -76,7 +76,7 @@ std::vector<FilePath> getWindowsSdkHeaderSearchPaths(ApplicationArchitectureType
 
 FilePath getWindowsSdkRootPathUsingRegistry(ApplicationArchitectureType architectureType, const std::string& sdkVersion) {
   QString key = QStringLiteral("HKEY_LOCAL_MACHINE\\SOFTWARE\\");
-  if(architectureType == APPLICATION_ARCHITECTURE_X86_32) {
+  if(architectureType == ApplicationArchitectureType::X86_32) {
     key += QStringLiteral("Wow6432Node\\");
   }
   key += QStringLiteral("Microsoft\\Microsoft SDKs\\Windows\\") + sdkVersion.c_str();

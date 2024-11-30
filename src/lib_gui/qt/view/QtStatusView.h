@@ -1,9 +1,8 @@
-#ifndef QT_STATUS_VIEW_H
-#define QT_STATUS_VIEW_H
-
+#pragma once
 #include <QWidget>
 
 #include "QtThreadedFunctor.h"
+#include "Status.h"
 #include "StatusView.h"
 
 class QBoxLayout;
@@ -46,5 +45,3 @@ private:
   QCheckBox* m_showErrors;
   QCheckBox* m_showInfo;
 };
-
-#endif    // QT_STATUS_VIEW_H

@@ -10,7 +10,6 @@ set(test_lib_names
     GraphTestSuite
     HierarchyCacheTestSuite
     IndexerCompositeTestSuite
-    LowMemoryStringMapTestSuite
     NetworkProtocolHelperTestSuite
     ProjectSettingsTestSuite
     ResourcePathsTestSuite
@@ -31,6 +30,7 @@ foreach(test_name IN LISTS test_lib_names)
            GTest::gmock
            GTest::gtest
            Sourcetrail::gtest_main
+           Sourcetrail::core::utility::utility
            Sourcetrail::lib)
 
   set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")

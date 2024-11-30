@@ -1,12 +1,10 @@
 # ${CMAKE_SOURCE_DIR}/src/core/tests/CMakeLists.txt
 
 set(gtest_lib_names
-    FileManagerTestSuite
     FilePathFilterTestSuite
     FilePathTestSuite
     FileSystemTestSuite
     TextAccessTestSuite
-    ScopedFunctorTestSuite
     ScopedTemporaryFileTestSuite)
 
 foreach(test_name IN LISTS gtest_lib_names)
@@ -19,6 +17,7 @@ foreach(test_name IN LISTS gtest_lib_names)
            lib::mocks
            Sourcetrail::core
            Sourcetrail::gtest_main
+           Sourcetrail::core::utility::utility
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 
@@ -94,6 +93,56 @@ add_sourcetrail_test(
   UnorderedCacheTestSuite.cpp
   DEPS
   Sourcetrail::core::utility::UnorderedCache
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  ScopedFunctorTestSuite
+  SOURCES
+  ScopedFunctorTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::ScopedFunctor
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  StatusTestSuite
+  SOURCES
+  StatusTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::Status
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+add_sourcetrail_test(
+  NAME
+  FileManagerTestSuite
+  SOURCES
+  FileManagerTestSuite.cpp
+  DEPS
+  Sourcetrail::core
+  Sourcetrail::core::utility::utility
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  LowMemoryStringMapTestSuite
+  SOURCES
+  LowMemoryStringMapTestSuite.cpp
+  DEPS
+  Sourcetrail::core
+  Sourcetrail::core::utility::GlobalId
+  Sourcetrail::core::utility::LowMemoryStringMap
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY
