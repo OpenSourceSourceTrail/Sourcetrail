@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <spdlog/spdlog.h>
-
 #include "CommandLineParser.h"
 #include "IApplicationSettings.hpp"
 #include "MockedApplicationSetting.hpp"

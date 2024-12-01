@@ -6,7 +6,6 @@ target_include_directories(testHelper PUBLIC ${CMAKE_CURRENT_LIST_DIR}/helper ${
 # ========================================================
 set(test_lib_names
     AppPathTestSuite
-    CommandlineTestSuite
     GraphTestSuite
     HierarchyCacheTestSuite
     IndexerCompositeTestSuite

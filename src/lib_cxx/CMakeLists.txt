@@ -127,13 +127,14 @@ target_link_libraries(
   PUBLIC Sourcetrail::core::utility::OrderedCache
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::Migrator
+          Sourcetrail::core::utility::ScopedSwitcher
+          Sourcetrail::core::utility::TextAccess
           Sourcetrail::core::utility::TextCodec
           Sourcetrail::core::utility::utility
-          Sourcetrail::core::utility::ScopedSwitcher
           Sourcetrail::lib
           Sourcetrail::messaging
           Sourcetrail::scheduling
-          Sourcetrail::core::utility::TextAccess
           ${REQ_LLVM_LIBS}
           ${CLANG_LIBRARIES}
           Qt5::Core)

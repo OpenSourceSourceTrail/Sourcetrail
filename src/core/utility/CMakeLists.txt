@@ -1,10 +1,13 @@
 # ${CMAKE_SOURCE_DIR}/src/core/utility/CMakeLists.txt
 add_subdirectory(applicationArchitectureType)
+add_subdirectory(commandline)
 add_subdirectory(configManager)
 add_subdirectory(file)
 add_subdirectory(globalId)
 add_subdirectory(logging)
 add_subdirectory(lowMemoryStringMap)
+add_subdirectory(migration)
+add_subdirectory(migrator)
 add_subdirectory(orderedCache)
 add_subdirectory(osType)
 add_subdirectory(scopedFunctor)

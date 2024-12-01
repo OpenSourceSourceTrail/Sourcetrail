@@ -269,6 +269,8 @@ target_link_libraries(
          Sourcetrail::core::utility::Status
          Sourcetrail::core::utility::Tree
          Sourcetrail::core::utility::utility
+         Sourcetrail::core::utility::Migration
+         Sourcetrail::core::utility::Migrator
          Sourcetrail::scheduling
          CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
@@ -331,6 +333,7 @@ target_link_libraries(
          Qt5::Svg
          Sourcetrail::core::utility::SingleValueCache
          Sourcetrail::core::utility::LowMemoryStringMap
+         Sourcetrail::core::utility::Migrator
          $<$<PLATFORM_ID:Windows>:Qt5::WinExtras>
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::logging

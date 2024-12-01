@@ -36,8 +36,10 @@ target_link_libraries(
          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
          Qt5::Widgets
          Qt5::Network
-  PRIVATE Sourcetrail::core::utility::logging Sourcetrail::core::utility::ScopedFunctor
-          Sourcetrail::libGui::utility::utilityApp)
+  PRIVATE Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::core::utility::commandline::CommandLineParser)
 
 target_include_directories(
   Sourcetrail

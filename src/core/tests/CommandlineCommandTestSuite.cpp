@@ -5,7 +5,7 @@
 
 #include "CommandlineCommand.h"
 #include "CommandLineParser.h"
-#include "mocks/MockedCommandlineCommand.hpp"
+#include "MockedCommandlineCommand.hpp"
 #include "utilities/CollectOutStream.hpp"
 
 using namespace testing;

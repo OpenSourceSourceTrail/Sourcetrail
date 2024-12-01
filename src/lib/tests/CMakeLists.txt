@@ -8,11 +8,6 @@ target_include_directories(lib_test_utilities PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 set(test_lib_names
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests
     BookmarkControllerTestSuite
-    CommandLineParserTestSuite
-    CommandlineCommandConfigTestSuite
-    CommandlineCommandIndexTestSuite
-    CommandlineCommandTestSuite
-    CommandlineHelperTestSuite
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite
@@ -59,9 +54,6 @@ target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::core:
 
 target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::core::utility::SingleValueCache)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(CommandlineHelperTestSuite PRIVATE -Wno-write-strings)
-endif()
 if(WIN32)
   target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
 endif()

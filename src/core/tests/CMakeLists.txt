@@ -132,6 +132,7 @@ add_sourcetrail_test(
   "unittests.core."
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
+
 add_sourcetrail_test(
   NAME
   FileManagerTestSuite
@@ -155,6 +156,102 @@ add_sourcetrail_test(
   Sourcetrail::core::utility::GlobalId
   Sourcetrail::core::utility::LowMemoryStringMap
   Sourcetrail::core::utility::TextAccess
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  CommandlineCommandConfigTestSuite
+  SOURCES
+  CommandlineCommandConfigTestSuite.cpp
+  DEPS
+  lib_test_utilities
+  lib::mocks
+  Sourcetrail::core::utility::commandline::CommandlineCommandConfig
+  Sourcetrail::core::utility::commandline::CommandLineParser
+  Sourcetrail::lib
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  CommandlineCommandIndexTestSuite
+  SOURCES
+  CommandlineCommandIndexTestSuite.cpp
+  DEPS
+  lib_test_utilities
+  lib::mocks
+  Sourcetrail::core::utility::commandline::CommandlineCommandConfig
+  Sourcetrail::core::utility::commandline::CommandlineCommandIndex
+  Sourcetrail::core::utility::commandline::CommandLineParser
+  Sourcetrail::lib
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  CommandlineCommandTestSuite
+  SOURCES
+  CommandlineCommandTestSuite.cpp
+  DEPS
+  lib::mocks
+  Sourcetrail::core::utility::commandline::commands::CommandlineCommand
+  Sourcetrail::core::utility::commandline::CommandLineParser
+  lib_test_utilities
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  CommandlineHelperTestSuite
+  SOURCES
+  CommandlineHelperTestSuite.cpp
+  DEPS
+  Boost::program_options
+  Sourcetrail::core::utility::commandline::CommandLineParser
+  Sourcetrail::core::utility::commandline::CommandlineHelper
+  Sourcetrail::core::utility::file::FilePath
+  lib_test_utilities
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+if(TARGET CommandlineHelperTestSuite AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  target_compile_options(CommandlineHelperTestSuite PRIVATE -Wno-write-strings)
+endif()
+
+add_sourcetrail_test(
+  NAME
+  CommandLineParserTestSuite
+  SOURCES
+  CommandLineParserTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::commandline::CommandLineParser
+  lib_test_utilities
+  Sourcetrail::core::utility::utilityString
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  CommandlineTestSuite
+  SOURCES
+  CommandlineTestSuite.cpp
+  DEPS
+  lib::mocks
+  Sourcetrail::lib
+  Sourcetrail::core::utility::commandline::CommandLineParser
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY
