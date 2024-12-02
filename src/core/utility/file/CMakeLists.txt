@@ -1,4 +1,10 @@
 # ${CMAKE_SOURCE_DIR}/src/core/utility/file/CMakeLists.txt
 add_subdirectory(fileInfo)
+add_subdirectory(fileManager)
 add_subdirectory(filePath)
-
+add_subdirectory(filePathFilter)
+add_subdirectory(fileRegister)
+add_subdirectory(fileSystem)
+add_subdirectory(fileTree)
+add_subdirectory(scopedTemporaryFile)
+add_subdirectory(utilityFile)

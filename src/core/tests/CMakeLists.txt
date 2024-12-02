@@ -1,32 +1,5 @@
 # ${CMAKE_SOURCE_DIR}/src/core/tests/CMakeLists.txt
 
-set(gtest_lib_names
-    FilePathFilterTestSuite
-    FilePathTestSuite
-    FileSystemTestSuite
-    ScopedTemporaryFileTestSuite)
-
-foreach(test_name IN LISTS gtest_lib_names)
-  add_executable(${test_name} ${test_name}.cpp)
-
-  target_link_libraries(
-    ${test_name}
-    PUBLIC GTest::gmock
-           GTest::gtest
-           lib::mocks
-           Sourcetrail::core
-           Sourcetrail::gtest_main
-           Sourcetrail::core::utility::utility
-           $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-           $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
-
-  set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
-
-  gtest_discover_tests(
-    ${test_name}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "unittests.core.")
-endforeach()
 # ================================================================================================================================
 add_executable(ConfigManagerTestSuite ConfigManagerTestSuite.cpp)
 
@@ -73,6 +46,7 @@ add_sourcetrail_test(
   "unittests.core."
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
+
 add_sourcetrail_test(
   NAME
   TextCodecTestSuite
@@ -141,6 +115,10 @@ add_sourcetrail_test(
   DEPS
   Sourcetrail::core
   Sourcetrail::core::utility::utility
+  Sourcetrail::core::utility::file::FileManager
+  Sourcetrail::core::utility::file::FilePath
+  Sourcetrail::core::utility::file::FilePathFilter
+  Sourcetrail::core::utility::file::FileSystem
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY
@@ -252,6 +230,69 @@ add_sourcetrail_test(
   lib::mocks
   Sourcetrail::lib
   Sourcetrail::core::utility::commandline::CommandLineParser
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  UtilityTestSuite
+  SOURCES
+  UtilityTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::utility
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  FilePathFilterTestSuite
+  SOURCES
+  FilePathFilterTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::file::FilePathFilter
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  FilePathTestSuite
+  SOURCES
+  FilePathTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::file::FilePath
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  FileSystemTestSuite
+  SOURCES
+  FileSystemTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::file::FileSystem
+  Sourcetrail::core::utility::file::FileManager
+  Sourcetrail::core::utility::file::FilePathFilter
+  Sourcetrail::core::utility::utility
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  ScopedTemporaryFileTestSuite
+  SOURCES
+  ScopedTemporaryFileTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::file::ScopedTemporaryFile
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY

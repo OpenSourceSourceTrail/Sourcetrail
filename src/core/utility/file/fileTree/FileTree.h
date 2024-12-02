@@ -1,10 +1,8 @@
 #pragma once
-// STL
 #include <set>
 #include <string>
-
 #include <unordered_map>
-// internal
+
 #include "FilePath.h"
 
 class FileTree final {

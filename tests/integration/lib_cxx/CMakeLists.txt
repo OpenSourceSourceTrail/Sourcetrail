@@ -6,13 +6,14 @@ foreach(test_name IN LISTS test_cxx_names)
 
   target_link_libraries(
     ${test_name}
-    PUBLIC testHelper
-           GTest::gtest
+    PUBLIC GTest::gtest
            GTest::gmock
            GTest::Main
            Sourcetrail::lib
            # Sourcetrail::gtest_main
            Sourcetrail::core::utility::TextAccess
+           Sourcetrail::helper::TestFileRegister
+           Sourcetrail::helper::TestStorage
            Sourcetrail::lib_cxx
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)

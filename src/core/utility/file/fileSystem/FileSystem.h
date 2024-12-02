@@ -1,9 +1,8 @@
 #pragma once
-// STL
 #include <set>
 #include <string>
 #include <vector>
-// internal
+
 #include "FileInfo.h"
 #include "TimeStamp.h"
 

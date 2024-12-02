@@ -1,5 +1,4 @@
 #pragma once
-
 #include "FileRegister.h"
 
 class TestFileRegister final : public FileRegister {

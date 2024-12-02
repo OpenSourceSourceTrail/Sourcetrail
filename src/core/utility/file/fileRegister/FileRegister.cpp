@@ -1,5 +1,5 @@
 #include "FileRegister.h"
-// internal
+
 #include "FilePath.h"
 #include "FilePathFilter.h"
 

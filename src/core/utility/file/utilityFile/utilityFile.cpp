@@ -1,8 +1,7 @@
 #include "utilityFile.h"
-// internal
+
 #include "FilePath.h"
 #include "FileSystem.h"
-//
 #include "logging.h"
 #include "utility.h"
 

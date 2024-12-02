@@ -132,6 +132,11 @@ target_link_libraries(
           Sourcetrail::core::utility::TextAccess
           Sourcetrail::core::utility::TextCodec
           Sourcetrail::core::utility::utility
+          Sourcetrail::core::utility::file::FileRegister
+          Sourcetrail::core::utility::file::FilePathFilter
+          Sourcetrail::core::utility::file::FileManager
+          Sourcetrail::core::utility::file::FileTree
+          Sourcetrail::core::utility::file::FileSystem
           Sourcetrail::lib
           Sourcetrail::messaging
           Sourcetrail::scheduling

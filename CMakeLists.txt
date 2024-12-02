@@ -271,6 +271,8 @@ target_link_libraries(
          Sourcetrail::core::utility::utility
          Sourcetrail::core::utility::Migration
          Sourcetrail::core::utility::Migrator
+         Sourcetrail::core::utility::file::FilePath
+         Sourcetrail::core::utility::file::FilePathFilter
          Sourcetrail::scheduling
          CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
@@ -284,6 +286,9 @@ target_link_libraries(
           Sourcetrail::core::utility::utilityUuid
           Sourcetrail::lib_gui
           Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::core::utility::file::FileSystem
+          Sourcetrail::core::utility::file::utilityFile
+          Sourcetrail::core::utility::file::FileManager
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
@@ -334,6 +339,9 @@ target_link_libraries(
          Sourcetrail::core::utility::SingleValueCache
          Sourcetrail::core::utility::LowMemoryStringMap
          Sourcetrail::core::utility::Migrator
+         Sourcetrail::core::utility::file::FilePathFilter
+         Sourcetrail::core::utility::file::FileSystem
+         Sourcetrail::libGui::utility::utilityApp
          $<$<PLATFORM_ID:Windows>:Qt5::WinExtras>
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::logging
@@ -345,6 +353,9 @@ target_link_libraries(
           Sourcetrail::core::utility::toUnderlying
           Sourcetrail::core::utility::utility
           Sourcetrail::core::utility::utilityUuid
+          Sourcetrail::core::utility::file::utilityFile
+          Sourcetrail::core::utility::file::FilePath
+          Sourcetrail::core::utility::file::FileManager
           Sourcetrail::lib_gui::utility
           Sourcetrail::libGui::utility::utilityApp
           Sourcetrail::messaging
