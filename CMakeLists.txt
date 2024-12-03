@@ -413,7 +413,6 @@ if(ENABLE_UNIT_TEST
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)
-    add_subdirectory(src/test)
     add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/tests/)
     add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib_gui/tests/)
     if(BUILD_CXX_LANGUAGE_PACKAGE)
