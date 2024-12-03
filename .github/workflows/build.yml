@@ -152,12 +152,18 @@ jobs:
         if: runner.os == 'Linux'
         run: grep -c "warning:" ${{github.workspace}}/build/build.log
 
-      - name: Test
+      - name: Test (Ubuntu)
+        if: runner.os == 'Linux'
         run: ctest -Q --test-dir ${{github.workspace}}/build --output-junit ${{github.workspace}}/build/report.xml
+
+      - name: Test (Windows)
+        if: runner.os == 'Windows'
+        run: ctest --test-dir ${{github.workspace}}/build
+        shell: cmd
 
       - name: Publish Test Report for ${{ matrix.config.name }}
         uses: mikepenz/action-junit-report@v4
-        if: success() || failure() # always run even if the previous step fails
+        if: runner.os == 'Linux'
         with:
           report_paths: ${{github.workspace}}/build/report.xml
           include_passed: true
