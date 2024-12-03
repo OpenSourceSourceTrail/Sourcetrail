@@ -68,7 +68,6 @@
         {
             "name": "ci_gnu_release",
             "displayName": "CI GNU Release",
-            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "gcc-12",
@@ -76,19 +75,17 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
                 "ENABLE_COVERAGE": "ON",
-                "ENABLE_UNIT_TEST": "ON",
-                "ENABLE_GUI_TEST": "ON",
-                "ENABLE_INTEGRATION_TEST": "ON",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake"
             },
             "inherits": [
+                "all-tests",
+                "ninja",
                 "linux"
             ]
         },
         {
             "name": "ci_clang_release",
             "displayName": "CI Clang Release",
-            "generator": "Ninja",
             "binaryDir": "${sourceDir}/build/",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang-15",
@@ -96,12 +93,11 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
                 "ENABLE_COVERAGE": "ON",
-                "ENABLE_UNIT_TEST": "ON",
-                "ENABLE_GUI_TEST": "ON",
-                "ENABLE_INTEGRATION_TEST": "ON",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake"
             },
             "inherits": [
+                "all-tests",
+                "ninja",
                 "linux"
             ]
         },
@@ -109,7 +105,6 @@
             "name": "ci_msvc_release",
             "displayName": "CI VC++ Release",
             "binaryDir": "${sourceDir}/build/",
-            "generator": "Ninja",
             "toolset": {
                 "value": "v143",
                 "strategy": "external"
@@ -127,6 +122,8 @@
                 "SR_IS_CI": "ON"
             },
             "inherits": [
+                "all-tests",
+                "ninja",
                 "window"
             ]
         }
