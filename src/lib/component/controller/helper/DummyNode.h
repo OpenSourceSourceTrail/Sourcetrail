@@ -6,10 +6,10 @@
 #include <QVector4D>
 
 #include "AccessKind.h"
+#include "GlobalId.hpp"
 #include "GroupType.h"
 #include "NameHierarchy.h"
 #include "Node.h"
-#include "types.h"
 #include "utility.h"
 #include "utilityString.h"
 

@@ -7,9 +7,9 @@
 #include <set>
 // internal
 #include "FilePath.h"
+#include "GlobalId.hpp"
 #include "LocationType.h"
 #include "SourceLocation.h"
-#include "types.h"
 
 class SourceLocationFile final {
 public:

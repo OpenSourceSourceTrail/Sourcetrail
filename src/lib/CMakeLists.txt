@@ -360,16 +360,6 @@ add_files(
   settings/ProjectSettings.h
   settings/Settings.cpp
   settings/Settings.h
-  utility/commandline/CommandlineHelper.cpp
-  utility/commandline/CommandlineHelper.h
-  utility/commandline/CommandLineParser.cpp
-  utility/commandline/CommandLineParser.h
-  utility/commandline/commands/CommandlineCommand.cpp
-  utility/commandline/commands/CommandlineCommand.h
-  utility/commandline/commands/CommandlineCommandConfig.cpp
-  utility/commandline/commands/CommandlineCommandConfig.h
-  utility/commandline/commands/CommandlineCommandIndex.cpp
-  utility/commandline/commands/CommandlineCommandIndex.h
   utility/interprocess/SharedMemory.cpp
   utility/interprocess/SharedMemory.h
   # Base Factory {
@@ -378,12 +368,7 @@ add_files(
   utility/interprocess/details/SharedMemoryGarbageCollector.cpp
   utility/interprocess/details/SharedMemoryGarbageCollector.h
   # }
-  utility/migration/Migration.h
-  utility/migration/Migrator.h)
-
-if(WIN32)
-  add_files(LIB utility/utilityWindows.cpp utility/utilityWindows.h)
-endif()
+)
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_files(
@@ -409,10 +394,3 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     settings/source_group/type/SourceGroupSettingsCustomCommand.h
     settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 endif()
-
-add_library(Sourcetrail_utility_logging INTERFACE)
-add_library(Sourcetrail::utility::logging ALIAS Sourcetrail_utility_logging)
-
-target_link_libraries(Sourcetrail_utility_logging INTERFACE spdlog::spdlog Sourcetrail::lib_utility)
-target_include_directories(Sourcetrail_utility_logging INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/utility/logging)
-target_compile_definitions(Sourcetrail_utility_logging INTERFACE SOURCE_PATH_PREFIX_LEN=${SOURCE_PATH_PREFIX_LEN})

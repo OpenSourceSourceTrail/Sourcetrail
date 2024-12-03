@@ -5,12 +5,12 @@
 #include <unordered_map>
 
 #include "FileSystem.h"
+#include "GlobalId.hpp"
 #include "LocationType.h"
 #include "logging.h"
 #include "SourceLocationCollection.h"
 #include "SourceLocationFile.h"
 #include "TextAccess.h"
-#include "types.h"
 #include "utilityString.h"
 
 const size_t SqliteIndexStorage::s_storageVersion = 25;

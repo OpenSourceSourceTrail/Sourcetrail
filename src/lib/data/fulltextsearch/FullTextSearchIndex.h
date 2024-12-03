@@ -5,8 +5,8 @@
 
 #include <unordered_map>
 // internal
+#include "GlobalId.hpp"
 #include "SuffixArray.h"
-#include "types.h"
 
 class StorageAccess;
 

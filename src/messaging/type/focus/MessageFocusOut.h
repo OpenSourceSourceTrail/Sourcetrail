@@ -2,9 +2,9 @@
 // STL
 #include <vector>
 // internal
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
 
 class MessageFocusOut final : public Message<MessageFocusOut> {
 public:

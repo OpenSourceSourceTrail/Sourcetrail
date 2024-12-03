@@ -49,7 +49,7 @@ void setupApp([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
 
       if(userLocalPath.exists()) {
         userDataPath = userLocalPath.getConcatenated(L"Coati Software/");
-        if(utility::getApplicationArchitectureType() == APPLICATION_ARCHITECTURE_X86_64) {
+        if(utility::getApplicationArchitectureType() == ApplicationArchitectureType::X86_64) {
           userDataPath.concatenate(L"Sourcetrail 64-bit/");
         } else {
           userDataPath.concatenate(L"Sourcetrail/");

@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include "GlobalId.hpp"
 #include "NameHierarchy.h"
 #include "TooltipInfo.h"
-#include "types.h"
 #include "View.h"
 
 class TooltipView : public View {

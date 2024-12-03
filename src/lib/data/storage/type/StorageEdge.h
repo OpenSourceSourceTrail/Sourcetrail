@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct StorageEdgeData {
   StorageEdgeData() = default;

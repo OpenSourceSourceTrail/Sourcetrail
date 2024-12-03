@@ -4,11 +4,11 @@
 // internal
 #include "AccessKind.h"
 #include "DefinitionKind.h"
+#include "GlobalId.hpp"
 #include "NameHierarchy.h"
 #include "ParseLocation.h"
 #include "ReferenceKind.h"
 #include "SymbolKind.h"
-#include "types.h"
 
 class ParserClient {
 public:

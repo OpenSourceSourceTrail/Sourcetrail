@@ -2,8 +2,8 @@
 #include <utility>
 #include <vector>
 
+#include "GlobalId.hpp"
 #include "TokenComponent.h"
-#include "types.h"
 
 class TokenComponentInheritanceChain : public TokenComponent {
 public:

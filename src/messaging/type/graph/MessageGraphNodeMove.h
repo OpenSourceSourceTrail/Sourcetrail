@@ -5,9 +5,9 @@
 #include <QVector2D>
 
 // internal
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
 
 class MessageGraphNodeMove final : public Message<MessageGraphNodeMove> {
 public:

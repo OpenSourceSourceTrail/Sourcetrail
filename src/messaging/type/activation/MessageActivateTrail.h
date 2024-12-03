@@ -1,9 +1,9 @@
 #pragma once
 // internal
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "MessageActivateBase.h"
 #include "TabId.h"
-#include "types.h"
 
 class MessageActivateTrail
     : public Message<MessageActivateTrail>

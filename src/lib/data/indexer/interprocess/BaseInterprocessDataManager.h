@@ -3,8 +3,8 @@
 
 #include <string>
 
+#include "GlobalId.hpp"
 #include "SharedMemory.h"
-#include "types.h"
 
 class BaseInterprocessDataManager {
 public:

@@ -9,6 +9,7 @@
 #include "ErrorCountInfo.h"
 #include "ErrorFilter.h"
 #include "ErrorInfo.h"
+#include "GlobalId.hpp"
 #include "LocationType.h"
 #include "NodeBookmark.h"
 #include "SearchMatch.h"
@@ -16,7 +17,6 @@
 #include "StorageStats.h"
 #include "TooltipInfo.h"
 #include "TooltipOrigin.h"
-#include "types.h"
 
 class FilePath;
 class Graph;

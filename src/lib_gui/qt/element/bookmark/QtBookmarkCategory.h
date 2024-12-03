@@ -5,7 +5,7 @@
 
 #include "BookmarkController.h"
 #include "ControllerProxy.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class QLabel;
 class QPushButton;

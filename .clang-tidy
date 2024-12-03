@@ -19,7 +19,6 @@ Checks:          "*,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: '*'
-AnalyzeTemporaryDtors: false
 FormatStyle:     none
 CheckOptions:
   hicpp-move-const-arg.CheckMoveToConstRef: 'true'

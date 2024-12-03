@@ -2,7 +2,7 @@
 // STL
 #include <limits>
 // internal
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct StorageSourceLocationData {
   static constexpr size_t Invalid = std::numeric_limits<size_t>::max();

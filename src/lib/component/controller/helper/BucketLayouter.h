@@ -6,7 +6,7 @@
 
 // internal
 #include "DummyNode.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct DummyEdge;
 

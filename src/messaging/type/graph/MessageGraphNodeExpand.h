@@ -1,8 +1,8 @@
 #pragma once
 
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
 
 class MessageGraphNodeExpand final : public Message<MessageGraphNodeExpand> {
 public:

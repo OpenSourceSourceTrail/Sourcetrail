@@ -1,20 +1,18 @@
-#ifndef STATUS_VIEW_H
-#define STATUS_VIEW_H
+#pragma once
 
 #include <vector>
 
-#include "Status.h"
 #include "View.h"
+
+struct Status;
 
 class StatusView : public View {
 public:
-  StatusView(ViewLayout* viewLayout);
-  virtual ~StatusView();
+  explicit StatusView(ViewLayout* viewLayout);
+  ~StatusView() override;
 
-  virtual std::string getName() const;
+  std::string getName() const override;
 
   virtual void addStatus(const std::vector<Status>& status) = 0;
   virtual void clear() = 0;
 };
-
-#endif    // STATUS_VIEW_H

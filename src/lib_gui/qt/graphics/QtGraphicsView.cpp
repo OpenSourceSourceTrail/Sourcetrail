@@ -37,7 +37,7 @@ QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
     : QGraphicsView(parent)
     , m_focusHandler(focusHandler)
     , m_zoomFactor(IApplicationSettings::getInstanceRaw()->getGraphZoomLevel()) {
-  QString modifierName = utility::getOsType() == OS_MAC ? QStringLiteral("Cmd") : QStringLiteral("Ctrl");
+  QString modifierName = utility::getOsType() == OsType::Mac ? QStringLiteral("Cmd") : QStringLiteral("Ctrl");
 
   setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 

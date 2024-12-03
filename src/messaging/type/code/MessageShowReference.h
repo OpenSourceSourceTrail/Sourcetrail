@@ -1,8 +1,8 @@
 #pragma once
 // internal
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "TabId.h"
-#include "types.h"
 
 class MessageShowReference final : public Message<MessageShowReference> {
 public:

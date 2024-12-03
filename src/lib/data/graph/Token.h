@@ -4,8 +4,8 @@
 #include <typeinfo>
 #include <vector>
 // internal
+#include "GlobalId.hpp"
 #include "TokenComponent.h"
-#include "types.h"
 
 class Token {
 public:

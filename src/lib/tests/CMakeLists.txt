@@ -6,13 +6,9 @@ add_library(lib_test_utilities utilities/FileHandler.cpp)
 target_include_directories(lib_test_utilities PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 set(test_lib_names
+    AppPathTestSuite
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests
     BookmarkControllerTestSuite
-    CommandLineParserTestSuite
-    CommandlineCommandConfigTestSuite
-    CommandlineCommandIndexTestSuite
-    CommandlineCommandTestSuite
-    CommandlineHelperTestSuite
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite
@@ -25,12 +21,11 @@ set(test_lib_names
     SourceLocationCollectionTestSuite
     SourceLocationFileTestSuite
     SourceLocationTestSuite
-    StatusTestSuite
     TabIdTestSuite
     TabTestSuite
     TimeStampTestSuite
     TreeTestSuite
-    UnorderedCacheTestSuite)
+    UserPathsTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
   add_executable(${test_name} ${test_name}.cpp)
@@ -57,13 +52,10 @@ foreach(test_name IN LISTS test_lib_names)
     TEST_PREFIX "unittests.lib.")
 endforeach()
 
-if(WIN32)
-  target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
-endif()
+target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::core::utility::ScopedFunctor)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(CommandlineHelperTestSuite PRIVATE -Wno-write-strings)
-endif()
+target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::core::utility::SingleValueCache)
+
 if(WIN32)
   target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
 endif()

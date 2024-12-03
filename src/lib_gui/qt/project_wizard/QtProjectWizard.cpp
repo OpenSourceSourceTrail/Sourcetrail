@@ -116,7 +116,7 @@ void addSourceGroupContents<SourceGroupSettingsCEmpty>(QtProjectWizardContentGro
   group->addContent(new QtProjectWizardContentPathsHeaderSearchGlobal(window));
   group->addSpace();
 
-  if(utility::getOsType() == OS_MAC) {
+  if(utility::getOsType() == OsType::Mac) {
     group->addContent(new QtProjectWizardContentPathsFrameworkSearch(settings, window));
     group->addContent(new QtProjectWizardContentPathsFrameworkSearchGlobal(window));
     group->addSpace();
@@ -144,7 +144,7 @@ void addSourceGroupContents<SourceGroupSettingsCppEmpty>(QtProjectWizardContentG
   group->addContent(new QtProjectWizardContentPathsHeaderSearchGlobal(window));
   group->addSpace();
 
-  if(utility::getOsType() == OS_MAC) {
+  if(utility::getOsType() == OsType::Mac) {
     group->addContent(new QtProjectWizardContentPathsFrameworkSearch(settings, window));
     group->addContent(new QtProjectWizardContentPathsFrameworkSearchGlobal(window));
     group->addSpace();
@@ -167,7 +167,7 @@ void addSourceGroupContents<SourceGroupSettingsCxxCdb>(QtProjectWizardContentGro
   group->addContent(new QtProjectWizardContentPathsHeaderSearchGlobal(window));
   group->addSpace();
 
-  if(utility::getOsType() == OS_MAC) {
+  if(utility::getOsType() == OsType::Mac) {
     group->addContent(new QtProjectWizardContentPathsFrameworkSearch(settings, window, true));
     group->addContent(new QtProjectWizardContentPathsFrameworkSearchGlobal(window));
     group->addSpace();

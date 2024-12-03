@@ -8,12 +8,12 @@ foreach(test_name IN LISTS test_cxx_names)
 
   target_link_libraries(
     ${test_name}
-    PUBLIC testHelper
-           lib::mocks
+    PUBLIC lib::mocks
            GTest::gtest
            Sourcetrail::gtest_main
            Sourcetrail::lib
            Sourcetrail::lib_cxx
+           Sourcetrail::core::utility::file::ScopedTemporaryFile
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 

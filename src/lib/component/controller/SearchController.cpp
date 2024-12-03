@@ -3,7 +3,6 @@
 #include "logging.h"
 #include "SearchView.h"
 #include "StorageAccess.h"
-#include "tracing.h"
 #include "type/tab/MessageTabState.h"
 
 SearchController::SearchController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
@@ -35,8 +34,6 @@ void SearchController::handleMessage(MessageFind* message) {
 }
 
 void SearchController::handleMessage(MessageSearchAutocomplete* message) {
-  TRACE("search autocomplete");
-
   SearchView* view = getView();
 
   // Don't autocomplete if autocompletion request is not up-to-date anymore

@@ -5,7 +5,7 @@
 #include <mutex>
 
 #include "../ITaskManager.hpp"
-#include "types.h"
+#include "GlobalId.hpp"
 
 namespace scheduling::impls {
 

@@ -17,7 +17,6 @@
 #include "TokenComponentAccess.h"
 #include "TokenComponentFilePath.h"
 #include "TokenComponentInheritanceChain.h"
-#include "tracing.h"
 #include "TrailLayouter.h"
 #include "type/graph/MessageActivateNodes.h"
 #include "type/MessageStatus.h"
@@ -55,8 +54,6 @@ void GraphController::handleMessage(MessageActivateLegend* message) {
 }
 
 void GraphController::handleMessage(MessageActivateOverview* message) {
-  TRACE("graph all");
-
   clear();
 
   if(message->acceptedNodeTypes != NodeTypeSet::all()) {
@@ -82,8 +79,6 @@ void GraphController::handleMessage(MessageActivateOverview* message) {
 }
 
 void GraphController::handleMessage(MessageActivateTokens* message) {
-  TRACE("graph activate");
-
   if(message->isEdge || message->keepContent()) {
     m_activeEdgeIds = message->tokenIds;
     if(message->isBundledEdges)    // only on redo
@@ -176,8 +171,6 @@ void GraphController::handleMessage(MessageActivateTokens* message) {
 }
 
 void GraphController::handleMessage(MessageActivateTrail* message) {
-  TRACE("trail activate");
-
   MessageStatus(L"Retrieving graph data", false, true).dispatch();
 
   m_activeEdgeIds.clear();
@@ -263,8 +256,6 @@ void GraphController::handleMessage(MessageActivateTrail* message) {
 }
 
 void GraphController::handleMessage(MessageActivateTrailEdge* message) {
-  TRACE("trail edge activate");
-
   m_activeEdgeIds = message->edgeIds;
   setVisibility(setActive(utility::concat(m_activeNodeIds, m_activeEdgeIds), true));
 
@@ -272,8 +263,6 @@ void GraphController::handleMessage(MessageActivateTrailEdge* message) {
 }
 
 void GraphController::handleMessage(MessageDeactivateEdge* /*message*/) {
-  TRACE("edge deactivate");
-
   m_activeEdgeIds.clear();
   setActive(utility::concat(m_activeNodeIds, m_activeEdgeIds), false);
 

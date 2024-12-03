@@ -11,7 +11,6 @@
 #include "SourceLocationFile.h"
 #include "StorageAccess.h"
 #include "TextAccess.h"
-#include "tracing.h"
 #include "type/error/MessageShowError.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/MessageStatus.h"
@@ -26,8 +25,6 @@ Id CodeController::getSchedulerId() const {
 }
 
 void CodeController::handleMessage(MessageActivateErrors* message) {
-  TRACE("code errors");
-
   saveOrRestoreViewMode(message);
 
   // TODO(Hussein): Check why?!
@@ -56,8 +53,6 @@ void CodeController::handleMessage(MessageActivateErrors* message) {
 }
 
 void CodeController::handleMessage(MessageActivateFullTextSearch* message) {
-  TRACE("code fulltext");
-
   saveOrRestoreViewMode(message);
 
   m_collection = m_storageAccess->getFullTextSearchLocations(message->searchTerm, message->caseSensitive);
@@ -86,8 +81,6 @@ void CodeController::handleMessage(MessageActivateLocalSymbols* message) {
 }
 
 void CodeController::handleMessage(MessageActivateOverview* message) {
-  TRACE("code all");
-
   saveOrRestoreViewMode(message);
   clearReferences();
 
@@ -163,8 +156,6 @@ void CodeController::handleMessage(MessageActivateOverview* message) {
 }
 
 void CodeController::handleMessage(MessageActivateTokens* message) {
-  TRACE("code activate");
-
   saveOrRestoreViewMode(message);
 
   CodeView* view = getView();
@@ -233,8 +224,6 @@ void CodeController::handleMessage(MessageActivateTrail* message) {
 }
 
 void CodeController::handleMessage(MessageActivateTrailEdge* message) {
-  TRACE("trail edge activate");
-
   saveOrRestoreViewMode(message);
 
   m_codeParams.activeTokenIds = message->edgeIds;
@@ -248,8 +237,6 @@ void CodeController::handleMessage(MessageActivateTrailEdge* message) {
 }
 
 void CodeController::handleMessage(MessageChangeFileView* message) {
-  TRACE("code change file");
-
   saveOrRestoreViewMode(message);
 
   for(CodeFileParams& file : m_files) {
@@ -282,8 +269,6 @@ void CodeController::handleMessage(MessageCodeReference* message) {
 }
 
 void CodeController::handleMessage(MessageCodeShowDefinition* message) {
-  TRACE("code show definition");
-
   Id nodeId = message->nodeId;
 
   std::shared_ptr<SourceLocationCollection> collection = m_storageAccess->getSourceLocationsForTokenIds({nodeId});
@@ -429,8 +414,6 @@ void CodeController::handleMessage(MessageShowReference* message) {
 }
 
 void CodeController::handleMessage(MessageShowScope* message) {
-  TRACE("code scope");
-
   std::shared_ptr<SourceLocationCollection> collection = m_storageAccess->getSourceLocationsForLocationIds(
       {message->scopeLocationId});
 

@@ -118,7 +118,7 @@ QSize QtCodeArea::sizeHint() const {
     width = std::max(rect.width(), width);
   }
 
-  if(horizontalScrollBar()->minimum() != horizontalScrollBar()->maximum() && utility::getOsType() != OS_MAC) {
+  if(horizontalScrollBar()->minimum() != horizontalScrollBar()->maximum() && utility::getOsType() != OsType::Mac) {
     height += horizontalScrollBar()->height();
   }
 
@@ -205,7 +205,7 @@ void QtCodeArea::lineNumberAreaPaintEvent(QPaintEvent* event) {
   int drawAreaTop = event->rect().top();
   int drawAreaBottom = event->rect().bottom() + 1;
 
-  if(horizontalScrollBar()->minimum() != horizontalScrollBar()->maximum() && utility::getOsType() != OS_MAC &&
+  if(horizontalScrollBar()->minimum() != horizontalScrollBar()->maximum() && utility::getOsType() != OsType::Mac &&
      drawAreaBottom > height() - horizontalScrollBar()->height()) {
     drawAreaBottom = height() - horizontalScrollBar()->height();
   }

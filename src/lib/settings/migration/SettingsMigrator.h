@@ -5,6 +5,6 @@
 
 class Settings;
 
-typedef Migrator<Settings> SettingsMigrator;
+using SettingsMigrator = Migrator<Settings>;
 
 #endif    // SETTINGS_MIGRATOR_H

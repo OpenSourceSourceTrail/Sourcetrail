@@ -1,5 +1,5 @@
 [requires]
-boost/1.74.0
+boost/1.83.0
 fmt/10.2.1
 range-v3/0.12.0
 spdlog/1.13.0
@@ -17,7 +17,7 @@ cmake_layout
 
 [options]
 boost/*:shared=False
-boost/*:without_atomic=True
+boost/*:without_atomic=False
 boost/*:without_chrono=True
 boost/*:without_container=True
 boost/*:without_context=True

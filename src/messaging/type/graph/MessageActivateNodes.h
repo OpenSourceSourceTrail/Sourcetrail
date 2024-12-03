@@ -1,9 +1,9 @@
 #pragma once
 
+#include "GlobalId.hpp"
 #include "Message.h"
 #include "NameHierarchy.h"
 #include "TabId.h"
-#include "types.h"
 
 class MessageActivateNodes final : public Message<MessageActivateNodes> {
 public:

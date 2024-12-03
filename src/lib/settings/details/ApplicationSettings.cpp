@@ -13,6 +13,7 @@
 #include "SettingsMigrationMoveKey.h"
 #include "SettingsMigrator.h"
 #include "Status.h"
+#include "to_underlying.hpp"
 #include "UserPaths.h"
 #include "utility.h"
 #include "utilityFile.h"
@@ -269,7 +270,8 @@ void ApplicationSettings::setStatusFilter(int mask) noexcept {
 }
 
 int ApplicationSettings::getStatusFilter() const noexcept {
-  return getValue<int>("application/status_filter", StatusType::STATUS_INFO | StatusType::STATUS_ERROR);
+  return getValue<int>(
+      "application/status_filter", utility::to_underlying(StatusType::Info) | utility::to_underlying(StatusType::Error));
 }
 
 int ApplicationSettings::getLogFilter() const noexcept {

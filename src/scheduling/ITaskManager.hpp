@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 class TaskScheduler;
 

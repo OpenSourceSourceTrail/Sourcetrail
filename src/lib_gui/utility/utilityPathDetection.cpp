@@ -14,7 +14,7 @@
 std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
   std::shared_ptr<CombinedPathDetector> combinedDetector = std::make_shared<CombinedPathDetector>();
 
-  if(utility::getOsType() != OS_WINDOWS) {
+  if(utility::getOsType() != OsType::Windows) {
     return combinedDetector;
   }
 
@@ -22,37 +22,37 @@ std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
   combinedDetector->addDetector(std::make_shared<CxxVs15HeaderPathDetector>());
 
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, false, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, false, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, false, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, false, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, true, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, true, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, true, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015, true, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, false, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, false, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, false, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, false, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, true, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, true, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, true, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013, true, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, false, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, false, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, false, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, false, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, true, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, true, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, true, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012, true, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, false, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, false, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, false, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, false, ApplicationArchitectureType::X86_64));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, true, APPLICATION_ARCHITECTURE_X86_32));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, true, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
-      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, true, APPLICATION_ARCHITECTURE_X86_64));
+      CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, true, ApplicationArchitectureType::X86_64));
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   return combinedDetector;

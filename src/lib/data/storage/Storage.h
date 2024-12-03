@@ -6,6 +6,7 @@
 #include <set>
 #include <string>
 
+#include "GlobalId.hpp"
 #include "StorageComponentAccess.h"
 #include "StorageEdge.h"
 #include "StorageElementComponent.h"
@@ -16,7 +17,6 @@
 #include "StorageOccurrence.h"
 #include "StorageSourceLocation.h"
 #include "StorageSymbol.h"
-#include "types.h"
 
 class Storage {
 public:

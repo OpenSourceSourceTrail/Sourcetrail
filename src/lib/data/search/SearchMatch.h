@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 // internal
+#include "GlobalId.hpp"
 #include "Node.h"
-#include "types.h"
 
 class NodeTypeSet;
 

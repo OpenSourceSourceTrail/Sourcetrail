@@ -4,8 +4,8 @@
 
 // internal
 #include "Edge.h"
+#include "GlobalId.hpp"
 #include "TokenComponentBundledEdges.h"
-#include "types.h"
 
 class Edge;
 

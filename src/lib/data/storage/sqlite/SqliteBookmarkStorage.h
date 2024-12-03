@@ -1,11 +1,11 @@
 #pragma once
 
+#include "GlobalId.hpp"
 #include "SqliteStorage.h"
 #include "StorageBookmark.h"
 #include "StorageBookmarkCategory.h"
 #include "StorageBookmarkedEdge.h"
 #include "StorageBookmarkedNode.h"
-#include "types.h"
 
 class SqliteBookmarkStorage : public SqliteStorage {
 public:

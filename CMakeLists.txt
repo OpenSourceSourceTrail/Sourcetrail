@@ -64,6 +64,11 @@ include(cmake/add_files.cmake)
 include(cmake/version_setup.cmake)
 include(cmake/licenses.cmake)
 include(cmake/create_symlink.cmake)
+include(cmake/add_sourcetrail_library.cmake)
+include(cmake/add_sourcetrail_interface.cmake)
+include(cmake/add_sourcetrail_test.cmake)
+include(cmake/clang-tidy.cmake)
+include(cmake/cppcheck.cmake)
 
 if(ENABLE_SANITIZER_ADDRESS
    OR ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
@@ -163,7 +168,7 @@ set(Boost_USE_STATIC_LIBS
     CACHE BOOL "Set to ON to force the use of the static libraries.")
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(
-  Boost 1.74
+  Boost 1.83
   COMPONENTS date_time
              filesystem
              program_options
@@ -225,7 +230,8 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
     PUBLIC GTest::gmock
            GTest::gtest
            spdlog::spdlog
-           Sourcetrail::lib_utility)
+           Sourcetrail::core::utility::utilityString
+           Sourcetrail::core::utility::TextCodec)
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
@@ -234,12 +240,11 @@ add_subdirectory(src/external)
 add_subdirectory(src/lib)
 add_subdirectory(src/lib_gui)
 
-# Lib Utility ------------------------------------------------------------------
-add_subdirectory(src/lib_utility)
 # core -------------------------------------------------------------------------
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
 add_subdirectory(src/messaging)
+add_subdirectory(src/lib_gui/utility/utilityApp)
 # Lib Cxx ----------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_subdirectory(src/lib_cxx)
@@ -258,10 +263,32 @@ target_include_directories(
 
 target_link_libraries(
   Sourcetrail_lib
-  PUBLIC Sourcetrail::messaging Sourcetrail::scheduling CppSQLite::CppSQLite3
+  PUBLIC Sourcetrail::messaging
+         Sourcetrail::core::utility::ConfigManager
+         Sourcetrail::core::utility::LowMemoryStringMap
+         Sourcetrail::core::utility::Status
+         Sourcetrail::core::utility::Tree
+         Sourcetrail::core::utility::utility
+         Sourcetrail::core::utility::Migration
+         Sourcetrail::core::utility::Migrator
+         Sourcetrail::core::utility::file::FilePath
+         Sourcetrail::core::utility::file::FilePathFilter
+         Sourcetrail::scheduling
+         CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
+          Sourcetrail::core::utility::ConfigManager
+          Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::core::utility::Status
+          Sourcetrail::core::utility::TextAccess
+          Sourcetrail::core::utility::TextCodec
+          Sourcetrail::core::utility::toUnderlying
+          Sourcetrail::core::utility::utilityUuid
           Sourcetrail::lib_gui
-          Sourcetrail::utility::logging
+          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::core::utility::file::FileSystem
+          Sourcetrail::core::utility::file::utilityFile
+          Sourcetrail::core::utility::file::FileManager
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
@@ -277,9 +304,7 @@ add_library(Sourcetrail::lib_gui::utility ALIAS Sourcetrail_lib_gui_utility)
 
 target_sources(
   Sourcetrail_lib_gui_utility
-  PRIVATE src/lib_gui/utility/utilityApp.cpp
-          src/lib_gui/utility/utilityPathDetection.cpp
-          src/lib_gui/utility/path_detector/CombinedPathDetector.cpp
+  PRIVATE src/lib_gui/utility/utilityPathDetection.cpp src/lib_gui/utility/path_detector/CombinedPathDetector.cpp
           src/lib_gui/utility/path_detector/PathDetector.cpp)
 
 target_include_directories(Sourcetrail_lib_gui_utility PUBLIC src/lib_gui/utility/ src/lib_gui/utility/path_detector/
@@ -287,11 +312,14 @@ target_include_directories(Sourcetrail_lib_gui_utility PUBLIC src/lib_gui/utilit
 
 target_link_libraries(
   Sourcetrail_lib_gui_utility
+  PUBLIC Sourcetrail::core::utility::ApplicationArchitectureType Sourcetrail::core::utility::OsType
   PRIVATE Boost::system
           Qt5::Core
           Sourcetrail::core
           Sourcetrail::lib
-          Sourcetrail::utility::logging)
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::core::utility::logging
+          Sourcetrail::libGui::utility::utilityApp)
 
 # Lib Gui ----------------------------------------------------------------------
 # target for running versionnumber script
@@ -308,12 +336,30 @@ target_link_libraries(
          Qt5::Widgets
          Qt5::Network
          Qt5::Svg
+         Sourcetrail::core::utility::SingleValueCache
+         Sourcetrail::core::utility::LowMemoryStringMap
+         Sourcetrail::core::utility::Migrator
+         Sourcetrail::core::utility::file::FilePathFilter
+         Sourcetrail::core::utility::file::FileSystem
+         Sourcetrail::libGui::utility::utilityApp
          $<$<PLATFORM_ID:Windows>:Qt5::WinExtras>
   PRIVATE Sourcetrail::core
-          Sourcetrail::messaging
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
+          Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::OrderedCache
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::core::utility::Status
+          Sourcetrail::core::utility::TextAccess
+          Sourcetrail::core::utility::TextCodec
+          Sourcetrail::core::utility::toUnderlying
+          Sourcetrail::core::utility::utility
+          Sourcetrail::core::utility::utilityUuid
+          Sourcetrail::core::utility::file::utilityFile
+          Sourcetrail::core::utility::file::FilePath
+          Sourcetrail::core::utility::file::FileManager
           Sourcetrail::lib_gui::utility
-          Sourcetrail::utility::logging)
+          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::messaging
+          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
 
 # command for versioning script
 add_custom_command(

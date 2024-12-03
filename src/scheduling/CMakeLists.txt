@@ -24,8 +24,8 @@ target_include_directories(Sourcetrail_scheduling PUBLIC ${CMAKE_CURRENT_LIST_DI
 
 target_link_libraries(
   Sourcetrail_scheduling
-  PUBLIC Sourcetrail::core Sourcetrail::utility::logging
-  PRIVATE Boost::date_time)
+  PUBLIC Sourcetrail::core Sourcetrail::core::utility::logging Sourcetrail::core::utility::GlobalId
+  PRIVATE Boost::date_time Sourcetrail::core::utility::ScopedFunctor)
 
 if(ENABLE_UNIT_TEST)
   add_subdirectory(mocks)

@@ -1,5 +1,5 @@
 #include "StatusController.h"
-// internal
+
 #include "IApplicationSettings.hpp"
 #include "StatusView.h"
 #include "utility.h"
@@ -56,7 +56,7 @@ void StatusController::addStatus(const std::vector<Status>& statuses) {
   std::vector<Status> filteredStatus;
 
   for(const Status& status : statuses) {
-    if((status.type & m_statusFilter) != 0) {
+    if((static_cast<std::uint8_t>(status.type) & static_cast<std::uint8_t>(m_statusFilter)) != 0) {
       filteredStatus.push_back(status);
     }
   }

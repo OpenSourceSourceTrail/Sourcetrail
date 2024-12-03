@@ -10,7 +10,7 @@
 
 #include "FilePath.h"
 #include "FileRegister.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 class CanonicalFilePathCache {
 public:

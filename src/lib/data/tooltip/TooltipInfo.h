@@ -5,7 +5,7 @@
 
 #include <QVector2D>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 class SourceLocationFile;
 

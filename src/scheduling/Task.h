@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "types.h"
+#include "GlobalId.hpp"
 
 class Blackboard;
 

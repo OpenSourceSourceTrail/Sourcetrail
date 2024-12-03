@@ -2,7 +2,7 @@
 // STL
 #include <string>
 // internal
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct StorageFile {
   StorageFile() = default;

@@ -4,9 +4,9 @@
 
 #include <QVector2D>
 
+#include "GlobalId.hpp"
 #include "GroupType.h"
 #include "ScreenSearchInterfaces.h"
-#include "types.h"
 #include "View.h"
 
 struct DummyEdge;

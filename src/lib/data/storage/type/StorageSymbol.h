@@ -1,7 +1,7 @@
 #pragma once
 // internal
 #include "DefinitionKind.h"
-#include "types.h"
+#include "GlobalId.hpp"
 
 struct StorageSymbol {
   StorageSymbol() = default;
