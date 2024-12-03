@@ -5,6 +5,7 @@
 #include "mocks/MockedStatusView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "Status.h"
 #include "StatusController.h"
 #include "StatusView.h"
 
@@ -12,7 +13,7 @@ using namespace testing;
 
 struct StatusControllerFix : Test {
   void SetUp() override {
-    MessageQueue::getInstance()->startMessageLoopThreaded();
+    IMessageQueue::getInstance()->startMessageLoopThreaded();
 
     MockedViewFactory viewFactory;
     auto componentFactory = std::make_shared<ComponentFactory>(&viewFactory, nullptr);
@@ -26,7 +27,7 @@ struct StatusControllerFix : Test {
   }
 
   void TearDown() override {
-    MessageQueue::getInstance()->stopMessageLoop();
+    IMessageQueue::getInstance()->stopMessageLoop();
   }
 
   StatusController* controller = nullptr;
@@ -58,5 +59,5 @@ TEST_F(StatusControllerFix, MessageStatus) {
 TEST_F(StatusControllerFix, MessageStatusFilterChanged) {
   EXPECT_CALL(*statusView, clear).WillOnce(Return());
   EXPECT_CALL(*statusView, addStatus(_)).WillOnce(Return());
-  MessageStatusFilterChanged{STATUS_INFO}.dispatch();
+  MessageStatusFilterChanged{static_cast<int>(StatusType::Info)}.dispatch();
 }

@@ -1,5 +1,6 @@
 # ${CMAKE_SOURCE_DIR}/src/lib/tests/CMakeLists.txt
 add_subdirectory(mocks)
+add_subdirectory(helper)
 
 add_library(lib_test_utilities utilities/FileHandler.cpp)
 
@@ -14,13 +15,26 @@ set(test_lib_names
     ComponentTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
+    GraphTestSuite
+    GraphViewStyleTestSuite # TODO(SOUR-97)
+    HierarchyCacheTestSuite
+    IndexerCompositeTestSuite
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite
+    NetworkProtocolHelperTestSuite
+    ProjectSettingsTestSuite
     ProjectTestSuite
+    ResourcePathsTestSuite
+    SearchIndexTestSuite
+    SettingsMigratorTestSuite
+    SettingsTestSuite
+    SharedMemoryTestSuite
     SingleValueCacheTestSuite
     SourceLocationCollectionTestSuite
     SourceLocationFileTestSuite
     SourceLocationTestSuite
+    # StatusBarControllerTestSuite TODO(SOUR-95)
+    # StatusControllerTestSuite TODO(SOUR-96)
     TabIdTestSuite
     TabTestSuite
     TimeStampTestSuite
@@ -38,6 +52,7 @@ foreach(test_name IN LISTS test_lib_names)
            GTest::gtest
            Sourcetrail::lib
            Sourcetrail::gtest_main
+           Sourcetrail::core::utility::TextAccess
            Qt5::Gui
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
@@ -56,6 +71,10 @@ target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::core:
 
 target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::core::utility::SingleValueCache)
 
+# target_link_libraries(StatusBarControllerTestSuite PRIVATE Sourcetrail::messaging)
+# target_link_libraries(StatusControllerTestSuite PRIVATE Sourcetrail::messaging)
+
 if(WIN32)
   target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
 endif()
+# ================================================================================================================================

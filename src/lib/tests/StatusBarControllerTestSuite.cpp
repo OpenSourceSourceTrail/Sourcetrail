@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 #include "ComponentFactory.h"
+#include "MessageQueue.h"
 #include "mocks/MockedStatusBarView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
@@ -14,7 +15,7 @@ using namespace testing;
 
 struct StatusBarControllerFix : Test {
   void SetUp() override {
-    MessageQueue::getInstance()->startMessageLoopThreaded();
+    IMessageQueue::getInstance()->startMessageLoopThreaded();
 
     MockedViewFactory viewFactory;
     storageAccess = std::make_shared<MockedStorageAccess>();
@@ -29,7 +30,7 @@ struct StatusBarControllerFix : Test {
   }
 
   void TearDown() override {
-    MessageQueue::getInstance()->stopMessageLoop();
+    IMessageQueue::getInstance()->stopMessageLoop();
   }
 
   StatusBarController* controller = nullptr;

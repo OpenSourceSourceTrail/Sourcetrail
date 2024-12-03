@@ -47,7 +47,8 @@ void PrintTo(const GraphViewStyle::NodeColor& node, std::ostream* os) {
   // clang-format on
 }
 
-TEST_F(GraphViewStyleFix, loadStyleSettings) {
+// TODO(SOUR-97)
+TEST_F(GraphViewStyleFix, DISABLED_loadStyleSettings) {
   EXPECT_CALL(*graphViewStyle, getGraphViewZoomDifferenceForPlatform()).WillOnce(Return(0));
   EXPECT_CALL(*graphViewStyle, getCharHeight(_, _)).WillOnce(Return(0));
 
