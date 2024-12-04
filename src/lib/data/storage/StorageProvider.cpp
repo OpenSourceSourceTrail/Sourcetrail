@@ -3,12 +3,12 @@
 #include "logging.h"
 
 int StorageProvider::getStorageCount() const {
-  std::lock_guard<std::mutex> lock(mStoragesMutex);
+  const std::lock_guard<std::mutex> lock(mStoragesMutex);
   return static_cast<int>(mStorages.size());
 }
 
 void StorageProvider::clear() {
-  std::lock_guard<std::mutex> lock(mStoragesMutex);
+  const std::lock_guard<std::mutex> lock(mStoragesMutex);
   return mStorages.clear();
 }
 
@@ -16,7 +16,7 @@ void StorageProvider::insert(std::shared_ptr<IntermediateStorage> storage) {
   const std::size_t storageSize = storage->getSourceLocationCount();
   std::list<std::shared_ptr<IntermediateStorage>>::iterator iterator;
 
-  std::lock_guard<std::mutex> lock(mStoragesMutex);
+  const std::lock_guard<std::mutex> lock(mStoragesMutex);
   for(iterator = mStorages.begin(); iterator != mStorages.end(); iterator++) {
     if((*iterator)->getSourceLocationCount() < storageSize) {
       break;
@@ -28,7 +28,7 @@ void StorageProvider::insert(std::shared_ptr<IntermediateStorage> storage) {
 std::shared_ptr<IntermediateStorage> StorageProvider::consumeSecondLargestStorage() {
   std::shared_ptr<IntermediateStorage> ret;
   {
-    std::lock_guard<std::mutex> lock(mStoragesMutex);
+    const std::lock_guard<std::mutex> lock(mStoragesMutex);
     if(mStorages.size() > 1) {
       auto iterator = mStorages.begin();
       iterator++;
@@ -42,7 +42,7 @@ std::shared_ptr<IntermediateStorage> StorageProvider::consumeSecondLargestStorag
 std::shared_ptr<IntermediateStorage> StorageProvider::consumeLargestStorage() {
   std::shared_ptr<IntermediateStorage> ret;
   {
-    std::lock_guard<std::mutex> lock(mStoragesMutex);
+    const std::lock_guard<std::mutex> lock(mStoragesMutex);
     if(!mStorages.empty()) {
       ret = mStorages.front();
       mStorages.pop_front();
@@ -55,7 +55,7 @@ std::shared_ptr<IntermediateStorage> StorageProvider::consumeLargestStorage() {
 void StorageProvider::logCurrentState() const {
   std::string logString = "Storages waiting for injection:";
   {
-    std::lock_guard<std::mutex> lock(mStoragesMutex);
+    const std::lock_guard<std::mutex> lock(mStoragesMutex);
     for(const auto& storage : mStorages) {
       logString += " " + std::to_string(storage->getSourceLocationCount()) + ";";
     }

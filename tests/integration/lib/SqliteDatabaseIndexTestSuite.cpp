@@ -7,7 +7,7 @@
 namespace {
 
 TEST(SqliteDatabaseIndexTestSuite, getName) {
-  SqliteDatabaseIndex index("test_index", "test_target");
+  const SqliteDatabaseIndex index("test_index", "test_target");
   EXPECT_EQ(index.getName(), "test_index");
 }
 

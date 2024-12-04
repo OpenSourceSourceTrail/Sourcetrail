@@ -113,7 +113,7 @@ std::pair<Id, bool> IntermediateStorage::addNode(const StorageNodeData& nodeData
 }
 
 std::vector<Id> IntermediateStorage::addNodes(const std::vector<StorageNode>& nodes) {
-  return nodes | ranges::view::transform([this](const StorageNode& node) -> Id { return addNode(node).first; }) |
+  return nodes | ranges::views::transform([this](const StorageNode& node) -> Id { return addNode(node).first; }) |
       ranges::to<std::vector>();
 }
 
@@ -156,14 +156,14 @@ Id IntermediateStorage::addEdge(const StorageEdgeData& edgeData) {
     return mEdges[found->second].id;
   }
 
-  Id edgeId = mNextId++;
+  const Id edgeId = mNextId++;
   mEdges.emplace_back(edgeId, edgeData);
   mEdgesIndex.emplace(edgeData, mEdges.size() - 1);
   return edgeId;
 }
 
 std::vector<Id> IntermediateStorage::addEdges(const std::vector<StorageEdge>& edges) {
-  return edges | ranges::view::transform([this](const StorageEdge& edge) -> Id { return addEdge(edge); }) |
+  return edges | ranges::views::transform([this](const StorageEdge& edge) -> Id { return addEdge(edge); }) |
       ranges::to<std::vector>();
 }
 
@@ -172,13 +172,13 @@ Id IntermediateStorage::addLocalSymbol(const StorageLocalSymbolData& localSymbol
     return found->id;
   }
 
-  Id localSymbolId = mNextId++;
+  const Id localSymbolId = mNextId++;
   mLocalSymbols.emplace(localSymbolId, localSymbolData);
   return localSymbolId;
 }
 
 std::vector<Id> IntermediateStorage::addLocalSymbols(const std::set<StorageLocalSymbol>& symbols) {
-  return symbols | ranges::view::transform([this](const StorageLocalSymbol& symbol) -> Id { return addLocalSymbol(symbol); }) |
+  return symbols | ranges::views::transform([this](const StorageLocalSymbol& symbol) -> Id { return addLocalSymbol(symbol); }) |
       ranges::to<std::vector>();
 }
 
@@ -187,14 +187,14 @@ Id IntermediateStorage::addSourceLocation(const StorageSourceLocationData& sourc
     return found->id;
   }
 
-  Id sourceLocationId = mNextId++;
+  const Id sourceLocationId = mNextId++;
   mSourceLocations.emplace(sourceLocationId, sourceLocationData);
   return sourceLocationId;
 }
 
 std::vector<Id> IntermediateStorage::addSourceLocations(const std::vector<StorageSourceLocation>& locations) {
   return locations |
-      ranges::view::transform([this](const StorageSourceLocation& location) -> Id { return addSourceLocation(location); }) |
+      ranges::views::transform([this](const StorageSourceLocation& location) -> Id { return addSourceLocation(location); }) |
       ranges::to<std::vector>();
 }
 
@@ -203,7 +203,7 @@ Id IntermediateStorage::addError(const StorageErrorData& errorData) {
     return mErrors[found->second].id;
   }
 
-  Id errorId = mNextId++;
+  const Id errorId = mNextId++;
   mErrors.emplace_back(errorId, errorData);
   mErrorsIndex.emplace(errorData, mErrors.size() - 1);
   return errorId;
@@ -214,7 +214,7 @@ void IntermediateStorage::setStorageNodes(std::vector<StorageNode> storageNodes)
 
   mNodesIndex.clear();
   mNodeIdIndex.clear();
-  for(const auto& [index, node] : ranges::view::enumerate(mNodes)) {
+  for(const auto& [index, node] : ranges::views::enumerate(mNodes)) {
     mNodesIndex.emplace(node, index);
     mNodeIdIndex.emplace(node.id, index);
   }
@@ -225,7 +225,7 @@ void IntermediateStorage::setStorageFiles(std::vector<StorageFile> storageFiles)
 
   mFilesIndex.clear();
   mFilesIdIndex.clear();
-  for(const auto& [index, file] : ranges::view::enumerate(mFiles)) {
+  for(const auto& [index, file] : ranges::views::enumerate(mFiles)) {
     mFilesIndex.emplace(file, index);
     mFilesIdIndex.emplace(file.id, index);
   }
@@ -234,15 +234,15 @@ void IntermediateStorage::setStorageFiles(std::vector<StorageFile> storageFiles)
 void IntermediateStorage::setStorageEdges(std::vector<StorageEdge> storageEdges) {
   mEdges = std::move(storageEdges);
 
-  mEdgesIndex = mEdges | ranges::view::enumerate |
-      ranges::view::transform([](const auto& item) -> std::pair<StorageEdgeData, size_t> { return {item.second, item.first}; }) |
+  mEdgesIndex = mEdges | ranges::views::enumerate |
+      ranges::views::transform([](const auto& item) -> std::pair<StorageEdgeData, size_t> { return {item.second, item.first}; }) |
       ranges::to<std::map>();
 }
 
 void IntermediateStorage::setErrors(std::vector<StorageError> errors) {
   mErrors = std::move(errors);
 
-  mErrorsIndex = mErrors | ranges::view::enumerate |
-      ranges::view::transform([](const auto& item) -> std::pair<StorageErrorData, size_t> { return {item.second, item.first}; }) |
+  mErrorsIndex = mErrors | ranges::views::enumerate |
+      ranges::views::transform([](const auto& item) -> std::pair<StorageErrorData, size_t> { return {item.second, item.first}; }) |
       ranges::to<std::map>();
 }

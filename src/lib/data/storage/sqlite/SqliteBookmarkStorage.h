@@ -72,7 +72,7 @@ public:
    * @param data The bookmarked edge data to store
    * @return The stored bookmarked edge with its assigned ID
    */
-  StorageBookmarkedEdge addBookmarkedEdge(const StorageBookmarkedEdgeData data);
+  StorageBookmarkedEdge addBookmarkedEdge(const StorageBookmarkedEdgeData& data);
 
   /**
    * @brief Removes a bookmark category from storage

@@ -35,14 +35,14 @@ using testing::StrictMock;
 using testing::Test;
 
 bool checkTableExists(const QString& dbFullPath, const QString& tableName) noexcept {
-  QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-  db.setDatabaseName(dbFullPath);
-  if(!db.open()) {
-    qDebug() << db.lastError();
+  QSqlDatabase database = QSqlDatabase::addDatabase("QSQLITE");
+  database.setDatabaseName(dbFullPath);
+  if(!database.open()) {
+    qDebug() << database.lastError();
     return false;
   }
 
-  const auto tables = db.tables();
+  const auto tables = database.tables();
   return tables.contains(tableName);
 }
 
@@ -80,6 +80,7 @@ TEST(SqliteStorage, getVersion_EmptyVersion) {
 }
 
 TEST(SqliteStorage, getVersion_SetVersion) {
+  constexpr size_t StorageVersion = 100;
   // Given:
   MockedSqliteStorage sqliteStorage;
 
@@ -87,7 +88,7 @@ TEST(SqliteStorage, getVersion_SetVersion) {
   EXPECT_CALL(sqliteStorage, setupTables);
   EXPECT_CALL(sqliteStorage, setupPrecompiledStatements);
   ASSERT_NO_THROW(sqliteStorage.setup());
-  sqliteStorage.setVersion(100);
+  sqliteStorage.setVersion(StorageVersion);
 
   // When:
   const auto version = sqliteStorage.getVersion();
@@ -114,7 +115,7 @@ TEST(SqliteStorage, setVersion_InvaludVersion) {
 
 TEST(SqliteStorage, executeStatementScalar_InvalidQuery) {
   // Given:
-  MockedSqliteStorage sqliteStorage;
+  const MockedSqliteStorage sqliteStorage;
 
   // When:
   const auto value = sqliteStorage.executeStatementScalar("invalid query", 0);
@@ -214,7 +215,7 @@ TEST_F(SqliteStorageFix, executeStatement) {
 }    // namespace
 
 int main(int argc, char** argv) {
-  auto logger = spdlog::default_logger_raw();
+  auto* logger = spdlog::default_logger_raw();
   logger->set_level(spdlog::level::off);
   // NOTE(Hussein): Windows platform needs to copy `sqldrivers` folder to test dir.
   // QSqlDatabase needs QCoreApplication to be called to before discover SQL drivers.

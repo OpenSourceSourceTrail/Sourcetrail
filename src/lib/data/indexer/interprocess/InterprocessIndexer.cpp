@@ -26,9 +26,11 @@ void InterprocessIndexer::work() {
 
     pUpdaterThread = std::make_shared<std::thread>([&]() {
       while(updaterThreadRunning) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1000ms);
 
         if(mInterprocessIndexingStatusManager.getIndexingInterrupted()) {
+          // NOLINTNEXTLINE(bugprone-lambda-function-name)
           LOG_INFO(fmt::format("{} received indexer interrupt command.", mProcessId));
           if(pIndexer) {
             pIndexer->interrupt();
@@ -38,7 +40,7 @@ void InterprocessIndexer::work() {
       }
     });
 
-    ScopedFunctor threadStopper([&]() {
+    const ScopedFunctor threadStopper([&]() {
       updaterThreadRunning = false;
       if(pUpdaterThread) {
         pUpdaterThread->join();
@@ -58,7 +60,8 @@ void InterprocessIndexer::work() {
 
         LOG_INFO(fmt::format("{} waits, too many intermediate storages: {}", mProcessId, storageCount));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(200ms);
       }
 
       if(!updaterThreadRunning) {
@@ -81,12 +84,12 @@ void InterprocessIndexer::work() {
 
       LOG_INFO(fmt::format("{} sall done", mProcessId));
     }
-  } catch(boost::interprocess::interprocess_exception& e) {
-    LOG_INFO(fmt::format("{} error: {}", mProcessId, e.what()));
-    throw e;
-  } catch(std::exception& e) {
-    LOG_INFO(fmt::format("{} error: {}", mProcessId, e.what()));
-    throw e;
+  } catch(boost::interprocess::interprocess_exception& exception) {
+    LOG_INFO(fmt::format("{} error: {}", mProcessId, exception.what()));
+    throw exception;    // NOLINT(cert-err60-cpp)
+  } catch(std::exception& exception) {
+    LOG_INFO(fmt::format("{} error: {}", mProcessId, exception.what()));
+    throw exception;
   } catch(...) {
     LOG_INFO(fmt::format("{} something went wrong while running the indexer", mProcessId));
   }

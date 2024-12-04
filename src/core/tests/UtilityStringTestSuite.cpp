@@ -60,36 +60,36 @@ TEST(Split, splitWithDelimiterAtEnd) {
 
 TEST(Join, joinWithCharDelimiter) {
   std::deque<std::string> list;
-  list.push_back("A");
-  list.push_back("B");
-  list.push_back("C");
+  list.emplace_back("A");
+  list.emplace_back("B");
+  list.emplace_back("C");
 
-  std::string result = utility::join(list, ',');
+  const std::string result = utility::join(list, ',');
   EXPECT_THAT(result, StrEq("A,B,C"));
 }
 
 TEST(Join, joinWithStringDelimiter) {
   std::deque<std::string> list;
-  list.push_back("A");
-  list.push_back("B");
-  list.push_back("C");
+  list.emplace_back("A");
+  list.emplace_back("B");
+  list.emplace_back("C");
 
-  std::string result = utility::join(list, "==");
+  const std::string result = utility::join(list, "==");
   EXPECT_THAT(result, StrEq("A==B==C"));
 }
 
 TEST(Join, joinOnEmptyList) {
-  std::deque<std::string> list;
-  std::string result = utility::join(list, ',');
+  const std::deque<std::string> list;
+  const std::string result = utility::join(list, ',');
 
   EXPECT_THAT(result, IsEmpty());
 }
 
 TEST(Join, joinWithEmptyStringsInList) {
   std::deque<std::string> list;
-  list.push_back("A");
-  list.push_back("");
-  list.push_back("");
+  list.emplace_back("A");
+  list.emplace_back("");
+  list.emplace_back("");
 
   const std::string result = utility::join(list, ':');
   EXPECT_THAT(result, StrEq("A::"));

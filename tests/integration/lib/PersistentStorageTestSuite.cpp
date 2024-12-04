@@ -12,7 +12,6 @@ constexpr std::wstring_view kDbPath = L"data/test.sqlite";
 constexpr std::wstring_view kBookmarkPath = L"data/testBookmarks.sqlite";
 
 using testing::IsEmpty;
-using testing::NotNull;
 using testing::Test;
 
 struct TaskClearStorageScenario : Test {
@@ -24,7 +23,8 @@ struct TaskClearStorageScenario : Test {
   void TearDown() override {}
 
   void createErrors() const {
-    for(Id index = 0; index < 10; ++index) {
+    constexpr size_t ErrosCount = 10;
+    for(Id index = 0; index < ErrosCount; ++index) {
       mStorage->addError({std::to_wstring(index), {}, false, false});
     }
   }

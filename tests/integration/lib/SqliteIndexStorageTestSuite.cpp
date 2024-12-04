@@ -2,7 +2,7 @@
 
 #include "FileSystem.h"
 #ifndef _WIN32
-#  define private public
+#  define private public    // NOLINT(clang-diagnostic-keyword-macro)
 #endif
 #include "SqliteIndexStorage.h"
 #ifndef _WIN32
@@ -12,7 +12,7 @@
 namespace {
 
 TEST(SqliteIndexStorage, addsNodeSuccessfully) {
-  FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
+  const FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
   int nodeCount = -1;
   {
     SqliteIndexStorage storage(databasePath);
@@ -22,19 +22,19 @@ TEST(SqliteIndexStorage, addsNodeSuccessfully) {
     storage.commitTransaction();
     nodeCount = storage.getNodeCount();
   }
-  FileSystem::remove(databasePath);
+  std::ignore = FileSystem::remove(databasePath);
 
   EXPECT_TRUE(1 == nodeCount);
 }
 
 TEST(SqliteIndexStorage, removesNodeSuccessfully) {
-  FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
+  const FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
   int nodeCount = -1;
   {
     SqliteIndexStorage storage(databasePath);
     storage.setup();
     storage.beginTransaction();
-    Id nodeId = storage.addNode(StorageNodeData(0, L"a"));
+    const Id nodeId = storage.addNode(StorageNodeData(0, L"a"));
     storage.removeElement(nodeId);
     storage.commitTransaction();
     nodeCount = storage.getNodeCount();
@@ -45,14 +45,14 @@ TEST(SqliteIndexStorage, removesNodeSuccessfully) {
 }
 
 TEST(SqliteIndexStorage, addsEdgeSuccessfully) {
-  FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
+  const FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
   int edgeCount = -1;
   {
     SqliteIndexStorage storage(databasePath);
     storage.setup();
     storage.beginTransaction();
-    Id sourceNodeId = storage.addNode(StorageNodeData(0, L"a"));
-    Id targetNodeId = storage.addNode(StorageNodeData(0, L"b"));
+    const Id sourceNodeId = storage.addNode(StorageNodeData(0, L"a"));
+    const Id targetNodeId = storage.addNode(StorageNodeData(0, L"b"));
     storage.addEdge(StorageEdgeData(0, sourceNodeId, targetNodeId));
     storage.commitTransaction();
     edgeCount = storage.getEdgeCount();
@@ -63,15 +63,15 @@ TEST(SqliteIndexStorage, addsEdgeSuccessfully) {
 }
 
 TEST(SqliteIndexStorage, removesEdgeSuccessfully) {
-  FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
+  const FilePath databasePath(L"data/SQLiteTestSuite/test.sqlite");
   int edgeCount = -1;
   {
     SqliteIndexStorage storage(databasePath);
     storage.setup();
     storage.beginTransaction();
-    Id sourceNodeId = storage.addNode(StorageNodeData(0, L"a"));
-    Id targetNodeId = storage.addNode(StorageNodeData(0, L"b"));
-    Id edgeId = storage.addEdge(StorageEdgeData(0, sourceNodeId, targetNodeId));
+    const Id sourceNodeId = storage.addNode(StorageNodeData(0, L"a"));
+    const Id targetNodeId = storage.addNode(StorageNodeData(0, L"b"));
+    const Id edgeId = storage.addEdge(StorageEdgeData(0, sourceNodeId, targetNodeId));
     storage.removeElement(edgeId);
     storage.commitTransaction();
     edgeCount = storage.getEdgeCount();
@@ -94,10 +94,11 @@ protected:
 
 #ifndef _WIN32
 TEST_F(SqliteIndexStorageTest, DoGetFirst_ReturnsFirstElement) {
+  constexpr auto Node1Type = 42;
   // Given:
   StorageNode node;
   node.id = 1;
-  node.type = 42;
+  node.type = Node1Type;
   ASSERT_EQ(1, mStorage->addNode(node));
 
   // When:
@@ -105,7 +106,7 @@ TEST_F(SqliteIndexStorageTest, DoGetFirst_ReturnsFirstElement) {
 
   // Then:
   EXPECT_EQ(result.id, 1);
-  EXPECT_EQ(result.type, 42);
+  EXPECT_EQ(result.type, Node1Type);
 }
 
 TEST_F(SqliteIndexStorageTest, DoGetFirst_ReturnsEmptyOnNoMatch) {
@@ -119,21 +120,23 @@ TEST_F(SqliteIndexStorageTest, DoGetFirst_HandlesInvalidQuery) {
 }
 
 TEST_F(SqliteIndexStorageTest, DoGetFirst_ReturnsOnlyFirstWhenMultipleExist) {
+  constexpr auto Node1Type = 42;
+  constexpr auto Node2Type = 43;
   // Add multiple nodes
   StorageNode node1;
   node1.id = 1;
-  node1.type = 42;
+  node1.type = Node1Type;
   mStorage->addNode(node1);
 
   StorageNode node2;
   node2.id = 2;
-  node2.type = 43;
+  node2.type = Node2Type;
   mStorage->addNode(node2);
 
   const auto result = mStorage->doGetFirst<StorageNode>("");
 
   EXPECT_EQ(result.id, 1);
-  EXPECT_EQ(result.type, 42);
+  EXPECT_EQ(result.type, Node1Type);
 }
 #endif
 
@@ -170,7 +173,7 @@ TEST_F(SqliteIndexStorageTest, DoGetAll_WithQuery_ReturnsFilteredNodes) {
   node2.serializedName = L"node2";
   node2.type = 2;
 
-  Id id1 = mStorage->addNode(node1);
+  const Id id1 = mStorage->addNode(node1);
   mStorage->addNode(node2);
 
   // Test with specific query
@@ -183,7 +186,7 @@ TEST_F(SqliteIndexStorageTest, DoGetAll_WithQuery_ReturnsFilteredNodes) {
 
 TEST_F(SqliteIndexStorageTest, DoGetAll_EmptyResults_ReturnsEmptyVector) {
   // Test with query that should return no results
-  std::vector<StorageNode> results = mStorage->doGetAll<StorageNode>("WHERE id == -1");
+  const std::vector<StorageNode> results = mStorage->doGetAll<StorageNode>("WHERE id == -1");
 
   // Verify
   EXPECT_TRUE(results.empty());

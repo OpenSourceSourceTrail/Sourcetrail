@@ -94,8 +94,8 @@ void SharedIntermediateStorage::setStorageEdges(const std::vector<StorageEdge>& 
 std::set<StorageLocalSymbol> SharedIntermediateStorage::getStorageLocalSymbols() const {
   std::set<StorageLocalSymbol> result;
 
-  for(unsigned int i = 0; i < mStorageLocalSymbols.size(); i++) {
-    result.emplace(fromShared(mStorageLocalSymbols[i]));
+  for(const auto& mStorageLocalSymbol : mStorageLocalSymbols) {
+    result.emplace(fromShared(mStorageLocalSymbol));
   }
 
   return result;
@@ -112,8 +112,8 @@ void SharedIntermediateStorage::setStorageLocalSymbols(const std::set<StorageLoc
 std::set<StorageSourceLocation> SharedIntermediateStorage::getStorageSourceLocations() const {
   std::set<StorageSourceLocation> result;
 
-  for(unsigned int i = 0; i < mStorageSourceLocations.size(); i++) {
-    result.emplace(fromShared(mStorageSourceLocations[i]));
+  for(const auto& mStorageSourceLocation : mStorageSourceLocations) {
+    result.emplace(fromShared(mStorageSourceLocation));
   }
 
   return result;
@@ -167,8 +167,8 @@ std::vector<StorageError> SharedIntermediateStorage::getStorageErrors() const {
   std::vector<StorageError> result;
   result.reserve(mStorageErrors.size());
 
-  for(unsigned int i = 0; i < mStorageErrors.size(); i++) {
-    result.emplace_back(fromShared(mStorageErrors[i]));
+  for(const auto& mStorageError : mStorageErrors) {
+    result.emplace_back(fromShared(mStorageError));
   }
 
   return result;

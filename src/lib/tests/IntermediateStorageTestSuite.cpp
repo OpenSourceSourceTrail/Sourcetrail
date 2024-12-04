@@ -8,8 +8,8 @@ namespace {
 
 using testing::IsEmpty;
 
-bool operator==(const StorageNodeData& a, const StorageNodeData& b) {
-  return a.type == b.type && a.serializedName == b.serializedName;
+bool operator==(const StorageNodeData& nodeA, const StorageNodeData& nodeB) {
+  return nodeA.type == nodeB.type && nodeA.serializedName == nodeB.serializedName;
 }
 
 TEST(IntermediateStorageFix, clear) {
@@ -38,7 +38,7 @@ TEST(IntermediateStorageFix, clear) {
 
 TEST(IntermediateStorageFix, hasFatalErrorsEmpty) {
   // Given:
-  IntermediateStorage storage;
+  const IntermediateStorage storage;
   // When:
   const auto result = storage.hasFatalErrors();
   // Then:
@@ -85,7 +85,7 @@ TEST(IntermediateStorageFix, addNodeForFirstTime) {
   // Given:
   IntermediateStorage storage;
   // When:
-  StorageNodeData node;
+  const StorageNodeData node;
   const auto result = storage.addNode(node);
   // Then:
   ASSERT_TRUE(result.second);
@@ -117,8 +117,8 @@ TEST(IntermediateStorageFix, addTwoNodesAnotherNodeUsingAddNodes) {
   // Given: A node added to the storage
   IntermediateStorage storage;
   // When: Add the same node
-  StorageNode node0;
-  StorageNode node1{1, 0, L"New"};
+  const StorageNode node0;
+  const StorageNode node1{1, 0, L"New"};
   const auto result = storage.addNodes(std::vector{node0, node1});
   // Then:
   ASSERT_EQ(2, result.size());
@@ -141,7 +141,7 @@ TEST(IntermediateStorageFix, setNodeTypeMissingNode) {
 TEST(IntermediateStorageFix, setNodeTypeGoodCase) {
   // Given:
   IntermediateStorage storage;
-  StorageNodeData node;
+  const StorageNodeData node;
   const auto result = storage.addNode(node);
   // When:
   storage.setNodeType(result.first, 1);
@@ -165,7 +165,7 @@ TEST(IntermediateStorageFix, setEmptyStorageNodes) {
 TEST(IntermediateStorageFix, setStorageNodes) {
   // Given:
   IntermediateStorage storage;
-  std::vector<StorageNode> nodes{
+  const std::vector<StorageNode> nodes{
       {1, {}},
       {2, {}},
       {3, {}},
@@ -182,7 +182,7 @@ TEST(IntermediateStorageFix, AddFileFirstTime) {
   // Given:
   IntermediateStorage storage;
   // When:
-  StorageFile file{};
+  const StorageFile file{};
   storage.addFile(file);
   // Then:
   const auto storageFiles = storage.getStorageFiles();
@@ -212,9 +212,9 @@ TEST(IntermediateStorageFix, addFiles) {
   // Given:
   IntermediateStorage storage;
   // When:
-  StorageFile file0{1, L"1.cpp", {}, {}, {}, {}};
-  StorageFile file1{2, L"2.cpp", {}, {}, {}, {}};
-  StorageFile file2{1, L"1.cpp", {}, {}, true, true};
+  const StorageFile file0{1, L"1.cpp", {}, {}, {}, {}};
+  const StorageFile file1{2, L"2.cpp", {}, {}, {}, {}};
+  const StorageFile file2{1, L"1.cpp", {}, {}, true, true};
   storage.addFile(file0);
   storage.addFile(file1);
   storage.addFile(file2);
@@ -228,13 +228,13 @@ TEST(IntermediateStorageFix, addFiles) {
 TEST(IntermediateStorageFix, setFilesWithErrorsIncomplete) {
   // Given: a sourceLocation is set with LOCATION_ERROR
   IntermediateStorage storage;
-  std::vector<StorageSourceLocation> storageSourceLocation{
+  const std::vector<StorageSourceLocation> storageSourceLocation{
       StorageSourceLocation{0, 3, 0, 0, 1, 1, locationTypeToInt(LOCATION_ERROR)},
       StorageSourceLocation{1, 4, 0, 0, 1, 1, locationTypeToInt(LOCATION_ERROR)},
       StorageSourceLocation{2, 5, 0, 0, 1, 1, locationTypeToInt(LOCATION_SIGNATURE)},
   };
   storage.addSourceLocations(storageSourceLocation);
-  std::vector<StorageFile> storageFiles{
+  const std::vector<StorageFile> storageFiles{
       StorageFile{3, L"main.cpp", L"cpp", "now", true, true},
       StorageFile{5, L"application.cpp", L"cpp", "now", false, false},
   };
@@ -261,7 +261,7 @@ TEST(IntermediateStorageFix, setFileLanguageMissingNode) {
 TEST(IntermediateStorageFix, setFileLanguageGoodCase) {
   // Given:
   IntermediateStorage storage;
-  StorageFile file{1, L"1.cpp", {}, {}, {}, {}};
+  const StorageFile file{1, L"1.cpp", {}, {}, {}, {}};
   storage.addFile(file);
   // When:
   storage.setFileLanguage(Id{std::numeric_limits<Id>::max()}, L"cpp");
@@ -273,7 +273,7 @@ TEST(IntermediateStorageFix, setFileLanguageGoodCase) {
 TEST(IntermediateStorageFix, setStorageFiles) {
   // Given:
   IntermediateStorage storage;
-  std::vector<StorageFile> files{
+  const std::vector<StorageFile> files{
       {},
       {},
       {10, L"", L"", "", false, false},
@@ -289,7 +289,7 @@ TEST(IntermediateStorageFix, AddEdgeFirstTime) {
   // Given:
   IntermediateStorage storage;
   // When:
-  StorageEdgeData edge{};
+  const StorageEdgeData edge{};
   const auto edgeId = storage.addEdge(edge);
   // Then:
   ASSERT_EQ(1, edgeId);
@@ -304,7 +304,7 @@ TEST(IntermediateStorageFix, addTwoEdgesForSameEdge) {
   // Given:
   IntermediateStorage storage;
   // When:
-  std::vector<StorageEdge> edges = {{}, {}};
+  const std::vector<StorageEdge> edges = {{}, {}};
   const auto edgesId = storage.addEdges(edges);
   // Then:
   ASSERT_EQ(edgesId.size(), 2);
@@ -318,7 +318,7 @@ TEST(IntermediateStorageFix, addTwoEdges) {
   // Given:
   IntermediateStorage storage;
   // When:
-  std::vector<StorageEdge> edges = {{1, 1, 100, 101}, {2, 2, 200, 201}};
+  const std::vector<StorageEdge> edges = {{1, 1, 100, 101}, {2, 2, 200, 201}};
   const auto edgesId = storage.addEdges(edges);
   // Then:
   ASSERT_EQ(edgesId.size(), 2);
@@ -331,7 +331,7 @@ TEST(IntermediateStorageFix, addTwoEdges) {
 TEST(IntermediateStorageFix, setStorageEdges) {
   // Given:
   IntermediateStorage storage;
-  std::vector<StorageEdge> edges{
+  const std::vector<StorageEdge> edges{
       {},
       {},
       {10, {}},
@@ -347,7 +347,7 @@ TEST(IntermediateStorageFix, addLocalSymbolFirstTime) {
   // Given:
   IntermediateStorage storage;
   // When:
-  StorageLocalSymbolData symbolData{};
+  const StorageLocalSymbolData symbolData{};
   const auto symbolId = storage.addLocalSymbol(symbolData);
   // Then:
   ASSERT_EQ(1, symbolId);
@@ -359,7 +359,7 @@ TEST(IntermediateStorageFix, addLocalSymbol) {
   // Given:
   IntermediateStorage storage;
   // When:
-  std::set<StorageLocalSymbol> localSymbols{{}, {2, L"something"}};
+  const std::set<StorageLocalSymbol> localSymbols{{}, {2, L"something"}};
   const auto symbolId = storage.addLocalSymbols(localSymbols);
   // Then:
   ASSERT_EQ(2, symbolId.size());
@@ -373,7 +373,7 @@ TEST(IntermediateStorageFix, addSourceLocations) {
   // Given:
   IntermediateStorage storage;
   // When:
-  std::vector<StorageSourceLocation> sourceLocations{{}, {}, {1, 2, 0, 0, 1, 1, 1}};
+  const std::vector<StorageSourceLocation> sourceLocations{{}, {}, {1, 2, 0, 0, 1, 1, 1}};
   const auto sourceLocationIds = storage.addSourceLocations(sourceLocations);
   // Then:
   ASSERT_EQ(3, sourceLocationIds.size());
@@ -387,8 +387,8 @@ TEST(IntermediateStorageFix, addSourceLocations) {
 TEST(IntermediateStorageFix, addErrors) {
   // Given:
   IntermediateStorage storage;
-  StorageErrorData error0;
-  StorageErrorData error1{L"message", L"translationUnit", {}, {}};
+  const StorageErrorData error0;
+  const StorageErrorData error1{L"message", L"translationUnit", {}, {}};
   // When:
   const auto error0Id = storage.addError(error0);
   const auto error1Id = storage.addError(error0);
@@ -414,7 +414,7 @@ TEST(IntermediateStorageFix, setEmptyErrors) {
 TEST(IntermediateStorageFix, setErrors) {
   // Given:
   IntermediateStorage storage;
-  std::vector<StorageError> errors{{1, {}}, {2, {}}, {3, {}}};
+  const std::vector<StorageError> errors{{1, {}}, {2, {}}, {3, {}}};
   // When:
   storage.setErrors(errors);
   // Then:
@@ -519,7 +519,7 @@ TEST(IntermediateStorageFix, setStorageLocalSymbols) {
 
 TEST(IntermediateStorageFix, NextId) {
   // Given: no symbols exists
-  IntermediateStorage storage;
+  const IntermediateStorage storage;
   // When: add a list of symbols
   const auto nextId = storage.getNextId();
   // Then: the symbols didn't change

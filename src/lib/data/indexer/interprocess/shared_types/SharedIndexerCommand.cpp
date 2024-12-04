@@ -78,8 +78,8 @@ void SharedIndexerCommand::setSourceFilePath(const FilePath& filePath) {
 std::set<FilePath> SharedIndexerCommand::getIndexedPaths() const {
   std::set<FilePath> result;
 
-  for(unsigned int i = 0; i < m_indexedPaths.size(); i++) {
-    result.insert(FilePath(utility::decodeFromUtf8(m_indexedPaths[i].c_str())));
+  for(const auto& m_indexedPath : m_indexedPaths) {
+    result.insert(FilePath(utility::decodeFromUtf8(m_indexedPath.c_str())));
   }
 
   return result;

@@ -131,7 +131,7 @@ public:
    * @brief Sets the project settings text
    * @param text The text to set
    */
-  void setProjectSettingsText(std::string text);
+  void setProjectSettingsText(const std::string& text);
 
   /**
    * @brief Adds a node to the storage
@@ -262,7 +262,7 @@ public:
    * @brief Removes an element from the storage
    * @param id The ID of the element to remove
    */
-  void removeElement(Id id);
+  void removeElement(Id elementId);
 
   /**
    * @brief Removes multiple elements from the storage
@@ -293,7 +293,7 @@ public:
    * @param fileIds The IDs of the files to remove
    * @param updateStatusCallback The callback to update the status
    */
-  void removeElementsWithLocationInFiles(const std::vector<Id>& fileIds, std::function<void(int)> updateStatusCallback);
+  void removeElementsWithLocationInFiles(const std::vector<Id>& fileIds, const std::function<void(int)>& updateStatusCallback);
 
   /**
    * @brief Removes all errors from the storage
@@ -370,7 +370,7 @@ public:
    * @param id The ID of the source or target node
    * @return The edges
    */
-  std::vector<StorageEdge> getEdgesBySourceOrTargetId(Id id) const;
+  std::vector<StorageEdge> getEdgesBySourceOrTargetId(Id targetId) const;
 
   /**
    * @brief Returns edges by their type
@@ -416,7 +416,7 @@ public:
    * @param id The ID of the node to return
    * @return The node
    */
-  StorageNode getNodeById(Id id) const;
+  StorageNode getNodeById(Id nodeId) const;
 
   /**
    * @brief Returns a node by its serialized name
@@ -584,9 +584,9 @@ public:
    * @return The element
    */
   template <typename ResultType>
-  ResultType getFirstById(const Id id) const {
-    if(id != 0) {
-      return doGetFirst<ResultType>("WHERE id == " + std::to_string(id));
+  ResultType getFirstById(const Id elementId) const {
+    if(0 != elementId) {
+      return doGetFirst<ResultType>("WHERE id == " + std::to_string(elementId));
     }
     return ResultType();
   }
@@ -609,7 +609,7 @@ public:
    * @param func The function to iterate over
    */
   template <typename StorageType>
-  void forEach(std::function<void(StorageType&&)> func) const {
+  void forEach(const std::function<void(StorageType&&)>& func) const {
     forEach("", func);
   }
 
@@ -619,7 +619,7 @@ public:
    * @param func The function to iterate over
    */
   template <typename StorageType>
-  void forEachOfType(int type, std::function<void(StorageType&&)> func) const {
+  void forEachOfType(int type, std::function<void(StorageType&&)>& func) const {
     forEach("WHERE type == " + std::to_string(type), func);
   }
 
@@ -629,7 +629,7 @@ public:
    * @param func The function to iterate over
    */
   template <typename StorageType>
-  void forEachByIds(const std::vector<Id>& ids, std::function<void(StorageType&&)> func) const {
+  void forEachByIds(const std::vector<Id>& ids, std::function<void(StorageType&&)>& func) const {
     if(!ids.empty()) {
       forEach("WHERE id IN (" + utility::join(utility::toStrings(ids), ',') + ")", func);
     }
@@ -728,7 +728,7 @@ private:
   }
 
   template <typename StorageType>
-  void forEach(const std::string& query, std::function<void(StorageType&&)> func) const;
+  void forEach(const std::string& query, const std::function<void(StorageType&&)>& func) const;
 
   LowMemoryStringMap<std::string, uint32_t, 0> m_tempNodeNameIndex;
   LowMemoryStringMap<std::wstring, uint32_t, 0> m_tempWNodeNameIndex;
@@ -774,14 +774,11 @@ private:
     }
 
     bool execute(const std::vector<StorageType>& types, SqliteIndexStorage* storage) {
-      size_t i = 0;
-      for(std::pair<size_t, CppSQLite3Statement>& p : m_stmts) {
-        const size_t& batchSize = p.first;
-        CppSQLite3Statement& stmt = p.second;
-
-        while(types.size() - i >= batchSize) {
+      size_t index = 0;
+      for(auto& [batchSize, stmt] : m_stmts) {
+        while(types.size() - index >= batchSize) {
           for(size_t j = 0; j < batchSize; j++) {
-            m_bindValuesFunc(stmt, types[i + j], j);
+            m_bindValuesFunc(stmt, types[index + j], j);
           }
 
           const bool success = storage->executeStatement(stmt);
@@ -789,7 +786,7 @@ private:
             return false;
           }
 
-          i += batchSize;
+          index += batchSize;
         }
       }
 
@@ -819,25 +816,27 @@ private:
 };
 
 template <>
-void SqliteIndexStorage::forEach<StorageEdge>(const std::string& query, std::function<void(StorageEdge&&)> func) const;
+void SqliteIndexStorage::forEach<StorageEdge>(const std::string& query, const std::function<void(StorageEdge&&)>& func) const;
 template <>
-void SqliteIndexStorage::forEach<StorageNode>(const std::string& query, std::function<void(StorageNode&&)> func) const;
+void SqliteIndexStorage::forEach<StorageNode>(const std::string& query, const std::function<void(StorageNode&&)>& func) const;
 template <>
-void SqliteIndexStorage::forEach<StorageSymbol>(const std::string& query, std::function<void(StorageSymbol&&)> func) const;
+void SqliteIndexStorage::forEach<StorageSymbol>(const std::string& query, const std::function<void(StorageSymbol&&)>& func) const;
 template <>
-void SqliteIndexStorage::forEach<StorageFile>(const std::string& query, std::function<void(StorageFile&&)> func) const;
+void SqliteIndexStorage::forEach<StorageFile>(const std::string& query, const std::function<void(StorageFile&&)>& func) const;
 template <>
-void SqliteIndexStorage::forEach<StorageLocalSymbol>(const std::string& query, std::function<void(StorageLocalSymbol&&)> func) const;
+void SqliteIndexStorage::forEach<StorageLocalSymbol>(const std::string& query,
+                                                     const std::function<void(StorageLocalSymbol&&)>& func) const;
 template <>
 void SqliteIndexStorage::forEach<StorageSourceLocation>(const std::string& query,
-                                                        std::function<void(StorageSourceLocation&&)> func) const;
+                                                        const std::function<void(StorageSourceLocation&&)>& func) const;
 template <>
-void SqliteIndexStorage::forEach<StorageOccurrence>(const std::string& query, std::function<void(StorageOccurrence&&)> func) const;
+void SqliteIndexStorage::forEach<StorageOccurrence>(const std::string& query,
+                                                    const std::function<void(StorageOccurrence&&)>& func) const;
 template <>
 void SqliteIndexStorage::forEach<StorageComponentAccess>(const std::string& query,
-                                                         std::function<void(StorageComponentAccess&&)> func) const;
+                                                         const std::function<void(StorageComponentAccess&&)>& func) const;
 template <>
 void SqliteIndexStorage::forEach<StorageElementComponent>(const std::string& query,
-                                                          std::function<void(StorageElementComponent&&)> func) const;
+                                                          const std::function<void(StorageElementComponent&&)>& func) const;
 template <>
-void SqliteIndexStorage::forEach<StorageError>(const std::string& query, std::function<void(StorageError&&)> func) const;
+void SqliteIndexStorage::forEach<StorageError>(const std::string& query, const std::function<void(StorageError&&)>& func) const;

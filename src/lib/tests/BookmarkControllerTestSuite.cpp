@@ -18,7 +18,7 @@ using testing::Return;
 
 struct MockedMessageBookmarkUpdate : public MessageListener<MessageBookmarkUpdate> {
   uint32_t mCountOfCall = 0;
-  void handleMessage(MessageBookmarkUpdate*) override {
+  void handleMessage(MessageBookmarkUpdate* /*message*/) override {
     ++mCountOfCall;
   }
 };
@@ -60,7 +60,7 @@ struct BookmarkControllerFix : public Test {
     }
   }
 
-  void MockCleanBookmarkCategories() {
+  void MockCleanBookmarkCategories() const {
     EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
     EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
     EXPECT_CALL(*mStorageAccess, getAllBookmarkCategories())
@@ -112,8 +112,8 @@ TEST_F(BookmarkControllerFix, DISABLED_createBookmark) {
   const std::wstring name = L"bookmark";
   const std::wstring comment = L"comment";
   const std::wstring category = L"category";
-  constexpr Id id = 10;
-  mController->createBookmark(name, comment, category, id);
+  constexpr Id expectedId = 10;
+  mController->createBookmark(name, comment, category, expectedId);
 
   EXPECT_EQ(1, mBookmarkUpdate->mCountOfCall);
 }
@@ -125,8 +125,8 @@ TEST_F(BookmarkControllerFix, DISABLED_createBookmarkWithDefaultId) {
   const std::wstring name = L"bookmark";
   const std::wstring comment = L"comment";
   const std::wstring category = L"category";
-  constexpr Id id = 0;
-  mController->createBookmark(name, comment, category, id);
+  constexpr Id expectedId = 0;
+  mController->createBookmark(name, comment, category, expectedId);
 
   EXPECT_EQ(1, mBookmarkUpdate->mCountOfCall);
 }
@@ -139,8 +139,8 @@ TEST_F(BookmarkControllerFix, editBookmark) {
   const std::wstring name = L"bookmark";
   const std::wstring comment = L"comment";
   const std::wstring category = L"category";
-  constexpr Id id = 10;
-  mController->editBookmark(id, name, comment, category);
+  constexpr Id expectedId = 10;
+  mController->editBookmark(expectedId, name, comment, category);
 }
 
 TEST_F(BookmarkControllerFix, deleteBookmark) {
@@ -148,8 +148,8 @@ TEST_F(BookmarkControllerFix, deleteBookmark) {
   MockCleanBookmarkCategories();
   MockUpdate(true, true);
 
-  constexpr Id id = 10;
-  mController->deleteBookmark(id);
+  constexpr Id expectedId = 10;
+  mController->deleteBookmark(expectedId);
 }
 
 TEST_F(BookmarkControllerFix, deleteCategory) {
@@ -157,6 +157,6 @@ TEST_F(BookmarkControllerFix, deleteCategory) {
   EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
   MockUpdate(true);
 
-  constexpr Id id = 10;
-  mController->deleteBookmarkCategory(id);
+  constexpr Id expectedId = 10;
+  mController->deleteBookmarkCategory(expectedId);
 }
