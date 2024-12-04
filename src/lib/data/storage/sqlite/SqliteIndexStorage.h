@@ -619,7 +619,7 @@ public:
    * @param func The function to iterate over
    */
   template <typename StorageType>
-  void forEachOfType(int type, std::function<void(StorageType&&)>& func) const {
+  void forEachOfType(int type, const std::function<void(StorageType&&)>& func) const {
     forEach("WHERE type == " + std::to_string(type), func);
   }
 
@@ -629,7 +629,7 @@ public:
    * @param func The function to iterate over
    */
   template <typename StorageType>
-  void forEachByIds(const std::vector<Id>& ids, std::function<void(StorageType&&)>& func) const {
+  void forEachByIds(const std::vector<Id>& ids, const std::function<void(StorageType&&)>& func) const {
     if(!ids.empty()) {
       forEach("WHERE id IN (" + utility::join(utility::toStrings(ids), ',') + ")", func);
     }
@@ -744,7 +744,7 @@ private:
                  size_t valueCount,
                  std::function<void(CppSQLite3Statement& stmt, const StorageType&, size_t)> bindValuesFunc,
                  CppSQLite3DB& database) {
-      m_bindValuesFunc = bindValuesFunc;
+      m_bindValuesFunc = std::move(bindValuesFunc);
 
       std::string valueStr = '(' + utility::join(std::vector<std::string>(valueCount, "?"), ',') + ')';
 
