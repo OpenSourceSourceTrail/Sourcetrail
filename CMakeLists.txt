@@ -69,6 +69,7 @@ include(cmake/add_sourcetrail_interface.cmake)
 include(cmake/add_sourcetrail_test.cmake)
 include(cmake/clang-tidy.cmake)
 include(cmake/cppcheck.cmake)
+include(cmake/coverage.cmake)
 
 if(ENABLE_SANITIZER_ADDRESS
    OR ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
@@ -126,27 +127,6 @@ endif()
 # Project ----------------------------------------------------------------------
 if(BUILD_DOC)
   include(cmake/doxygen.cmake)
-endif()
-
-if(ENABLE_COVERAGE)
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    configure_file("${CMAKE_SOURCE_DIR}/cmake/coverage.sh.in" "${CMAKE_BINARY_DIR}/coverage.sh")
-    file(
-      CHMOD
-      "${CMAKE_BINARY_DIR}/coverage.sh"
-      FILE_PERMISSIONS
-      OWNER_EXECUTE
-      OWNER_WRITE
-      OWNER_READ)
-    add_custom_target(
-      Coverage
-      COMMAND ${CMAKE_BINARY_DIR}/coverage.sh
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-    add_compile_options(--coverage)
-    add_link_options(--coverage)
-  else()
-    message("Compiler is not supported")
-  endif()
 endif()
 
 #RPATH
@@ -409,7 +389,7 @@ if(ENABLE_UNIT_TEST
 
   find_package(
     Qt5 ${QT_MIN_VERSION}
-    COMPONENTS Test
+    COMPONENTS Test Sql
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)

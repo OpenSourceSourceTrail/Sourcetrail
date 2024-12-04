@@ -74,7 +74,6 @@
                 "CMAKE_CXX_COMPILER": "g++-12",
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
-                "ENABLE_COVERAGE": "ON",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake"
             },
             "inherits": [
@@ -92,7 +91,6 @@
                 "CMAKE_CXX_COMPILER": "clang++-15",
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
-                "ENABLE_COVERAGE": "ON",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake"
             },
             "inherits": [

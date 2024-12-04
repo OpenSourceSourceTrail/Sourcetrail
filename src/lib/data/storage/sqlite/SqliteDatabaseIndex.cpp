@@ -1,28 +1,33 @@
 #include "SqliteDatabaseIndex.h"
 
+#include <utility>
+
+#include "CppSQLite3.h"
 #include "logging.h"
 
-SqliteDatabaseIndex::SqliteDatabaseIndex(const std::string& indexName, const std::string& indexTarget)
-    : m_indexName(indexName), m_indexTarget(indexTarget) {}
+SqliteDatabaseIndex::SqliteDatabaseIndex(std::string indexName, std::string indexTarget) noexcept
+    : mIndexName(std::move(indexName)), mIndexTarget(std::move(indexTarget)) {}
 
-std::string SqliteDatabaseIndex::getName() const {
-  return m_indexName;
+bool SqliteDatabaseIndex::createOnDatabase(CppSQLite3DB& database) noexcept {
+  try {
+    LOG_INFO(fmt::format("Creating database index \"{}\"", mIndexName));
+    const auto query = fmt::format("CREATE INDEX IF NOT EXISTS {} ON {};", mIndexName, mIndexTarget);
+    std::ignore = database.execDML(query.c_str());
+  } catch(CppSQLite3Exception& error) {
+    LOG_ERROR(fmt::format("{}: {}", error.errorCode(), error.errorMessage()));
+    return false;
+  }
+  return true;
 }
 
-void SqliteDatabaseIndex::createOnDatabase(CppSQLite3DB& database) {
+bool SqliteDatabaseIndex::removeFromDatabase(CppSQLite3DB& database) noexcept {
   try {
-    LOG_INFO(fmt::format("Creating database index \"{}\"", m_indexName));
-    database.execDML(("CREATE INDEX IF NOT EXISTS " + m_indexName + " ON " + m_indexTarget + ";").c_str());
-  } catch(CppSQLite3Exception e) {
-    LOG_ERROR(fmt::format("{}: {}", e.errorCode(), e.errorMessage()));
+    LOG_INFO(fmt::format("Removing database index \"{}\"", mIndexName));
+    const auto query = fmt::format("DROP INDEX IF EXISTS main.{};", mIndexName);
+    std::ignore = database.execDML(query.c_str());
+  } catch(CppSQLite3Exception& error) {
+    LOG_ERROR(fmt::format("{}: {}", error.errorCode(), error.errorMessage()));
+    return false;
   }
-}
-
-void SqliteDatabaseIndex::removeFromDatabase(CppSQLite3DB& database) {
-  try {
-    LOG_INFO(fmt::format("Removing database index \"{}\"", m_indexName));
-    database.execDML(("DROP INDEX IF EXISTS main." + m_indexName + ";").c_str());
-  } catch(CppSQLite3Exception e) {
-    LOG_ERROR(fmt::format("{}: {}", e.errorCode(), e.errorMessage()));
-  }
+  return true;
 }

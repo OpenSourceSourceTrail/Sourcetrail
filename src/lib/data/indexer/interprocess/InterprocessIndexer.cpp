@@ -1,7 +1,7 @@
 #include "InterprocessIndexer.h"
-// fmt
+
 #include <fmt/format.h>
-// internal
+
 #include "IndexerCommand.h"
 #include "IndexerComposite.h"
 #include "LanguagePackageManager.h"
@@ -9,11 +9,11 @@
 #include "ScopedFunctor.h"
 
 InterprocessIndexer::InterprocessIndexer(const std::string& uuid, Id processId)
-    : m_interprocessIndexerCommandManager(uuid, processId, false)
-    , m_interprocessIndexingStatusManager(uuid, processId, false)
-    , m_interprocessIntermediateStorageManager(uuid, processId, false)
-    , m_uuid(uuid)
-    , m_processId(processId) {}
+    : mInterprocessIndexerCommandManager(uuid, processId, false)
+    , mInterprocessIndexingStatusManager(uuid, processId, false)
+    , mInterprocessIntermediateStorageManager(uuid, processId, false)
+    , mUuid(uuid)
+    , mProcessId(processId) {}
 
 void InterprocessIndexer::work() {
   bool updaterThreadRunning = true;
@@ -21,15 +21,17 @@ void InterprocessIndexer::work() {
   std::shared_ptr<IndexerBase> pIndexer;
 
   try {
-    LOG_INFO(fmt::format("{} starting up indexer", m_processId));
+    LOG_INFO(fmt::format("{} starting up indexer", mProcessId));
     pIndexer = LanguagePackageManager::getInstance()->instantiateSupportedIndexers();
 
     pUpdaterThread = std::make_shared<std::thread>([&]() {
       while(updaterThreadRunning) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(1000ms);
 
-        if(m_interprocessIndexingStatusManager.getIndexingInterrupted()) {
-          LOG_INFO(fmt::format("{} received indexer interrupt command.", m_processId));
+        if(mInterprocessIndexingStatusManager.getIndexingInterrupted()) {
+          // NOLINTNEXTLINE(bugprone-lambda-function-name)
+          LOG_INFO(fmt::format("{} received indexer interrupt command.", mProcessId));
           if(pIndexer) {
             pIndexer->interrupt();
           }
@@ -38,7 +40,7 @@ void InterprocessIndexer::work() {
       }
     });
 
-    ScopedFunctor threadStopper([&]() {
+    const ScopedFunctor threadStopper([&]() {
       updaterThreadRunning = false;
       if(pUpdaterThread) {
         pUpdaterThread->join();
@@ -46,50 +48,51 @@ void InterprocessIndexer::work() {
       }
     });
 
-    while(auto pIndexerCommand = m_interprocessIndexerCommandManager.popIndexerCommand()) {
-      LOG_INFO(fmt::format("{} fetched indexer command for \"{}\"", m_processId, pIndexerCommand->getSourceFilePath().str()));
-      LOG_INFO(fmt::format("{} indexer commands left: {}", m_processId, m_interprocessIndexerCommandManager.indexerCommandCount()));
+    while(auto pIndexerCommand = mInterprocessIndexerCommandManager.popIndexerCommand()) {
+      LOG_INFO(fmt::format("{} fetched indexer command for \"{}\"", mProcessId, pIndexerCommand->getSourceFilePath().str()));
+      LOG_INFO(fmt::format("{} indexer commands left: {}", mProcessId, mInterprocessIndexerCommandManager.indexerCommandCount()));
 
       while(updaterThreadRunning) {
-        const size_t storageCount = m_interprocessIntermediateStorageManager.getIntermediateStorageCount();
+        const size_t storageCount = mInterprocessIntermediateStorageManager.getIntermediateStorageCount();
         if(storageCount < 2) {
           break;
         }
 
-        LOG_INFO(fmt::format("{} waits, too many intermediate storages: {}", m_processId, storageCount));
+        LOG_INFO(fmt::format("{} waits, too many intermediate storages: {}", mProcessId, storageCount));
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(200ms);
       }
 
       if(!updaterThreadRunning) {
         break;
       }
 
-      LOG_INFO(fmt::format("{} updating indexer status with currently indexed filepath", m_processId));
-      m_interprocessIndexingStatusManager.startIndexingSourceFile(pIndexerCommand->getSourceFilePath());
+      LOG_INFO(fmt::format("{} updating indexer status with currently indexed filepath", mProcessId));
+      mInterprocessIndexingStatusManager.startIndexingSourceFile(pIndexerCommand->getSourceFilePath());
 
-      LOG_INFO(fmt::format("{} starting to index current file", m_processId));
+      LOG_INFO(fmt::format("{} starting to index current file", mProcessId));
       auto pResult = pIndexer->index(pIndexerCommand);
 
       if(pResult) {
-        LOG_INFO(fmt::format("{} spushing index to shared memory", m_processId));
-        m_interprocessIntermediateStorageManager.pushIntermediateStorage(pResult);
+        LOG_INFO(fmt::format("{} spushing index to shared memory", mProcessId));
+        mInterprocessIntermediateStorageManager.pushIntermediateStorage(pResult);
       }
 
-      LOG_INFO(fmt::format("{} sfinalizing indexer status for current file", m_processId));
-      m_interprocessIndexingStatusManager.finishIndexingSourceFile();
+      LOG_INFO(fmt::format("{} sfinalizing indexer status for current file", mProcessId));
+      mInterprocessIndexingStatusManager.finishIndexingSourceFile();
 
-      LOG_INFO(fmt::format("{} sall done", m_processId));
+      LOG_INFO(fmt::format("{} sall done", mProcessId));
     }
-  } catch(boost::interprocess::interprocess_exception& e) {
-    LOG_INFO(fmt::format("{} error: {}", m_processId, e.what()));
-    throw e;
-  } catch(std::exception& e) {
-    LOG_INFO(fmt::format("{} error: {}", m_processId, e.what()));
-    throw e;
+  } catch(boost::interprocess::interprocess_exception& exception) {
+    LOG_INFO(fmt::format("{} error: {}", mProcessId, exception.what()));
+    throw exception;    // NOLINT(cert-err60-cpp)
+  } catch(std::exception& exception) {
+    LOG_INFO(fmt::format("{} error: {}", mProcessId, exception.what()));
+    throw exception;
   } catch(...) {
-    LOG_INFO(fmt::format("{} something went wrong while running the indexer", m_processId));
+    LOG_INFO(fmt::format("{} something went wrong while running the indexer", mProcessId));
   }
 
-  LOG_INFO(fmt::format("{} shutting down indexer", m_processId));
+  LOG_INFO(fmt::format("{} shutting down indexer", mProcessId));
 }

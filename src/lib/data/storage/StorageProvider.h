@@ -1,6 +1,4 @@
-#ifndef STORAGE_PROVIDER_H
-#define STORAGE_PROVIDER_H
-
+#pragma once
 #include <list>
 #include <memory>
 #include <mutex>
@@ -24,8 +22,6 @@ public:
   void logCurrentState() const;
 
 private:
-  std::list<std::shared_ptr<IntermediateStorage>> m_storages;    // larger storages are in front
-  mutable std::mutex m_storagesMutex;
+  std::list<std::shared_ptr<IntermediateStorage>> mStorages;    // larger storages are in front
+  mutable std::mutex mStoragesMutex;
 };
-
-#endif    // STORAGE_PROVIDER_H

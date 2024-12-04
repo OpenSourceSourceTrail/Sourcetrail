@@ -8,14 +8,16 @@ Checks:          "*,
                   -fuchsia-*,
                   -google-*,
                   -llvm*,
-                  -modernize-use-trailing-return-type,
                   -zircon-*,
+                  -bugprone-easily-swappable-parameters,
+                  -bugprone-suspicious-include,
+                  -cppcoreguidelines-non-private-member-variables-in-classes,
+                  -misc-include-cleaner,
+                  -misc-non-private-member-variables-in-classes,
+                  -modernize-use-trailing-return-type,
+                  -readability-avoid-const-params-in-decls,
                   -readability-else-after-return,
                   -readability-static-accessed-through-instance,
-                  -readability-avoid-const-params-in-decls,
-                  -cppcoreguidelines-non-private-member-variables-in-classes,
-                  -misc-non-private-member-variables-in-classes,
-                  -bugprone-suspicious-include,
 "
 WarningsAsErrors: ''
 HeaderFilterRegex: '*'
@@ -148,7 +150,6 @@ CheckOptions:
   cert-err61-cpp.CheckThrowTemporaries: 'true'
   cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues: '1;2;3;4;'
   cppcoreguidelines-no-malloc.Allocations: '::malloc;::calloc'
-  misc-throw-by-value-catch-by-reference.MaxSize: '-1'
   cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues: 'false'
   bugprone-narrowing-conversions.IgnoreConversionFromTypes: ''
   readability-function-size.BranchThreshold: '4294967295'
@@ -192,7 +193,6 @@ CheckOptions:
   bugprone-narrowing-conversions.WarnOnFloatingPointNarrowingConversion: 'true'
   cert-sig30-c.AsyncSafeFunctionSet: POSIX
   hicpp-member-init.UseAssignment: 'false'
-  cert-err61-cpp.MaxSize: '-1'
   modernize-use-default-member-init.UseAssignment: 'false'
   readability-function-size.NestingThreshold: '4294967295'
   bugprone-sizeof-expression.WarnOnSizeOfPointerToAggregate: 'true'
@@ -231,7 +231,6 @@ CheckOptions:
   bugprone-suspicious-string-compare.StringCompareLikeFunctions: ''
   modernize-avoid-bind.PermissiveParameterList: 'false'
   readability-suspicious-call-argument.Suffix: 'true'
-  cert-err09-cpp.MaxSize: '-1'
   modernize-use-override.FinalSpelling: final
   hicpp-use-equals-default.IgnoreMacros: 'true'
   modernize-use-noexcept.ReplacementString: ''

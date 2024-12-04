@@ -92,9 +92,9 @@ jobs:
           cache: 'true'
           cache-key-prefix: 'install-qt-action'
 
-      - name: Install conan (Ubuntu)
+      - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo pip install conan
+        run: sudo pip install conan gcovr
 
       - name: Install conan (Windows)
         if: runner.os == 'Windows'

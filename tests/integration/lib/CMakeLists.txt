@@ -3,8 +3,11 @@
 set(test_lib_names
     RefreshInfoGeneratorTestSuite
     SourceGroupTestSuite
+    PersistentStorageTestSuite
     SqliteBookmarkStorageTestSuite
+    SqliteDatabaseIndexTestSuite
     SqliteIndexStorageTestSuite
+    SqliteStorageTestSuite
     StorageTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
@@ -16,6 +19,7 @@ foreach(test_name IN LISTS test_lib_names)
            GTest::gmock
            Qt5::Core
            Qt5::Gui
+           Qt5::Sql
            Sourcetrail::messaging
            Sourcetrail::gtest_main
            Sourcetrail::core::utility::TextAccess
@@ -23,6 +27,7 @@ foreach(test_name IN LISTS test_lib_names)
            Sourcetrail::core::utility::file::utilityFile
            lib::mocks
            Boost::date_time
+           spdlog::spdlog
            $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)

@@ -1,5 +1,4 @@
-#ifndef INTERPROCESS_INDEXING_STATUS_MANAGER_H
-#define INTERPROCESS_INDEXING_STATUS_MANAGER_H
+#pragma once
 
 #include <set>
 
@@ -9,7 +8,7 @@
 class InterprocessIndexingStatusManager : public BaseInterprocessDataManager {
 public:
   InterprocessIndexingStatusManager(const std::string& instanceUuid, Id processId, bool isOwner);
-  virtual ~InterprocessIndexingStatusManager();
+  ~InterprocessIndexingStatusManager() override;
 
   void startIndexingSourceFile(const FilePath& filePath);
   void finishIndexingSourceFile();
@@ -23,13 +22,11 @@ public:
   std::vector<FilePath> getCrashedSourceFilePaths();
 
 private:
-  static const char* s_sharedMemoryNamePrefix;
+  static const char* sSharedMemoryNamePrefix;
 
-  static const char* s_indexingFilesKeyName;
-  static const char* s_currentFilesKeyName;
-  static const char* s_crashedFilesKeyName;
-  static const char* s_finishedProcessIdsKeyName;
-  static const char* s_indexingInterruptedKeyName;
+  static const char* sIndexingFilesKeyName;
+  static const char* sCurrentFilesKeyName;
+  static const char* sCrashedFilesKeyName;
+  static const char* sFinishedProcessIdsKeyName;
+  static const char* sIndexingInterruptedKeyName;
 };
-
-#endif    // INTERPROCESS_INDEXING_STATUS_MANAGER_H

@@ -1,5 +1,4 @@
-#ifndef STORAGE_ACCESS_PROXY_H
-#define STORAGE_ACCESS_PROXY_H
+#pragma once
 
 #include <memory>
 
@@ -98,5 +97,3 @@ public:
 private:
   std::weak_ptr<StorageAccess> m_subject;
 };
-
-#endif    // STORAGE_ACCESS_PROXY_H

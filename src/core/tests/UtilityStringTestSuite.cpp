@@ -1,3 +1,4 @@
+#include <regex>
 #include <string>
 
 #include <gmock/gmock.h>
@@ -59,36 +60,36 @@ TEST(Split, splitWithDelimiterAtEnd) {
 
 TEST(Join, joinWithCharDelimiter) {
   std::deque<std::string> list;
-  list.push_back("A");
-  list.push_back("B");
-  list.push_back("C");
+  list.emplace_back("A");
+  list.emplace_back("B");
+  list.emplace_back("C");
 
-  std::string result = utility::join(list, ',');
+  const std::string result = utility::join(list, ',');
   EXPECT_THAT(result, StrEq("A,B,C"));
 }
 
 TEST(Join, joinWithStringDelimiter) {
   std::deque<std::string> list;
-  list.push_back("A");
-  list.push_back("B");
-  list.push_back("C");
+  list.emplace_back("A");
+  list.emplace_back("B");
+  list.emplace_back("C");
 
-  std::string result = utility::join(list, "==");
+  const std::string result = utility::join(list, "==");
   EXPECT_THAT(result, StrEq("A==B==C"));
 }
 
 TEST(Join, joinOnEmptyList) {
-  std::deque<std::string> list;
-  std::string result = utility::join(list, ',');
+  const std::deque<std::string> list;
+  const std::string result = utility::join(list, ',');
 
   EXPECT_THAT(result, IsEmpty());
 }
 
 TEST(Join, joinWithEmptyStringsInList) {
   std::deque<std::string> list;
-  list.push_back("A");
-  list.push_back("");
-  list.push_back("");
+  list.emplace_back("A");
+  list.emplace_back("");
+  list.emplace_back("");
 
   const std::string result = utility::join(list, ':');
   EXPECT_THAT(result, StrEq("A::"));
@@ -305,10 +306,10 @@ TEST(GenerateRandomString, goodCase) {
   constexpr auto StringLength0 = 16U;
   const auto result0 = utility::createRandomString(StringLength0);
   ASSERT_EQ(StringLength0, result0.size());
-  EXPECT_THAT(result0, MatchesRegex("([A-z]|[0-9]){16}"s));
+  EXPECT_TRUE(std::regex_match(result0, std::regex("([A-z]|[0-9]){16}"s)));
 
   constexpr auto StringLength1 = 32U;
   const auto result1 = utility::createRandomString(StringLength1);
   ASSERT_EQ(StringLength1, result1.size());
-  EXPECT_THAT(result1, MatchesRegex("([A-z]|[0-9]){32}"s));
+  EXPECT_TRUE(std::regex_match(result1, std::regex("([A-z]|[0-9]){32}"s)));
 }
