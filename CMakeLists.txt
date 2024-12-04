@@ -401,7 +401,7 @@ add_subdirectory(src/app)
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
    OR ENABLE_INTEGRATION_TEST)
-  if(WIN32)
+  if(WIN32 AND NOT ${SR_IS_CI})
     copy_qt_binaries("${CMAKE_BINARY_DIR}/test" FALSE)
   endif()
   execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" "${CMAKE_BINARY_DIR}/test")
