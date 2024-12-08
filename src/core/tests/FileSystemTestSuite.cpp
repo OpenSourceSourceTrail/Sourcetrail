@@ -33,7 +33,7 @@ namespace {
 
 TEST(FileSystem, findCppFiles) {
   std::vector<std::wstring> cppFiles = utility::convert<FilePath, std::wstring>(
-      FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".cpp"}),
+      file::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".cpp"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
   EXPECT_TRUE(cppFiles.size() == 4);
@@ -45,7 +45,7 @@ TEST(FileSystem, findCppFiles) {
 
 TEST(FileSystem, findHFiles) {
   std::vector<std::wstring> headerFiles = utility::convert<FilePath, std::wstring>(
-      FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h"}),
+      file::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
   EXPECT_TRUE(headerFiles.size() == 3);
@@ -56,7 +56,7 @@ TEST(FileSystem, findHFiles) {
 
 TEST(FileSystem, findAllSourceFiles) {
   std::vector<std::wstring> sourceFiles = utility::convert<FilePath, std::wstring>(
-      FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h", L".hpp", L".cpp"}),
+      file::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h", L".hpp", L".cpp"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
   EXPECT_TRUE(sourceFiles.size() == 8);
@@ -70,7 +70,7 @@ TEST(FileSystem, findFileInfos) {
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back(L"./data/FileSystemTestSuite/src");
 
-  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, false);
+  std::vector<FileInfo> files = file::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, false);
 
   EXPECT_TRUE(files.size() == 3);
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.cpp"));
@@ -84,7 +84,7 @@ TEST(FileSystem, findFileInfosWithSymlinks) {
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back(L"./data/FileSystemTestSuite/src");
 
-  const auto files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, true);
+  const auto files = file::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, true);
 
   EXPECT_TRUE(files.size() == 5);
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/Settings/player.h", L"./data/FileSystemTestSuite/player.h"));
@@ -107,7 +107,7 @@ TEST(FileSystem, findSymlinkedDirectories) {
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back("./data/FileSystemTestSuite/src");
 
-  const auto dirs = FileSystem::getSymLinkedDirectories(directoryPaths);
+  const auto dirs = file::getSymLinkedDirectories(directoryPaths);
 
   EXPECT_TRUE(dirs.size() == 2);
 #  endif
