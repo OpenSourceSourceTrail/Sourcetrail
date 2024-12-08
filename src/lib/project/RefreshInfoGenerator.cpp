@@ -182,7 +182,7 @@ std::set<FilePath> RefreshInfoGenerator::getAllSourceFilePaths(const std::vector
 }
 
 bool RefreshInfoGenerator::didFileChange(const FileInfo& info, std::shared_ptr<const PersistentStorage> storage) {
-  FileInfo diskFileInfo = FileSystem::getFileInfoForPath(info.path);
+  FileInfo diskFileInfo = filesystem::getFileInfoForPath(info.path);
   if(diskFileInfo.lastWriteTime > info.lastWriteTime) {
     if(!storage->hasContentForFile(info.path)) {
       return true;

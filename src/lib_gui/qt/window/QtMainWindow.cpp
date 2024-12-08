@@ -628,8 +628,8 @@ void QtMainWindow::resetZoom() {
 }
 
 void QtMainWindow::resetWindowLayout() {
-  FileSystem::remove(UserPaths::getWindowSettingsFilePath());
-  FileSystem::copyFile(
+  filesystem::remove(UserPaths::getWindowSettingsFilePath());
+  filesystem::copyFile(
       ResourcePaths::getFallbackDirectoryPath().concatenate(L"window_settings.ini"), UserPaths::getWindowSettingsFilePath());
   loadDockWidgetLayout();
 }

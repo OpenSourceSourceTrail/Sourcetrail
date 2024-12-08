@@ -78,7 +78,7 @@ void QtHighlighter::loadHighlightingRules() {
   }
 
   for(const FilePath& path :
-      FileSystem::getFilePathsFromDirectory(ResourcePaths::getSyntaxHighlightingRulesDirectoryPath(), {L".rules"})) {
+      filesystem::getFilePathsFromDirectory(ResourcePaths::getSyntaxHighlightingRulesDirectoryPath(), {L".rules"})) {
     std::wstring language = path.withoutExtension().fileName();
 
     std::shared_ptr<TextAccess> textAccess = TextAccess::createFromFile(path);

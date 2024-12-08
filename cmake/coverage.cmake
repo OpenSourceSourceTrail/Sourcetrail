@@ -24,7 +24,8 @@ if(ENABLE_COVERAGE)
         ${CMAKE_SOURCE_DIR}/src/lib_gui/tests -e ${CMAKE_SOURCE_DIR}/src/lib_utility/tests -e
         ${CMAKE_SOURCE_DIR}/src/messaging/tests -e ${CMAKE_SOURCE_DIR}/src/scheduling/tests -e
         ${CMAKE_SOURCE_DIR}/src/test --html-nested=${CMAKE_BINARY_DIR}/coverage/index.html --gcov-delete -j
-        ${CORES_COUNT} ${CMAKE_BINARY_DIR}
+        ${CORES_COUNT} --gcov-executable ${GCOV_VERSION} --exclude-unreachable-branches --exclude-throw-branches
+        ${CMAKE_BINARY_DIR}
       COMMENT "Generate coverage for GNU"
       # Working directory for the command
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

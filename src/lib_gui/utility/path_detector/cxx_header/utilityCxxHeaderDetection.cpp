@@ -61,7 +61,7 @@ std::vector<FilePath> getWindowsSdkHeaderSearchPaths(ApplicationArchitectureType
   {
     const FilePath sdkPath = getWindowsSdkRootPathUsingRegistry(architectureType, "v10.0");
     if(sdkPath.exists()) {
-      for(const FilePath& versionPath : FileSystem::getDirectSubDirectories(sdkPath.getConcatenated(L"include/"))) {
+      for(const FilePath& versionPath : filesystem::getDirectSubDirectories(sdkPath.getConcatenated(L"include/"))) {
         const FilePath ucrtPath = versionPath.getConcatenated(L"ucrt");
         if(ucrtPath.exists()) {
           headerSearchPaths.push_back(ucrtPath);
