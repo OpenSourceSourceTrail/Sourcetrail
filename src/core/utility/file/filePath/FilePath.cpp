@@ -8,53 +8,28 @@
 #include "logging.h"
 #include "utilityString.h"
 
-FilePath::FilePath()
-    : m_path(std::make_unique<boost::filesystem::path>(""))
-    , m_exists(false)
-    , m_checkedExists(false)
-    , m_isDirectory(false)
-    , m_checkedIsDirectory(false)
-    , m_canonicalized(false) {}
+FilePath::FilePath() : m_path(std::make_unique<boost::filesystem::path>("")), m_canonicalized(false) {}
 
 FilePath::FilePath(const std::string& filePath)
-    : m_path(std::make_unique<boost::filesystem::path>(filePath))
-    , m_exists(false)
-    , m_checkedExists(false)
-    , m_isDirectory(false)
-    , m_checkedIsDirectory(false)
-    , m_canonicalized(false) {}
+    : m_path(std::make_unique<boost::filesystem::path>(filePath)), m_canonicalized(false) {}
 
 FilePath::FilePath(const std::wstring& filePath)
-    : m_path(std::make_unique<boost::filesystem::path>(filePath))
-    , m_exists(false)
-    , m_checkedExists(false)
-    , m_isDirectory(false)
-    , m_checkedIsDirectory(false)
-    , m_canonicalized(false) {}
+    : m_path(std::make_unique<boost::filesystem::path>(filePath)), m_canonicalized(false) {}
 
 FilePath::FilePath(const FilePath& other)
     : m_path(std::make_unique<boost::filesystem::path>(other.getPath()))
     , m_exists(other.m_exists)
-    , m_checkedExists(other.m_checkedExists)
     , m_isDirectory(other.m_isDirectory)
-    , m_checkedIsDirectory(other.m_checkedIsDirectory)
     , m_canonicalized(other.m_canonicalized) {}
 
 FilePath::FilePath(FilePath&& other) noexcept
     : m_path(std::move(other.m_path))
     , m_exists(other.m_exists)
-    , m_checkedExists(other.m_checkedExists)
     , m_isDirectory(other.m_isDirectory)
-    , m_checkedIsDirectory(other.m_checkedIsDirectory)
     , m_canonicalized(other.m_canonicalized) {}
 
 FilePath::FilePath(const std::wstring& filePath, const std::wstring& base)
-    : m_path(std::make_unique<boost::filesystem::path>(boost::filesystem::absolute(filePath, base)))
-    , m_exists(false)
-    , m_checkedExists(false)
-    , m_isDirectory(false)
-    , m_checkedIsDirectory(false)
-    , m_canonicalized(false) {}
+    : m_path(std::make_unique<boost::filesystem::path>(boost::filesystem::absolute(filePath, base))), m_canonicalized(false) {}
 
 FilePath::~FilePath() = default;
 
@@ -72,26 +47,24 @@ bool FilePath::empty() const {
 }
 
 bool FilePath::exists() const noexcept {
-  if(!m_checkedExists) {
+  if(!m_exists.has_value()) {
     m_exists = boost::filesystem::exists(getPath());
-    m_checkedExists = true;
   }
 
-  return m_exists;
+  return m_exists.value();
 }
 
 bool FilePath::recheckExists() const {
-  m_checkedExists = false;
+  m_exists.reset();
   return exists();
 }
 
 bool FilePath::isDirectory() const {
-  if(!m_checkedIsDirectory) {
+  if(!m_isDirectory.has_value()) {
     m_isDirectory = boost::filesystem::is_directory(getPath());
-    m_checkedIsDirectory = true;
   }
 
-  return m_isDirectory;
+  return m_isDirectory.value();
 }
 
 bool FilePath::isAbsolute() const {
@@ -111,7 +84,7 @@ bool FilePath::isValid() const {
   }
 
   for(; it != m_path->end(); ++it) {
-    if(!boost::filesystem::windows_name(it->string())) {
+    if(!boost::filesystem::portable_name(it->string())) {
       return false;
     }
   }
@@ -123,11 +96,9 @@ FilePath FilePath::getParentDirectory() const {
   FilePath parentDirectory(m_path->parent_path().wstring());
 
   if(!parentDirectory.empty()) {
-    parentDirectory.m_checkedIsDirectory = true;
     parentDirectory.m_isDirectory = true;
 
-    if(m_checkedExists && m_exists) {
-      parentDirectory.m_checkedExists = true;
+    if(m_exists) {
       parentDirectory.m_exists = true;
     }
   }
@@ -324,10 +295,8 @@ FilePath FilePath::getRelativeTo(const FilePath& other) const {
 
 FilePath& FilePath::concatenate(const FilePath& other) {
   m_path->operator/=(other.getPath());
-  m_exists = false;
-  m_checkedExists = false;
-  m_isDirectory = false;
-  m_checkedIsDirectory = false;
+  m_exists.reset();
+  m_isDirectory.reset();
   m_canonicalized = false;
 
   return *this;
@@ -341,10 +310,8 @@ FilePath FilePath::getConcatenated(const FilePath& other) const {
 
 FilePath& FilePath::concatenate(const std::wstring& other) {
   m_path->operator/=(other);
-  m_exists = false;
-  m_checkedExists = false;
-  m_isDirectory = false;
-  m_checkedIsDirectory = false;
+  m_exists.reset();
+  m_isDirectory.reset();
   m_canonicalized = false;
 
   return *this;
@@ -428,9 +395,7 @@ bool FilePath::hasExtension(const std::vector<std::wstring>& extensions) const {
 FilePath& FilePath::operator=(const FilePath& other) {
   m_path = std::make_unique<boost::filesystem::path>(other.getPath());
   m_exists = other.m_exists;
-  m_checkedExists = other.m_checkedExists;
   m_isDirectory = other.m_isDirectory;
-  m_checkedIsDirectory = other.m_checkedIsDirectory;
   m_canonicalized = other.m_canonicalized;
   return *this;
 }
@@ -438,9 +403,7 @@ FilePath& FilePath::operator=(const FilePath& other) {
 FilePath& FilePath::operator=(FilePath&& other) noexcept {
   m_path = std::move(other.m_path);
   m_exists = other.m_exists;
-  m_checkedExists = other.m_checkedExists;
   m_isDirectory = other.m_isDirectory;
-  m_checkedIsDirectory = other.m_checkedIsDirectory;
   m_canonicalized = other.m_canonicalized;
   return *this;
 }
