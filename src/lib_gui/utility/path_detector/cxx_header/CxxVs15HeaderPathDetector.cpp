@@ -22,8 +22,7 @@ std::vector<FilePath> CxxVs15HeaderPathDetector::doGetPaths() const {
       if(out.exitCode == 0) {
         const FilePath vsInstallPath(out.output);
         if(vsInstallPath.exists()) {
-          for(const FilePath& versionPath :
-              FileSystem::getDirectSubDirectories(vsInstallPath.getConcatenated(L"VC/Tools/MSVC"))) {
+          for(const FilePath& versionPath : file::getDirectSubDirectories(vsInstallPath.getConcatenated(L"VC/Tools/MSVC"))) {
             if(versionPath.exists()) {
               headerSearchPaths.push_back(versionPath.getConcatenated(L"include"));
               headerSearchPaths.push_back(versionPath.getConcatenated(L"atlmfc/include"));
