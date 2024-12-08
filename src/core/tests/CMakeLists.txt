@@ -266,10 +266,15 @@ add_sourcetrail_test(
   FilePathTestSuite.cpp
   DEPS
   Sourcetrail::core::utility::file::FilePath
+  Boost::filesystem
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
+
+target_compile_definitions(
+  FilePathTestSuite PRIVATE LIB_TEST_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\" ROOT_DIR=\"${CMAKE_SOURCE_DIR}\"
+                            SOURCE_PATH_PREFIX_LEN=${SOURCE_PATH_PREFIX_LEN})
 
 add_sourcetrail_test(
   NAME
