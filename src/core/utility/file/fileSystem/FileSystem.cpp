@@ -232,3 +232,7 @@ std::vector<FilePath> FileSystem::getRecursiveSubDirectories(const FilePath& pat
 
   return v;
 }
+
+bool FileSystem::isPortableFileName(const std::string& fileName) {
+  return boost::filesystem::portable_file_name(fileName);
+}

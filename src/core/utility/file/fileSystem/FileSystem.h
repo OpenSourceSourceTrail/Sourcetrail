@@ -32,4 +32,5 @@ public:
   static void createDirectory(const FilePath& path);
   static std::vector<FilePath> getDirectSubDirectories(const FilePath& path);
   static std::vector<FilePath> getRecursiveSubDirectories(const FilePath& path);
+  static bool isPortableFileName(const std::string& fileName);
 };
