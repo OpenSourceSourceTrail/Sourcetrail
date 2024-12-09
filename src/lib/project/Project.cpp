@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include <range/v3/algorithm/any_of.hpp>
+
 #include "../../scheduling/TaskDecoratorRepeat.h"
 #include "../../scheduling/TaskFindKeyOnBlackboard.h"
 #include "../../scheduling/TaskGroupParallel.h"
@@ -359,7 +361,7 @@ void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refres
 RefreshInfo Project::getRefreshInfo(RefreshMode mode) const {
   switch(mode) {
   case REFRESH_NONE:
-    return RefreshInfo();
+    return {};
 
   case REFRESH_UPDATED_FILES:
     return RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(m_sourceGroups, m_storage);
@@ -374,11 +376,13 @@ RefreshInfo Project::getRefreshInfo(RefreshMode mode) const {
 }
 
 void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
-  if(m_refreshStage == RefreshStageType::INDEXING) {
+  // Check the project status if it's indexing
+  if(RefreshStageType::INDEXING == m_refreshStage) {
     MessageStatus(L"Cannot refresh project while indexing.", true, false).dispatch();
     return;
   }
 
+  // Check if nothing to refresh
   {
     std::wstring message;
     if(info.mode != REFRESH_ALL_FILES && info.filesToClear.empty() && info.filesToIndex.empty()) {
@@ -400,18 +404,12 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
     }
   }
 
-  if(info.mode != REFRESH_ALL_FILES && (info.filesToClear.size() || info.nonIndexedFilesToClear.size())) {
+  // Check if filesToClear and/or nonIndexedFilesToClear are valid for index and **update the info**
+  if(REFRESH_ALL_FILES != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
     for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-      if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED && !sourceGroup->allowsPartialClearing()) {
-        bool abortIndexing = false;
-        for(const FilePath& sourcePath : utility::concat(info.filesToClear, info.nonIndexedFilesToClear)) {
-          if(sourceGroup->containsSourceFilePath(sourcePath)) {
-            abortIndexing = true;
-            break;
-          }
-        }
-
-        if(abortIndexing) {
+      if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus() && !sourceGroup->allowsPartialClearing()) {
+        if(const auto files = utility::concat(info.filesToClear, info.nonIndexedFilesToClear); ranges::any_of(
+               files, [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); })) {
           if(m_hasGUI &&
              dialogView->confirm(L"<p>This project contains a source group of type \"" +
                                      utility::decodeFromUtf8(sourceGroupTypeToString(sourceGroup->getType())) +
@@ -422,11 +420,10 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
             m_refreshStage = RefreshStageType::NONE;
             dialogView->clearDialogs();
             return;
-          } else {
-            const bool shallow = info.shallow;
-            info = getRefreshInfo(REFRESH_ALL_FILES);
-            info.shallow = shallow;
           }
+          const bool shallow = info.shallow;
+          info = getRefreshInfo(REFRESH_ALL_FILES);
+          info.shallow = shallow;
         }
 
         break;
@@ -434,31 +431,34 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
     }
   }
 
+  // Start
   MessageStatus(L"Preparing Indexing", false, true).dispatch();
   MessageErrorCountClear().dispatch();
 
   dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Setting up Indexers");
   MessageIndexingStatus(true, 0).dispatch();
 
+  // Clear storage cache
   m_storageCache->clear();
   m_storageCache->setSubject(m_storage);
 
   const FilePath indexDbFilePath = m_settings->getDBFilePath();
   const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
 
-  if(info.mode != REFRESH_ALL_FILES) {
-    // store the indexed data into the temp db but keep the current state to allow browsing
-    // while indexing
-    filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
+  // store the indexed data into the temp db but keep the current state to allow browsing while indexing
+  if(REFRESH_ALL_FILES != info.mode) {
+    std::ignore = filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
   }
 
-  std::shared_ptr<PersistentStorage> tempStorage = std::make_shared<PersistentStorage>(
-      tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
+  // Create new temp storage
+  auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
   tempStorage->setup();
 
-  std::shared_ptr<TaskGroupSequence> taskSequential = std::make_shared<TaskGroupSequence>();
+  // Build task graph
+  auto taskSequential = std::make_shared<TaskGroupSequence>();
 
-  if(info.mode != REFRESH_ALL_FILES && (info.filesToClear.size() || info.nonIndexedFilesToClear.size())) {
+  // Add task to clear the storage in case of refresh all
+  if(REFRESH_ALL_FILES != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
     taskSequential->addTask(
         std::make_shared<TaskCleanStorage>(tempStorage,
                                            dialogView,
@@ -466,14 +466,15 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
                                            info.mode == REFRESH_UPDATED_AND_INCOMPLETE_FILES));
   }
 
+  // Store the setting at temp storage
   tempStorage->setProjectSettingsText(TextAccess::createFromFile(getProjectSettingsFilePath())->getText());
   tempStorage->updateVersion();
 
-  std::unique_ptr<CombinedIndexerCommandProvider> indexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
-  std::unique_ptr<CombinedIndexerCommandProvider> customIndexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
+  auto indexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
+  auto customIndexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
   for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-    if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
-      if(sourceGroup->getType() == SOURCE_GROUP_CUSTOM_COMMAND) {
+    if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus()) {
+      if(SOURCE_GROUP_CUSTOM_COMMAND == sourceGroup->getType()) {
         customIndexerCommandProvider->addProvider(sourceGroup->getIndexerCommandProvider(info));
       } else {
         indexerCommandProvider->addProvider(sourceGroup->getIndexerCommandProvider(info));
