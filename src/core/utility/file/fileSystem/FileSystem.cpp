@@ -6,7 +6,8 @@
 // internal
 #include "utilityString.h"
 
-std::vector<FilePath> FileSystem::getFilePathsFromDirectory(const FilePath& path, const std::vector<std::wstring>& extensions) {
+namespace file {
+std::vector<FilePath> getFilePathsFromDirectory(const FilePath& path, const std::vector<std::wstring>& extensions) {
   std::set<std::wstring> ext(extensions.begin(), extensions.end());
   std::vector<FilePath> files;
 
@@ -32,16 +33,16 @@ std::vector<FilePath> FileSystem::getFilePathsFromDirectory(const FilePath& path
   return files;
 }
 
-FileInfo FileSystem::getFileInfoForPath(const FilePath& filePath) {
+FileInfo getFileInfoForPath(const FilePath& filePath) {
   if(filePath.exists()) {
     return FileInfo(filePath, getLastWriteTime(filePath));
   }
   return FileInfo();
 }
 
-std::vector<FileInfo> FileSystem::getFileInfosFromPaths(const std::vector<FilePath>& paths,
-                                                        const std::vector<std::wstring>& fileExtensions,
-                                                        bool followSymLinks) {
+std::vector<FileInfo> getFileInfosFromPaths(const std::vector<FilePath>& paths,
+                                            const std::vector<std::wstring>& fileExtensions,
+                                            bool followSymLinks) {
   std::set<std::wstring> ext;
   for(const std::wstring& e : fileExtensions) {
     ext.insert(utility::toLowerCase(e));
@@ -106,11 +107,11 @@ std::vector<FileInfo> FileSystem::getFileInfosFromPaths(const std::vector<FilePa
   return files;
 }
 
-std::set<FilePath> FileSystem::getSymLinkedDirectories(const FilePath& path) {
+std::set<FilePath> getSymLinkedDirectories(const FilePath& path) {
   return getSymLinkedDirectories(std::vector<FilePath>{path});
 }
 
-std::set<FilePath> FileSystem::getSymLinkedDirectories(const std::vector<FilePath>& paths) {
+std::set<FilePath> getSymLinkedDirectories(const std::vector<FilePath>& paths) {
   std::set<boost::filesystem::path> symlinkDirs;
 
   for(const FilePath& path : paths) {
@@ -149,11 +150,11 @@ std::set<FilePath> FileSystem::getSymLinkedDirectories(const std::vector<FilePat
   return files;
 }
 
-unsigned long long FileSystem::getFileByteSize(const FilePath& filePath) {
+unsigned long long getFileByteSize(const FilePath& filePath) {
   return boost::filesystem::file_size(filePath.getPath());
 }
 
-TimeStamp FileSystem::getLastWriteTime(const FilePath& filePath) {
+TimeStamp getLastWriteTime(const FilePath& filePath) {
   boost::posix_time::ptime lastWriteTime;
   if(filePath.exists()) {
     std::time_t t = boost::filesystem::last_write_time(filePath.getPath());
@@ -163,14 +164,14 @@ TimeStamp FileSystem::getLastWriteTime(const FilePath& filePath) {
   return TimeStamp(lastWriteTime);
 }
 
-bool FileSystem::remove(const FilePath& path) {
+bool remove(const FilePath& path) {
   boost::system::error_code ec;
   const bool ret = boost::filesystem::remove(path.getPath(), ec);
   path.recheckExists();
   return ret;
 }
 
-bool FileSystem::rename(const FilePath& from, const FilePath& to) {
+bool rename(const FilePath& from, const FilePath& to) {
   if(!from.recheckExists() || to.recheckExists()) {
     return false;
   }
@@ -180,7 +181,7 @@ bool FileSystem::rename(const FilePath& from, const FilePath& to) {
   return true;
 }
 
-bool FileSystem::copyFile(const FilePath& from, const FilePath& to) {
+bool copyFile(const FilePath& from, const FilePath& to) {
   if(!from.recheckExists() || to.recheckExists()) {
     return false;
   }
@@ -190,7 +191,7 @@ bool FileSystem::copyFile(const FilePath& from, const FilePath& to) {
   return true;
 }
 
-bool FileSystem::copy_directory(const FilePath& from, const FilePath& to) {
+bool copy_directory(const FilePath& from, const FilePath& to) {
   if(!from.recheckExists() || to.recheckExists()) {
     return false;
   }
@@ -200,12 +201,12 @@ bool FileSystem::copy_directory(const FilePath& from, const FilePath& to) {
   return true;
 }
 
-void FileSystem::createDirectory(const FilePath& path) {
+void createDirectory(const FilePath& path) {
   boost::filesystem::create_directories(path.str());
   path.recheckExists();
 }
 
-std::vector<FilePath> FileSystem::getDirectSubDirectories(const FilePath& path) {
+std::vector<FilePath> getDirectSubDirectories(const FilePath& path) {
   std::vector<FilePath> v;
 
   if(path.exists() && path.isDirectory()) {
@@ -219,7 +220,7 @@ std::vector<FilePath> FileSystem::getDirectSubDirectories(const FilePath& path) 
   return v;
 }
 
-std::vector<FilePath> FileSystem::getRecursiveSubDirectories(const FilePath& path) {
+std::vector<FilePath> getRecursiveSubDirectories(const FilePath& path) {
   std::vector<FilePath> v;
 
   if(path.exists() && path.isDirectory()) {
@@ -232,3 +233,8 @@ std::vector<FilePath> FileSystem::getRecursiveSubDirectories(const FilePath& pat
 
   return v;
 }
+
+bool isPortableFileName(const std::string& fileName) {
+  return boost::filesystem::portable_file_name(fileName);
+}
+}    // namespace file
