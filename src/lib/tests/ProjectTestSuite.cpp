@@ -5,12 +5,14 @@
 #include <gtest/gtest.h>
 
 #include "FilePath.h"
+#include "gmock/gmock.h"
 #include "MessageListener.h"
 #include "type/MessageStatus.h"
 #define private public
 #include "Project.h"
 #undef private
 #include "IApplicationSettings.hpp"
+#include "IndexerCommandProvider.h"
 #include "ITaskManager.hpp"
 #include "MockedApplicationSetting.hpp"
 #include "mocks/MockedDialogView.hpp"
@@ -21,6 +23,7 @@
 #include "PersistentStorage.h"
 #include "SourceGroupSettings.h"
 #include "SourceGroupSettingsCppEmpty.h"
+#include "TabId.h"
 
 using namespace std::chrono_literals;
 using namespace testing;
@@ -97,6 +100,15 @@ struct MockedPersistentStorage : PersistentStorage {
   MOCK_METHOD(void, finishInjection, (), (override));
 };
 
+struct MockedIndexerCommandProvider : IndexerCommandProvider {
+  MOCK_METHOD(std::vector<FilePath>, getAllSourceFilePaths, (), (const, override));
+  MOCK_METHOD(std::shared_ptr<IndexerCommand>, consumeCommand, (), (override));
+  MOCK_METHOD(std::shared_ptr<IndexerCommand>, consumeCommandForSourceFilePath, (const FilePath& filePath), (override));
+  MOCK_METHOD(std::vector<std::shared_ptr<IndexerCommand>>, consumeAllCommands, (), (override));
+  MOCK_METHOD(void, clear, (), (override));
+  MOCK_METHOD(size_t, size, (), (const, override));
+};
+
 struct ProjectFix : Test {
   void SetUp() override {
     mMockedMessageQueue = std::make_shared<StrictMock<MockedMessageQueue>>();
@@ -111,7 +123,8 @@ struct ProjectFix : Test {
     mDialogView = std::make_shared<StrictMock<MockedDialogView>>();
 
     IApplicationSettings::setInstance(std::make_shared<MockedApplicationSettings>());
-    scheduling::ITaskManager::setInstance(std::make_shared<scheduling::mocks::MockedTaskManager>());
+    mTaskManager = std::make_shared<scheduling::mocks::MockedTaskManager>();
+    scheduling::ITaskManager::setInstance(mTaskManager);
   }
 
   void TearDown() override {
@@ -121,6 +134,7 @@ struct ProjectFix : Test {
     mMockedMessageQueue.reset();
   }
 
+  std::shared_ptr<scheduling::mocks::MockedTaskManager> mTaskManager;
   std::shared_ptr<StrictMock<MockedMessageQueue>> mMockedMessageQueue;
   std::shared_ptr<StrictMock<MockedProjectSettings>> mSettings;
   std::unique_ptr<StrictMock<MockedStorageCache>> mStorageCache;
@@ -328,22 +342,23 @@ TEST_F(ProjectFix, buildIndex_statusIsNoneAndNoFilesToIndex) {
   EXPECT_EQ(mProject->m_refreshStage, Project::RefreshStageType::NONE);
 }
 
+#if BUILD_CXX_LANGUAGE_PACKAGE
 TEST_F(ProjectFix, buildIndex_statusIsNoneAndOneFileToClear) {
-  // Given: Refresh none flags and one file to clear
+  // Given: Refresh none flags and one file to clear.
   const RefreshInfo info{{}, {FilePath{"1.cpp"}}, {}, REFRESH_NONE};
-  // And:
-  auto sourceGroup = std::make_shared<MockedSourceGroup>();
+  // And: SourceGroup contains one file and Disallow partial clearing.
+  const auto sourceGroup = std::make_shared<MockedSourceGroup>();
   EXPECT_CALL(*sourceGroup, getAllSourceFilePaths).WillRepeatedly(Return(std::set{FilePath{"2.cpp"}}));
   EXPECT_CALL(*sourceGroup, allowsPartialClearing()).WillRepeatedly(Return(false));
-  // And:
-  mProject->m_sourceGroups.push_back(sourceGroup);
-  // And:
-  auto sourceGroupSettings = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);
+  // And: Expect SourceGroupSettingsCppEmpty from sourceGroup
+  const auto sourceGroupSettings = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);
   EXPECT_CALL(testing::Const(*sourceGroup), getSourceGroupSettings()).WillRepeatedly(Return(sourceGroupSettings));
-  // And:
+  // And: Add the mocked sourceGroup to the project
+  mProject->m_sourceGroups.push_back(sourceGroup);
+  // And: User should confirm to clear
   EXPECT_CALL(*mDialogView, confirm).WillOnce(Return(1));
   EXPECT_CALL(*mDialogView, clearDialogs);
-  // And:
+  // And: A message should be pushed.
   EXPECT_CALL(*mMockedMessageQueue, pushMessage).WillOnce(Return());
 
   // When: Call the build.
@@ -351,6 +366,36 @@ TEST_F(ProjectFix, buildIndex_statusIsNoneAndOneFileToClear) {
 
   // Then: The status keep the same.
   EXPECT_EQ(mProject->m_refreshStage, Project::RefreshStageType::NONE);
+}
+
+TEST_F(ProjectFix, buildIndex_goodCase) {
+  // Given: Refresh none flags and one file to clear.
+  const RefreshInfo info{{}, {}, {}, REFRESH_ALL_FILES};
+  // And:
+  auto sourceGroup = std::make_shared<MockedSourceGroup>();
+  auto sourceGroupSettingsCppEmpty = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);
+  EXPECT_CALL(testing::Const(*sourceGroup), getSourceGroupSettings()).WillRepeatedly(Return(sourceGroupSettingsCppEmpty));
+  mProject->m_sourceGroups.push_back(sourceGroup);
+  // And:
+  mProject->m_storage = std::make_shared<MockedPersistentStorage>();
+  // And: A message should be pushed.
+  EXPECT_CALL(*mMockedMessageQueue, pushMessage).WillRepeatedly(Return());
+  EXPECT_CALL(*mDialogView, showUnknownProgressDialog);
+  EXPECT_CALL(*mStorageCache, setUseErrorCache);
+  // And:
+  const auto taskScheduler = std::make_shared<TaskScheduler>(TabId::app());
+  // EXPECT_CALL(*mTaskManager, createScheduler(testing::_)).WillOnce(Return(taskScheduler));
+  EXPECT_CALL(*mTaskManager, getScheduler(testing::_)).WillOnce(Return(taskScheduler));
+  // And:
+  EXPECT_CALL(*mDialogView, hideUnknownProgressDialog);
+  auto mockedIndexerCommandProvider = std::make_shared<MockedIndexerCommandProvider>();
+  EXPECT_CALL(*sourceGroup, getIndexerCommandProvider).WillOnce(Return(mockedIndexerCommandProvider));
+
+  // When: Call the build.
+  mProject->buildIndex(info, mDialogView);
+
+  // Then: The status keep the same.
+  EXPECT_EQ(mProject->m_refreshStage, Project::RefreshStageType::INDEXING);
 }
 
 // TODO(Hussein): The test isn't complete
@@ -364,3 +409,4 @@ TEST_F(ProjectFix, DISABLED_buildIndex_emptyFilesInSourceGroup) {
   const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, REFRESH_ALL_FILES};
   mProject->buildIndex(info, mDialogView);
 }
+#endif
