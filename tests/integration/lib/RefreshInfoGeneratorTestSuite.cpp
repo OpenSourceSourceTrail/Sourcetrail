@@ -87,19 +87,19 @@ private:
 };
 
 void cleanup() {
-  FileSystem::remove(m_indexDbPath);
-  FileSystem::remove(m_bookmarkDbPath);
+  file::remove(m_indexDbPath);
+  file::remove(m_bookmarkDbPath);
 
   if(m_sourceFolder.recheckExists()) {
-    for(const FilePath& path : FileSystem::getFilePathsFromDirectory(m_sourceFolder)) {
-      FileSystem::remove(path);
+    for(const FilePath& path : file::getFilePathsFromDirectory(m_sourceFolder)) {
+      file::remove(path);
     }
-    FileSystem::remove(m_sourceFolder);
+    file::remove(m_sourceFolder);
   }
 }
 
 void addFileToFileSystem(const FilePath& filePath) {
-  FileSystem::createDirectory(filePath.getParentDirectory());
+  file::createDirectory(filePath.getParentDirectory());
   std::ofstream file;
   file.open(filePath.str());
   file << "This is some file content.\n";
