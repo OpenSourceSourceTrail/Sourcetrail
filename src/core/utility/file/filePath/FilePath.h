@@ -11,6 +11,7 @@
  */
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -368,9 +369,7 @@ public:
 private:
   std::unique_ptr<boost::filesystem::path> m_path;
 
-  mutable bool m_exists;
-  mutable bool m_checkedExists;
-  mutable bool m_isDirectory;
-  mutable bool m_checkedIsDirectory;
-  mutable bool m_canonicalized;
+  mutable std::optional<bool> m_exists;
+  mutable std::optional<bool> m_isDirectory;
+  bool m_canonicalized;
 };
