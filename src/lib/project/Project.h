@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include <TaskGroupSequence.h>
+
 #include "IProject.hpp"
 #include "RefreshInfo.h"
 #include "SourceGroup.h"
@@ -58,6 +60,11 @@ public:
   void refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested) override;
 
   [[nodiscard]] RefreshInfo getRefreshInfo(RefreshMode mode) const override;
+
+  std::shared_ptr<TaskGroupSequence> createIndexTasks(RefreshInfo info,
+                                                      std::shared_ptr<DialogView> dialogView,
+                                                      std::shared_ptr<PersistentStorage> tempStorage,
+                                                      size_t& sourceFileCount);
 
   void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) override;
 

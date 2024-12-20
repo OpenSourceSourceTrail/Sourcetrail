@@ -46,6 +46,22 @@
 #include "utilityApp.h"
 #include "utilityString.h"
 
+namespace {
+constexpr int DefaultIndexerThreadCount = 4;
+
+int getIndexerThreadCount() {
+  int indexerThreadCount = IApplicationSettings::getInstanceRaw()->getIndexerThreadCount();
+  if(indexerThreadCount <= 0) {
+    indexerThreadCount = utility::getIdealThreadCount();
+    if(indexerThreadCount <= 0) {
+      indexerThreadCount = DefaultIndexerThreadCount;    // setting to some fallback value
+    }
+  }
+  return indexerThreadCount;
+}
+
+}    // namespace
+
 Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI)
     : m_settings(std::move(settings))
     , m_storageCache(storageCache)
@@ -375,89 +391,10 @@ RefreshInfo Project::getRefreshInfo(RefreshMode mode) const {
   }
 }
 
-void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
-  assert(dialogView);
-  // Check the project status if it's indexing
-  if(RefreshStageType::INDEXING == m_refreshStage) {
-    MessageStatus(L"Cannot refresh project while indexing.", true, false).dispatch();
-    return;
-  }
-
-  // Check if nothing to refresh
-  {
-    std::wstring message;
-    if(info.mode != RefreshMode::AllFiles && info.filesToClear.empty() && info.filesToIndex.empty()) {
-      message = L"Nothing to refresh, all files are up-to-date.";
-    } else if(m_sourceGroups.empty()) {
-      message = L"Nothing to refresh, no Source Groups loaded.";
-    }
-
-    if(!message.empty()) {
-      if(m_hasGUI) {
-        dialogView->clearDialogs();
-      } else {
-        MessageIndexingFinished().dispatch();
-      }
-
-      MessageStatus(message).dispatch();
-      m_refreshStage = RefreshStageType::NONE;
-      return;
-    }
-  }
-
-  // Check if filesToClear and/or nonIndexedFilesToClear are valid for index and **update the info**
-  if(RefreshMode::AllFiles != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
-    for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-      if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus() && !sourceGroup->allowsPartialClearing()) {
-        if(const auto files = utility::concat(info.filesToClear, info.nonIndexedFilesToClear); ranges::any_of(
-               files, [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); })) {
-          if(m_hasGUI &&
-             dialogView->confirm(L"<p>This project contains a source group of type \"" +
-                                     utility::decodeFromUtf8(sourceGroupTypeToString(sourceGroup->getType())) +
-                                     L"\" that cannot be partially cleared. Do you want to re-index the "
-                                     L"whole project instead?</p>",
-                                 {L"Full Re-Index", L"Cancel"}) == 1) {
-            MessageStatus(L"Cannot partially clear project. Indexing aborted.").dispatch();
-            m_refreshStage = RefreshStageType::NONE;
-            dialogView->clearDialogs();
-            return;
-          }
-          const bool shallow = info.shallow;
-          info = getRefreshInfo(RefreshMode::AllFiles);
-          info.shallow = shallow;
-        }
-
-        break;
-      }
-    }
-  }
-
-  // Start
-  MessageStatus(L"Preparing Indexing", false, true).dispatch();
-  MessageErrorCountClear().dispatch();
-
-  dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Setting up Indexers");
-  MessageIndexingStatus(true, 0).dispatch();
-
-  // Clear storage cache
-  m_storageCache->clear();
-  m_storageCache->setSubject(m_storage);
-
-  const FilePath indexDbFilePath = m_settings->getDBFilePath();
-  const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
-
-  // store the indexed data into the temp db but keep the current state to allow browsing while indexing
-  if(RefreshMode::AllFiles != info.mode) {
-    std::ignore = filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
-  }
-
-  // Create new temp storage
-  // TODO(Hussein): Create PersistentStorage using factory pattern
-  auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
-  tempStorage->setup();
-
-  // Build task graph
-  // TODO(Hussein): Create Tasks using factory pattern
+std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
+                                                             std::shared_ptr<DialogView> dialogView,
+                                                             std::shared_ptr<PersistentStorage> tempStorage,
+                                                             size_t& sourceFileCount) {
   auto taskSequential = std::make_shared<TaskGroupSequence>();
 
   // Add task to clear the storage in case of refresh all
@@ -487,22 +424,16 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
     }
   }
 
-  size_t sourceFileCount = indexerCommandProvider->size() + customIndexerCommandProvider->size();
+  sourceFileCount = indexerCommandProvider->size() + customIndexerCommandProvider->size();
 
   // TODO(Hussein): Create Tasks using factory pattern
   taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("shallow_indexing", info.shallow));
   taskSequential->addTask(std::make_shared<TaskSetValue<int>>("source_file_count", static_cast<int>(sourceFileCount)));
   taskSequential->addTask(std::make_shared<TaskSetValue<int>>("indexed_source_file_count", 0));
   taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("interrupted_indexing", false));
-  taskSequential->addTask(std::make_shared<TaskSetValue<float>>("index_time", 0.0f));
+  taskSequential->addTask(std::make_shared<TaskSetValue<float>>("index_time", 0.0F));
 
-  int indexerThreadCount = IApplicationSettings::getInstanceRaw()->getIndexerThreadCount();
-  if(indexerThreadCount <= 0) {
-    indexerThreadCount = utility::getIdealThreadCount();
-    if(indexerThreadCount <= 0) {
-      indexerThreadCount = 4;    // setting to some fallback value
-    }
-  }
+  const int indexerThreadCount = getIndexerThreadCount();
 
   if(!indexerCommandProvider->empty()) {
     const int adjustedIndexerThreadCount = std::min<int>(indexerThreadCount, static_cast<int>(indexerCommandProvider->size()));
@@ -628,10 +559,95 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
           std::make_shared<TaskLambda>([]() { Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([]() {})); }))));
 
   taskSequential->setIsBackgroundTask(true);
-  Task::dispatch(TabId::app(), taskSequential);
+  return taskSequential;
+}
+
+void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
+  assert(dialogView);
+  // Check the project status if it's indexing
+  if(RefreshStageType::INDEXING == m_refreshStage) {
+    MessageStatus(L"Cannot refresh project while indexing.", true, false).dispatch();
+    return;
+  }
+
+  // Check if nothing to refresh
+  {
+    std::wstring message;
+    if(info.mode != RefreshMode::AllFiles && info.filesToClear.empty() && info.filesToIndex.empty()) {
+      message = L"Nothing to refresh, all files are up-to-date.";
+    } else if(m_sourceGroups.empty()) {
+      message = L"Nothing to refresh, no Source Groups loaded.";
+    }
+
+    if(!message.empty()) {
+      if(m_hasGUI) {
+        dialogView->clearDialogs();
+      } else {
+        MessageIndexingFinished().dispatch();
+      }
+
+      MessageStatus(message).dispatch();
+      m_refreshStage = RefreshStageType::NONE;
+      return;
+    }
+  }
+
+  // Check if filesToClear and/or nonIndexedFilesToClear are valid for index and **update the info**
+  if(RefreshMode::AllFiles != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
+    for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
+      if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus() && !sourceGroup->allowsPartialClearing()) {
+        if(const auto files = utility::concat(info.filesToClear, info.nonIndexedFilesToClear); ranges::any_of(
+               files, [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); })) {
+          if(m_hasGUI &&
+             dialogView->confirm(L"<p>This project contains a source group of type \"" +
+                                     utility::decodeFromUtf8(sourceGroupTypeToString(sourceGroup->getType())) +
+                                     L"\" that cannot be partially cleared. Do you want to re-index the "
+                                     L"whole project instead?</p>",
+                                 {L"Full Re-Index", L"Cancel"}) == 1) {
+            MessageStatus(L"Cannot partially clear project. Indexing aborted.").dispatch();
+            m_refreshStage = RefreshStageType::NONE;
+            dialogView->clearDialogs();
+            return;
+          }
+          const bool shallow = info.shallow;
+          info = getRefreshInfo(RefreshMode::AllFiles);
+          info.shallow = shallow;
+        }
+
+        break;
+      }
+    }
+  }
+
+  // Start
+  MessageStatus(L"Preparing Indexing", false, true).dispatch();
+  MessageErrorCountClear().dispatch();
+
+  dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Setting up Indexers");
+  MessageIndexingStatus(true, 0).dispatch();
+
+  // Clear storage cache
+  m_storageCache->clear();
+  m_storageCache->setSubject(m_storage);
+
+  const FilePath indexDbFilePath = m_settings->getDBFilePath();
+  const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
+
+  // store the indexed data into the temp db but keep the current state to allow browsing while indexing
+  if(RefreshMode::AllFiles != info.mode) {
+    std::ignore = filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
+  }
+
+  // Create new temp storage
+  // TODO(Hussein): Create PersistentStorage using factory pattern (SOUR-102)
+  const auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
+  tempStorage->setup();
+
+  size_t sourceFileCount{};
+  Task::dispatch(TabId::app(), createIndexTasks(info, dialogView, tempStorage, sourceFileCount));
 
   m_refreshStage = RefreshStageType::INDEXING;
-  // MessageStatus(L"Starting Indexing: " + std::to_wstring(sourceFileCount) + L" source files", false, true).dispatch();
+  MessageStatus(fmt::format(L"Starting Indexing: {} source files", sourceFileCount), false, true).dispatch();
   MessageIndexingStarted().dispatch();
 }
 
