@@ -17,6 +17,7 @@
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedMessageQueue.hpp"
 #include "mocks/MockedProjectSettings.hpp"
+#include "mocks/MockedSourceGroup.hpp"
 #include "mocks/MockedStorageCache.hpp"
 #include "mocks/MockedTaskManager.hpp"
 #include "PersistentStorage.h"
@@ -32,24 +33,6 @@ constexpr auto WaitingDuration = 100ms;
 // TODO(Hussein): Move to mocks folder
 struct MockedMessageStatus : MessageListener<MessageStatus> {
   MOCK_METHOD(void, handleMessage, (MessageStatus*), (override));
-};
-
-struct MockedSourceGroup : SourceGroup {
-  MOCK_METHOD(bool, prepareIndexing, (), (override));
-  MOCK_METHOD(bool, allowsPartialClearing, (), (const, override));
-  MOCK_METHOD(bool, allowsShallowIndexing, (), (const, override));
-
-  MOCK_METHOD(std::set<FilePath>, filterToContainedFilePaths, (const std::set<FilePath>& filePaths), (const, override));
-  MOCK_METHOD(std::set<FilePath>, getAllSourceFilePaths, (), (const, override));
-  MOCK_METHOD(std::shared_ptr<IndexerCommandProvider>, getIndexerCommandProvider, (const RefreshInfo& info), (const, override));
-  MOCK_METHOD(std::vector<std::shared_ptr<IndexerCommand>>, getIndexerCommands, (const RefreshInfo& info), (const, override));
-  MOCK_METHOD(std::shared_ptr<Task>,
-              getPreIndexTask,
-              (std::shared_ptr<StorageProvider> storageProvider, std::shared_ptr<DialogView> dialogView),
-              (const, override));
-
-  MOCK_METHOD(std::shared_ptr<SourceGroupSettings>, getSourceGroupSettings, (), (override));
-  MOCK_METHOD(std::shared_ptr<const SourceGroupSettings>, getSourceGroupSettings, (), (const, override));
 };
 
 struct MockedPersistentStorage : PersistentStorage {
