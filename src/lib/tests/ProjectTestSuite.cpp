@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include "FilePath.h"
-#include "gmock/gmock.h"
 #include "MessageListener.h"
 #include "type/MessageStatus.h"
 #define private public
@@ -301,7 +300,7 @@ TEST_F(ProjectFix, buildIndex_whileIndexing) {
   // Given: The project is indexing.
   mProject->m_refreshStage = Project::RefreshStageType::INDEXING;
   // And: Refresh all files flags.
-  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, REFRESH_ALL_FILES};
+  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, RefreshMode::AllFiles};
   // And: A message is called.
   EXPECT_CALL(*mMockedMessageQueue, pushMessage);
 
@@ -318,7 +317,7 @@ TEST_F(ProjectFix, buildIndex_emptySourceGroups) {
   // And: The clearDialogs is called.
   EXPECT_CALL(*mDialogView, clearDialogs).WillOnce(Return());
   // And: Refresh all files flags and empty source groups
-  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, REFRESH_ALL_FILES};
+  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, RefreshMode::AllFiles};
 
   // When: Call the build.
   mProject->buildIndex(info, mDialogView);
@@ -333,7 +332,7 @@ TEST_F(ProjectFix, buildIndex_statusIsNoneAndNoFilesToIndex) {
   // And: The clearDialogs is called.
   EXPECT_CALL(*mDialogView, clearDialogs).WillOnce(Return());
   // And: Refresh all files flags and empty source groups
-  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, REFRESH_NONE};
+  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, RefreshMode::None};
 
   // When: Call the build.
   mProject->buildIndex(info, mDialogView);
@@ -345,7 +344,7 @@ TEST_F(ProjectFix, buildIndex_statusIsNoneAndNoFilesToIndex) {
 #if BUILD_CXX_LANGUAGE_PACKAGE
 TEST_F(ProjectFix, buildIndex_statusIsNoneAndOneFileToClear) {
   // Given: Refresh none flags and one file to clear.
-  const RefreshInfo info{{}, {FilePath{"1.cpp"}}, {}, REFRESH_NONE};
+  const RefreshInfo info{{}, {FilePath{"1.cpp"}}, {}, RefreshMode::None};
   // And: SourceGroup contains one file and Disallow partial clearing.
   const auto sourceGroup = std::make_shared<MockedSourceGroup>();
   EXPECT_CALL(*sourceGroup, getAllSourceFilePaths).WillRepeatedly(Return(std::set{FilePath{"2.cpp"}}));
@@ -370,7 +369,7 @@ TEST_F(ProjectFix, buildIndex_statusIsNoneAndOneFileToClear) {
 
 TEST_F(ProjectFix, buildIndex_goodCase) {
   // Given: Refresh none flags and one file to clear.
-  const RefreshInfo info{{}, {}, {}, REFRESH_ALL_FILES};
+  const RefreshInfo info{{}, {}, {}, RefreshMode::AllFiles};
   // And:
   auto sourceGroup = std::make_shared<MockedSourceGroup>();
   auto sourceGroupSettingsCppEmpty = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);
@@ -406,7 +405,7 @@ TEST_F(ProjectFix, DISABLED_buildIndex_emptyFilesInSourceGroup) {
   EXPECT_CALL(testing::Const(*sourceGroup), getSourceGroupSettings()).WillRepeatedly(Return(x));
   mProject->m_sourceGroups.push_back(sourceGroup);
 
-  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, REFRESH_ALL_FILES};
+  const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, RefreshMode::AllFiles};
   mProject->buildIndex(info, mDialogView);
 }
 #endif

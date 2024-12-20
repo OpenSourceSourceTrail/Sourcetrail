@@ -258,6 +258,7 @@ target_link_libraries(
          Sourcetrail::core::utility::Migrator
          Sourcetrail::core::utility::file::FilePath
          Sourcetrail::core::utility::file::FilePathFilter
+         Sourcetrail::core::utility::toUnderlying
          Sourcetrail::scheduling
          CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::core
@@ -267,7 +268,6 @@ target_link_libraries(
           Sourcetrail::core::utility::Status
           Sourcetrail::core::utility::TextAccess
           Sourcetrail::core::utility::TextCodec
-          Sourcetrail::core::utility::toUnderlying
           Sourcetrail::core::utility::utilityUuid
           Sourcetrail::lib_gui
           Sourcetrail::libGui::utility::utilityApp
