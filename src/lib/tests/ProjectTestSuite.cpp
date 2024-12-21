@@ -392,3 +392,58 @@ TEST_F(ProjectFix, DISABLED_buildIndex_emptyFilesInSourceGroup) {
   mProject->buildIndex(info, mDialogView);
 }
 #endif
+
+class ProjectTest : public Test {
+protected:
+  // std::shared_ptr<MockedFileSystem> mockFileSystem;
+  std::shared_ptr<MockedDialogView> mockDialogView;
+  std::shared_ptr<ProjectSettings> mockSettings;
+  StorageCache* mockStorageCache;
+  std::string appUUID;
+  bool hasGUI;
+  std::unique_ptr<Project> project;
+
+  void SetUp() override {
+    // mockFileSystem = std::make_shared<MockFileSystem>();
+    mockDialogView = std::make_shared<MockedDialogView>();
+    mockSettings = std::make_shared<ProjectSettings>();
+    mockStorageCache = nullptr;
+    appUUID = "testUUID";
+    hasGUI = true;
+    project = std::make_unique<Project>(mockSettings, mockStorageCache, appUUID, hasGUI);
+  }
+};
+
+TEST_F(ProjectTest, SwapToTempStorageFile_Success) {
+  FilePath indexDbFilePath("index.db");
+  FilePath tempIndexDbFilePath("temp_index.db");
+
+  // EXPECT_CALL(*mockFileSystem, remove(indexDbFilePath)).Times(1);
+  // EXPECT_CALL(*mockFileSystem, rename(tempIndexDbFilePath, indexDbFilePath)).Times(1);
+
+  bool result = project->swapToTempStorageFile(indexDbFilePath, tempIndexDbFilePath, mockDialogView);
+  EXPECT_TRUE(result);
+}
+
+TEST_F(ProjectTest, DISABLED_SwapToTempStorageFile_RemoveException) {
+  FilePath indexDbFilePath("index.db");
+  FilePath tempIndexDbFilePath("temp_index.db");
+
+  // EXPECT_CALL(*mockFileSystem, remove(indexDbFilePath)).WillOnce(Throw(std::runtime_error("remove error")));
+  EXPECT_CALL(*mockDialogView, confirm(_, _)).Times(1);
+
+  bool result = project->swapToTempStorageFile(indexDbFilePath, tempIndexDbFilePath, mockDialogView);
+  EXPECT_FALSE(result);
+}
+
+TEST_F(ProjectTest, DISABLED_SwapToTempStorageFile_RenameException) {
+  FilePath indexDbFilePath("index.db");
+  FilePath tempIndexDbFilePath("temp_index.db");
+
+  // EXPECT_CALL(*mockFileSystem, remove(indexDbFilePath)).Times(1);
+  // EXPECT_CALL(*mockFileSystem, rename(tempIndexDbFilePath, indexDbFilePath)).WillOnce(Throw(std::runtime_error("rename error")));
+  EXPECT_CALL(*mockDialogView, confirm(_, _)).Times(1);
+
+  bool result = project->swapToTempStorageFile(indexDbFilePath, tempIndexDbFilePath, mockDialogView);
+  EXPECT_FALSE(result);
+}

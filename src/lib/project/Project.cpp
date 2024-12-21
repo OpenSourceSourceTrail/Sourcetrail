@@ -1,6 +1,10 @@
 #include "Project.h"
 
+#include <cassert>
+#include <tuple>
 #include <utility>
+
+#include <fmt/format.h>
 
 #include <range/v3/algorithm/any_of.hpp>
 
@@ -63,12 +67,7 @@ int getIndexerThreadCount() {
 }    // namespace
 
 Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI)
-    : m_settings(std::move(settings))
-    , m_storageCache(storageCache)
-    , m_state(ProjectStateType::NOT_LOADED)
-    , m_refreshStage(RefreshStageType::NONE)
-    , m_appUUID(std::move(appUUID))
-    , m_hasGUI(hasGUI) {}
+    : m_settings(std::move(settings)), m_storageCache(storageCache), m_appUUID(std::move(appUUID)), m_hasGUI(hasGUI) {}
 
 Project::~Project() = default;
 
@@ -407,10 +406,6 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
                                            info.mode == RefreshMode::UpdatedAndIncompleteFiles));
   }
 
-  // Store the setting at temp storage
-  tempStorage->setProjectSettingsText(TextAccess::createFromFile(getProjectSettingsFilePath())->getText());
-  tempStorage->updateVersion();
-
   // TODO(Hussein): Create Tasks using factory pattern
   auto indexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
   auto customIndexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
@@ -596,13 +591,14 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
   if(RefreshMode::AllFiles != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
     for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
       if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus() && !sourceGroup->allowsPartialClearing()) {
-        if(const auto files = utility::concat(info.filesToClear, info.nonIndexedFilesToClear); ranges::any_of(
-               files, [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); })) {
+        if(ranges::any_of(info.filesToClear,
+                          [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); }) ||
+           ranges::any_of(info.nonIndexedFilesToClear,
+                          [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); })) {
           if(m_hasGUI &&
-             dialogView->confirm(L"<p>This project contains a source group of type \"" +
-                                     utility::decodeFromUtf8(sourceGroupTypeToString(sourceGroup->getType())) +
-                                     L"\" that cannot be partially cleared. Do you want to re-index the "
-                                     L"whole project instead?</p>",
+             dialogView->confirm(fmt::format(L"<p>This project contains a source group of type \"{}\" that cannot be partially "
+                                             L"cleared. Do you want to re-index the whole project instead?</p>",
+                                             utility::decodeFromUtf8(sourceGroupTypeToString(sourceGroup->getType()))),
                                  {L"Full Re-Index", L"Cancel"}) == 1) {
             MessageStatus(L"Cannot partially clear project. Indexing aborted.").dispatch();
             m_refreshStage = RefreshStageType::NONE;
@@ -642,6 +638,9 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
   // TODO(Hussein): Create PersistentStorage using factory pattern (SOUR-102)
   const auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
   tempStorage->setup();
+  // Store the setting at temp storage
+  tempStorage->setProjectSettingsText(TextAccess::createFromFile(getProjectSettingsFilePath())->getText());
+  tempStorage->updateVersion();
 
   size_t sourceFileCount{};
   Task::dispatch(TabId::app(), createIndexTasks(info, dialogView, tempStorage, sourceFileCount));
