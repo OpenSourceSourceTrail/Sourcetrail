@@ -277,9 +277,9 @@ target_compile_definitions(
 
 add_sourcetrail_test(
   NAME
-  FileSystemTestSuite
+  UtilityFileFileSystemTestSuite
   SOURCES
-  FileSystemTestSuite.cpp
+  UtilityFileFileSystemTestSuite.cpp
   DEPS
   Sourcetrail::core::utility::file::FileSystem
   Sourcetrail::core::utility::file::FileManager
@@ -291,8 +291,8 @@ add_sourcetrail_test(
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
 
-target_compile_definitions(FileSystemTestSuite PRIVATE LIB_TEST_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"
-                                                       ROOT_DIR=\"${CMAKE_SOURCE_DIR}\")
+target_compile_definitions(UtilityFileFileSystemTestSuite PRIVATE LIB_TEST_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"
+                                                                  ROOT_DIR=\"${CMAKE_SOURCE_DIR}\")
 
 add_sourcetrail_test(
   NAME
@@ -301,6 +301,18 @@ add_sourcetrail_test(
   ScopedTemporaryFileTestSuite.cpp
   DEPS
   Sourcetrail::core::utility::file::ScopedTemporaryFile
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
+  FileSystemTestSuite
+  SOURCES
+  FileSystemTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::FileSystem
   TEST_PREFIX
   "unittests.core."
   WORKING_DIRECTORY
