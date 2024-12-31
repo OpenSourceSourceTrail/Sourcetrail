@@ -10,7 +10,11 @@
 namespace {
 
 constexpr const char* const ExistingFilePath = "data/FileSystemTestSuite/main.cpp";
+#ifdef _WIN32
+constexpr std::uintmax_t ExistingFileSize = 136U;
+#else
 constexpr std::uintmax_t ExistingFileSize = 126U;
+#endif
 constexpr const char* const MissingFilePath = "missing.txt";
 
 namespace fs = std::filesystem;
