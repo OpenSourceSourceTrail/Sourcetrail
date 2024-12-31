@@ -1,6 +1,8 @@
 # ${CMAKE_SOURCE_DIR}/src/core/utility/fileSystem/CMakeLists.txt
 add_subdirectory(impls)
-if(ENABLE_UNIT_TEST OR ENABLE_GUI_TEST OR ENABLE_INTEGRATION_TEST)
+if(ENABLE_UNIT_TEST
+   OR ENABLE_GUI_TEST
+   OR ENABLE_INTEGRATION_TEST)
   add_subdirectory(mocks)
 endif()
 
