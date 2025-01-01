@@ -1,5 +1,14 @@
+/**
+ * @file IFileSystem.hpp
+ * @author Ahmed Abdel Aal (eng.ahmedhussein@gmail.com)
+ * @brief Interface for file system operations.
+ * @date 2025-01-01
+ *
+ * @copyright Copyright (c) 2025
+ */
 #pragma once
 #include <filesystem>
+#include <memory>
 
 #include <nonstd/expected.hpp>
 
@@ -8,7 +17,34 @@ namespace core::utility::filesystem {
 template <typename T = void>
 using Result = nonstd::expected<T, std::string>;
 
+/**
+ * @brief Interface for file system operations.
+ */
 struct IFileSystem {
+  using Raw = IFileSystem*;
+  using Ptr = std::shared_ptr<IFileSystem>;
+
+  /**
+   * @brief Get the instance object
+   *
+   * @return Ptr the instance object
+   */
+  static Ptr instance() noexcept;
+
+  /**
+   * @brief Get the Instance Raw object
+   *
+   * @return Raw the instance raw object
+   */
+  static Raw getInstanceRaw() noexcept;
+
+  /**
+   * @brief Set the instance object
+   *
+   * @param instance the instance object
+   */
+  static void setInstance(Ptr instance) noexcept;
+
   virtual ~IFileSystem() noexcept;
 
   /**
@@ -101,6 +137,9 @@ struct IFileSystem {
    */
   [[nodiscard]] virtual Result<> rename(const std::filesystem::path& oldPath,
                                         const std::filesystem::path& newPath) const noexcept = 0;
+
+private:
+  static Ptr sInstance;
 };
 
 }    // namespace core::utility::filesystem
