@@ -30,7 +30,7 @@ QtProjectWizardContentPreferences::QtProjectWizardContentPreferences(QtProjectWi
     , m_newColorSchemeIndex(-1)
     , m_screenAutoScaling(nullptr)
     , m_screenScaleFactor(nullptr) {
-  m_colorSchemePaths = FileSystem::getFilePathsFromDirectory(ResourcePaths::getColorSchemesDirectoryPath(), {L".xml"});
+  m_colorSchemePaths = filesystem::getFilePathsFromDirectory(ResourcePaths::getColorSchemesDirectoryPath(), {L".xml"});
 }
 
 QtProjectWizardContentPreferences::~QtProjectWizardContentPreferences() {

@@ -1,22 +1,19 @@
 #pragma once
 /**
  * @file FilePath.h
- * @brief A robust file path management class using Boost filesystem
+ * @brief A robust file path management class using standard filesystem
  *
  * @details This class provides comprehensive file path manipulation and query capabilities,
- * offering a high-level abstraction over boost::filesystem::path with additional
+ * offering a high-level abstraction over std::filesystem::path with additional
  * functionality for path operations, validation, and environment variable expansion.
  *
  * @note The class is thread-safe for const methods but not for mutation operations
  */
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
-
-namespace boost::filesystem {
-class path;
-}    // namespace boost::filesystem
 
 /**
  * @class FilePath
@@ -25,7 +22,7 @@ class path;
  * @details
  * The FilePath class provides comprehensive file path manipulation,
  * validation, and transformation capabilities. It serves as a high-level
- * wrapper around boost::filesystem::path with additional features for
+ * wrapper around std::filesystem::path with additional features for
  * path handling, environment variable expansion, and cross-platform
  * filesystem operations.
  *
@@ -43,7 +40,7 @@ class path;
  *
  * @warning
  * - Not thread-safe for mutation operations
- * - Relies on boost::filesystem for core path manipulations
+ * - Relies on std::filesystem for core path manipulations
  *
  * @example
  * ```cpp
@@ -54,7 +51,6 @@ class path;
  * bool exists = path.exists();
  * ```
  *
- * @see boost::filesystem::path
  * @see std::filesystem
  */
 class FilePath final {
@@ -103,7 +99,7 @@ public:
    * @param filePath Path to be resolved
    * @param base Base directory for resolving relative paths
    */
-  FilePath(const std::wstring& filePath, const std::wstring& base);
+  FilePath(const std::wstring& filePath, const std::wstring& basePath);
 
   /**
    * @brief Destructor
@@ -121,11 +117,11 @@ public:
 
   // Conversion and Information Methods
   /**
-   * @brief Retrieve underlying boost filesystem path
+   * @brief Retrieve underlying standard filesystem path
    *
-   * @return boost::filesystem::path representing the current path
+   * @return std::filesystem::path representing the current path
    */
-  [[nodiscard]] boost::filesystem::path getPath() const;
+  [[nodiscard]] std::filesystem::path getPath() const;
 
   /**
    * @brief Check if the path is empty
@@ -154,7 +150,7 @@ public:
    *
    * @return true if path is a directory, false otherwise
    */
-  [[nodiscard]] bool isDirectory() const;
+  [[nodiscard]] bool isDirectory() const noexcept;
 
   /**
    * @brief Check if path is absolute
@@ -366,11 +362,9 @@ public:
   bool operator<(const FilePath& other) const;
 
 private:
-  std::unique_ptr<boost::filesystem::path> m_path;
+  std::unique_ptr<std::filesystem::path> m_path;
 
-  mutable bool m_exists;
-  mutable bool m_checkedExists;
-  mutable bool m_isDirectory;
-  mutable bool m_checkedIsDirectory;
-  mutable bool m_canonicalized;
+  mutable std::optional<bool> m_exists;
+  mutable std::optional<bool> m_isDirectory;
+  bool m_canonicalized = false;
 };

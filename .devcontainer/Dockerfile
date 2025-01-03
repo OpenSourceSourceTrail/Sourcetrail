@@ -7,10 +7,6 @@ RUN echo 'APT::Install-Suggests "0";' >> /etc/apt/apt.conf.d/00-docker && \
 # Set the ARG for non-interactive apt
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Remove existing Clang or LLVM installations
-RUN apt-get update && apt-get purge -y 'llvm-*' 'clang-*' \
-    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
-
 # Install all dependencies in one step to reduce layers
 RUN apt-get update &&                                                    \
     apt-get install -y                                                   \
@@ -33,6 +29,7 @@ RUN apt-get update &&                                                    \
     doxygen &&                                                           \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 10 && \
+    update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcc-12 10 && \
     apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Generate en_US.UTF-8 locale on the system
@@ -48,12 +45,12 @@ RUN INSTALL_PREFIX="/opt/llvm-15.0.7" && \
     wget -q https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-15.0.7.tar.gz -O /tmp/llvmorg-15.0.7.tar.gz && \
     tar -xzf /tmp/llvmorg-15.0.7.tar.gz -C /tmp/ &&                                                                       \
     cmake -G Ninja                                                                                                        \
-          -DCMAKE_BUILD_TYPE=Release                                                                                      \
-          -DLLVM_ENABLE_PROJECTS=clang                                                                                    \
-          -DLLVM_ENABLE_RTTI=ON                                                                                           \
-          -DLLVM_TARGETS_TO_BUILD=host                                                                                    \
-          -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}                                                                        \
-          /tmp/llvm-project-llvmorg-15.0.7/llvm -B /tmp/build &&                                                          \
+    -DCMAKE_BUILD_TYPE=Release                                                                                      \
+    -DLLVM_ENABLE_PROJECTS=clang                                                                                    \
+    -DLLVM_ENABLE_RTTI=ON                                                                                           \
+    -DLLVM_TARGETS_TO_BUILD=host                                                                                    \
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}                                                                        \
+    /tmp/llvm-project-llvmorg-15.0.7/llvm -B /tmp/build &&                                                          \
     cmake --build /tmp/build &&                                                                                           \
     cmake --install /tmp/build &&                                                                                         \
     rm -rf /tmp/llvmorg-15.0.7.tar.gz /tmp/llvm-project-llvmorg-15.0.7 /tmp/build

@@ -13,7 +13,7 @@
 
 struct FileManagerFix : testing::Test {
   void SetUp() override {
-    filePaths = FileSystem::getFilePathsFromDirectory(FilePath(L"./data/FileManagerTestSuite/src/"));
+    filePaths = filesystem::getFilePathsFromDirectory(FilePath(L"./data/FileManagerTestSuite/src/"));
     ASSERT_EQ(3, filePaths.size());
 
     sourceExtensions.resize(filePaths.size());

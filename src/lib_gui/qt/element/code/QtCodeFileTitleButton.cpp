@@ -106,7 +106,7 @@ void QtCodeFileTitleButton::updateTexts() {
     toolTip = L"incomplete " + toolTip;
   }
 
-  if((!m_filePath.recheckExists()) || (FileSystem::getLastWriteTime(m_filePath) > m_modificationTime)) {
+  if((!m_filePath.recheckExists()) || (filesystem::getLastWriteTime(m_filePath) > m_modificationTime)) {
     title += L"*";
     toolTip = L"out-of-date " + toolTip;
   }
