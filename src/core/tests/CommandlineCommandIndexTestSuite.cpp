@@ -64,7 +64,7 @@ TEST_F(CommandlineCommandIndexFix, goodCaseArgs) {
   auto ret = mConfig->parse(args);
 
   ASSERT_EQ(CommandlineCommand::ReturnStatus::CMD_OK, ret);
-  EXPECT_EQ(RefreshMode::REFRESH_ALL_FILES, mParser->getRefreshMode());
+  EXPECT_EQ(RefreshMode::AllFiles, mParser->getRefreshMode());
   EXPECT_TRUE(mParser->getShallowIndexingRequested());
 }
 

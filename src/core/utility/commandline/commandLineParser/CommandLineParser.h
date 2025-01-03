@@ -61,7 +61,7 @@ private:
 
   const std::string m_version;
   FilePath m_projectFile;
-  RefreshMode m_refreshMode = REFRESH_UPDATED_FILES;
+  RefreshMode m_refreshMode = RefreshMode::UpdatedFiles;
   bool m_shallowIndexingRequested = false;
 
   bool m_quit = false;

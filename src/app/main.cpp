@@ -172,7 +172,7 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   if(commandLineParser.hasError()) {
     Application::getInstance()->handleDialog(commandLineParser.getError());
   } else {
-    MessageLoadProject(commandLineParser.getProjectFilePath(), false, REFRESH_NONE).dispatch();
+    MessageLoadProject(commandLineParser.getProjectFilePath(), false, RefreshMode::None).dispatch();
   }
 
   return QApplication::exec();

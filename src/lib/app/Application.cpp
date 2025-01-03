@@ -256,7 +256,7 @@ void Application::handleMessage(MessageLoadProject* message) {
   if(mProject && mProject->getProjectSettingsFilePath() == projectSettingsFilePath) {
     if(message->settingsChanged && mHasGui) {
       mProject->setStateOutdated();
-      refreshProject(REFRESH_ALL_FILES, message->shallowIndexingRequested);
+      refreshProject(RefreshMode::AllFiles, message->shallowIndexingRequested);
     }
   } else {
     MessageStatus(L"Loading Project: " + projectSettingsFilePath.wstr(), false, true).dispatch();
@@ -303,14 +303,14 @@ void Application::handleMessage(MessageLoadProject* message) {
       MessageStatus(errorMessage, true).dispatch();
     }
 
-    if(REFRESH_NONE != message->refreshMode) {
+    if(RefreshMode::None != message->refreshMode) {
       refreshProject(message->refreshMode, message->shallowIndexingRequested);
     }
   }
 }
 
 void Application::handleMessage(MessageRefresh* pMessage) {
-  refreshProject(pMessage->all ? REFRESH_ALL_FILES : REFRESH_UPDATED_FILES, false);
+  refreshProject(pMessage->all ? RefreshMode::AllFiles : RefreshMode::UpdatedFiles, false);
 }
 
 void Application::handleMessage(MessageRefreshUI* pMessage) {

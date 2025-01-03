@@ -134,7 +134,7 @@ TEST(RefreshInfoGenerator, refreshInfoForAllFilesIsEmptyForEmptyProject) {
 
   const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForAllFiles(sourceGroups);
 
-  EXPECT_TRUE(REFRESH_ALL_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::AllFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -152,7 +152,7 @@ TEST(RefreshInfoGenerator, refreshInfoForAllFilesClearsNothingAndIndexesPrevious
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForAllFiles(sourceGroups);
 
-    EXPECT_TRUE(REFRESH_ALL_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::AllFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -177,7 +177,7 @@ TEST(RefreshInfoGenerator, refreshInfoForAllFilesIsEmptyForDisabledSourceGroup) 
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForAllFiles(sourceGroups);
 
-    EXPECT_TRUE(REFRESH_ALL_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::AllFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -205,7 +205,7 @@ TEST(RefreshInfoGenerator, refreshInfoForAllFilesIsClearsIndexedFilesOfDisabledS
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -242,7 +242,7 @@ TEST(RefreshInfoGenerator, refreshInfoForAllFilesIsClearsNonindexedFilesOfDisabl
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -267,7 +267,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesIsEmptyForEmptyStorageAndEm
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -345,7 +345,7 @@ RefreshInfo getRefreshInfo(KnownState knownState, ChangedState changedState, Fil
 
 TEST(RefreshInfoGenerator, unknownUnchangedSourcefileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, UNCHANGED, SOURCE_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -353,7 +353,7 @@ TEST(RefreshInfoGenerator, unknownUnchangedSourcefileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, unknownUnchangedSourcefileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, UNCHANGED, SOURCE_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -361,7 +361,7 @@ TEST(RefreshInfoGenerator, unknownUnchangedSourcefileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, unknownUnchangedHeaderfileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, UNCHANGED, HEADER_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -369,7 +369,7 @@ TEST(RefreshInfoGenerator, unknownUnchangedHeaderfileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, unknownUnchangedHeaderfileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, UNCHANGED, HEADER_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -378,7 +378,7 @@ TEST(RefreshInfoGenerator, unknownUnchangedHeaderfileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, unknownChangedSourcefileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, CHANGED, SOURCE_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -386,7 +386,7 @@ TEST(RefreshInfoGenerator, unknownChangedSourcefileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, unknownChangedSourcefileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, CHANGED, SOURCE_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -394,7 +394,7 @@ TEST(RefreshInfoGenerator, unknownChangedSourcefileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, unknownChangedHeaderfileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, CHANGED, HEADER_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -402,7 +402,7 @@ TEST(RefreshInfoGenerator, unknownChangedHeaderfileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, unknownChangedHeaderfileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(UNKNOWN, CHANGED, HEADER_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -412,7 +412,7 @@ TEST(RefreshInfoGenerator, unknownChangedHeaderfileThatIsToindex) {
 // this test does not really make sense
 TEST(RefreshInfoGenerator, nonindexedUnchangedSourcefileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, UNCHANGED, SOURCE_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -420,7 +420,7 @@ TEST(RefreshInfoGenerator, nonindexedUnchangedSourcefileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, nonindexedUnchangedSourcefileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, UNCHANGED, SOURCE_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -429,7 +429,7 @@ TEST(RefreshInfoGenerator, nonindexedUnchangedSourcefileThatIsToindex) {
 // this test does not make much sense without source files
 TEST(RefreshInfoGenerator, nonindexedUnchangedHeaderfileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, UNCHANGED, HEADER_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -437,7 +437,7 @@ TEST(RefreshInfoGenerator, nonindexedUnchangedHeaderfileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, nonindexedUnchangedHeaderfileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, UNCHANGED, HEADER_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -446,7 +446,7 @@ TEST(RefreshInfoGenerator, nonindexedUnchangedHeaderfileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, nonindexedChangedSourcefileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, CHANGED, SOURCE_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -454,7 +454,7 @@ TEST(RefreshInfoGenerator, nonindexedChangedSourcefileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, nonindexedChangedSourcefileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, CHANGED, SOURCE_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -462,7 +462,7 @@ TEST(RefreshInfoGenerator, nonindexedChangedSourcefileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, nonindexedChangedHeaderfileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, CHANGED, HEADER_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
   ;    // must be cleared here and will be re-indexed on demand
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
@@ -471,7 +471,7 @@ TEST(RefreshInfoGenerator, nonindexedChangedHeaderfileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, nonindexedChangedHeaderfileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(NON_INDEXED, CHANGED, HEADER_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());    // the header file will only be indexed on demand
@@ -479,7 +479,7 @@ TEST(RefreshInfoGenerator, nonindexedChangedHeaderfileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, indexedUnchangedSourcefileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, UNCHANGED, SOURCE_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -487,7 +487,7 @@ TEST(RefreshInfoGenerator, indexedUnchangedSourcefileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, indexedUnchangedSourcefileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, UNCHANGED, SOURCE_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -496,7 +496,7 @@ TEST(RefreshInfoGenerator, indexedUnchangedSourcefileThatIsToindex) {
 // TODO: check if depending source file gets reindexed
 TEST(RefreshInfoGenerator, indexedUnchangedHeaderfileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, UNCHANGED, HEADER_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -504,7 +504,7 @@ TEST(RefreshInfoGenerator, indexedUnchangedHeaderfileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, indexedUnchangedHeaderfileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, UNCHANGED, HEADER_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -512,7 +512,7 @@ TEST(RefreshInfoGenerator, indexedUnchangedHeaderfileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, indexedChangedSourcefileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, CHANGED, SOURCE_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -520,7 +520,7 @@ TEST(RefreshInfoGenerator, indexedChangedSourcefileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, indexedChangedSourcefileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, CHANGED, SOURCE_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -528,7 +528,7 @@ TEST(RefreshInfoGenerator, indexedChangedSourcefileThatIsToindex) {
 
 TEST(RefreshInfoGenerator, indexedChangedHeaderfileThatIsNottoindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, CHANGED, HEADER_FILE, NOT_TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -536,7 +536,7 @@ TEST(RefreshInfoGenerator, indexedChangedHeaderfileThatIsNottoindex) {
 
 TEST(RefreshInfoGenerator, indexedChangedHeaderfileThatIsToindex) {
   const RefreshInfo refreshInfo = getRefreshInfo(INDEXED, CHANGED, HEADER_FILE, TO_INDEX);
-  EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+  EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
   EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
   EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
   EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());    // the header file will only be indexed on demand
@@ -567,7 +567,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesClearsAndReindexesKnownOutd
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(2 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(2 == refreshInfo.filesToIndex.size());
@@ -604,7 +604,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesClearsKnownOutdatedHeaderFi
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(2 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -639,7 +639,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesClearsUnknownOutdatedHeader
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -674,7 +674,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesDoesNotClearUnknownUptodate
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(0 == refreshInfo.filesToIndex.size());
@@ -706,7 +706,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesClearsOutdatedSourceFileAnd
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(2 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -747,7 +747,7 @@ TEST(RefreshInfoGenerator, refreshInfoForUpdatedFilesDoesNotClearUptodateHeaderR
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(0 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -789,7 +789,7 @@ TEST(RefreshInfoGenerator, clearsUnchangedFilesReferencedByUnchangedFileThatRefe
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(2 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());
@@ -833,7 +833,7 @@ TEST(RefreshInfoGenerator, clearsUnchangedFilesReferencedByUnchangedFileThatRefe
 
     const RefreshInfo refreshInfo = RefreshInfoGenerator::getRefreshInfoForUpdatedFiles(sourceGroups, storage);
 
-    EXPECT_TRUE(REFRESH_UPDATED_FILES == refreshInfo.mode);
+    EXPECT_TRUE(RefreshMode::UpdatedFiles == refreshInfo.mode);
     EXPECT_TRUE(1 == refreshInfo.nonIndexedFilesToClear.size());
     EXPECT_TRUE(2 == refreshInfo.filesToClear.size());
     EXPECT_TRUE(1 == refreshInfo.filesToIndex.size());

@@ -8,7 +8,7 @@ class MessageLoadProject : public Message<MessageLoadProject> {
 public:
   explicit MessageLoadProject(FilePath filePath,
                               bool settingsChanged_ = false,
-                              RefreshMode refreshMode_ = REFRESH_NONE,
+                              RefreshMode refreshMode_ = RefreshMode::None,
                               bool shallowIndexingRequested_ = false);
 
   static std::string getStaticType() {

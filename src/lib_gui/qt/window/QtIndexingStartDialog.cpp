@@ -68,12 +68,12 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
   modeLayout->addSpacing(5);
 
   m_refreshModeButtons.emplace(
-      REFRESH_UPDATED_FILES, new QRadioButton(QStringLiteral("Updated files")));    // NOLINT(cppcoreguidelines-owning-memory)
+      RefreshMode::UpdatedFiles, new QRadioButton(QStringLiteral("Updated files")));    // NOLINT(cppcoreguidelines-owning-memory)
   m_refreshModeButtons.emplace(
-      REFRESH_UPDATED_AND_INCOMPLETE_FILES,
+      RefreshMode::UpdatedAndIncompleteFiles,
       new QRadioButton(QStringLiteral("Incomplete && updated files")));    // NOLINT(cppcoreguidelines-owning-memory)
   m_refreshModeButtons.emplace(
-      REFRESH_ALL_FILES, new QRadioButton(QStringLiteral("All files")));    // NOLINT(cppcoreguidelines-owning-memory)
+      RefreshMode::AllFiles, new QRadioButton(QStringLiteral("All files")));    // NOLINT(cppcoreguidelines-owning-memory)
 
   std::function<void(bool)> func = [=](bool checked) {
     if(!checked) {
@@ -150,7 +150,7 @@ void QtIndexingStartDialog::updateRefreshInfo(const RefreshInfo& info) {
   m_clearLabel->setText("Files to clear: " + QString::number(clearCount));
   m_indexLabel->setText("Source files to index: " + QString::number(indexCount));
 
-  m_clearLabel->setVisible((clearCount != 0U) && info.mode != REFRESH_ALL_FILES);
+  m_clearLabel->setVisible((clearCount != 0U) && RefreshMode::AllFiles != info.mode);
   m_indexLabel->setVisible(true);
 }
 

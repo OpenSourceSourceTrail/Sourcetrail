@@ -26,13 +26,13 @@ TEST_F(CommandLineParserFix, goodCase) {}
 // NOLINTNEXTLINE
 TEST(CommandLineParser, refreshModes) {
   commandline::CommandLineParser parser({});
-  EXPECT_EQ(RefreshMode::REFRESH_UPDATED_FILES, parser.getRefreshMode());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
 
   parser.fullRefresh();
-  EXPECT_EQ(RefreshMode::REFRESH_ALL_FILES, parser.getRefreshMode());
+  EXPECT_EQ(RefreshMode::AllFiles, parser.getRefreshMode());
 
   parser.incompleteRefresh();
-  EXPECT_EQ(RefreshMode::REFRESH_UPDATED_AND_INCOMPLETE_FILES, parser.getRefreshMode());
+  EXPECT_EQ(RefreshMode::UpdatedAndIncompleteFiles, parser.getRefreshMode());
 }
 
 // NOLINTNEXTLINE
@@ -55,7 +55,7 @@ TEST(CommandLineParser, initStateEmptyArgs) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_FALSE(parser.hasError());
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -77,7 +77,7 @@ TEST(CommandLineParserConfig, helpOption) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_TRUE(parser.exitApplication());
   EXPECT_FALSE(parser.hasError());
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -95,7 +95,7 @@ TEST(CommandLineParserConfig, versionOption) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_TRUE(parser.exitApplication());
   EXPECT_FALSE(parser.hasError());
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -119,7 +119,7 @@ TEST(CommandLineParserConfig, projectFileOptionIsEmpty) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_FALSE(parser.hasError());
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -134,7 +134,7 @@ TEST(CommandLineParserConfig, projectFileOptionNotExists) {
   const std::wstring GeneratedErrorMessage =
       L"Provided Projectfile is not valid:\n* Provided Projectfile('not-exists')  does not exist";
   EXPECT_THAT(parser.getError(), StrEq(GeneratedErrorMessage));
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -153,7 +153,7 @@ TEST(CommandLineParserConfig, projectFileMissingExtention) {
                                                     fs::path{EmptyProjectPath}.filename().string() +
                                                     "')  has a wrong file ending");
   EXPECT_THAT(parser.getError(), StrEq(ErrorMessage));
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -172,7 +172,7 @@ TEST(CommandLineParserConfig, emptyProjectFile) {
                                                     fs::path{EmptyProjectPath}.filename().string() +
                                                     "')  could not be loaded (invalid)");
   EXPECT_THAT(parser.getError(), StrEq(ErrorMessage));
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
   // EXPECT_THAT(parser.getProjectFilePath().str(), StrEq(fs::path {EmptyProjectPath}.filename().string()));
 }
@@ -188,7 +188,7 @@ TEST(CommandLineParserConfig, loadTutorialProject) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_FALSE(parser.hasError()) << parser.getError();
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
   auto resultPath = fs::absolute(parser.getProjectFilePath().str());
   auto expectedPath = fs::absolute(ProjectPath);
@@ -203,7 +203,7 @@ TEST(CommandLineParserConfig, initStateNoRegisitedCommands) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_TRUE(parser.hasError());
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
 
@@ -215,6 +215,6 @@ TEST(CommandLineParserConfig, initStateRegisitedCommands) {
   EXPECT_FALSE(parser.runWithoutGUI());
   EXPECT_FALSE(parser.exitApplication());
   EXPECT_TRUE(parser.hasError());
-  EXPECT_EQ(RefreshMode::REFRESH_NONE, parser.getShallowIndexingRequested());
+  EXPECT_EQ(RefreshMode::UpdatedFiles, parser.getRefreshMode());
   EXPECT_FALSE(parser.getShallowIndexingRequested());
 }
