@@ -141,6 +141,7 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # Settings ---------------------------------------------------------------------
+find_package(expected-lite REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
