@@ -8,7 +8,7 @@ project(
   VERSION ${VERSION_STRING}
   HOMEPAGE_URL "opensourcesourcetrail.github.io"
   LANGUAGES C CXX)
-
+#---------------------------------------------------------------------------------------------------------------------------------
 set(BUILD_CXX_LANGUAGE_PACKAGE
     OFF
     CACHE BOOL "Add C and C++ support to the Sourcetrail indexer.")
@@ -32,10 +32,10 @@ set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
     CACHE BOOL "Inject undefined behavior sanitizer.")
 set(ENABLE_SANITIZER_THREAD
     OFF
-    CACHE BOOL "Inject thread sanitizer.")
+    CACHE BOOL "Inject thread sanitizer. `unsupported`")
 set(ENABLE_SANITIZER_MEMORY
     OFF
-    CACHE BOOL "Inject memory sanitizer.")
+    CACHE BOOL "Inject memory sanitizer. `unsupported`")
 set(ENABLE_COVERAGE
     OFF
     CACHE BOOL "Build coverage report run `ninja coverage`.")
@@ -47,15 +47,15 @@ set(SOURCETRAIL_CMAKE_VERBOSE
     CACHE BOOL "CMake verbose")
 set(SOURCETRAIL_WARNING_AS_ERROR
     OFF
-    CACHE BOOL "")
+    CACHE BOOL "Treat warnings as errors")
 set(SOURCETRAIL_USE_LIBCPP
     OFF
-    CACHE BOOL "")
+    CACHE BOOL "Use libc++ instead of libstdc++")
 
 set(GCOV_VERSION
     "gcov-12"
     CACHE STRING "Version of gcov")
-
+#---------------------------------------------------------------------------------------------------------------------------------
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -63,7 +63,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 11)
-
+#---------------------------------------------------------------------------------------------------------------------------------
 include(cmake/add_files.cmake)
 include(cmake/version_setup.cmake)
 include(cmake/licenses.cmake)
@@ -74,14 +74,14 @@ include(cmake/add_sourcetrail_test.cmake)
 include(cmake/clang-tidy.cmake)
 include(cmake/cppcheck.cmake)
 include(cmake/coverage.cmake)
-
+#---------------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_SANITIZER_ADDRESS
    OR ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
    OR ENABLE_SANITIZER_THREAD
    OR ENABLE_SANITIZER_MEMORY)
   include(cmake/sanitizers.cmake)
 endif()
-
+#---------------------------------------------------------------------------------------------------------------------------------
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
   add_compile_options(-fcolor-diagnostics)
   if(SOURCETRAIL_USE_LIBCPP)
@@ -91,7 +91,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options(-fdiagnostics-color=always)
 endif()
-
+#---------------------------------------------------------------------------------------------------------------------------------
 include(cmake/set_alternate_linker.cmake)
 set(USE_ALTERNATE_LINKER
     ""
@@ -102,11 +102,13 @@ if(NOT
    "")
   set_alternate_linker(${USE_ALTERNATE_LINKER})
 endif()
-
+#---------------------------------------------------------------------------------------------------------------------------------
 include(cmake/compiler_warnings.cmake)
-# Variables --------------------------------------------------------------------
-set(PROJECT_NAME Sourcetrail)
-
+#---------------------------------------------------------------------------------------------------------------------------------
+if(BUILD_DOC)
+  include(cmake/doxygen.cmake)
+endif()
+# Variables ----------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   set(PLATFORM_INCLUDE "includesWindows.h")
 elseif(APPLE)
@@ -128,10 +130,8 @@ if(WIN32)
     message("bash: '${BASH}'")
   endif()
 endif()
-# Project ----------------------------------------------------------------------
-if(BUILD_DOC)
-  include(cmake/doxygen.cmake)
-endif()
+# Project ------------------------------------------------------------------------------------------------------------------------
+set(PROJECT_NAME Sourcetrail)
 
 #RPATH
 if(UNIX AND NOT APPLE)
@@ -139,14 +139,13 @@ if(UNIX AND NOT APPLE)
   set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
   set(CMAKE_INSTALL_RPATH "$ORIGIN/lib/:$$ORIGIN/lib/")
 endif()
-
-# Settings ---------------------------------------------------------------------
+# Settings -----------------------------------------------------------------------------------------------------------------------
 find_package(expected-lite REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SQLite3 CONFIG REQUIRED)
-# Boost ------------------------------------------------------------------------
+# Boost --------------------------------------------------------------------------------------------------------------------------
 set(Boost_USE_MULTITHREAD ON)
 set(Boost_USE_STATIC_LIBS
     ON
@@ -159,7 +158,7 @@ find_package(
              program_options
              system
   REQUIRED)
-# Qt ---------------------------------------------------------------------------
+# Qt -----------------------------------------------------------------------------------------------------------------------------
 set(QT_MIN_VERSION "5.15.0")
 set(QT_MIN_VERSION_HEX 0x051500)
 find_package(
@@ -199,7 +198,7 @@ if(Qt5Widgets_FOUND)
   #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX}    # disables all the APIs deprecated at or before the specified Qt version
   add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX})
 endif()
-# Setup ------------------------------------------------------------------------
+# Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(cmake/copy_qt_binaries.cmake)
 endif()
@@ -224,17 +223,16 @@ string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 add_subdirectory(src/external)
 add_subdirectory(src/lib)
 add_subdirectory(src/lib_gui)
-
-# core -------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
 add_subdirectory(src/messaging)
 add_subdirectory(src/lib_gui/utility/utilityApp)
-# Lib Cxx ----------------------------------------------------------------------
+# Lib Cxx ------------------------------------------------------------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_subdirectory(src/lib_cxx)
 endif()
-# Lib --------------------------------------------------------------------------
+# Lib ----------------------------------------------------------------------------------------------------------------------------
 add_library(Sourcetrail_lib ${LIB_FILES})
 add_library(Sourcetrail::lib ALIAS Sourcetrail_lib)
 
@@ -283,7 +281,7 @@ target_link_libraries(
 
 #configure language package defines
 configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")
-# Lib gui_utility --------------------------------------------------------------
+# Lib gui_utility ----------------------------------------------------------------------------------------------------------------
 add_library(Sourcetrail_lib_gui_utility)
 add_library(Sourcetrail::lib_gui::utility ALIAS Sourcetrail_lib_gui_utility)
 
@@ -306,11 +304,11 @@ target_link_libraries(
           Sourcetrail::core::utility::logging
           Sourcetrail::libGui::utility::utilityApp)
 
-# Lib Gui ----------------------------------------------------------------------
+# Lib Gui ------------------------------------------------------------------------------------------------------------------------
 # target for running versionnumber script
 # workaround for running customcommand (ninja dependency cycle)
 add_custom_target(versionnumber ALL)
-# Lib Gui ----------------------------------------------------------------------
+# Lib Gui ------------------------------------------------------------------------------------------------------------------------
 add_library(Sourcetrail_lib_gui ${LIB_GUI_FILES} bin/resources.qrc ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h)
 
 add_library(Sourcetrail::lib_gui ALIAS Sourcetrail_lib_gui)
@@ -378,11 +376,11 @@ set_target_properties(
              INCLUDE_CURRENT_DIR ON)
 
 set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
-# Indexer App ------------------------------------------------------------------
+# Indexer App --------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/indexer)
-# App --------------------------------------------------------------------------
+# App ----------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app)
-# Tests ------------------------------------------------------------------------
+# Tests --------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
    OR ENABLE_INTEGRATION_TEST)
@@ -409,7 +407,9 @@ if(ENABLE_UNIT_TEST
     add_subdirectory(tests)
   endif()
 endif()
-# Assets -----------------------------------------------------------------------
+# Assets -------------------------------------------------------------------------------------------------------------------------
 execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" "${CMAKE_BINARY_DIR}/app")
 create_symlink("${CMAKE_SOURCE_DIR}/bin/app/data" "${CMAKE_BINARY_DIR}/app/data")
 create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user")
+# Packaging ----------------------------------------------------------------------------------------------------------------------
+# TODO(SOUR-104)
