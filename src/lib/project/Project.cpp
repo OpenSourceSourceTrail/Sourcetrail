@@ -66,10 +66,10 @@ int getIndexerThreadCount() {
 
 }    // namespace
 
-Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI)
+Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI) noexcept
     : m_settings(std::move(settings)), m_storageCache(storageCache), m_appUUID(std::move(appUUID)), m_hasGUI(hasGUI) {}
 
-Project::~Project() = default;
+Project::~Project() noexcept = default;
 
 FilePath Project::getProjectSettingsFilePath() const {
   return m_settings->getFilePath();
@@ -426,7 +426,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
   }
 
   // Create new temp storage
-  // TODO(Hussein): Create PersistentStorage using factory pattern (SOUR-102)
+  // TODO(SOUR-102): Create PersistentStorage using factory pattern
   const auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
   tempStorage->setup();
   // Store the setting at temp storage
@@ -677,7 +677,7 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
   return taskSequential;
 }
 
-bool Project::checkIfNothingToRefresh(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
+bool Project::checkIfNothingToRefresh(const RefreshInfo& info, std::shared_ptr<DialogView> dialogView) {
   std::wstring message;
   if(info.mode != RefreshMode::AllFiles && info.filesToClear.empty() && info.filesToIndex.empty()) {
     message = L"Nothing to refresh, all files are up-to-date.";
