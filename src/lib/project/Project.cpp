@@ -390,6 +390,126 @@ RefreshInfo Project::getRefreshInfo(RefreshMode mode) const {
   }
 }
 
+void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
+  assert(dialogView);
+  // Check the project status if it's indexing
+  if(RefreshStageType::INDEXING == m_refreshStage) {
+    MessageStatus(L"Cannot refresh project while indexing.", true, false).dispatch();
+    return;
+  }
+
+  if(checkIfNothingToRefresh(info, dialogView)) {
+    return;
+  }
+
+  if(checkIfFilesToClear(info, dialogView)) {
+    return;
+  }
+
+  // Start
+  MessageStatus(L"Preparing Indexing", false, true).dispatch();
+  MessageErrorCountClear().dispatch();
+
+  dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Setting up Indexers");
+  MessageIndexingStatus(true, 0).dispatch();
+
+  // Clear storage cache
+  m_storageCache->clear();
+  m_storageCache->setSubject(m_storage);
+
+  const FilePath indexDbFilePath = m_settings->getDBFilePath();
+  const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
+
+  // store the indexed data into the temp db but keep the current state to allow browsing while indexing
+  if(RefreshMode::AllFiles != info.mode) {
+    std::ignore = filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
+  }
+
+  // Create new temp storage
+  // TODO(Hussein): Create PersistentStorage using factory pattern (SOUR-102)
+  const auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
+  tempStorage->setup();
+  // Store the setting at temp storage
+  tempStorage->setProjectSettingsText(TextAccess::createFromFile(getProjectSettingsFilePath())->getText());
+  tempStorage->updateVersion();
+
+  size_t sourceFileCount{};
+  Task::dispatch(TabId::app(), createIndexTasks(info, dialogView, tempStorage, sourceFileCount));
+
+  m_refreshStage = RefreshStageType::INDEXING;
+  MessageStatus(fmt::format(L"Starting Indexing: {} source files", sourceFileCount), false, true).dispatch();
+  MessageIndexingStarted().dispatch();
+}
+
+void Project::swapToTempStorage(std::shared_ptr<DialogView> dialogView) {
+  LOG_INFO("Switching to temporary indexing data");
+
+  const FilePath indexDbFilePath = m_settings->getDBFilePath();
+  const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
+  const FilePath bookmarkDbFilePath = m_settings->getBookmarkDBFilePath();
+
+  m_storage.reset();
+
+  if(!swapToTempStorageFile(indexDbFilePath, tempIndexDbFilePath, dialogView)) {
+    m_state = ProjectStateType::NOT_LOADED;
+    return;
+  }
+
+  m_storage = std::make_shared<PersistentStorage>(indexDbFilePath, bookmarkDbFilePath);
+  m_storage->setup();
+
+  // std::shared_ptr<DialogView> dialogView =
+  // Application::getInstance()->getDialogView(DialogView::UseCase::INDEXING);
+  // dialogView->showUnknownProgressDialog(L"Finish Indexing", L"Building caches");
+  m_storage->buildCaches();
+  // dialogView->hideUnknownProgressDialog();
+
+  m_storageCache->setSubject(m_storage);
+  m_state = ProjectStateType::LOADED;
+}
+
+bool Project::swapToTempStorageFile(const FilePath& indexDbFilePath,
+                                    const FilePath& tempIndexDbFilePath,
+                                    std::shared_ptr<DialogView> dialogView) {
+  try {
+    filesystem::remove(indexDbFilePath);
+    filesystem::rename(tempIndexDbFilePath, indexDbFilePath);
+  } catch(std::exception& /*e*/) {
+    if(m_hasGUI) {
+      dialogView->confirm(
+          L"<p>The old index database file of this project seems to be used by a different "
+          L"process and cannot "
+          L"be updated.</p><p>Please close all processes that are using this database and "
+          L"re-load this project to "
+          L"apply or discard the changes pending from the current indexer run.</p>");
+    }
+    return false;
+  }
+  return true;
+}
+
+void Project::discardTempStorage() {
+  const FilePath tempIndexDbPath = m_settings->getTempDBFilePath();
+  if(tempIndexDbPath.exists()) {
+    LOG_INFO("Discarding temporary indexing data");
+    filesystem::remove(tempIndexDbPath);
+  }
+}
+
+bool Project::hasCxxSourceGroup() const {
+#if BUILD_CXX_LANGUAGE_PACKAGE
+  for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
+    if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
+      if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
+        return true;
+      }
+    }
+  }
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  return false;
+}
+
+
 std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
                                                              std::shared_ptr<DialogView> dialogView,
                                                              std::shared_ptr<PersistentStorage> tempStorage,
@@ -557,37 +677,29 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
   return taskSequential;
 }
 
-void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
-  assert(dialogView);
-  // Check the project status if it's indexing
-  if(RefreshStageType::INDEXING == m_refreshStage) {
-    MessageStatus(L"Cannot refresh project while indexing.", true, false).dispatch();
-    return;
+bool Project::checkIfNothingToRefresh(RefreshInfo info, std::shared_ptr<DialogView> dialogView) {
+  std::wstring message;
+  if(info.mode != RefreshMode::AllFiles && info.filesToClear.empty() && info.filesToIndex.empty()) {
+    message = L"Nothing to refresh, all files are up-to-date.";
+  } else if(m_sourceGroups.empty()) {
+    message = L"Nothing to refresh, no Source Groups loaded.";
   }
 
-  // Check if nothing to refresh
-  {
-    std::wstring message;
-    if(info.mode != RefreshMode::AllFiles && info.filesToClear.empty() && info.filesToIndex.empty()) {
-      message = L"Nothing to refresh, all files are up-to-date.";
-    } else if(m_sourceGroups.empty()) {
-      message = L"Nothing to refresh, no Source Groups loaded.";
+  if(!message.empty()) {
+    if(m_hasGUI) {
+      dialogView->clearDialogs();
+    } else {
+      MessageIndexingFinished().dispatch();
     }
 
-    if(!message.empty()) {
-      if(m_hasGUI) {
-        dialogView->clearDialogs();
-      } else {
-        MessageIndexingFinished().dispatch();
-      }
-
-      MessageStatus(message).dispatch();
-      m_refreshStage = RefreshStageType::NONE;
-      return;
-    }
+    MessageStatus(message).dispatch();
+    m_refreshStage = RefreshStageType::NONE;
+    return true;
   }
+  return false;
+}
 
-  // Check if filesToClear and/or nonIndexedFilesToClear are valid for index and **update the info**
+bool Project::checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView> dialogView) {
   if(RefreshMode::AllFiles != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
     for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
       if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus() && !sourceGroup->allowsPartialClearing()) {
@@ -603,7 +715,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
             MessageStatus(L"Cannot partially clear project. Indexing aborted.").dispatch();
             m_refreshStage = RefreshStageType::NONE;
             dialogView->clearDialogs();
-            return;
+            return true;
           }
           const bool shallow = info.shallow;
           info = getRefreshInfo(RefreshMode::AllFiles);
@@ -614,106 +726,5 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
       }
     }
   }
-
-  // Start
-  MessageStatus(L"Preparing Indexing", false, true).dispatch();
-  MessageErrorCountClear().dispatch();
-
-  dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Setting up Indexers");
-  MessageIndexingStatus(true, 0).dispatch();
-
-  // Clear storage cache
-  m_storageCache->clear();
-  m_storageCache->setSubject(m_storage);
-
-  const FilePath indexDbFilePath = m_settings->getDBFilePath();
-  const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
-
-  // store the indexed data into the temp db but keep the current state to allow browsing while indexing
-  if(RefreshMode::AllFiles != info.mode) {
-    std::ignore = filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
-  }
-
-  // Create new temp storage
-  // TODO(Hussein): Create PersistentStorage using factory pattern (SOUR-102)
-  const auto tempStorage = std::make_shared<PersistentStorage>(tempIndexDbFilePath, m_storage->getBookmarkDbFilePath());
-  tempStorage->setup();
-  // Store the setting at temp storage
-  tempStorage->setProjectSettingsText(TextAccess::createFromFile(getProjectSettingsFilePath())->getText());
-  tempStorage->updateVersion();
-
-  size_t sourceFileCount{};
-  Task::dispatch(TabId::app(), createIndexTasks(info, dialogView, tempStorage, sourceFileCount));
-
-  m_refreshStage = RefreshStageType::INDEXING;
-  MessageStatus(fmt::format(L"Starting Indexing: {} source files", sourceFileCount), false, true).dispatch();
-  MessageIndexingStarted().dispatch();
-}
-
-void Project::swapToTempStorage(std::shared_ptr<DialogView> dialogView) {
-  LOG_INFO("Switching to temporary indexing data");
-
-  const FilePath indexDbFilePath = m_settings->getDBFilePath();
-  const FilePath tempIndexDbFilePath = m_settings->getTempDBFilePath();
-  const FilePath bookmarkDbFilePath = m_settings->getBookmarkDBFilePath();
-
-  m_storage.reset();
-
-  if(!swapToTempStorageFile(indexDbFilePath, tempIndexDbFilePath, dialogView)) {
-    m_state = ProjectStateType::NOT_LOADED;
-    return;
-  }
-
-  m_storage = std::make_shared<PersistentStorage>(indexDbFilePath, bookmarkDbFilePath);
-  m_storage->setup();
-
-  // std::shared_ptr<DialogView> dialogView =
-  // Application::getInstance()->getDialogView(DialogView::UseCase::INDEXING);
-  // dialogView->showUnknownProgressDialog(L"Finish Indexing", L"Building caches");
-  m_storage->buildCaches();
-  // dialogView->hideUnknownProgressDialog();
-
-  m_storageCache->setSubject(m_storage);
-  m_state = ProjectStateType::LOADED;
-}
-
-bool Project::swapToTempStorageFile(const FilePath& indexDbFilePath,
-                                    const FilePath& tempIndexDbFilePath,
-                                    std::shared_ptr<DialogView> dialogView) {
-  try {
-    filesystem::remove(indexDbFilePath);
-    filesystem::rename(tempIndexDbFilePath, indexDbFilePath);
-  } catch(std::exception& /*e*/) {
-    if(m_hasGUI) {
-      dialogView->confirm(
-          L"<p>The old index database file of this project seems to be used by a different "
-          L"process and cannot "
-          L"be updated.</p><p>Please close all processes that are using this database and "
-          L"re-load this project to "
-          L"apply or discard the changes pending from the current indexer run.</p>");
-    }
-    return false;
-  }
-  return true;
-}
-
-void Project::discardTempStorage() {
-  const FilePath tempIndexDbPath = m_settings->getTempDBFilePath();
-  if(tempIndexDbPath.exists()) {
-    LOG_INFO("Discarding temporary indexing data");
-    filesystem::remove(tempIndexDbPath);
-  }
-}
-
-bool Project::hasCxxSourceGroup() const {
-#if BUILD_CXX_LANGUAGE_PACKAGE
-  for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-    if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
-      if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
-        return true;
-      }
-    }
-  }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return false;
 }

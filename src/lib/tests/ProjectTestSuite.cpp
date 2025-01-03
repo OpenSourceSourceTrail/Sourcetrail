@@ -382,10 +382,12 @@ TEST_F(ProjectFix, buildIndex_goodCase) {
 
 // TODO(Hussein): The test isn't complete
 TEST_F(ProjectFix, DISABLED_buildIndex_emptyFilesInSourceGroup) {
+  std::ignore = scheduling::ITaskManager::getInstanceRaw()->createScheduler(TabId::app());
+
   mProject->m_storage = std::make_shared<MockedPersistentStorage>();
   auto sourceGroup = std::make_shared<MockedSourceGroup>();
-  auto x = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);
-  EXPECT_CALL(testing::Const(*sourceGroup), getSourceGroupSettings()).WillRepeatedly(Return(x));
+  auto sourceGroupSettings = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);
+  EXPECT_CALL(testing::Const(*sourceGroup), getSourceGroupSettings()).WillRepeatedly(Return(sourceGroupSettings));
   mProject->m_sourceGroups.push_back(sourceGroup);
 
   const RefreshInfo info{{FilePath{"1.cpp"}}, {}, {}, RefreshMode::AllFiles};

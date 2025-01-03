@@ -61,17 +61,12 @@ public:
 
   [[nodiscard]] RefreshInfo getRefreshInfo(RefreshMode mode) const override;
 
-  std::shared_ptr<TaskGroupSequence> createIndexTasks(RefreshInfo info,
-                                                      std::shared_ptr<DialogView> dialogView,
-                                                      std::shared_ptr<PersistentStorage> tempStorage,
-                                                      size_t& sourceFileCount);
-
   void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) override;
 
 private:
-  enum class ProjectStateType { NOT_LOADED, EMPTY, LOADED, OUTDATED, OUTVERSIONED, NEEDS_MIGRATION, DB_CORRUPTED };
+  enum class ProjectStateType : std::uint8_t { NOT_LOADED, EMPTY, LOADED, OUTDATED, OUTVERSIONED, NEEDS_MIGRATION, DB_CORRUPTED };
 
-  enum class RefreshStageType { REFRESHING, INDEXING, NONE };
+  enum class RefreshStageType : std::uint8_t { REFRESHING, INDEXING, NONE };
 
   void swapToTempStorage(std::shared_ptr<DialogView> dialogView);
   bool swapToTempStorageFile(const FilePath& indexDbFilePath,
@@ -80,6 +75,15 @@ private:
   void discardTempStorage();
 
   [[nodiscard]] bool hasCxxSourceGroup() const;
+
+  std::shared_ptr<TaskGroupSequence> createIndexTasks(RefreshInfo info,
+                                                      std::shared_ptr<DialogView> dialogView,
+                                                      std::shared_ptr<PersistentStorage> tempStorage,
+                                                      size_t& sourceFileCount);
+
+  bool checkIfNothingToRefresh(RefreshInfo info, std::shared_ptr<DialogView> dialogView);
+
+  bool checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView> dialogView);
 
   std::shared_ptr<ProjectSettings> m_settings;
   StorageCache* m_storageCache;
