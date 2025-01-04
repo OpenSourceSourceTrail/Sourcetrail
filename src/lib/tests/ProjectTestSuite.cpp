@@ -395,6 +395,7 @@ TEST_F(ProjectFix, DISABLED_buildIndex_emptyFilesInSourceGroup) {
 }
 #endif
 
+#ifndef _WIN32
 class ProjectTest : public Test {
 protected:
   // std::shared_ptr<MockedFileSystem> mockFileSystem;
@@ -449,3 +450,4 @@ TEST_F(ProjectTest, DISABLED_SwapToTempStorageFile_RenameException) {
   bool result = project->swapToTempStorageFile(indexDbFilePath, tempIndexDbFilePath, mockDialogView);
   EXPECT_FALSE(result);
 }
+#endif
