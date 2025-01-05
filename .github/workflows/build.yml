@@ -9,7 +9,7 @@ on:
 
 jobs:
   clang-format:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,7 +22,7 @@ jobs:
           fallback-style: 'Google'
 
   cmake-format:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -48,14 +48,14 @@ jobs:
             }
           - {
               name: "Ubuntu Latest GCC",
-              os: ubuntu-22.04,
+              os: ubuntu-24.04,
               tag: gnu,
               cc: "gcc",
               cxx: "g++"
             }
           - {
               name: "Ubuntu Latest CLang",
-              os: ubuntu-22.04,
+              os: ubuntu-24.04,
               tag: "clang",
               cc: "clang",
               cxx: "clang++"
@@ -94,7 +94,10 @@ jobs:
 
       - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo pip install conan gcovr
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install conan gcovr
 
       - name: Install conan (Windows)
         if: runner.os == 'Windows'
@@ -117,7 +120,9 @@ jobs:
 
       - name: Install conan dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
+        run: |
+          source venv/bin/activate
+          conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
 
       - name: Install conan dependencies (Windows)
         if: runner.os == 'Windows'
