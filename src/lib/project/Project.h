@@ -1,7 +1,18 @@
+/**
+ * @file Project.h
+ * @author Malte Langkabel (mlangkabel@coati.io)
+ * @brief The Project class represents a project within the application.
+ * @version 0.1
+ * @date 2025-01-03
+ *
+ * @copyright Copyright (c) 2025
+ */
 #pragma once
 #include <memory>
 #include <string>
 #include <vector>
+
+#include <TaskGroupSequence.h>
 
 #include "IProject.hpp"
 #include "RefreshInfo.h"
@@ -15,13 +26,20 @@ class StorageCache;
 struct FileInfo;
 struct ProjectBuilderIndex;
 
-#ifdef ST_TESTING
-#  include <gtest/gtest.h>
-struct ProjectFix;
-#endif
-
 /**
- * @brief Project object
+ * @brief The Project class represents a project within the application.
+ *
+ * This class is responsible for managing the project's settings, state, and operations such as loading, refreshing, and indexing.
+ * It provides various methods to interact with the project, including checking its state, comparing settings, and managing
+ * storage. The Project class is designed to be non-copyable and non-movable to ensure the integrity of the project data.
+ *
+ * Key functionalities include:
+ * - Loading and refreshing the project
+ * - Building the project index
+ * - Managing project state and settings
+ * - Interacting with dialog views for user interface operations
+ *
+ * The class also supports testing through the use of Google Test framework.
  */
 class Project final : public IProject {
 public:
@@ -32,7 +50,8 @@ public:
    * @param storageCache Storage Cache
    * @param hasGUI The application started with GUI
    */
-  Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI);
+  Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI) noexcept;
+
   /**
    * @name Disable copy and move operators
    * @{ */
@@ -42,29 +61,85 @@ public:
   Project& operator=(Project&&) = delete;
   /**  @} */
 
-  ~Project() override;
+  ~Project() noexcept override;
 
+  /**
+   * @brief Get the project settings file path
+   *
+   * @return File path
+   */
   [[nodiscard]] FilePath getProjectSettingsFilePath() const override;
+
+  /**
+   * @brief Get the project description
+   *
+   * @return Description
+   */
   [[nodiscard]] std::string getDescription() const override;
 
+  /**
+   * @brief Check if the project is loaded
+   *
+   * @return True if loaded
+   */
   [[nodiscard]] bool isLoaded() const override;
+
+  /**
+   * @brief Check if the project is indexing
+   *
+   * @return True if indexing
+   */
   [[nodiscard]] bool isIndexing() const override;
 
+  /**
+   * @brief Check if the project settings are equal except name and location
+   *
+   * @param otherSettings Other project settings
+   * @return True if equal
+   */
   [[nodiscard]] bool settingsEqualExceptNameAndLocation(const ProjectSettings& otherSettings) const override;
+
+  /**
+   * @brief Set the project state to outdated
+   */
   void setStateOutdated() override;
 
+  /**
+   * @brief Load the project
+   *
+   * @param dialogView Dialog view
+   */
   void load(const std::shared_ptr<DialogView>& dialogView) override;
 
+  /**
+   * @brief Refresh the project
+   *
+   * @param dialogView Dialog view
+   * @param refreshMode Refresh mode
+   * @param shallowIndexingRequested Shallow indexing requested
+   */
   void refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested) override;
 
+  /**
+   * @brief Get the refresh info
+   *
+   * @param mode Refresh mode
+   * @return Refresh info
+   */
   [[nodiscard]] RefreshInfo getRefreshInfo(RefreshMode mode) const override;
 
+  /**
+   * @brief Build the index
+   *
+   * @param info Refresh info
+   * @param dialogView Dialog view
+   */
   void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) override;
 
 private:
-  enum class ProjectStateType { NOT_LOADED, EMPTY, LOADED, OUTDATED, OUTVERSIONED, NEEDS_MIGRATION, DB_CORRUPTED };
+  enum class ProjectStateType : std::uint8_t { NOT_LOADED, EMPTY, LOADED, OUTDATED, OUTVERSIONED, NEEDS_MIGRATION, DB_CORRUPTED };
 
-  enum class RefreshStageType { REFRESHING, INDEXING, NONE };
+  enum class RefreshStageType : std::uint8_t { REFRESHING, INDEXING, NONE };
 
   void swapToTempStorage(std::shared_ptr<DialogView> dialogView);
   bool swapToTempStorageFile(const FilePath& indexDbFilePath,
@@ -74,21 +149,24 @@ private:
 
   [[nodiscard]] bool hasCxxSourceGroup() const;
 
+  std::shared_ptr<TaskGroupSequence> createIndexTasks(RefreshInfo info,
+                                                      std::shared_ptr<DialogView> dialogView,
+                                                      std::shared_ptr<PersistentStorage> tempStorage,
+                                                      size_t& sourceFileCount);
+
+  bool checkIfNothingToRefresh(const RefreshInfo& info, std::shared_ptr<DialogView> dialogView);
+
+  bool checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView> dialogView);
+
   std::shared_ptr<ProjectSettings> m_settings;
   StorageCache* m_storageCache;
 
-  ProjectStateType m_state;
-  RefreshStageType m_refreshStage;
+  ProjectStateType m_state = ProjectStateType::NOT_LOADED;
+  RefreshStageType m_refreshStage = RefreshStageType::NONE;
 
   std::shared_ptr<PersistentStorage> m_storage;
   std::vector<std::shared_ptr<SourceGroup>> m_sourceGroups;
 
   std::string m_appUUID;
   bool m_hasGUI;
-
-  friend ProjectBuilderIndex;
-#ifdef ST_TESTING
-  FRIEND_TEST(ProjectFix, loadWhileIndexing);
-  FRIEND_TEST(ProjectFix, loadFailed);
-#endif
 };
