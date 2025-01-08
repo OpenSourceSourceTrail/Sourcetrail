@@ -183,6 +183,16 @@ jobs:
           include_passed: true
           detailed_summary: true
 
+      - name: Upload build directory as artifact
+        if: runner.os == 'Linux' && matrix.config.tag == 'gnu'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifact-${{ github.event.number }}
+          path: |
+            ${{ github.workspace }}/build/compile_commands.json
+            ${{ github.workspace }}/build/Sourcetrail_lib_gui_autogen
+            ${{ github.workspace }}/build/src
+
   clang_tidy:
     runs-on: ubuntu-24.04
     needs: [build]
@@ -226,3 +236,9 @@ jobs:
             exit 0
           fi
           clang-tidy --config-file=./.clang-tidy  -p ${{github.workspace}}/build/compile_commands.json -warnings-as-errors='*' $src_files
+
+  cppcheck:
+    needs: build
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/cppcheck.yaml
+    secrets: inherit

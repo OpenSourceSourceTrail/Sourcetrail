@@ -1,0 +1,95 @@
+name: CppCheck
+
+on:
+  workflow_call:
+
+jobs:
+  cppcheck:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history to ensure base SHA is available
+
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifact-${{ github.event.number }}
+          path: ${{ github.workspace }}/build
+
+      - name: Install CppCheck
+        run: sudo apt install cppcheck -y
+
+      - name: Run CppCheck
+        run: |
+          SKIP_NEXT_STEPS=false
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
+          if [ -n "$FILES" ]; then
+            # Run cppcheck on all C++ files
+            cppcheck --enable=all --inline-suppr --std=c++17 \
+                    --suppress=missingIncludeSystem --suppress=missingInclude --suppress=unmatchedSuppression \
+                    --suppress=*:*tests/* --verbose --xml \
+                    --project=${{ github.workspace }}/build/compile_commands.json 2> cppcheck-report-${{ github.event.number }}.xml
+          else
+            echo "No C++ files to analyze with cppcheck."
+            SKIP_NEXT_STEPS=true
+          fi
+          echo "SKIP_NEXT_STEPS=${SKIP_NEXT_STEPS}" >> $GITHUB_ENV
+
+      - name: Filter CppCheck XML for diff files
+        if: ${{ !env.SKIP_NEXT_STEPS }}
+        run: |
+          # Prefix each file with the workspace path
+          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
+          FILES=$(echo "$FILES" | sed "s|^|${{ github.workspace }}/|")
+          FILTERED_REPORT=filtered-cppcheck-report-${{ github.event.number }}.xml
+
+          # Export FILES for the Python script
+          export FILES
+
+          # Generate a filtered cppcheck XML report
+          python3 <<EOF
+          import os
+          import xml.etree.ElementTree as ET
+
+          # Retrieve the FILES environment variable
+          diff_files = os.getenv("FILES", "").splitlines()
+          report_file = 'cppcheck-report-${{ github.event.number }}.xml'
+          filtered_report_file = '$FILTERED_REPORT'
+
+          # Parse the XML report
+          tree = ET.parse(report_file)
+          root = tree.getroot()
+
+          # Extract the cppcheck version from the original XML
+          cppcheck_version = root.find('cppcheck').get('version')
+
+          # Create a new XML structure for filtered data
+          new_root = ET.Element('results', version='2')
+
+          cppcheck_element = ET.SubElement(new_root, 'cppcheck', version=cppcheck_version)
+          errors_element = ET.SubElement(new_root, 'errors')  # Add the 'errors' tag
+
+          for error in root.findall('errors/error'):
+              location = error.find('location')
+              if location is not None and location.get('file') in diff_files:
+                  errors_element.append(error)
+
+          # Write filtered XML to file
+          ET.ElementTree(new_root).write(filtered_report_file, encoding='utf-8', xml_declaration=True)
+          EOF
+
+      - name: Generate Html report for diff files only
+        if: ${{ !env.SKIP_NEXT_STEPS }}
+        run: cppcheck-htmlreport --file=filtered-cppcheck-report-${{ github.event.number }}.xml --report-dir=cppcheck-report-${{ github.event.number }} --source-dir=${{ github.workspace }}
+
+      - name: Upload CppCheck report
+        if: ${{ !env.SKIP_NEXT_STEPS }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-report-${{ github.event.number }}
+          path: cppcheck-report-${{ github.event.number }}
