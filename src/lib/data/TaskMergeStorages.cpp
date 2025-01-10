@@ -9,8 +9,14 @@ void TaskMergeStorages::doEnter(std::shared_ptr<Blackboard> /*blackboard*/) {}
 Task::TaskState TaskMergeStorages::doUpdate(std::shared_ptr<Blackboard> /*blackboard*/) {
   if(m_storageProvider->getStorageCount() > 2)    // largest storage won't be touched here
   {
-    std::shared_ptr<IntermediateStorage> target = m_storageProvider->consumeSecondLargestStorage();
-    std::shared_ptr<IntermediateStorage> source = m_storageProvider->consumeSecondLargestStorage();
+    std::shared_ptr<IntermediateStorage> target;
+    if(auto result = m_storageProvider->consumeSecondLargestStorage()) {
+      target = result.value();
+    }
+    std::shared_ptr<IntermediateStorage> source;
+    if(auto result = m_storageProvider->consumeSecondLargestStorage()) {
+      source = result.value();
+    }
     if(target && source) {
       target->inject(source.get());
       m_storageProvider->insert(target);
