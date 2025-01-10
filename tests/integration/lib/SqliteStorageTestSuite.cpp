@@ -49,6 +49,7 @@ bool checkTableExists(const QString& dbFullPath, const QString& tableName) noexc
 TEST(SqliteStorage, setup_GoodCase) {
   namespace fs = std::filesystem;
   // Given:
+  // TODO(Hussein): Create a fixture for this test.
   const FilePath dbFullPath{(fs::temp_directory_path() / L"setup_GoodCase.sqlite").wstring()};
   MockedSqliteStorage sqliteStorage{dbFullPath};
 
