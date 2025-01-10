@@ -31,11 +31,10 @@ set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
     OFF
     CACHE BOOL "Inject undefined behavior sanitizer.")
 set(ENABLE_SANITIZER_THREAD
-    OFF
-    CACHE BOOL "Inject thread sanitizer. `unsupported`")
+    CACHE BOOL "Inject thread sanitizer. `not supported`")
 set(ENABLE_SANITIZER_MEMORY
     OFF
-    CACHE BOOL "Inject memory sanitizer. `unsupported`")
+    CACHE BOOL "Inject memory sanitizer. `not supported`")
 set(ENABLE_COVERAGE
     OFF
     CACHE BOOL "Build coverage report run `ninja coverage`.")
@@ -259,6 +258,7 @@ target_link_libraries(
          Sourcetrail::core::utility::toUnderlying
          Sourcetrail::scheduling
          CppSQLite::CppSQLite3
+         nonstd::expected-lite
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::ConfigManager
           Sourcetrail::core::utility::logging
