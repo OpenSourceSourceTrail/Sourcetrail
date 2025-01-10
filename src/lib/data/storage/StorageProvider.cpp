@@ -1,64 +1,52 @@
 #include "StorageProvider.h"
 
-#include "logging.h"
+#include <range/v3/algorithm/find_if.hpp>
 
-int StorageProvider::getStorageCount() const {
-  const std::lock_guard<std::mutex> lock(mStoragesMutex);
+int StorageProvider::getStorageCount() const noexcept {
+  const std::lock_guard lock(mStoragesMutex);
   return static_cast<int>(mStorages.size());
 }
 
 void StorageProvider::clear() {
   const std::lock_guard<std::mutex> lock(mStoragesMutex);
-  return mStorages.clear();
+  mStorages.clear();
 }
 
-void StorageProvider::insert(std::shared_ptr<IntermediateStorage> storage) {
-  const std::size_t storageSize = storage->getSourceLocationCount();
-  std::list<std::shared_ptr<IntermediateStorage>>::iterator iterator;
-
-  const std::lock_guard<std::mutex> lock(mStoragesMutex);
-  for(iterator = mStorages.begin(); iterator != mStorages.end(); iterator++) {
-    if((*iterator)->getSourceLocationCount() < storageSize) {
-      break;
-    }
+nonstd::expected<void, std::string> StorageProvider::insert(std::shared_ptr<IntermediateStorage> storage) noexcept {
+  if(!storage) {
+    return nonstd::make_unexpected("Storage is null");
   }
-  mStorages.insert(iterator, std::move(storage));
+  const std::size_t storageSize = storage->getSourceLocationCount();
+
+  const std::lock_guard lock(mStoragesMutex);
+  const auto iterator = ranges::find_if(
+      mStorages, [storageSize](const auto& currentStorage) { return currentStorage->getSourceLocationCount() < storageSize; });
+  std::ignore = mStorages.insert(iterator, std::move(storage));
+  return {};
 }
 
-std::shared_ptr<IntermediateStorage> StorageProvider::consumeSecondLargestStorage() {
-  std::shared_ptr<IntermediateStorage> ret;
+nonstd::expected<std::shared_ptr<IntermediateStorage>, std::string> StorageProvider::consumeSecondLargestStorage() noexcept {
   {
-    const std::lock_guard<std::mutex> lock(mStoragesMutex);
+    const std::lock_guard lock(mStoragesMutex);
     if(mStorages.size() > 1) {
       auto iterator = mStorages.begin();
-      iterator++;
-      ret = *iterator;
+      ++iterator;
+      auto storage = *iterator;
       mStorages.erase(iterator);
+      return storage;
     }
   }
-  return ret;
+  return nonstd::make_unexpected("No Storage found");
 }
 
-std::shared_ptr<IntermediateStorage> StorageProvider::consumeLargestStorage() {
-  std::shared_ptr<IntermediateStorage> ret;
+nonstd::expected<std::shared_ptr<IntermediateStorage>, std::string> StorageProvider::consumeLargestStorage() noexcept {
   {
-    const std::lock_guard<std::mutex> lock(mStoragesMutex);
+    const std::lock_guard lock(mStoragesMutex);
     if(!mStorages.empty()) {
-      ret = mStorages.front();
+      auto ret = mStorages.front();
       mStorages.pop_front();
+      return ret;
     }
   }
-
-  return ret;
-}
-
-void StorageProvider::logCurrentState() const {
-  std::string logString = "Storages waiting for injection:";
-  {
-    const std::lock_guard<std::mutex> lock(mStoragesMutex);
-    for(const auto& storage : mStorages) {
-      logString += " " + std::to_string(storage->getSourceLocationCount()) + ";";
-    }
-  }
-  LOG_INFO(logString);
+  return nonstd::make_unexpected("No Storage found");
 }
