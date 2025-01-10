@@ -7,7 +7,7 @@ if(CPPCHECK_EXECUTABLE)
   set(CPPCHECK_OPTIONS
       --enable=warning,performance,portability
       --suppress=missingInclude
-      --error-exitcode=0
+      --error-exitcode=1
       --std=c++${CMAKE_CXX_STANDARD}
       --verbose
       --project=${CMAKE_BINARY_DIR}/compile_commands.json
