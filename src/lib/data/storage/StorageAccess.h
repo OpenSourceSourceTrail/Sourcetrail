@@ -103,7 +103,7 @@ public:
    * @return A shared pointer to a SourceLocationCollection containing the matching locations.
    */
   [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getFullTextSearchLocations(const std::wstring& searchTerm,
-                                                                               bool caseSensitive) const = 0;
+                                                                                             bool caseSensitive) const = 0;
 
   /**
    * @brief Get autocompletion matches for a query.
@@ -113,8 +113,8 @@ public:
    * @return A vector of SearchMatch objects representing the matches.
    */
   [[nodiscard]] virtual std::vector<SearchMatch> getAutocompletionMatches(const std::wstring& query,
-                                                            NodeTypeSet acceptedNodeTypes,
-                                                            bool acceptCommands) const = 0;
+                                                                          NodeTypeSet acceptedNodeTypes,
+                                                                          bool acceptCommands) const = 0;
 
   /**
    * @brief Get search matches for given token IDs.
@@ -166,12 +166,12 @@ public:
    * @return A shared pointer to a Graph object representing the trail.
    */
   [[nodiscard]] virtual std::shared_ptr<Graph> getGraphForTrail(Id originId,
-                                                  Id targetId,
-                                                  NodeKindMask nodeTypes,
-                                                  Edge::TypeMask edgeTypes,
-                                                  bool nodeNonIndexed,
-                                                  size_t depth,
-                                                  bool directed) const = 0;
+                                                                Id targetId,
+                                                                NodeKindMask nodeTypes,
+                                                                Edge::TypeMask edgeTypes,
+                                                                bool nodeNonIndexed,
+                                                                size_t depth,
+                                                                bool directed) const = 0;
 
   /**
    * @brief Get the available node types in the storage.
@@ -205,14 +205,16 @@ public:
    * @param tokenIds A vector of token IDs.
    * @return A shared pointer to a SourceLocationCollection containing the locations.
    */
-  [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getSourceLocationsForTokenIds(const std::vector<Id>& tokenIds) const = 0;
+  [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getSourceLocationsForTokenIds(
+      const std::vector<Id>& tokenIds) const = 0;
 
   /**
    * @brief Get source locations for given location IDs.
    * @param locationIds A vector of location IDs.
    * @return A shared pointer to a SourceLocationCollection containing the locations.
    */
-  [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getSourceLocationsForLocationIds(const std::vector<Id>& locationIds) const = 0;
+  [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getSourceLocationsForLocationIds(
+      const std::vector<Id>& locationIds) const = 0;
 
   /**
    * @brief Get all source locations for a file.
@@ -229,8 +231,8 @@ public:
    * @return A shared pointer to a SourceLocationFile containing the locations.
    */
   [[nodiscard]] virtual std::shared_ptr<SourceLocationFile> getSourceLocationsForLinesInFile(const FilePath& filePath,
-                                                                               size_t startLine,
-                                                                               size_t endLine) const = 0;
+                                                                                             size_t startLine,
+                                                                                             size_t endLine) const = 0;
 
   /**
    * @brief Get source locations of a specific type in a file.
@@ -238,7 +240,8 @@ public:
    * @param type The type of locations to retrieve.
    * @return A shared pointer to a SourceLocationFile containing the locations.
    */
-  [[nodiscard]] virtual std::shared_ptr<SourceLocationFile> getSourceLocationsOfTypeInFile(const FilePath& filePath, LocationType type) const = 0;
+  [[nodiscard]] virtual std::shared_ptr<SourceLocationFile> getSourceLocationsOfTypeInFile(const FilePath& filePath,
+                                                                                           LocationType type) const = 0;
 
   /**
    * @brief Get the content of a file.
@@ -294,14 +297,16 @@ public:
    * @param filePath The path of the file.
    * @return A vector of ErrorInfo objects representing the filtered errors for the file.
    */
-  [[nodiscard]] virtual std::vector<ErrorInfo> getErrorsForFileLimited(const ErrorFilter& filter, const FilePath& filePath) const = 0;
+  [[nodiscard]] virtual std::vector<ErrorInfo> getErrorsForFileLimited(const ErrorFilter& filter,
+                                                                       const FilePath& filePath) const = 0;
 
   /**
    * @brief Get source locations for given errors.
    * @param errors A vector of ErrorInfo objects.
    * @return A shared pointer to a SourceLocationCollection containing the error locations.
    */
-  [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getErrorSourceLocations(const std::vector<ErrorInfo>& errors) const = 0;
+  [[nodiscard]] virtual std::shared_ptr<SourceLocationCollection> getErrorSourceLocations(
+      const std::vector<ErrorInfo>& errors) const = 0;
 
   /**
    * @brief Add a node bookmark.
@@ -380,8 +385,8 @@ public:
    * @param localSymbolIds A vector of local symbol IDs.
    * @return A TooltipInfo object containing the tooltip information.
    */
-  [[nodiscard]] virtual TooltipInfo getTooltipInfoForSourceLocationIdsAndLocalSymbolIds(const std::vector<Id>& locationIds,
-                                                                          const std::vector<Id>& localSymbolIds) const = 0;
+  [[nodiscard]] virtual TooltipInfo getTooltipInfoForSourceLocationIdsAndLocalSymbolIds(
+      const std::vector<Id>& locationIds, const std::vector<Id>& localSymbolIds) const = 0;
 
   /**
    * @brief Set whether to use the error cache.

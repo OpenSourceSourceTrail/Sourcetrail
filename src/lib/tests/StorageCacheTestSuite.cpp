@@ -3,7 +3,7 @@
 
 #include "Graph.h"
 #include "TextAccess.h"
-#define private public
+#define private public    // NOLINT(clang-diagnostic-keyword-macro)
 #include "StorageCache.h"
 #undef private
 

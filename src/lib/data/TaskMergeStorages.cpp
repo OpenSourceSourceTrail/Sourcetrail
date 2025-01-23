@@ -1,8 +1,11 @@
 #include "TaskMergeStorages.h"
 
+#include <utility>
+
 #include "StorageProvider.h"
 
-TaskMergeStorages::TaskMergeStorages(std::shared_ptr<StorageProvider> storageProvider) : m_storageProvider(storageProvider) {}
+TaskMergeStorages::TaskMergeStorages(std::shared_ptr<StorageProvider> storageProvider)
+    : m_storageProvider(std::move(storageProvider)) {}
 
 void TaskMergeStorages::doEnter(std::shared_ptr<Blackboard> /*blackboard*/) {}
 

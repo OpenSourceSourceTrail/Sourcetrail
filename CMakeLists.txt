@@ -30,8 +30,7 @@ set(ENABLE_SANITIZER_ADDRESS
 set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
     OFF
     CACHE BOOL "Inject undefined behavior sanitizer.")
-set(ENABLE_SANITIZER_THREAD
-    CACHE BOOL "Inject thread sanitizer. `not supported`")
+set(ENABLE_SANITIZER_THREAD CACHE BOOL "Inject thread sanitizer. `not supported`")
 set(ENABLE_SANITIZER_MEMORY
     OFF
     CACHE BOOL "Inject memory sanitizer. `not supported`")
