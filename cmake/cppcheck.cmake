@@ -11,7 +11,8 @@ if(CPPCHECK_EXECUTABLE)
       --std=c++${CMAKE_CXX_STANDARD}
       --verbose
       --project=${CMAKE_BINARY_DIR}/compile_commands.json
-      --output-file=${CMAKE_BINARY_DIR}/cppcheck.log)
+      --xml
+      --output-file=${CMAKE_BINARY_DIR}/cppcheck.xml)
 
   # Create a custom target for cppcheck
   add_custom_target(

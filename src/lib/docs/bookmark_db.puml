@@ -1,0 +1,49 @@
+@startuml
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class bookmark {
+   name: text
+   comment: text
+   timestamp: text
+   category_id: integer
+   id: integer
+}
+class bookmark_category {
+   name: text
+   id: integer
+}
+class bookmarked_edge {
+   serialized_source_node_name: text
+   serialized_target_node_name: text
+   edge_type: integer
+   source_node_active: integer
+   id: integer
+}
+class bookmarked_element {
+   bookmark_id: integer
+   id: integer
+}
+class bookmarked_node {
+   serialized_node_name: text
+   id: integer
+}
+class meta {
+   key: text
+   value: text
+   id: integer
+}
+class sqlite_master {
+   type: text
+   name: text
+   tbl_name: text
+   rootpage: int
+   sql: text
+}
+
+bookmark            -[#595959,plain]-^  bookmark_category  : "category_id:id"
+bookmarked_edge     -[#595959,plain]-^  bookmarked_element : "id"
+bookmarked_element  -[#595959,plain]-^  bookmark           : "bookmark_id:id"
+bookmarked_node     -[#595959,plain]-^  bookmarked_element : "id"
+@enduml

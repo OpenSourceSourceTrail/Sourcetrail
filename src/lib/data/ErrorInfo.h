@@ -1,8 +1,8 @@
 #pragma once
-// STL
 #include <limits>
-// internal
-#include "StorageError.h"
+#include <string>
+
+#include "GlobalId.hpp"
 
 struct ErrorInfo {
   static constexpr size_t Invalid = std::numeric_limits<size_t>::max();
@@ -27,11 +27,11 @@ struct ErrorInfo {
       , indexed(indexed_) {}
 
   Id id = 0;
-  std::wstring message = {};
-  std::wstring filePath = {};
+  std::wstring message;
+  std::wstring filePath;
   size_t lineNumber = Invalid;
   size_t columnNumber = Invalid;
-  std::wstring translationUnit = {};
+  std::wstring translationUnit;
   bool fatal = false;
   bool indexed = false;
 };

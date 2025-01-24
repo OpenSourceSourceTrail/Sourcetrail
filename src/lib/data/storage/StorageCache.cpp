@@ -6,31 +6,29 @@
 #include "utility.h"
 
 void StorageCache::clear() {
-  m_graphForAll.reset();
-
-  m_storageStats = StorageStats();
-
+  mGraphForAll.reset();
+  mStorageStats = {};
   setUseErrorCache(false);
 }
 
 std::shared_ptr<Graph> StorageCache::getGraphForAll() const {
-  if(!m_graphForAll) {
-    m_graphForAll = StorageAccessProxy::getGraphForAll();
+  if(!mGraphForAll) {
+    mGraphForAll = StorageAccessProxy::getGraphForAll();
   }
 
-  return m_graphForAll;
+  return mGraphForAll;
 }
 
 StorageStats StorageCache::getStorageStats() const {
-  if(m_storageStats.nodeCount == 0U) {
-    m_storageStats = StorageAccessProxy::getStorageStats();
+  if(mStorageStats.nodeCount == 0U) {
+    mStorageStats = StorageAccessProxy::getStorageStats();
   }
 
-  return m_storageStats;
+  return mStorageStats;
 }
 
 std::shared_ptr<TextAccess> StorageCache::getFileContent(const FilePath& filePath, bool showsErrors) const {
-  if(m_useErrorCache && showsErrors) {
+  if(mUseErrorCache && showsErrors) {
     return TextAccess::createFromFile(filePath);
   }
 
@@ -38,23 +36,23 @@ std::shared_ptr<TextAccess> StorageCache::getFileContent(const FilePath& filePat
 }
 
 ErrorCountInfo StorageCache::getErrorCount() const {
-  if(!m_useErrorCache) {
+  if(!mUseErrorCache) {
     return StorageAccessProxy::getErrorCount();
   }
 
-  return m_errorCount;
+  return mErrorCount;
 }
 
 std::vector<ErrorInfo> StorageCache::getErrorsLimited(const ErrorFilter& filter) const {
-  if(!m_useErrorCache) {
+  if(!mUseErrorCache) {
     return StorageAccessProxy::getErrorsLimited(filter);
   }
 
-  return filter.filterErrors(m_cachedErrors);
+  return filter.filterErrors(mCachedErrors);
 }
 
 std::vector<ErrorInfo> StorageCache::getErrorsForFileLimited(const ErrorFilter& filter, const FilePath& filePath) const {
-  if(!m_useErrorCache) {
+  if(!mUseErrorCache) {
     return StorageAccessProxy::getErrorsForFileLimited(filter, filePath);
   }
 
@@ -64,13 +62,13 @@ std::vector<ErrorInfo> StorageCache::getErrorsForFileLimited(const ErrorFilter& 
 std::shared_ptr<SourceLocationCollection> StorageCache::getErrorSourceLocations(const std::vector<ErrorInfo>& errors) const {
   std::shared_ptr<SourceLocationCollection> collection = StorageAccessProxy::getErrorSourceLocations(errors);
 
-  if(m_useErrorCache) {
+  if(mUseErrorCache) {
     std::map<std::wstring, bool> fileIndexed;
-    for(const ErrorInfo& error : m_cachedErrors) {
+    for(const ErrorInfo& error : mCachedErrors) {
       fileIndexed.emplace(error.filePath, error.indexed);
     }
 
-    collection->forEachSourceLocationFile([&](std::shared_ptr<SourceLocationFile> file) {
+    collection->forEachSourceLocationFile([&](const std::shared_ptr<SourceLocationFile>& file) {
       file->setIsComplete(false);
 
       auto iterator = fileIndexed.find(file->getFilePath().wstr());
@@ -85,14 +83,13 @@ std::shared_ptr<SourceLocationCollection> StorageCache::getErrorSourceLocations(
   return collection;
 }
 
-
 void StorageCache::setUseErrorCache(bool enabled) {
-  m_useErrorCache = enabled;
-  m_cachedErrors.clear();
-  m_errorCount = ErrorCountInfo();
+  mUseErrorCache = enabled;
+  mCachedErrors.clear();
+  mErrorCount = {};
 }
 
 void StorageCache::addErrorsToCache(const std::vector<ErrorInfo>& newErrors, const ErrorCountInfo& errorCount) {
-  utility::append(m_cachedErrors, newErrors);
-  m_errorCount = errorCount;
+  utility::append(mCachedErrors, newErrors);
+  mErrorCount = errorCount;
 }

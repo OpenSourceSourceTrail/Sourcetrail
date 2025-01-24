@@ -8,11 +8,11 @@ QT_FORWARD_DECLARE_CLASS(QLineEdit);
 class SourceGroupSettingsCustomCommand;
 
 class QtProjectWizardContentCustomCommand : public QtProjectWizardContent {
-  Q_OBJECT    // NOLINT(readability-identifier-length)
+  // NOLINTNEXTLINE(readability-identifier-length)
+  Q_OBJECT
 
-      public
-      : QtProjectWizardContentCustomCommand(std::shared_ptr<SourceGroupSettingsCustomCommand> settings,
-                                            QtProjectWizardWindow* window);
+public:
+  QtProjectWizardContentCustomCommand(std::shared_ptr<SourceGroupSettingsCustomCommand> settings, QtProjectWizardWindow* window);
 
   // QtProjectWizardContent implementation
   void populate(QGridLayout* layout, int& row) override;

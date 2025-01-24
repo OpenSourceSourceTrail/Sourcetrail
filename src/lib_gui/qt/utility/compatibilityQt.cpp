@@ -2,7 +2,7 @@
 
 #include <QtGlobal>
 
-namespace utility { namespace compatibility {
+namespace utility::compatibility {
 QPoint QWheelEvent_globalPos(const QWheelEvent& event) {
 #if(QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
   return event.globalPosition().toPoint();
@@ -10,4 +10,4 @@ QPoint QWheelEvent_globalPos(const QWheelEvent& event) {
   return event.globalPos();
 #endif
 }
-}}    // namespace utility::compatibility
+}    // namespace utility::compatibility
