@@ -21,7 +21,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            wget \
+            curl \
             cmake \
             ninja-build \
             python3 \
@@ -42,7 +42,7 @@ jobs:
       - name: Download LLVM/Clang Source
         if: steps.clang-cache.outputs.cache-hit != 'true'
         run: |
-          wget https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-${CLANG_VERSION}.tar.gz
+          curl -o llvmorg-15.0.7.tar.gz https://codeload.github.com/llvm/llvm-project/tar.gz/refs/tags/llvmorg-${CLANG_VERSION}
           tar -xzf llvmorg-${CLANG_VERSION}.tar.gz
           mv llvm-project-llvmorg-${CLANG_VERSION} llvm-project
 
