@@ -28,7 +28,6 @@ jobs:
           pip install conan
 
       - name: Cache Conan packages
-
         uses: actions/cache@v2
         with:
           path: ~/.conan2
@@ -41,3 +40,11 @@ jobs:
 
       - name: Configure CMake
         run: cmake --preset="ci_gnu_release"
+
+      - name: Run clang-tidy
+        run: |
+          src_files=$(git diff origin/main --name-only | grep "\.cpp")
+          IFS=$'\n' # Loop below should separate on new lines, not spaces.
+          for file in $src_files; do
+            clang-tidy --config-file=./.clang-tidy  -p ${{github.workspace}}/build/compile_commands.json "${file}"
+          done
