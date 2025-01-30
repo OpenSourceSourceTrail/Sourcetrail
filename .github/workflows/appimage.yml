@@ -25,9 +25,7 @@ jobs:
         run: git fetch --tags origin
 
       - name: Install dependencies
-        run: |
-          sudo apt-get update
-          run: sudo apt install -y gcc-12 g++-12 clang-15 ninja-build python3-pip
+        run: sudo apt install -y gcc-12 g++-12 clang-15 ninja-build python3-pip
 
       - name: Install Qt dependencies
         run: |
@@ -63,7 +61,7 @@ jobs:
       - name: Install conan dependencies
         run: |
           source venv/bin/activate
-          conan install . -s build_type=Release -of .conan/gnu --build=missing -pr:a .conan/gnu/profile
+          conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
 
       - name: Configure CMake
         run: cmake --preset="ci_gnu_release"
@@ -78,7 +76,7 @@ jobs:
       - name: Create AppImage
         working-directory: ${{github.workspace}}/build
         run: |
-          ./linuxdeploy-x86_64.AppImage \
+          ${{github.workspace}}/linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
             --plugin qt \
             --output appimage
