@@ -410,5 +410,21 @@ endif()
 execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" "${CMAKE_BINARY_DIR}/app")
 create_symlink("${CMAKE_SOURCE_DIR}/bin/app/data" "${CMAKE_BINARY_DIR}/app/data")
 create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user")
+# Install Executables ------------------------------------------------------------------------------------------------------------
+install(
+  TARGETS Sourcetrail Sourcetrail_indexer
+  RUNTIME DESTINATION bin
+)
+
+# Install Resources
+install(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/
+  DESTINATION bin/data
+)
+
+install(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/user/
+  DESTINATION bin/user
+)
 # Packaging ----------------------------------------------------------------------------------------------------------------------
 # TODO(SOUR-104)
