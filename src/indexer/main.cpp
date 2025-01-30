@@ -23,7 +23,7 @@
 #endif
 
 namespace {
-void setupLogging(const std::string& logFilePath) {
+void setupLogging(const std::string logFilePath) {
   auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath);
   fileSink->set_level(spdlog::level::trace);
   spdlog::set_default_logger(std::make_shared<spdlog::logger>("indexer", std::move(fileSink)));
