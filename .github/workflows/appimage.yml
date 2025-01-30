@@ -1,10 +1,16 @@
 name: Build AppImage
 
 on:
-  workflow_dispatch:
   push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     tags:
+#       - '[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:
