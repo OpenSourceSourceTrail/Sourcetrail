@@ -7,50 +7,37 @@ on:
     branches: ["main"]
 
 jobs:
-    clang-tidy:
-        runs-on: ubuntu-24.04
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-              with:
-                submodules: "true"
+  clang_tidy:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
 
-            - name: Get tags
-              run: git fetch --tags origin
+      - name: Get tags
+        run: git fetch --tags origin
 
-            - name: Install dependencies
-              run: sudo apt install -y build-essential cmake qtbase5-dev libqt5svg5-dev python3-pip grep make
+      - name: Install dependencies
+        run: sudo apt install -y gcc-12 g++-12 ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
 
-            - name: Install conan2
-              run: |
-                    python3 -m venv venv
-                    source venv/bin/activate
-                    pip install conan
+      - name: Install conan
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install conan
 
-            - name: Cache Conan packages (Ubuntu)
-              if: runner.os == 'Linux'
-              uses: actions/cache@v2
-              with:
-                  path: ~/.conan2
-                  key: conan-ubuntu-24.04-gnu-${{ hashFiles('**/conanfile.txt') }}
+      - name: Cache Conan packages
 
-            - name: Cache Conan packages
-              uses: actions/cache@v2
-              with:
-                    path: ~/.conan2
-                    key: conan-ubuntu-24.04-gnu-${{ hashFiles('**/conanfile.txt') }}
+        uses: actions/cache@v2
+        with:
+          path: ~/.conan2
+          key: conan-ubuntu-24.04-gnu-${{ hashFiles('**/conanfile.txt') }}
 
-            - name: Configure CMake
-              run: cmake -B build -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=".conan/gcc/build/Release/generators/conan_toolchain.cmake" .
+      - name: Install conan dependencies
+        run: |
+          source venv/bin/activate
+          conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
 
-            - name: Run clang-tidy
-              run: |
-                FILES=$(git diff --name-only origin/main | grep -E '\.(cpp|h|hpp)$')
-                if [ -n "$FILES" ]; then
-                    clang-tidy \
-                    -p ${{ github.workspace }}/build/compile_commands.json \
-                    --config-file=.clang-tidy \
-                    --quiet \
-                    --format-style=file \
-                    "$FILES"
-                fi
+      - name: Configure CMake
+        run: cmake --preset="ci_gnu_release"

@@ -3,9 +3,16 @@ name: Build
 on:
   push:
     branches: ["main"]
+    paths:
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/*.cpp'
   pull_request:
-    branches:
-      - main
+    branches: ["main"]
+    paths:
+      - '**/*.h'
+      - '**/*.hpp'
+      - '**/*.cpp'
 
 jobs:
   clang-format:
