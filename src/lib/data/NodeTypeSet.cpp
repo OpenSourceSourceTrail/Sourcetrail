@@ -130,7 +130,7 @@ NodeTypeSet::NodeTypeSet(NodeTypeSet::MaskType typeMask) : m_nodeTypeMask(typeMa
 
 NodeTypeSet::MaskType NodeTypeSet::nodeTypeToMask(const NodeType& nodeType) {
   // todo: convert to mask if ids are not power of two anymore
-  return static_cast<MaskType>(nodeType.getId());
+  return nodeType.getId();
 }
 
 const std::vector<NodeType> NodeTypeSet::s_allNodeTypes = {

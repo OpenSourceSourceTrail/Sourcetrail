@@ -356,9 +356,9 @@ void QtLineItemBase::drawArrow(const QPolygon& poly, QPainterPath* path, QPainte
 void QtLineItemBase::getPivotPoints(QVector2D* p, const QVector4D& in, const QVector4D& out, int offset, bool /*target*/) const {
   float f = 1 / 2.f;
 
-  p[0] = {static_cast<float>(in.x() + (in.z() - in.x()) * f + offset), static_cast<float>(out.y())};
-  p[2] = {static_cast<float>(in.x() + (in.z() - in.x()) * f + offset), static_cast<float>(out.w())};
+  p[0] = {(in.x() + (in.z() - in.x()) * f + offset), out.y()};
+  p[2] = {(in.x() + (in.z() - in.x()) * f + offset), out.w()};
 
-  p[1] = {static_cast<float>(out.z()), static_cast<float>(in.y() + (in.w() - in.y()) * f + offset)};
-  p[3] = {static_cast<float>(out.x()), static_cast<float>(in.y() + (in.w() - in.y()) * f + offset)};
+  p[1] = {out.z(), (in.y() + (in.w() - in.y()) * f + offset)};
+  p[3] = {out.x(), (in.y() + (in.w() - in.y()) * f + offset)};
 }

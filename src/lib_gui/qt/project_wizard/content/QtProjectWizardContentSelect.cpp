@@ -92,35 +92,33 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   vlayout->addStretch();
   layout->addLayout(vlayout, 0, QtProjectWizardWindow::FRONT_COL, Qt::AlignRight);
 
-  connect(m_languages,
-          static_cast<void (QButtonGroup::*)(QAbstractButton*)>(&QButtonGroup::buttonClicked),
-          [this](QAbstractButton* button) {
-            LanguageType selectedLanguage = LANGUAGE_UNKNOWN;
-            bool ok = false;
-            int languageTypeInt = button->property("language_type").toInt(&ok);
-            if(ok) {
-              selectedLanguage = LanguageType(languageTypeInt);
-            }
+  connect(m_languages, &QButtonGroup::buttonClicked, [this](QAbstractButton* button) {
+    LanguageType selectedLanguage = LANGUAGE_UNKNOWN;
+    bool ok = false;
+    int languageTypeInt = button->property("language_type").toInt(&ok);
+    if(ok) {
+      selectedLanguage = LanguageType(languageTypeInt);
+    }
 
-            bool hasRecommended = false;
-            for(auto& [languageType, buttonGroup] : m_buttons) {
-              buttonGroup->setExclusive(false);
-              for(QAbstractButton* abstractButton : buttonGroup->buttons()) {
-                abstractButton->setChecked(false);
-                abstractButton->setVisible(languageType == selectedLanguage);
+    bool hasRecommended = false;
+    for(auto& [languageType, buttonGroup] : m_buttons) {
+      buttonGroup->setExclusive(false);
+      for(QAbstractButton* abstractButton : buttonGroup->buttons()) {
+        abstractButton->setChecked(false);
+        abstractButton->setVisible(languageType == selectedLanguage);
 
-                if(languageType == selectedLanguage) {
-                  hasRecommended = hasRecommended | abstractButton->property("recommended").toBool();
-                }
-              }
-              buttonGroup->setExclusive(true);
-            }
+        if(languageType == selectedLanguage) {
+          hasRecommended = hasRecommended | abstractButton->property("recommended").toBool();
+        }
+      }
+      buttonGroup->setExclusive(true);
+    }
 
-            m_window->setNextEnabled(false);
-            m_title->setText("Source Group Types - " + m_languages->checkedButton()->text());
+    m_window->setNextEnabled(false);
+    m_title->setText("Source Group Types - " + m_languages->checkedButton()->text());
 
-            m_description->setText(hasRecommended ? QStringLiteral("<b>* recommended</b>") : QLatin1String(""));
-          });
+    m_description->setText(hasRecommended ? QStringLiteral("<b>* recommended</b>") : QLatin1String(""));
+  });
 
   auto* flayout = new QtFlowLayout(10, 0, 0);    // NOLINT(cppcoreguidelines-owning-memory)
 
@@ -152,21 +150,19 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
     m_buttons[languageIt.first] = sourceGroupButtons;
   }
 
-  for(auto& button : m_buttons) {
-    connect(button.second,
-            static_cast<void (QButtonGroup::*)(QAbstractButton*)>(&QButtonGroup::buttonClicked),
-            [this](QAbstractButton* button) {
-              SourceGroupType selectedType = SOURCE_GROUP_UNKNOWN;
-              bool ok = false;
-              int selectedTypeInt = button->property("source_group_type").toInt(&ok);
-              if(ok) {
-                selectedType = SourceGroupType(selectedTypeInt);
-              }
+  for(auto& innerButton : m_buttons) {
+    connect(innerButton.second, &QButtonGroup::buttonClicked, [this](QAbstractButton* button) {
+      SourceGroupType selectedType = SOURCE_GROUP_UNKNOWN;
+      bool ok = false;
+      int selectedTypeInt = button->property("source_group_type").toInt(&ok);
+      if(ok) {
+        selectedType = SourceGroupType(selectedTypeInt);
+      }
 
-              m_description->setText(m_sourceGroupTypeDescriptions[selectedType].c_str());
+      m_description->setText(m_sourceGroupTypeDescriptions[selectedType].c_str());
 
-              m_window->setNextEnabled(true);
-            });
+      m_window->setNextEnabled(true);
+    });
   }
 
   auto* container = new QWidget;              // NOLINT(cppcoreguidelines-owning-memory)
