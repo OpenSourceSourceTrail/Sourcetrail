@@ -6,7 +6,7 @@
 		"dockerfile": "Dockerfile"
 	},
 	"mounts": [
-  		"source=${localWorkspaceFolder},target=/home/sourcetrail/workspace,type=bind",
+		"source=${localWorkspaceFolder},target=/home/sourcetrail/workspace,type=bind",
 		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,readonly"
 	],
 	"containerEnv": {
@@ -16,7 +16,7 @@
 		"LC_ALL": "en_US.UTF-8"
 	},
 	"workspaceFolder": "/home/sourcetrail/workspace",
-	"postCreateCommand": "chmod +x ./scripts/run_conan.sh && ./scripts/run_conan.sh",
+	"postCreateCommand": "./scripts/run_conan.sh",
 	"customizations": {
 		"vscode": {
 			"extensions": [
