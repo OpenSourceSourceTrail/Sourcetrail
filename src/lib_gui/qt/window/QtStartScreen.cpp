@@ -31,7 +31,7 @@ QPushButton* createButton(qt::window::QtStartScreen* that,
                           const QString& objectName,
                           std::function<void()> onClickEvent) {
   auto* newProjectButton = new QPushButton(buttonName, that);    // NOLINT(cppcoreguidelines-owning-memory)
-#if Q_OS_MAC
+#ifdef Q_OS_MAC
   newProjectButton->setAttribute(Qt::WA_LayoutUsesWidgetRect);    // fixes layouting on Mac
 #endif
   newProjectButton->setObjectName(objectName);

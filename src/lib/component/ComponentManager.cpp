@@ -62,7 +62,9 @@ void ComponentManager::setupMain(ViewLayout* viewLayout, Id appId) {
 
   auto screenSearchComponent = m_componentFactory.createScreenSearchComponent(viewLayout);
   auto* screenSearchController = screenSearchComponent->getController<ScreenSearchController>();
-  screenSearchController->addResponder(graphView.get());
+  if(graphView) {
+    screenSearchController->addResponder(graphView.get());
+  }
   screenSearchController->addResponder(codeView.get());
   m_components.push_back(screenSearchComponent);
 

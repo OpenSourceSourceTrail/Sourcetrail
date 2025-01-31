@@ -122,7 +122,8 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
   QColor textColor(0, 0, 0);
 
   if(type.size() && type != QLatin1String("command") && type != QLatin1String("filter")) {
-    const GraphViewStyle::NodeColor& nodeColor = GraphViewStyle::getNodeColor(nodeType.getUnderscoredTypeString(), false);
+    const auto& underscoredTypeString = nodeType.getUnderscoredTypeString();
+    const GraphViewStyle::NodeColor& nodeColor = GraphViewStyle::getNodeColor(underscoredTypeString, false);
     fillColor = QColor(nodeColor.fill.c_str());
     textColor = QColor(nodeColor.text.c_str());
   } else {
@@ -177,10 +178,10 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
   // draw subtext
   if(subtext.size()) {
     // draw arrow icon
-    painter->drawPixmap(static_cast<int>(static_cast<float>(option.rect.left()) + m_charWidth2 * 2.0F),
-                        static_cast<int>(option.rect.top() + top2 + 1 +
-                                         static_cast<int>((m_charHeight2 - static_cast<float>(m_arrow.height())) / 2.0F)),
-                        m_arrow.pixmap());
+    painter->drawPixmap(
+        static_cast<int>(static_cast<float>(option.rect.left()) + m_charWidth2 * 2.0F),
+        (option.rect.top() + top2 + 1 + static_cast<int>((m_charHeight2 - static_cast<float>(m_arrow.height())) / 2.0F)),
+        m_arrow.pixmap());
 
     painter->setFont(m_font2);
 

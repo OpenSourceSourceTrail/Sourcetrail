@@ -27,13 +27,17 @@ void ScreenSearchController::foundMatches(ScreenSearchResponder* responder, size
     m_matchIndex = m_matches.size();
   }
 
-  getView<ScreenSearchView>()->setMatchCount(m_matches.size());
+  if(auto* view = getView<ScreenSearchView>(); nullptr != view) {
+    view->setMatchCount(m_matches.size());
+  }
 }
 
 void ScreenSearchController::addResponder(ScreenSearchResponder* responder) {
-  if(responder) {
+  if(nullptr != responder) {
     m_responders.push_back(responder);
-    getView<ScreenSearchView>()->addResponder(responder->getName());
+    if(auto* view = getView<ScreenSearchView>(); nullptr != view) {
+      view->addResponder(responder->getName());
+    }
   }
 }
 
@@ -98,7 +102,9 @@ void ScreenSearchController::clearMatches() {
     m_matchIndex = 0;
   }
 
-  getView<ScreenSearchView>()->setMatchCount(0);
+  if(auto* view = getView<ScreenSearchView>(); nullptr != view) {
+    view->setMatchIndex(0);
+  }
 
   for(ScreenSearchResponder* responder : m_responders) {
     responder->clearMatches();

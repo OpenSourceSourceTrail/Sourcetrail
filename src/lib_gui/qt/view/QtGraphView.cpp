@@ -451,7 +451,7 @@ QVector2D QtGraphView::getViewSize() const {
   QtGraphicsView* view = getView();
 
   const float zoomFactor = view->getZoomFactor();
-  return {static_cast<float>((view->width() - 50) / zoomFactor), static_cast<float>((view->height() - 100) / zoomFactor)};
+  return {((view->width() - 50) / zoomFactor), ((view->height() - 100) / zoomFactor)};
 }
 
 GroupType QtGraphView::getGrouping() const {
