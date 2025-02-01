@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Configure apt to not install suggested or recommended packages
 RUN echo 'APT::Install-Suggests "0";' >> /etc/apt/apt.conf.d/00-docker && \
@@ -22,7 +22,7 @@ RUN apt-get update &&                                                    \
     git                                                                  \
     git-lfs                                                              \
     ninja-build                                                          \
-    python3-pip                                                          \
+    python3-venv                                                          \
     qtbase5-dev                                                          \
     libqt5svg5-dev                                                       \
     graphviz                                                             \
@@ -60,8 +60,9 @@ ENV PATH="/opt/llvm-15.0.7/bin:$PATH"
 ENV LD_LIBRARY_PATH="/opt/llvm-15.0.7/lib:$LD_LIBRARY_PATH"
 ENV CMAKE_PREFIX_PATH="/opt/llvm-15.0.7:$CMAKE_PREFIX_PATH"
 
-# Install Python packages in one step
-RUN pip3 install --no-cache-dir conan==2.5.0 cmakelint gcovr
+# Install Python packages
+RUN python3 -m venv ~/env && \
+    ~/env/bin/pip install conan==2.5.0 cmakelint gcovr
 
 # Add a non-root user in one step
 RUN useradd -ms /bin/bash sourcetrail
