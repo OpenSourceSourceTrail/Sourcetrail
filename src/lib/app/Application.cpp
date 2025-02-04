@@ -285,16 +285,16 @@ void Application::handleMessage(MessageLoadProject* message) {
       }
 
       updateTitle();
-    } catch(std::exception& e) {
-      auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with exception: {}",
-                                      projectSettingsFilePath.wstr(),
-                                      utility::decodeFromUtf8(e.what()));
-      LOG_ERROR_W(errorMessage);
-      MessageStatus(errorMessage, true).dispatch();
     } catch(CppSQLite3Exception& e) {
       auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with sqlite exception: {}",
                                       projectSettingsFilePath.wstr(),
                                       utility::decodeFromUtf8(e.errorMessage()));
+      LOG_ERROR_W(errorMessage);
+      MessageStatus(errorMessage, true).dispatch();
+    } catch(std::exception& e) {
+      auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with exception: {}",
+                                      projectSettingsFilePath.wstr(),
+                                      utility::decodeFromUtf8(e.what()));
       LOG_ERROR_W(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
     } catch(...) {

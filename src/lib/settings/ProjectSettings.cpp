@@ -284,8 +284,8 @@ SettingsMigrator ProjectSettings::getMigrations() const {
         std::make_shared<SettingsMigrationMoveKey>(key + "/exclude_paths/exclude_path", key + "/exclude_filters/exclude_filter"));
   }
 
-  for(const auto& sourceGroupSettings : getAllSourceGroupSettings()) {
 #if BUILD_CXX_LANGUAGE_PACKAGE
+  for(const auto& sourceGroupSettings : getAllSourceGroupSettings()) {
     if(sourceGroupSettings->getType() == SOURCE_GROUP_CXX_CDB) {
       const std::string key = SourceGroupSettings::s_keyPrefix + sourceGroupSettings->getId();
       constexpr auto TargetVersion = 6;
@@ -293,8 +293,8 @@ SettingsMigrator ProjectSettings::getMigrations() const {
                             std::make_shared<SettingsMigrationMoveKey>(
                                 key + "/source_paths/source_path", key + "/indexed_header_paths/indexed_header_path"));
     }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   }
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   for(const auto& sourceGroupSettings : getAllSourceGroupSettings()) {
     std::string languageName;

@@ -180,7 +180,7 @@ bool remove(const FilePath& path) {
   if(ec) {
     LOG_ERROR(ec.message());
   }
-  path.recheckExists();
+  std::ignore = path.recheckExists();
   return ret;
 }
 
@@ -206,7 +206,7 @@ bool copyFile(const FilePath& from, const FilePath& to) {
 
 void createDirectory(const FilePath& path) {
   fs::create_directories(path.str());
-  path.recheckExists();
+  std::ignore = path.recheckExists();
 }
 
 std::vector<FilePath> getDirectSubDirectories(const FilePath& path) {
