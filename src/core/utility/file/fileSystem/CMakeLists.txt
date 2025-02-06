@@ -11,5 +11,4 @@ add_sourcetrail_library(
   Sourcetrail::core::utility::TimeStamp
   PRIVATE_DEPS
   Boost::system
-  Sourcetrail::core::utility::utilityString
-  Sourcetrail_core_utility_logging)
+  Sourcetrail::core::utility::utilityString)

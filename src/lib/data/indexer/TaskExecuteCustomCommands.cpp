@@ -98,7 +98,7 @@ Task::TaskState TaskExecuteCustomCommands::doUpdate(std::shared_ptr<Blackboard> 
         sourceStorage.buildCaches();
         targetStorage.inject(&sourceStorage);
       }
-      filesystem::remove(sourceDatabaseFilePath);
+      FileSystem::remove(sourceDatabaseFilePath);
     }
   }
 
@@ -155,7 +155,7 @@ void TaskExecuteCustomCommands::executeParallelIndexerCommands(int threadId, std
           LOG_WARNING_W(L"Temporary storage \"" + databaseFilePath.wstr() +
                         L"\" already exists on file system. File will be removed to avoid "
                         L"conflicts.");
-          filesystem::remove(databaseFilePath);
+          FileSystem::remove(databaseFilePath);
         }
         storage = std::make_shared<PersistentStorage>(databaseFilePath, FilePath());
         storage->setup();

@@ -2,38 +2,28 @@
 // boost
 #include <boost/date_time.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
-
+#include <boost/filesystem.hpp>
 // internal
-#include <regex>
-
-#include "logging.h"
 #include "utilityString.h"
 
-namespace fs = std::filesystem;
-
-namespace filesystem {
-static bool doesSelfReferencingSymlinksExist(const fs::path& symlinkPath, const fs::path& resolvedSymlinkPath) {
-  return resolvedSymlinkPath.filename() == resolvedSymlinkPath.string() && resolvedSymlinkPath.filename() == symlinkPath.filename();
-}
-
-std::vector<FilePath> getFilePathsFromDirectory(const FilePath& path, const std::vector<std::wstring>& extensions) {
+std::vector<FilePath> FileSystem::getFilePathsFromDirectory(const FilePath& path, const std::vector<std::wstring>& extensions) {
   std::set<std::wstring> ext(extensions.begin(), extensions.end());
   std::vector<FilePath> files;
 
   if(path.isDirectory()) {
-    fs::recursive_directory_iterator it(path.getPath());
-    fs::recursive_directory_iterator endit;
+    boost::filesystem::recursive_directory_iterator it(path.getPath());
+    boost::filesystem::recursive_directory_iterator endit;
     while(it != endit) {
-      if(fs::is_symlink(*it)) {
+      if(boost::filesystem::is_symlink(*it)) {
         // check for self-referencing symlinks
-        fs::path p = fs::read_symlink(*it);
-        if(doesSelfReferencingSymlinksExist(*it, p)) {
+        boost::filesystem::path p = boost::filesystem::read_symlink(*it);
+        if(p.filename() == p.string() && p.filename() == it->path().filename()) {
           ++it;
           continue;
         }
       }
 
-      if(fs::is_regular_file(*it) && (ext.empty() || ext.find(it->path().extension().wstring()) != ext.end())) {
+      if(boost::filesystem::is_regular_file(*it) && (ext.empty() || ext.find(it->path().extension().wstring()) != ext.end())) {
         files.push_back(FilePath(it->path().generic_wstring()));
       }
       ++it;
@@ -42,50 +32,50 @@ std::vector<FilePath> getFilePathsFromDirectory(const FilePath& path, const std:
   return files;
 }
 
-FileInfo getFileInfoForPath(const FilePath& filePath) {
+FileInfo FileSystem::getFileInfoForPath(const FilePath& filePath) {
   if(filePath.exists()) {
     return FileInfo(filePath, getLastWriteTime(filePath));
   }
   return FileInfo();
 }
 
-std::vector<FileInfo> getFileInfosFromPaths(const std::vector<FilePath>& paths,
-                                            const std::vector<std::wstring>& fileExtensions,
-                                            bool followSymLinks) {
+std::vector<FileInfo> FileSystem::getFileInfosFromPaths(const std::vector<FilePath>& paths,
+                                                        const std::vector<std::wstring>& fileExtensions,
+                                                        bool followSymLinks) {
   std::set<std::wstring> ext;
   for(const std::wstring& e : fileExtensions) {
     ext.insert(utility::toLowerCase(e));
   }
 
-  std::set<fs::path> symlinkDirs;
+  std::set<boost::filesystem::path> symlinkDirs;
   std::set<FilePath> filePaths;
 
   std::vector<FileInfo> files;
 
   for(const FilePath& path : paths) {
     if(path.isDirectory()) {
-      fs::recursive_directory_iterator it(path.getPath(), fs::directory_options::follow_directory_symlink);
-      fs::recursive_directory_iterator endit;
-
-      for(; it != endit; ++it) {
-        if(fs::is_symlink(*it)) {
+      boost::filesystem::recursive_directory_iterator it(path.getPath(), boost::filesystem::symlink_option::recurse);
+      boost::filesystem::recursive_directory_iterator endit;
+      boost::system::error_code ec;
+      for(; it != endit; it.increment(ec)) {
+        if(boost::filesystem::is_symlink(*it)) {
           if(!followSymLinks) {
-            it.disable_recursion_pending();
+            it.no_push();
             continue;
           }
 
           // check for self-referencing symlinks
-          fs::path p = fs::read_symlink(*it);
-          if(doesSelfReferencingSymlinksExist(*it, p)) {
+          boost::filesystem::path p = boost::filesystem::read_symlink(*it);
+          if(p.filename() == p.string() && p.filename() == it->path().filename()) {
             continue;
           }
 
           // check for duplicates when following directory symlinks
-          if(fs::is_directory(*it)) {
-            fs::path absDir = std::filesystem::canonical(it->path().parent_path() / p);
+          if(boost::filesystem::is_directory(*it)) {
+            boost::filesystem::path absDir = boost::filesystem::canonical(p, it->path().parent_path());
 
             if(symlinkDirs.find(absDir) != symlinkDirs.end()) {
-              it.disable_recursion_pending();
+              it.no_push();
               continue;
             }
 
@@ -93,7 +83,7 @@ std::vector<FileInfo> getFileInfosFromPaths(const std::vector<FilePath>& paths,
           }
         }
 
-        if(fs::is_regular_file(*it) &&
+        if(boost::filesystem::is_regular_file(*it) &&
            (ext.empty() || ext.find(utility::toLowerCase(it->path().extension().wstring())) != ext.end())) {
           const FilePath canonicalPath = FilePath(it->path().wstring()).getCanonical();
           if(filePaths.find(canonicalPath) != filePaths.end()) {
@@ -116,31 +106,32 @@ std::vector<FileInfo> getFileInfosFromPaths(const std::vector<FilePath>& paths,
   return files;
 }
 
-std::set<FilePath> getSymLinkedDirectories(const FilePath& path) {
+std::set<FilePath> FileSystem::getSymLinkedDirectories(const FilePath& path) {
   return getSymLinkedDirectories(std::vector<FilePath>{path});
 }
 
-std::set<FilePath> getSymLinkedDirectories(const std::vector<FilePath>& paths) {
-  std::set<fs::path> symlinkDirs;
+std::set<FilePath> FileSystem::getSymLinkedDirectories(const std::vector<FilePath>& paths) {
+  std::set<boost::filesystem::path> symlinkDirs;
 
   for(const FilePath& path : paths) {
     if(path.isDirectory()) {
-      fs::recursive_directory_iterator it(path.getPath(), fs::directory_options::follow_directory_symlink);
-      fs::recursive_directory_iterator endit;
-      for(; it != endit; ++it) {
-        if(fs::is_symlink(*it)) {
+      boost::filesystem::recursive_directory_iterator it(path.getPath(), boost::filesystem::symlink_option::recurse);
+      boost::filesystem::recursive_directory_iterator endit;
+      boost::system::error_code ec;
+      for(; it != endit; it.increment(ec)) {
+        if(boost::filesystem::is_symlink(*it)) {
           // check for self-referencing symlinks
-          fs::path p = fs::read_symlink(*it);
-          if(doesSelfReferencingSymlinksExist(*it, p)) {
+          boost::filesystem::path p = boost::filesystem::read_symlink(*it);
+          if(p.filename() == p.string() && p.filename() == it->path().filename()) {
             continue;
           }
 
           // check for duplicates when following directory symlinks
-          if(fs::is_directory(*it)) {
-            fs::path absDir = std::filesystem::canonical(it->path().parent_path() / p);
+          if(boost::filesystem::is_directory(*it)) {
+            boost::filesystem::path absDir = boost::filesystem::canonical(p, it->path().parent_path());
 
             if(symlinkDirs.find(absDir) != symlinkDirs.end()) {
-              it.disable_recursion_pending();
+              it.no_push();
               continue;
             }
 
@@ -158,63 +149,68 @@ std::set<FilePath> getSymLinkedDirectories(const std::vector<FilePath>& paths) {
   return files;
 }
 
-unsigned long long getFileByteSize(const FilePath& filePath) {
-  return fs::file_size(filePath.getPath());
+unsigned long long FileSystem::getFileByteSize(const FilePath& filePath) {
+  return boost::filesystem::file_size(filePath.getPath());
 }
 
-TimeStamp getLastWriteTime(const FilePath& filePath) {
+TimeStamp FileSystem::getLastWriteTime(const FilePath& filePath) {
+  boost::posix_time::ptime lastWriteTime;
   if(filePath.exists()) {
-    std::filesystem::file_time_type ft = std::filesystem::last_write_time(filePath.getPath());
-    std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(
-        ft - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()));
-    auto lastWriteTime = boost::posix_time::from_time_t(t);
+    std::time_t t = boost::filesystem::last_write_time(filePath.getPath());
+    lastWriteTime = boost::posix_time::from_time_t(t);
     lastWriteTime = boost::date_time::c_local_adjustor<boost::posix_time::ptime>::utc_to_local(lastWriteTime);
-    return TimeStamp(lastWriteTime);
   }
-  return TimeStamp();
+  return TimeStamp(lastWriteTime);
 }
 
-bool remove(const FilePath& path) {
-  std::error_code ec;
-  const bool ret = fs::remove(path.getPath(), ec);
-  if(ec) {
-    LOG_ERROR(ec.message());
-  }
+bool FileSystem::remove(const FilePath& path) {
+  boost::system::error_code ec;
+  const bool ret = boost::filesystem::remove(path.getPath(), ec);
   path.recheckExists();
   return ret;
 }
 
-bool rename(const FilePath& from, const FilePath& to) {
+bool FileSystem::rename(const FilePath& from, const FilePath& to) {
   if(!from.recheckExists() || to.recheckExists()) {
     return false;
   }
 
-  fs::rename(from.getPath(), to.getPath());
-
-  return to.recheckExists();
+  boost::filesystem::rename(from.getPath(), to.getPath());
+  to.recheckExists();
+  return true;
 }
 
-bool copyFile(const FilePath& from, const FilePath& to) {
+bool FileSystem::copyFile(const FilePath& from, const FilePath& to) {
   if(!from.recheckExists() || to.recheckExists()) {
     return false;
   }
 
-  fs::copy_file(from.getPath(), to.getPath());
-
-  return to.recheckExists();
+  boost::filesystem::copy_file(from.getPath(), to.getPath());
+  to.recheckExists();
+  return true;
 }
 
-void createDirectory(const FilePath& path) {
-  fs::create_directories(path.str());
+bool FileSystem::copy_directory(const FilePath& from, const FilePath& to) {
+  if(!from.recheckExists() || to.recheckExists()) {
+    return false;
+  }
+
+  boost::filesystem::copy_directory(from.getPath(), to.getPath());
+  to.recheckExists();
+  return true;
+}
+
+void FileSystem::createDirectory(const FilePath& path) {
+  boost::filesystem::create_directories(path.str());
   path.recheckExists();
 }
 
-std::vector<FilePath> getDirectSubDirectories(const FilePath& path) {
+std::vector<FilePath> FileSystem::getDirectSubDirectories(const FilePath& path) {
   std::vector<FilePath> v;
 
   if(path.exists() && path.isDirectory()) {
-    for(fs::directory_iterator end, dir(path.str()); dir != end; dir++) {
-      if(fs::is_directory(dir->path())) {
+    for(boost::filesystem::directory_iterator end, dir(path.str()); dir != end; dir++) {
+      if(boost::filesystem::is_directory(dir->path())) {
         v.push_back(FilePath(dir->path().wstring()));
       }
     }
@@ -223,31 +219,16 @@ std::vector<FilePath> getDirectSubDirectories(const FilePath& path) {
   return v;
 }
 
-inline bool isPortablePosixName(const std::string& name) {
-  if(name.empty()) {
-    return false;
+std::vector<FilePath> FileSystem::getRecursiveSubDirectories(const FilePath& path) {
+  std::vector<FilePath> v;
+
+  if(path.exists() && path.isDirectory()) {
+    for(boost::filesystem::recursive_directory_iterator end, dir(path.str()); dir != end; dir++) {
+      if(boost::filesystem::is_directory(dir->path())) {
+        v.push_back(FilePath(dir->path().wstring()));
+      }
+    }
   }
 
-  const std::regex posixNameRegex("^[a-zA-Z0-9._-]+$");
-  return std::regex_match(name, posixNameRegex);
+  return v;
 }
-
-inline bool isWindowsName(const std::string& name) {
-  if(name.empty()) {
-    return false;
-  }
-  const std::regex windowsNameRegex("^[\\x00-\\x1F<>:\"/\\\\|]+$");
-  return !std::regex_match(name, windowsNameRegex) && (name == "." || name == ".." || (name.back() != ' ' && name.back() != '.'));
-}
-
-bool isPortableName(const std::string& name) {
-  if(name.size() > 1 && (*name.begin() == '.' || *name.begin() == '-')) {
-    return false;
-  }
-  return isPortablePosixName(name) && isWindowsName(name);
-}
-
-bool isPortableFileName(const std::string& fileName) {
-  return isPortableName(fileName) && std::regex_match(fileName, std::regex(".*\\.[^\\.]{1,3}$"));
-}
-}    // namespace filesystem

@@ -5,7 +5,7 @@
 FileTree::FileTree(const FilePath& rootPath) : m_rootPath(rootPath.getAbsolute().makeCanonical()) {
   if(m_rootPath.exists()) {
     if(m_rootPath.isDirectory()) {
-      for(const FilePath& filePath : filesystem::getFilePathsFromDirectory(m_rootPath)) {
+      for(const FilePath& filePath : FileSystem::getFilePathsFromDirectory(m_rootPath)) {
         m_files[filePath.fileName()].insert(filePath);
       }
     } else {
@@ -39,7 +39,7 @@ std::vector<FilePath> FileTree::doGetAbsoluteRootPathsForRelativeFilePath(const 
         FilePath temp = relativeFilePath.getParentDirectory();
         while(!temp.empty()) {
           if(temp.fileName() == L"..") {
-            std::vector<FilePath> subDirectories = filesystem::getDirectSubDirectories(existingFilePath);
+            std::vector<FilePath> subDirectories = FileSystem::getDirectSubDirectories(existingFilePath);
             if(!subDirectories.empty()) {
               existingFilePath = subDirectories.front();
             } else {

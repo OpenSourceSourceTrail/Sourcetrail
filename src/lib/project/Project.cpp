@@ -146,13 +146,13 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
           }
         } else {
           LOG_INFO("Discarding temporary indexing data on user's decision");
-          filesystem::remove(tempDbPath);
+          FileSystem::remove(tempDbPath);
         }
       } else {
         LOG_INFO(
             "Switching to temporary indexing data because no other persistent data was "
             "found");
-        filesystem::rename(tempDbPath, dbPath);
+        FileSystem::rename(tempDbPath, dbPath);
       }
     }
   }
@@ -422,7 +422,7 @@ void Project::buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogVie
 
   // store the indexed data into the temp db but keep the current state to allow browsing while indexing
   if(RefreshMode::AllFiles != info.mode) {
-    std::ignore = filesystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
+    std::ignore = FileSystem::copyFile(indexDbFilePath, tempIndexDbFilePath);
   }
 
   // Create new temp storage
@@ -472,8 +472,8 @@ bool Project::swapToTempStorageFile(const FilePath& indexDbFilePath,
                                     const FilePath& tempIndexDbFilePath,
                                     std::shared_ptr<DialogView> dialogView) {
   try {
-    filesystem::remove(indexDbFilePath);
-    filesystem::rename(tempIndexDbFilePath, indexDbFilePath);
+    FileSystem::remove(indexDbFilePath);
+    FileSystem::rename(tempIndexDbFilePath, indexDbFilePath);
   } catch(std::exception& /*e*/) {
     if(m_hasGUI) {
       dialogView->confirm(
@@ -492,7 +492,7 @@ void Project::discardTempStorage() {
   const FilePath tempIndexDbPath = m_settings->getTempDBFilePath();
   if(tempIndexDbPath.exists()) {
     LOG_INFO("Discarding temporary indexing data");
-    filesystem::remove(tempIndexDbPath);
+    FileSystem::remove(tempIndexDbPath);
   }
 }
 

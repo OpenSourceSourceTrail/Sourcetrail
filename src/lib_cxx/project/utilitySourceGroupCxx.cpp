@@ -53,7 +53,7 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
     CxxParser::initializeLLVM();
 
     if(!pchOutputFilePath.getParentDirectory().exists()) {
-      filesystem::createDirectory(pchOutputFilePath.getParentDirectory());
+      FileSystem::createDirectory(pchOutputFilePath.getParentDirectory());
     }
 
     std::shared_ptr<IntermediateStorage> storage = std::make_shared<IntermediateStorage>();

@@ -61,7 +61,7 @@ void IDECommunicationController::handleSetActiveTokenMessage(const NetworkProtoc
     const FileInfo fileInfo = m_storageAccess->getFileInfoForFileId(fileId);
     const FilePath filePath = fileInfo.path;
 
-    if(filesystem::getFileInfoForPath(filePath).lastWriteTime == fileInfo.lastWriteTime) {
+    if(FileSystem::getFileInfoForPath(filePath).lastWriteTime == fileInfo.lastWriteTime) {
       // file was not modified
       std::shared_ptr<SourceLocationFile> sourceLocationFile = m_storageAccess->getSourceLocationsForLinesInFile(
           filePath, message.row, message.row);

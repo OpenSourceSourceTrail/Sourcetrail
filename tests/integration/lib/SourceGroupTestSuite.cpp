@@ -43,15 +43,11 @@ namespace {
 const bool updateExpectedOutput = false;
 
 static FilePath getInputDirectoryPath(const std::wstring& projectName) {
-  return FilePath(L"data/SourceGroupTestSuite/").getConcatenated(projectName).getConcatenated(L"/input").makeAbsolute().makeCanonical();
+  return FilePath(L"data/SourceGroupTestSuite/" + projectName + L"/input").makeAbsolute().makeCanonical();
 }
 
 static FilePath getOutputDirectoryPath(const std::wstring& projectName) {
-  return FilePath(L"data/SourceGroupTestSuite/")
-      .getConcatenated(projectName)
-      .getConcatenated(L"/expected_output")
-      .makeAbsolute()
-      .makeCanonical();
+  return FilePath(L"data/SourceGroupTestSuite/" + projectName + L"/expected_output").makeAbsolute().makeCanonical();
 }
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
@@ -261,12 +257,7 @@ TEST_F(SourceGroupFix, sourceGroupCxxCdbGeneratesExpectedOutput) {
   std::shared_ptr<SourceGroupSettingsCxxCdb> sourceGroupSettings = std::make_shared<SourceGroupSettingsCxxCdb>(
       "fake_id", &projectSettings);
   sourceGroupSettings->setIndexedHeaderPaths({FilePath(L"test/indexed/header/path")});
-  sourceGroupSettings->setCompilationDatabasePath(FilePath(L"data/SourceGroupTestSuite/")
-                                                      .getConcatenated(projectName)
-                                                      .getConcatenated(L"input/")
-                                                      .makeAbsolute()
-                                                      .makeCanonical()
-                                                      .concatenate(L"compile_commands.json"));
+  sourceGroupSettings->setCompilationDatabasePath(getInputDirectoryPath(projectName).concatenate(L"compile_commands.json"));
   sourceGroupSettings->setExcludeFilterStrings({L"**/excluded/**"});
   sourceGroupSettings->setHeaderSearchPaths({getInputDirectoryPath(projectName).concatenate(L"header_search/local")});
   sourceGroupSettings->setFrameworkSearchPaths({getInputDirectoryPath(projectName).concatenate(L"framework_search/local")});

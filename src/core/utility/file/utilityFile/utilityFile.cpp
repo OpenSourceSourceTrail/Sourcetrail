@@ -10,7 +10,7 @@ std::vector<FilePath> utility::partitionFilePathsBySize(std::vector<FilePath> fi
   std::vector<PairType> sourceFileSizesToCommands;
   for(const FilePath& path : filePaths) {
     if(path.exists()) {
-      sourceFileSizesToCommands.push_back(std::make_pair(filesystem::getFileByteSize(path), path));
+      sourceFileSizesToCommands.push_back(std::make_pair(FileSystem::getFileByteSize(path), path));
     } else {
       sourceFileSizesToCommands.push_back(std::make_pair(1, path));
     }

@@ -141,7 +141,7 @@ bool SqliteIndexStorage::addFile(const StorageFile& data) {
 
   std::string modificationTime(data.modificationTime);
   if(modificationTime.empty()) {
-    modificationTime = filesystem::getFileInfoForPath(filePath).lastWriteTime.toString();
+    modificationTime = FileSystem::getFileInfoForPath(filePath).lastWriteTime.toString();
   }
 
   std::shared_ptr<TextAccess> content;

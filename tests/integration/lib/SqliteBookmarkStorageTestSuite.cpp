@@ -10,7 +10,7 @@ TEST(SqliteBookmarkStorage, addBookmarks) {
   const size_t bookmarkCount = 4;
   int result = -1;
   {
-    filesystem::remove(databasePath);
+    FileSystem::remove(databasePath);
     SqliteBookmarkStorage storage(databasePath);
     storage.setup();
 
@@ -22,7 +22,7 @@ TEST(SqliteBookmarkStorage, addBookmarks) {
     result = static_cast<int>(storage.getAllBookmarks().size());
   }
 
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_EQ(result, bookmarkCount);
 }
@@ -32,7 +32,7 @@ TEST(SqliteBookmarkStorage, addBookmarkedNode) {
   const size_t bookmarkCount = 4;
   int result = -1;
   {
-    filesystem::remove(databasePath);
+    FileSystem::remove(databasePath);
     SqliteBookmarkStorage storage(databasePath);
     storage.setup();
 
@@ -47,7 +47,7 @@ TEST(SqliteBookmarkStorage, addBookmarkedNode) {
     result = static_cast<int>(storage.getAllBookmarkedNodes().size());
   }
 
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_EQ(result, bookmarkCount);
 }
@@ -56,7 +56,7 @@ TEST(SqliteBookmarkStorage, removeBookmarkAlsoRemovesBookmarkedNode) {
   FilePath databasePath(L"data/SQLiteTestSuite/bookmarkTest.sqlite");
   int result = -1;
   {
-    filesystem::remove(databasePath);
+    FileSystem::remove(databasePath);
     SqliteBookmarkStorage storage(databasePath);
     storage.setup();
 
@@ -70,7 +70,7 @@ TEST(SqliteBookmarkStorage, removeBookmarkAlsoRemovesBookmarkedNode) {
     result = static_cast<int>(storage.getAllBookmarkedNodes().size());
   }
 
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_EQ(0, result);
   ;
@@ -84,7 +84,7 @@ TEST(SqliteBookmarkStorage, editNodeBookmark) {
 
   StorageBookmark storageBookmark;
   {
-    filesystem::remove(databasePath);
+    FileSystem::remove(databasePath);
     SqliteBookmarkStorage storage(databasePath);
     storage.setup();
 
@@ -98,7 +98,7 @@ TEST(SqliteBookmarkStorage, editNodeBookmark) {
     storageBookmark = storage.getAllBookmarks().front();
   }
 
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_EQ(updatedName, storageBookmark.name);
   EXPECT_EQ(updatedComment, storageBookmark.comment);

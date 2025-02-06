@@ -18,7 +18,7 @@ SqliteStorage::SqliteStorage() {
 
 SqliteStorage::SqliteStorage(const FilePath& dbFilePath) : m_dbFilePath(dbFilePath.getCanonical()) {
   if(!m_dbFilePath.getParentDirectory().empty() && !m_dbFilePath.getParentDirectory().exists()) {
-    filesystem::createDirectory(m_dbFilePath.getParentDirectory());
+    FileSystem::createDirectory(m_dbFilePath.getParentDirectory());
   }
 
   try {

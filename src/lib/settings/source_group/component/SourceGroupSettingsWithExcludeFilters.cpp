@@ -46,7 +46,7 @@ std::vector<FilePathFilter> SourceGroupSettingsWithExcludeFilters::getFiltersExp
         if(std::regex_search(filterString, match, std::wregex(L"[\\\\/]")) && !match.empty() &&
            match.position(0) < int(wildcardPos)) {
           const FilePath p = utility::getExpandedAndAbsolutePath(FilePath(match.prefix().str()), projectDirectoryPath);
-          std::set<FilePath> symLinkPaths = filesystem::getSymLinkedDirectories(p);
+          std::set<FilePath> symLinkPaths = FileSystem::getSymLinkedDirectories(p);
           symLinkPaths.insert(p);
 
           utility::append(
@@ -60,7 +60,7 @@ std::vector<FilePathFilter> SourceGroupSettingsWithExcludeFilters::getFiltersExp
         const FilePath p = utility::getExpandedAndAbsolutePath(FilePath(filterString), projectDirectoryPath);
         const bool isFile = p.exists() && !p.isDirectory();
 
-        std::set<FilePath> symLinkPaths = filesystem::getSymLinkedDirectories(p);
+        std::set<FilePath> symLinkPaths = FileSystem::getSymLinkedDirectories(p);
         symLinkPaths.insert(p);
 
         utility::append(

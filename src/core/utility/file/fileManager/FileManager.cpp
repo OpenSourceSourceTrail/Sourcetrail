@@ -27,7 +27,7 @@ void FileManager::update(std::vector<FilePath> sourcePaths,
   };
   const auto transformFunc = [](const FileInfo& fileInfo) -> FilePath { return fileInfo.path; };
 
-  const auto files = filesystem::getFileInfosFromPaths(m_sourcePaths, m_sourceExtensions);
+  const auto files = FileSystem::getFileInfosFromPaths(m_sourcePaths, m_sourceExtensions);
   m_allSourceFilePaths = files | ranges::cpp20::views::filter(filterFunc) | ranges::cpp20::views::transform(transformFunc) |
       ranges::to<std::set>();
 }

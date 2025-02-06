@@ -22,7 +22,7 @@ TEST(SqliteIndexStorage, addsNodeSuccessfully) {
     storage.commitTransaction();
     nodeCount = storage.getNodeCount();
   }
-  std::ignore = filesystem::remove(databasePath);
+  std::ignore = FileSystem::remove(databasePath);
 
   EXPECT_TRUE(1 == nodeCount);
 }
@@ -39,7 +39,7 @@ TEST(SqliteIndexStorage, removesNodeSuccessfully) {
     storage.commitTransaction();
     nodeCount = storage.getNodeCount();
   }
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_TRUE(0 == nodeCount);
 }
@@ -57,7 +57,7 @@ TEST(SqliteIndexStorage, addsEdgeSuccessfully) {
     storage.commitTransaction();
     edgeCount = storage.getEdgeCount();
   }
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_TRUE(1 == edgeCount);
 }
@@ -76,7 +76,7 @@ TEST(SqliteIndexStorage, removesEdgeSuccessfully) {
     storage.commitTransaction();
     edgeCount = storage.getEdgeCount();
   }
-  filesystem::remove(databasePath);
+  FileSystem::remove(databasePath);
 
   EXPECT_TRUE(0 == edgeCount);
 }

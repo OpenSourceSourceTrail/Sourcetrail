@@ -42,7 +42,7 @@ void setWidgetRetainsSpaceWhenHidden(QWidget* widget) {
 void loadFontsFromDirectory(const FilePath& path, const std::wstring& extension) {
   std::vector<std::wstring> extensions;
   extensions.push_back(extension);
-  std::vector<FilePath> fontFilePaths = filesystem::getFilePathsFromDirectory(path, extensions);
+  std::vector<FilePath> fontFilePaths = FileSystem::getFilePathsFromDirectory(path, extensions);
 
   std::set<int> loadedFontIds;
 

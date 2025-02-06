@@ -4,6 +4,8 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QRegularExpression>
+// boost
+#include <boost/filesystem/path.hpp>
 // internal
 #include "FileSystem.h"
 #include "ProjectSettings.h"
@@ -65,7 +67,7 @@ bool QtProjectWizardContentProjectData::check() {
     return false;
   }
 
-  if(!filesystem::isPortableFileName(m_projectName->text().toStdString())) {
+  if(!boost::filesystem::portable_file_name(m_projectName->text().toStdString())) {
     QMessageBox msgBox(m_window);
     msgBox.setText(
         "The provided project name is not a valid file name. Please adjust the name "
@@ -113,7 +115,7 @@ bool QtProjectWizardContentProjectData::check() {
     int ret = msgBox.exec();
     if(ret == 1)    // QMessageBox::Yes
     {
-      filesystem::createDirectory(paths[0]);
+      FileSystem::createDirectory(paths[0]);
     } else {
       return false;
     }

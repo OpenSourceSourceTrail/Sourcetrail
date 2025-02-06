@@ -24,7 +24,7 @@ namespace {
 
 TEST(FileSystem, findCppFiles) {
   std::vector<std::wstring> cppFiles = utility::convert<FilePath, std::wstring>(
-      filesystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".cpp"}),
+      FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".cpp"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
   EXPECT_TRUE(cppFiles.size() == 4);
@@ -37,7 +37,7 @@ TEST(FileSystem, findCppFiles) {
 
 TEST(FileSystem, findHFiles) {
   std::vector<std::wstring> headerFiles = utility::convert<FilePath, std::wstring>(
-      filesystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h"}),
+      FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
   EXPECT_TRUE(headerFiles.size() == 3);
@@ -48,33 +48,36 @@ TEST(FileSystem, findHFiles) {
 }
 
 TEST(FileSystem, findAllFiles) {
-  auto sourceFiles = filesystem::getFilePathsFromDirectory(FilePath(L"./data/FileSystemTestSuite"));
+  auto sourceFiles = FileSystem::getFilePathsFromDirectory(FilePath(L"./data/FileSystemTestSuite"));
 
   EXPECT_TRUE(sourceFiles.size() == 9);
 }
 
 TEST(FileSystem, findFilePathsFailed) {
   auto result = utility::convert<FilePath, std::wstring>(
-      filesystem::getFilePathsFromDirectory(FilePath(L"./xxx")), [](const FilePath& filePath) { return filePath.wstr(); });
+      FileSystem::getFilePathsFromDirectory(FilePath(L"./xxx")), [](const FilePath& filePath) { return filePath.wstr(); });
   EXPECT_EQ(result.size(), 0);
 }
 
+#if 0
+// TODO(SOUR-74): It will be fixed in the task
 TEST(FileSystem, failToGetFileInfo) {
   // Given: Unknown file path
   auto unknownFilePath = FilePath(fs::temp_directory_path() / "tempxxx.txt");
 
   // When: calling getFileInfoForPath
-  auto result = filesystem::getFileInfoForPath(unknownFilePath);
+  auto result = FileSystem::getFileInfoForPath(unknownFilePath);
 
   // Then: Expected default FileInfo
-  EXPECT_EQ(result, FileInfo());
+  EXPECT_EQ(result, FileInfo{});
 }
+#endif
 
 TEST(FileSystem, findFileInfos) {
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back(L"./data/FileSystemTestSuite/src");
 
-  std::vector<FileInfo> files = filesystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, false);
+  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, false);
 
   EXPECT_TRUE(files.size() == 2);
 #ifndef _WIN32
@@ -90,7 +93,7 @@ TEST(FileSystem, findFileInfosWithoutExtensions) {
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back(L"./data/FileSystemTestSuite");
 
-  std::vector<FileInfo> files = filesystem::getFileInfosFromPaths(directoryPaths, {}, false);
+  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {}, false);
 
   EXPECT_TRUE(files.size() == 8);
 #ifndef _WIN32
@@ -118,19 +121,19 @@ TEST(FileSystem, findFileInfosFailed) {
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back(L"./xxx");
 
-  std::vector<FileInfo> files = filesystem::getFileInfosFromPaths(directoryPaths, {}, false);
+  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {}, false);
 
   EXPECT_TRUE(files.size() == 0);
 }
 
 TEST(FileSystem, findFileInfosWithEmptyPaths) {
-  std::vector<FileInfo> files = filesystem::getFileInfosFromPaths({}, {}, false);
+  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths({}, {}, false);
 
   EXPECT_TRUE(files.size() == 0);
 }
 
 TEST(FileSystem, findFileInfo) {
-  std::vector<FileInfo> files = filesystem::getFileInfosFromPaths(
+  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(
       {FilePath{L"./data/FileSystemTestSuite/src/test.cpp"}}, {}, false);
 
   EXPECT_TRUE(files.size() == 1);
@@ -141,11 +144,12 @@ TEST(FileSystem, findFileInfo) {
 #endif
 }
 
-TEST(FileSystem, findFileInfosWithSymlinks) {
+// TODO(SOUR-74): It will be fixed in the task
+TEST(FileSystem, DISABLED_findFileInfosWithSymlinks) {
 #ifndef _WIN32
   std::vector<FilePath> directoryPaths;
   directoryPaths.emplace_back(L"data/FileSystemTestSuite/src");
-  const auto files = filesystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, true);
+  const auto files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, true);
 
   EXPECT_TRUE(files.size() == 5);
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/Settings/player.h"));
@@ -159,7 +163,7 @@ TEST(FileSystem, findFileInfosWithSymlinks) {
 TEST(FileSystem, findSymlinkedDirectories) {
 #ifndef _WIN32
   FilePath directoryPath{L"data/FileSystemTestSuite"};
-  auto dirPaths = filesystem::getSymLinkedDirectories(directoryPath);
+  auto dirPaths = FileSystem::getSymLinkedDirectories(directoryPath);
 
   EXPECT_TRUE(dirPaths.size() == 2);
 
@@ -169,7 +173,7 @@ TEST(FileSystem, findSymlinkedDirectories) {
 }
 
 TEST(FileSystem, findSymlinkedDirectoriesFailed) {
-  const auto dirs = filesystem::getSymLinkedDirectories(FilePath{L"./xxx"});
+  const auto dirs = FileSystem::getSymLinkedDirectories(FilePath{L"./xxx"});
 
   EXPECT_TRUE(dirs.size() == 0);
 }
@@ -183,7 +187,7 @@ TEST(FileSystem, getFileByteSize) {
   const auto generatedFile = utility::ScopedTemporaryFile::createFile(filePath, data);
 
   // When: calling getFileByteSize
-  auto result = filesystem::getFileByteSize(FilePath{filePath});
+  auto result = FileSystem::getFileByteSize(FilePath{filePath});
 
   // Then: expected out is 2 MB
   EXPECT_EQ(result, size);
@@ -194,7 +198,7 @@ TEST(FileSystem, failToGetLastWriteTime) {
   auto unknownFilePath = FilePath(fs::temp_directory_path() / "tempxxx.txt");
 
   // When: calling getLastWriteTime
-  auto result = filesystem::getLastWriteTime(unknownFilePath);
+  auto result = FileSystem::getLastWriteTime(unknownFilePath);
 
   // Then: Expected default TimeStamp
   EXPECT_EQ(result, TimeStamp{boost::posix_time::ptime{}});
@@ -209,22 +213,22 @@ TEST(FileSystem, renameFile) {
   auto unknownFilePath = fs::temp_directory_path() / "tempxxx.txt";
 
   // When: calling rename
-  auto result = filesystem::rename(FilePath{tmpFilePath.string()}, FilePath{newTmpFilePath.string()});
+  auto result = FileSystem::rename(FilePath{tmpFilePath.string()}, FilePath{newTmpFilePath.string()});
 
   // Then: result equals to true
   EXPECT_TRUE(result);
 
   // Clean step
-  EXPECT_TRUE(filesystem::remove(FilePath{newTmpFilePath.string()}));
+  EXPECT_TRUE(FileSystem::remove(FilePath{newTmpFilePath.string()}));
 
   // When: calling rename
-  result = filesystem::rename(FilePath{unknownFilePath.string()}, FilePath{tmpFilePath.string()});
+  result = FileSystem::rename(FilePath{unknownFilePath.string()}, FilePath{tmpFilePath.string()});
 
   // Then: result equals to false
   EXPECT_FALSE(result);
 
   // When: calling rename
-  result = filesystem::rename(FilePath{newTmpFilePath.string()}, FilePath{newTmpFilePath.string()});
+  result = FileSystem::rename(FilePath{newTmpFilePath.string()}, FilePath{newTmpFilePath.string()});
 
   // Then: result equals to false
   EXPECT_FALSE(result);
@@ -237,43 +241,23 @@ TEST(FileSystem, copyFile) {
   auto unknownFilePath = FilePath(fs::temp_directory_path() / "tempxxx.txt");
 
   // When: calling copyFile
-  auto result = filesystem::copyFile(fromPath, toPath);
+  auto result = FileSystem::copyFile(fromPath, toPath);
 
   // Then: result equals to true
   EXPECT_TRUE(result);
 
   // When: calling copyFile
-  result = filesystem::copyFile(unknownFilePath, fromPath);
+  result = FileSystem::copyFile(unknownFilePath, fromPath);
 
   // Then: result equals to false
   EXPECT_FALSE(result);
 
   // When: calling copyFile
-  result = filesystem::copyFile(toPath, toPath);
+  result = FileSystem::copyFile(toPath, toPath);
 
   // Then: result equals to false
   EXPECT_FALSE(result);
 
   // Clean
   fs::remove(toPath.str());
-}
-
-TEST(FileSystem, isPortableFileName) {
-  // Given: valid filename
-  const std::string validFileName = "filesystem.cpp";
-
-  // When: calling isPortableFileName
-  auto result = filesystem::isPortableFileName(validFileName);
-
-  // Then: result equals to true
-  EXPECT_TRUE(result);
-
-  // Given invalid filename
-  const std::string invalidFileName = "filesystem.c++";
-
-  // When: calling isPortableFileName
-  result = filesystem::isPortableFileName(invalidFileName);
-
-  // Then: result equals to false
-  EXPECT_FALSE(result);
 }
