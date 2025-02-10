@@ -1,0 +1,87 @@
+name: Build AppImage
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+# on:
+#   workflow_dispatch:
+#   push:
+#     tags:
+#       - '[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+      - name: Get tags
+        run: git fetch --tags origin
+
+      - name: Install dependencies
+        run: sudo apt install -y gcc-12 g++-12 clang-15 ninja-build python3-pip
+
+      - name: Install Qt dependencies
+        run: |
+          sudo apt-get install -y \
+            qtbase5-dev \
+            qttools5-dev \
+            qttools5-dev-tools \
+            libqt5svg5-dev \
+            libqt5x11extras5-dev
+
+      - name: Install AppImage tools
+        run: |
+          sudo apt-get install -y \
+            libfuse2 \
+            desktop-file-utils \
+            librsvg2-dev
+          wget -O linuxdeploy-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -O linuxdeploy-plugin-qt-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x linuxdeploy*.AppImage
+
+      - name: Install conan
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install conan
+
+      - name: Cache Conan packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.conan2
+          key: conan-ubuntu-24.04-gnu-${{ hashFiles('**/conanfile.txt') }}
+
+      - name: Install conan dependencies
+        run: |
+          source venv/bin/activate
+          conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
+
+      - name: Configure CMake
+        run: cmake --preset="ci_gnu_release"
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build
+
+      - name: Install
+        working-directory: ${{github.workspace}}/build
+        run: DESTDIR=AppDir cmake --install .
+
+      - name: Create AppImage
+        run: |
+          linuxdeploy-x86_64.AppImage \
+            --appdir ${{github.workspace}}/build/AppDir \
+            --plugin qt \
+            --output appimage
+
+      - name: Upload AppImage
+        uses: actions/upload-artifact@v4
+        with:
+          name: AppImage
+          path: ${{github.workspace}}/*.AppImage
