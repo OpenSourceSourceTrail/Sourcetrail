@@ -26,6 +26,7 @@ RUN apt-get update &&                                                    \
     qtbase5-dev                                                          \
     libqt5svg5-dev                                                       \
     graphviz                                                             \
+    cppcheck                                                             \
     doxygen &&                                                           \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 10 && \
@@ -70,4 +71,4 @@ USER sourcetrail
 
 # Install Python packages
 RUN python3 -m venv ~/env && \
-    ~/env/bin/pip install conan==2.5.0 cmakelint gcovr
+    ~/env/bin/pip install --no-cache-dir conan==2.5.0 cmakelint==1.4.3 gcovr==5.0 pygments==2.11 pymdown-extensions==9.3
