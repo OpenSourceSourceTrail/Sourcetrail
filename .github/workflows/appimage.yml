@@ -71,15 +71,15 @@ jobs:
 
       - name: Install
         working-directory: ${{github.workspace}}/build
-        run: DESTDIR=AppDir cmake --install .
+        run: cmake --install .
 
       - name: Create AppImage
         working-directory: ${{github.workspace}}
         run: |
           ${{github.workspace}}/linuxdeploy-x86_64.AppImage \
-            --appdir ${{github.workspace}}/build/AppDir \
+            --appdir ${{github.workspace}}/build/install \
             --plugin qt \
-            --output ${{github.workspace}}/appimage
+            --output appimage
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4

@@ -74,7 +74,8 @@
                 "CMAKE_CXX_COMPILER": "g++-12",
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake"
+                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install"
             },
             "inherits": [
                 "all-tests",
