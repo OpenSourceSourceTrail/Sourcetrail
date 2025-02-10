@@ -42,9 +42,9 @@ jobs:
             libfuse2 \
             desktop-file-utils \
             librsvg2-dev
-          wget -O linuxdeploy-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-          wget -O linuxdeploy-plugin-qt-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-          chmod +x linuxdeploy*.AppImage
+          wget -O ${{github.workspace}}/linuxdeploy-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -O ${{github.workspace}}/linuxdeploy-plugin-qt-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          chmod +x ${{github.workspace}}/linuxdeploy*.AppImage
 
       - name: Install conan
         run: |
@@ -74,11 +74,12 @@ jobs:
         run: DESTDIR=AppDir cmake --install .
 
       - name: Create AppImage
+        working-directory: ${{github.workspace}}
         run: |
-          linuxdeploy-x86_64.AppImage \
+          ${{github.workspace}}/linuxdeploy-x86_64.AppImage \
             --appdir ${{github.workspace}}/build/AppDir \
             --plugin qt \
-            --output appimage
+            --output ${{github.workspace}}/appimage
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
