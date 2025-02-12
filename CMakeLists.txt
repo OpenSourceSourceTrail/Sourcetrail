@@ -414,29 +414,17 @@ create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user"
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
-install(
-  TARGETS Sourcetrail Sourcetrail_indexer
-  RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR}
-)
+install(TARGETS Sourcetrail Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
 
-install(
-  DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/
-  DESTINATION ${INSTALL_RUNTIME_DIR}/data/
-)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIME_DIR}/data/)
 
-install(
-  DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/user/
-  DESTINATION ${INSTALL_RUNTIME_DIR}/user/
-)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/user/ DESTINATION ${INSTALL_RUNTIME_DIR}/user/)
 
 # Install desktop file for application
-install(FILES "${CMAKE_SOURCE_DIR}/cmake/Sourcetrail.desktop"
-    DESTINATION "${APPIMAGE_ROOT}/share/applications"
-)
+install(FILES "${CMAKE_SOURCE_DIR}/cmake/Sourcetrail.desktop" DESTINATION "${APPIMAGE_ROOT}/share/applications")
 
 # Install application icon for desktop
 install(FILES "${CMAKE_SOURCE_DIR}/bin/app/data/gui/installer/Sourcetrail.png"
-    DESTINATION "${APPIMAGE_ROOT}/share/icons/hicolor/256x256/apps"
-)
+        DESTINATION "${APPIMAGE_ROOT}/share/icons/hicolor/256x256/apps")
 # Packaging ----------------------------------------------------------------------------------------------------------------------
 # TODO(SOUR-104)
