@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstddef>
 #include <filesystem>
 #include <iterator>
 #include <string>
@@ -22,11 +23,11 @@ namespace {
 }    // namespace
 
 TEST(FileSystem, findCppFiles) {
-  std::vector<std::wstring> cppFiles = utility::convert<FilePath, std::wstring>(
+  const std::vector<std::wstring> cppFiles = utility::convert<FilePath, std::wstring>(
       FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".cpp"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
-  EXPECT_TRUE(cppFiles.size() == 4);
+  ASSERT_EQ(4, cppFiles.size());
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(cppFiles, L"data/FileSystemTestSuite/main.cpp"));
   EXPECT_TRUE(utility::containsElement<std::wstring>(cppFiles, L"data/FileSystemTestSuite/Settings/sample.cpp"));
@@ -35,11 +36,11 @@ TEST(FileSystem, findCppFiles) {
 }
 
 TEST(FileSystem, findHFiles) {
-  std::vector<std::wstring> headerFiles = utility::convert<FilePath, std::wstring>(
+  const std::vector<std::wstring> headerFiles = utility::convert<FilePath, std::wstring>(
       FileSystem::getFilePathsFromDirectory(FilePath(L"data/FileSystemTestSuite"), {L".h"}),
       [](const FilePath& filePath) { return filePath.wstr(); });
 
-  EXPECT_TRUE(headerFiles.size() == 3);
+  ASSERT_EQ(3, headerFiles.size());
 
   EXPECT_TRUE(utility::containsElement<std::wstring>(headerFiles, L"data/FileSystemTestSuite/tictactoe.h"));
   EXPECT_TRUE(utility::containsElement<std::wstring>(headerFiles, L"data/FileSystemTestSuite/Settings/player.h"));
@@ -47,23 +48,23 @@ TEST(FileSystem, findHFiles) {
 }
 
 TEST(FileSystem, findAllFiles) {
-  auto sourceFiles = FileSystem::getFilePathsFromDirectory(FilePath(L"./data/FileSystemTestSuite"));
+  const auto sourceFiles = FileSystem::getFilePathsFromDirectory(FilePath(L"./data/FileSystemTestSuite"));
 
-  EXPECT_TRUE(sourceFiles.size() == 9);
+  EXPECT_EQ(9, sourceFiles.size());
 }
 
 TEST(FileSystem, findFilePathsFailed) {
-  auto result = utility::convert<FilePath, std::wstring>(
+  const auto result = utility::convert<FilePath, std::wstring>(
       FileSystem::getFilePathsFromDirectory(FilePath(L"./xxx")), [](const FilePath& filePath) { return filePath.wstr(); });
-  EXPECT_EQ(result.size(), 0);
+  EXPECT_TRUE(result.empty());
 }
 
 TEST(FileSystem, failToGetFileInfo) {
   // Given: Unknown file path
-  auto unknownFilePath = FilePath(fs::temp_directory_path() / "tempxxx.txt");
+  const auto unknownFilePath = FilePath(fs::temp_directory_path() / "tempxxx.txt");
 
   // When: calling getFileInfoForPath
-  auto result = FileSystem::getFileInfoForPath(unknownFilePath);
+  const auto result = FileSystem::getFileInfoForPath(unknownFilePath);
 
   // Then: Expected default FileInfo
   EXPECT_FALSE(result.lastWriteTime.isValid());
@@ -71,12 +72,11 @@ TEST(FileSystem, failToGetFileInfo) {
 }
 
 TEST(FileSystem, findFileInfos) {
-  std::vector<FilePath> directoryPaths;
-  directoryPaths.emplace_back(L"./data/FileSystemTestSuite/src");
+  const std::vector<FilePath> directoryPaths{FilePath{L"./data/FileSystemTestSuite/src"}};
 
-  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, false);
+  const std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, false);
 
-  EXPECT_TRUE(files.size() == 2);
+  ASSERT_EQ(2, files.size());
 #ifndef _WIN32
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.cpp"));
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.h"));
@@ -87,12 +87,11 @@ TEST(FileSystem, findFileInfos) {
 }
 
 TEST(FileSystem, findFileInfosWithoutExtensions) {
-  std::vector<FilePath> directoryPaths;
-  directoryPaths.emplace_back(L"./data/FileSystemTestSuite");
+  const std::vector<FilePath> directoryPaths{FilePath{L"./data/FileSystemTestSuite"}};
 
-  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {}, false);
+  const std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {}, false);
 
-  EXPECT_TRUE(files.size() == 8);
+  ASSERT_EQ(8, files.size());
 #ifndef _WIN32
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.cpp"));
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.h"));
@@ -115,25 +114,24 @@ TEST(FileSystem, findFileInfosWithoutExtensions) {
 }
 
 TEST(FileSystem, findFileInfosFailed) {
-  std::vector<FilePath> directoryPaths;
-  directoryPaths.emplace_back(L"./xxx");
+  const std::vector<FilePath> directoryPaths{FilePath{L"./xxx"}};
 
-  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {}, false);
+  const std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(directoryPaths, {}, false);
 
-  EXPECT_TRUE(files.size() == 0);
+  EXPECT_TRUE(files.empty());
 }
 
 TEST(FileSystem, findFileInfosWithEmptyPaths) {
-  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths({}, {}, false);
+  const std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths({}, {}, false);
 
-  EXPECT_TRUE(files.size() == 0);
+  EXPECT_TRUE(files.empty());
 }
 
 TEST(FileSystem, findFileInfo) {
-  std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(
+  const std::vector<FileInfo> files = FileSystem::getFileInfosFromPaths(
       {FilePath{L"./data/FileSystemTestSuite/src/test.cpp"}}, {}, false);
 
-  EXPECT_TRUE(files.size() == 1);
+  ASSERT_EQ(1, files.size());
 #ifndef _WIN32
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.cpp"));
 #else
@@ -155,13 +153,15 @@ TEST(FileSystem, findFileInfosWithSymlinks) {
 }
 
 TEST(FileSystem, findSymlinkedDirectories) {
-  FilePath directoryPath{L"data/FileSystemTestSuite"};
-  auto dirPaths = FileSystem::getSymLinkedDirectories(directoryPath);
+  const FilePath directoryPath{L"data/FileSystemTestSuite"};
+  const auto dirPaths = FileSystem::getSymLinkedDirectories(directoryPath);
 
   EXPECT_EQ(2, dirPaths.size());
 
-  EXPECT_TRUE(std::find(dirPaths.begin(), dirPaths.end(), FilePath(L"data/FileSystemTestSuite/src")) != dirPaths.end());
-  EXPECT_TRUE(std::find(dirPaths.begin(), dirPaths.end(), FilePath(L"data/FileSystemTestSuite/Settings")) != dirPaths.end());
+  // NOLINTNEXTLINE(performance-inefficient-algorithm)
+  EXPECT_TRUE(std::find(dirPaths.begin(), dirPaths.end(), FilePath{L"data/FileSystemTestSuite/src"}) != dirPaths.end());
+  // NOLINTNEXTLINE(performance-inefficient-algorithm)
+  EXPECT_TRUE(std::find(dirPaths.begin(), dirPaths.end(), FilePath{L"data/FileSystemTestSuite/Settings"}) != dirPaths.end());
 }
 #endif
 
@@ -174,9 +174,9 @@ TEST(FileSystem, findSymlinkedDirectoriesFailed) {
 TEST(FileSystem, getFileByteSize) {
   // Given: filepath
   const auto filePath = fs::temp_directory_path() / "tmp.txt";
-  constexpr size_t size = 2 * 1024 * 1024;      // 2 MB
-  const std::vector<char> buffer(size, ' ');    // Fill with ' ' for demonstration
-  std::string_view data(buffer.data(), buffer.size());
+  constexpr auto size = static_cast<const size_t>(2 * 1024 * 1024);    // 2 MB
+  const std::vector<char> buffer(size, ' ');                           // Fill with ' ' for demonstration
+  const std::string_view data(buffer.data(), buffer.size());
   const auto generatedFile = utility::ScopedTemporaryFile::createFile(filePath, data);
 
   // When: calling getFileByteSize
