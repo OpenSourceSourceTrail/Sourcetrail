@@ -1,13 +1,12 @@
 #include <algorithm>
-#include <any>
 #include <filesystem>
-#include <fstream>
 #include <iterator>
 #include <string>
 #include <vector>
 
 #include <gtest/gtest.h>
 
+#include "FilePath.h"
 #include "FileSystem.h"
 #include "ScopedTemporaryFile.hpp"
 #include "utility.h"
@@ -59,8 +58,6 @@ TEST(FileSystem, findFilePathsFailed) {
   EXPECT_EQ(result.size(), 0);
 }
 
-#if 0
-// TODO(SOUR-74): It will be fixed in the task
 TEST(FileSystem, failToGetFileInfo) {
   // Given: Unknown file path
   auto unknownFilePath = FilePath(fs::temp_directory_path() / "tempxxx.txt");
@@ -69,9 +66,9 @@ TEST(FileSystem, failToGetFileInfo) {
   auto result = FileSystem::getFileInfoForPath(unknownFilePath);
 
   // Then: Expected default FileInfo
-  EXPECT_EQ(result, FileInfo{});
+  EXPECT_FALSE(result.lastWriteTime.isValid());
+  EXPECT_TRUE(result.path.empty());
 }
-#endif
 
 TEST(FileSystem, findFileInfos) {
   std::vector<FilePath> directoryPaths;
@@ -144,38 +141,34 @@ TEST(FileSystem, findFileInfo) {
 #endif
 }
 
-// TODO(SOUR-74): It will be fixed in the task
-TEST(FileSystem, DISABLED_findFileInfosWithSymlinks) {
 #ifndef _WIN32
-  std::vector<FilePath> directoryPaths;
-  directoryPaths.emplace_back(L"data/FileSystemTestSuite/src");
+TEST(FileSystem, findFileInfosWithSymlinks) {
+  const std::vector<FilePath> directoryPaths{FilePath{L"data/FileSystemTestSuite/src"}};
   const auto files = FileSystem::getFileInfosFromPaths(directoryPaths, {L".h", L".hpp", L".cpp"}, true);
 
-  EXPECT_TRUE(files.size() == 5);
+  ASSERT_EQ(5, files.size());
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/Settings/player.h"));
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/Settings/sample.cpp"));
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/main.cpp"));
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.cpp"));
   EXPECT_TRUE(isInFileInfos(files, L"./data/FileSystemTestSuite/src/test.h"));
-#endif
 }
 
 TEST(FileSystem, findSymlinkedDirectories) {
-#ifndef _WIN32
   FilePath directoryPath{L"data/FileSystemTestSuite"};
   auto dirPaths = FileSystem::getSymLinkedDirectories(directoryPath);
 
-  EXPECT_TRUE(dirPaths.size() == 2);
+  EXPECT_EQ(2, dirPaths.size());
 
   EXPECT_TRUE(std::find(dirPaths.begin(), dirPaths.end(), FilePath(L"data/FileSystemTestSuite/src")) != dirPaths.end());
   EXPECT_TRUE(std::find(dirPaths.begin(), dirPaths.end(), FilePath(L"data/FileSystemTestSuite/Settings")) != dirPaths.end());
-#endif
 }
+#endif
 
 TEST(FileSystem, findSymlinkedDirectoriesFailed) {
   const auto dirs = FileSystem::getSymLinkedDirectories(FilePath{L"./xxx"});
 
-  EXPECT_TRUE(dirs.size() == 0);
+  EXPECT_EQ(0, dirs.size());
 }
 
 TEST(FileSystem, getFileByteSize) {
