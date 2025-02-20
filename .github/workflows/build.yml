@@ -84,7 +84,7 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc-12 g++-12 clang-15 ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
+        run: sudo apt install -y gcc-12 g++-12 ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
@@ -137,6 +137,29 @@ jobs:
         if: runner.os == 'Windows'
         run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
         shell: bash
+
+      - name: Download llvm build cache
+        if: runner.os == 'Linux'
+        uses: actions/download-artifact@v4
+        with:
+          name: clang-15.0.7-linux
+          path: ${{github.workspace}}/external
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 13470680180
+
+      - name: Install llvm (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p $HOME/.local/{bin,lib,include}
+          tar -xvf ${{github.workspace}}/external/clang-15.0.7-linux.tar.gz -C ${{github.workspace}}/external
+          cp -R ${{github.workspace}}/external/bin/* $HOME/.local/bin/
+          cp -R ${{github.workspace}}/external/lib/* $HOME/.local/lib/
+          cp -R ${{github.workspace}}/external/include/* $HOME/.local/include/
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/lib" >> $GITHUB_PATH
+          echo "$HOME/.local/include" >> $GITHUB_PATH
+          clang --version
+          llvm-config --version
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
@@ -194,48 +217,10 @@ jobs:
             ${{ github.workspace }}/build/src
 
   clang_tidy:
-    runs-on: ubuntu-24.04
-    needs: [build]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: "true"
-
-      - name: Get tags
-        run: git fetch --tags origin
-
-      - name: Install dependencies
-        run: sudo apt install -y gcc-12 g++-12 ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
-
-      - name: Install conan
-        run: |
-          python3 -m venv venv
-          source venv/bin/activate
-          pip install conan
-
-      - name: Cache Conan packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.conan2
-          key: conan-ubuntu-24.04-gnu-${{ hashFiles('**/conanfile.txt') }}
-
-      - name: Install conan dependencies
-        run: |
-          source venv/bin/activate
-          conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
-
-      - name: Configure CMake
-        run: cmake --preset="ci_gnu_release"
-
-      - name: Run clang-tidy
-        run: |
-          src_files=$(git diff origin/main --name-only | grep "\.cpp" || true)
-          if [ -z "$src_files" ]; then
-            echo "No files to check."
-          else
-            clang-tidy --config-file=./.clang-tidy -p ${{github.workspace}}/build/compile_commands.json -warnings-as-errors='*' $src_files
-          fi
+    needs: build
+    if: github.event_name == 'pull_request'
+    uses: ./.github/workflows/clang_tidy.yml
+    secrets: inherit
 
   cppcheck:
     needs: build
