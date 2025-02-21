@@ -78,7 +78,7 @@ jobs:
           tar -czvf clang-${CLANG_VERSION}-linux.tar.gz -C ${{ env.INSTALL_DIR }} .
 
       - name: Upload Clang Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: clang-${{ env.CLANG_VERSION }}-linux
           path: clang-${{ env.CLANG_VERSION }}-linux.tar.gz
