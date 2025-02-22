@@ -1,12 +1,11 @@
 #pragma once
-// internal
-#include "Message.h"
-//
 #include "ErrorCountInfo.h"
+#include "ErrorInfo.h"
+#include "Message.h"
 
 class MessageErrorCountUpdate final : public Message<MessageErrorCountUpdate> {
 public:
-  static const std::string getStaticType() {
+  static std::string getStaticType() {
     return "MessageErrorCountUpdate";
   }
 
