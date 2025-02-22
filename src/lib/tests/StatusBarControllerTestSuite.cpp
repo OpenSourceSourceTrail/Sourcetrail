@@ -3,11 +3,14 @@
 
 #include "ComponentFactory.h"
 #include "MessageQueue.h"
+#include "MockedMessageQueue.hpp"
 #include "mocks/MockedStatusBarView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#define private public
 #include "StatusBarController.h"
+#undef private
 #include "StatusView.h"
 
 
@@ -15,7 +18,8 @@ using namespace testing;
 
 struct StatusBarControllerFix : Test {
   void SetUp() override {
-    IMessageQueue::getInstance()->startMessageLoopThreaded();
+    messageQueue = std::make_shared<MockedMessageQueue>();
+    IMessageQueue::setInstance(messageQueue);
 
     MockedViewFactory viewFactory;
     storageAccess = std::make_shared<MockedStorageAccess>();
@@ -29,12 +33,11 @@ struct StatusBarControllerFix : Test {
     ASSERT_NE(nullptr, controller);
   }
 
-  void TearDown() override {
-    IMessageQueue::getInstance()->stopMessageLoop();
-  }
+  void TearDown() override {}
 
   StatusBarController* controller = nullptr;
   MockedViewLayout viewLayout;
+  std::shared_ptr<MockedMessageQueue> messageQueue;
   std::shared_ptr<MockedStatusBarView> statusBarView;
   std::shared_ptr<Component> component;
   std::shared_ptr<MockedStorageAccess> storageAccess;
@@ -52,60 +55,72 @@ TEST_F(StatusBarControllerFix, clear) {
 
 TEST_F(StatusBarControllerFix, MessageErrorCountClear) {
   EXPECT_CALL(*statusBarView, setErrorCount(_)).WillOnce(Return());
-  MessageErrorCountClear{}.dispatchImmediately();
+  MessageErrorCountClear message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, MessageErrorCountUpdate) {
-  EXPECT_CALL(*statusBarView, setErrorCount(_)).WillOnce(Return());
-  MessageErrorCountUpdate{ErrorCountInfo{}, {}}.dispatchImmediately();
+  const ErrorCountInfo info{1, 2};
+  EXPECT_CALL(*statusBarView, setErrorCount(info)).WillOnce(Return());
+  MessageErrorCountUpdate message{info, std::vector<ErrorInfo>{}};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, MessageIndexingFinished) {
-  EXPECT_CALL(*storageAccess, getErrorCount()).WillOnce(Return(ErrorCountInfo{}));
-  EXPECT_CALL(*statusBarView, setErrorCount(_)).WillOnce(Return());
-  EXPECT_CALL(*statusBarView, hideIndexingProgress()).WillOnce(Return());
-  MessageIndexingFinished{}.dispatchImmediately();
+  const ErrorCountInfo info{1, 2};
+  EXPECT_CALL(*storageAccess, getErrorCount()).WillOnce(Return(info));
+  EXPECT_CALL(*statusBarView, setErrorCount(info)).WillOnce(Return());
+  EXPECT_CALL(*statusBarView, hideIndexingProgress).WillOnce(Return());
+  MessageIndexingFinished message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, MessageIndexingStarted) {
   EXPECT_CALL(*statusBarView, showIndexingProgress(_)).WillOnce(Return());
-  MessageIndexingStarted{}.dispatchImmediately();
+  MessageIndexingStarted message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, ShowProgressMessageIndexingStatus) {
   EXPECT_CALL(*statusBarView, showIndexingProgress(_)).WillOnce(Return());
-  MessageIndexingStatus{true}.dispatchImmediately();
+  MessageIndexingStarted message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, HideProgressMessageIndexingStatus) {
   EXPECT_CALL(*statusBarView, hideIndexingProgress()).WillOnce(Return());
-  MessageIndexingStatus{false}.dispatchImmediately();
+  MessageIndexingStatus message{false};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, NoConnectionMessagePingReceived) {
   EXPECT_CALL(*statusBarView, showIdeStatus(_)).WillOnce(Return());
-  MessagePingReceived{}.dispatchImmediately();
+  MessagePingReceived message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, MessagePingReceived) {
   EXPECT_CALL(*statusBarView, showIdeStatus(_)).WillOnce(Return());
-  MessagePingReceived messagePingReceived;
-  messagePingReceived.ideName = L"vim";
-  messagePingReceived.dispatchImmediately();
+  MessagePingReceived message{};
+  message.ideName = L"vim";
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, MessageRefresh) {
   EXPECT_CALL(*statusBarView, setErrorCount(_)).WillOnce(Return());
   EXPECT_CALL(*storageAccess, getErrorCount()).WillOnce(Return(ErrorCountInfo{}));
-  MessageRefresh{}.dispatchImmediately();
+  MessageRefresh message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, ShowInStatusBarMessageStatus) {
   EXPECT_CALL(*statusBarView, showMessage(_, _, _)).WillOnce(Return());
-  MessageStatus{L"TEST"}.dispatchImmediately();
+  MessageStatus message{L"TEST"};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusBarControllerFix, MessageStatus) {
   EXPECT_CALL(*statusBarView, showMessage(_, _, _)).Times(0);
-  MessageStatus{L"", false, false, false}.dispatchImmediately();
+  MessageStatus message{L"", false, false, false};
+  controller->handleMessage(&message);
 }
