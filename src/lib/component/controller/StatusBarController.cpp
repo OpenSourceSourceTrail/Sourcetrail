@@ -4,7 +4,7 @@
 #include "StatusBarView.h"
 #include "StorageAccess.h"
 
-StatusBarController::StatusBarController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
+StatusBarController::StatusBarController(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 
 StatusBarController::~StatusBarController() = default;
 
@@ -13,7 +13,7 @@ StatusBarView* StatusBarController::getView() {
 }
 
 void StatusBarController::clear() {
-  getView()->setErrorCount(ErrorCountInfo());
+  getView()->setErrorCount(ErrorCountInfo{});
 }
 
 void StatusBarController::handleMessage(MessageErrorCountClear* /*message*/) {
@@ -25,7 +25,7 @@ void StatusBarController::handleMessage(MessageErrorCountUpdate* message) {
 }
 
 void StatusBarController::handleMessage(MessageIndexingFinished* /*message*/) {
-  getView()->setErrorCount(m_storageAccess->getErrorCount());
+  getView()->setErrorCount(mStorageAccess->getErrorCount());
   getView()->hideIndexingProgress();
 }
 
@@ -53,7 +53,7 @@ void StatusBarController::handleMessage(MessagePingReceived* message) {
 }
 
 void StatusBarController::handleMessage(MessageRefresh* /*message*/) {
-  getView()->setErrorCount(m_storageAccess->getErrorCount());
+  getView()->setErrorCount(mStorageAccess->getErrorCount());
 }
 
 void StatusBarController::handleMessage(MessageStatus* message) {
