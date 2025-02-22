@@ -13,7 +13,7 @@ StatusBarView* StatusBarController::getView() {
 }
 
 void StatusBarController::clear() {
-  getView()->setErrorCount(ErrorCountInfo());
+  getView()->setErrorCount(ErrorCountInfo{});
 }
 
 void StatusBarController::handleMessage(MessageErrorCountClear* /*message*/) {
