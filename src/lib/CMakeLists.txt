@@ -280,6 +280,7 @@ add_files(
   data/tooltip/TooltipOrigin.h
   data/DefinitionKind.cpp
   data/DefinitionKind.h
+  data/ErrorCountInfo.cpp
   data/ErrorCountInfo.h
   data/ErrorFilter.h
   data/ErrorInfo.h
