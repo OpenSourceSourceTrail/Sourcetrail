@@ -41,7 +41,6 @@ function(
   set(COMMON_WARNINGS
       -Wall
       -Wextra # reasonable and standard
-      -Wpedantic
       -Wshadow # warn the user if a variable declaration shadows one from a parent context
       -Wnon-virtual-dtor # warn the user if a class with virtual functions has a non-virtual destructor. This helps
       # catch hard to track down memory errors
