@@ -4,9 +4,8 @@
 #include "StatusView.h"
 #include "utility.h"
 
-StatusController::StatusController() {
-  m_statusFilter = IApplicationSettings::getInstanceRaw()->getStatusFilter();
-}
+StatusController::StatusController()
+    : mStatusFilter(static_cast<std::uint8_t>(IApplicationSettings::getInstanceRaw()->getStatusFilter())) {}
 
 StatusController::~StatusController() = default;
 
@@ -17,7 +16,7 @@ StatusView* StatusController::getView() const {
 void StatusController::clear() {}
 
 void StatusController::handleMessage(MessageClearStatusView* /*message*/) {
-  m_status.clear();
+  mStatus.clear();
   getView()->clear();
 }
 
@@ -36,19 +35,19 @@ void StatusController::handleMessage(MessageStatus* message) {
     stati.emplace_back(status, message->isError);
   }
 
-  utility::append(m_status, stati);
+  utility::append(mStatus, stati);
 
   addStatus(stati);
 }
 
 void StatusController::handleMessage(MessageStatusFilterChanged* message) {
-  m_statusFilter = message->statusFilter;
+  mStatusFilter = message->statusFilter;
 
   getView()->clear();
-  addStatus(m_status);
+  addStatus(mStatus);
 
   auto* settings = IApplicationSettings::getInstanceRaw();
-  settings->setStatusFilter(m_statusFilter);
+  settings->setStatusFilter(mStatusFilter);
   settings->save();
 }
 
@@ -56,7 +55,7 @@ void StatusController::addStatus(const std::vector<Status>& statuses) {
   std::vector<Status> filteredStatus;
 
   for(const Status& status : statuses) {
-    if((static_cast<std::uint8_t>(status.type) & static_cast<std::uint8_t>(m_statusFilter)) != 0) {
+    if((static_cast<std::uint8_t>(status.type) & static_cast<std::uint8_t>(mStatusFilter)) != 0) {
       filteredStatus.push_back(status);
     }
   }

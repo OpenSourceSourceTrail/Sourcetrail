@@ -37,7 +37,7 @@ set(test_lib_names
     StorageCacheTestSuite
     StorageProviderTestSuite
     # StatusBarControllerTestSuite TODO(SOUR-95)
-    # StatusControllerTestSuite TODO(SOUR-96)
+    StatusControllerTestSuite
     TabIdTestSuite
     TabTestSuite
     TimeStampTestSuite
