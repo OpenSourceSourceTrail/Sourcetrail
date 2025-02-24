@@ -374,8 +374,10 @@ set_target_properties(
              AUTORCC ON
              INCLUDE_CURRENT_DIR ON)
 
-set_source_files_properties(${CMAKE_BINARY_DIR}/Sourcetrail_lib_gui_autogen/mocs_compilation.cpp
-                            PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  set_source_files_properties(${CMAKE_BINARY_DIR}/Sourcetrail_lib_gui_autogen/mocs_compilation.cpp
+                              PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+endif()
 
 set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
 # Indexer App --------------------------------------------------------------------------------------------------------------------
