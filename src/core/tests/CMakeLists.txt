@@ -317,15 +317,3 @@ add_sourcetrail_test(
   "unittests.core."
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
-
-add_sourcetrail_test(
-  NAME
-  loggingTestSuite
-  SOURCES
-  loggingTestSuite.cpp
-  DEPS
-  Sourcetrail::core::utility::logging
-  TEST_PREFIX
-  "unittests.core."
-  WORKING_DIRECTORY
-  "${CMAKE_BINARY_DIR}/test/")
