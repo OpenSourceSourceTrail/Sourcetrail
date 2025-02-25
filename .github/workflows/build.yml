@@ -8,6 +8,7 @@ on:
       - '**/*.hpp'
       - '**/*.cpp'
       - '**/*.cmake'
+      - .github/workflows/*.yml
   pull_request:
     branches: ["main"]
     paths:
@@ -15,6 +16,7 @@ on:
       - '**/*.hpp'
       - '**/*.cpp'
       - '**/*.cmake'
+      - .github/workflows/*.yml
 
 jobs:
   clang-format:
