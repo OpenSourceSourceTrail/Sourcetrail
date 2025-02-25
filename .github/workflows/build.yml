@@ -168,14 +168,25 @@ jobs:
 
       - name: Build (Ubuntu)
         if: runner.os == 'Linux'
-        run: cmake --build ${{github.workspace}}/build | tee ${{github.workspace}}/build/build.log
+        run: |
+          set -eo pipefail  # Stop on first error
+          cmake --build ${{github.workspace}}/build | tee ${{github.workspace}}/build/build.log
+          exit ${PIPESTATUS[0]}
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
           call "${{ matrix.config.environment_script }}"
-          cmake --build ${{github.workspace}}/build
+          cmake --build ${{github.workspace}}/build > ${{github.workspace}}/build/build.log 2>&1 || (type ${{github.workspace}}/build/build.log && exit /b %errorlevel%)
         shell: cmd
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-${{ matrix.config.tag }}-${{ matrix.build_type }}
+          path: ${{github.workspace}}/build/build.log
+          retention-days: 7
 
       - name: Count warnings (Ubuntu)
         if: runner.os == 'Linux'
@@ -187,8 +198,16 @@ jobs:
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
-        run: ctest --test-dir ${{github.workspace}}/build ctest --exclude-regex "unittests\.core\.GenerateRandomString\.goodCase|unittests\.core\.CommandlineCommandIndexFix\.projectIsAbsent|unittests\.core\.CommandlineCommandIndexFix\.projectIsInvalidProj|unittests\.core\.CommandLineParserConfig\.projectFileMissingExtention|unittests\.core\.CommandLineParserConfig\.emptyProjectFile|unittests\.lib\.BookmarkControllerFix\.displayBookmarksFor2|unittests\.lib\.FileHandler\.goodCaseEmptyFile|unittests\.lib\.FileHandler\.emptyFileCanNotCreated|unittests\.lib\.FileHandler\.goodCaseFromBuffer|unittests\.lib\.FileHandler\.PassZeroToFromBuffer|unittests\.lib\.FileHandler\.goodCaseRandomData|unittests\.lib\.FileHandler\.PassZeroToRandomData|unittests\.lib_gui\.utilityAppTestSuite\.searchPath|QtSelfRefreshIconButtonTestSuite"
+        run: ctest --test-dir ${{github.workspace}}/build ctest --exclude-regex "unittests\.core\.GenerateRandomString\.goodCase|unittests\.core\.CommandlineCommandIndexFix\.projectIsAbsent|unittests\.core\.CommandlineCommandIndexFix\.projectIsInvalidProj|unittests\.core\.CommandLineParserConfig\.projectFileMissingExtention|unittests\.core\.CommandLineParserConfig\.emptyProjectFile|unittests\.lib\.BookmarkControllerFix\.displayBookmarksFor2|unittests\.lib\.FileHandler\.goodCaseEmptyFile|unittests\.lib\.FileHandler\.emptyFileCanNotCreated|unittests\.lib\.FileHandler\.goodCaseFromBuffer|unittests\.lib\.FileHandler\.PassZeroToFromBuffer|unittests\.lib\.FileHandler\.goodCaseRandomData|unittests\.lib\.FileHandler\.PassZeroToRandomData|unittests\.lib_gui\.utilityAppTestSuite\.searchPath|QtSelfRefreshIconButtonTestSuite" --output-junit ${{github.workspace}}/build/report.xml
         shell: cmd
+
+      - name: Upload ctest logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs-${{ matrix.config.tag }}-${{ matrix.build_type }}
+          path: ${{github.workspace}}/build/report.xml
+          retention-days: 7
 
       - name: Publish Test Report for ${{ matrix.config.name }}
         uses: mikepenz/action-junit-report@v4
