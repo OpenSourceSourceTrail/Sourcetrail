@@ -21,7 +21,7 @@ std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const FilePath& c
   if(!error.empty()) {
     const auto message = fmt::format(
         L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
-    LOG_ERROR_W(message);
+    LOG_ERROR(message);
     MessageStatus(message, true).dispatch();
   }
 

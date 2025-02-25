@@ -80,31 +80,19 @@ void log(spdlog::level::level_enum level,
  */
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG_TRACE(Format, ...) logging::internal::log(spdlog::level::trace, REL_FILE_PATH, __FUNCTION__, __LINE__, Format __VA_OPT__(,) __VA_ARGS__)
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOG_TRACE_W(Format, ...) LOG_TRACE(Format __VA_OPT__(,) __VA_ARGS__)
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG_DEBUG(Format, ...) logging::internal::log(spdlog::level::debug, REL_FILE_PATH, __FUNCTION__, __LINE__, Format __VA_OPT__(,) __VA_ARGS__)
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOG_DEBUG_W(Format, ...) LOG_DEBUG(Format __VA_OPT__(,) __VA_ARGS__)
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG_INFO(Format, ...) logging::internal::log(spdlog::level::info, REL_FILE_PATH, __FUNCTION__, __LINE__, Format __VA_OPT__(,) __VA_ARGS__)
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOG_INFO_W(Format, ...) LOG_INFO(Format __VA_OPT__(,) __VA_ARGS__)
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG_WARNING(Format, ...) logging::internal::log(spdlog::level::warn, REL_FILE_PATH, __FUNCTION__, __LINE__, Format __VA_OPT__(,) __VA_ARGS__)
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOG_WARNING_W(Format, ...) LOG_WARNING(Format __VA_OPT__(,) __VA_ARGS__)
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG_ERROR(Format, ...) logging::internal::log(spdlog::level::err, REL_FILE_PATH, __FUNCTION__, __LINE__, Format __VA_OPT__(,) __VA_ARGS__)
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOG_ERROR_W(Format, ...) LOG_ERROR(Format __VA_OPT__(,) __VA_ARGS__)
 
 // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
 #define LOG_CRITICAL(Format, ...) logging::internal::log(spdlog::level::critical, REL_FILE_PATH, __FUNCTION__, __LINE__, Format __VA_OPT__(,) __VA_ARGS__)
-// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define LOG_CRITICAL_W(Format, ...) LOG_CRITICAL(Format __VA_OPT__(,) __VA_ARGS__)
 // clang-format on

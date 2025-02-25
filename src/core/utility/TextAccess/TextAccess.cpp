@@ -121,7 +121,7 @@ std::vector<std::string> TextAccess::readFile(const FilePath& filePath) {
     srcFile.open(filePath.str(), std::ios::binary | std::ios::in);
 
     if(srcFile.fail()) {
-      LOG_ERROR_W(L"Could not open file " + filePath.wstr());
+      LOG_ERROR(L"Could not open file " + filePath.wstr());
       return result;
     }
 

@@ -58,7 +58,7 @@ void loadFontsFromDirectory(const FilePath& path, const std::wstring& extension)
 
   for(int loadedFontId : loadedFontIds) {
     for(QString& family : QFontDatabase::applicationFontFamilies(loadedFontId)) {
-      LOG_INFO_W(L"Loaded FontFamily: " + family.toStdWString());
+      LOG_INFO(L"Loaded FontFamily: " + family.toStdWString());
     }
   }
 }
@@ -78,7 +78,7 @@ std::string getStyleSheet(const FilePath& path) {
 
     std::deque<std::string> seq = utility::split(css.substr(posA + 1, posB - posA - 1), ':');
     if(seq.size() != 2) {
-      LOG_ERROR_W(L"Syntax error in file: " + path.wstr());
+      LOG_ERROR(L"Syntax error in file: " + path.wstr());
       return "";
     }
 
@@ -134,7 +134,7 @@ std::string getStyleSheet(const FilePath& path) {
           index += 3;
         }
       } else {
-        LOG_ERROR_W(L"Syntax error in file: " + path.wstr());
+        LOG_ERROR(L"Syntax error in file: " + path.wstr());
         return "";
       }
     } else if(key == "color") {
@@ -145,7 +145,7 @@ std::string getStyleSheet(const FilePath& path) {
     } else if(key == "platform_wml") {
       std::vector<std::string> values = utility::splitToVector(val, '|');
       if(values.size() != 3) {
-        LOG_ERROR_W(L"Syntax error in file: " + path.wstr());
+        LOG_ERROR(L"Syntax error in file: " + path.wstr());
         return "";
       }
 
@@ -163,7 +163,7 @@ std::string getStyleSheet(const FilePath& path) {
         break;
       }
     } else {
-      LOG_ERROR_W(L"Syntax error in file: " + path.wstr());
+      LOG_ERROR(L"Syntax error in file: " + path.wstr());
       return "";
     }
 
@@ -194,7 +194,7 @@ QString getStyleSheet(const QString& resource) {
 
     std::deque<std::string> seq = utility::split(css.substr(posA + 1, posB - posA - 1), ':');
     if(seq.size() != 2) {
-      LOG_ERROR_W(L"Syntax error in resource: " + resource.toStdWString());
+      LOG_ERROR(L"Syntax error in resource: " + resource.toStdWString());
       return "";
     }
 
@@ -250,7 +250,7 @@ QString getStyleSheet(const QString& resource) {
           index += 3;
         }
       } else {
-        LOG_ERROR_W(L"Syntax error in resource: " + resource.toStdWString());
+        LOG_ERROR(L"Syntax error in resource: " + resource.toStdWString());
         return "";
       }
     } else if(key == "color") {
@@ -262,7 +262,7 @@ QString getStyleSheet(const QString& resource) {
     } else if(key == "platform_wml") {
       std::vector<std::string> values = utility::splitToVector(val, '|');
       if(values.size() != 3) {
-        LOG_ERROR_W(L"Syntax error in resource: " + resource.toStdWString());
+        LOG_ERROR(L"Syntax error in resource: " + resource.toStdWString());
         return "";
       }
 
@@ -280,7 +280,7 @@ QString getStyleSheet(const QString& resource) {
         break;
       }
     } else {
-      LOG_ERROR_W(L"Syntax error in resource: " + resource.toStdWString());
+      LOG_ERROR(L"Syntax error in resource: " + resource.toStdWString());
       return "";
     }
 

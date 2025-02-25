@@ -36,8 +36,8 @@ std::wstring NameHierarchy::serializeRange(const NameHierarchy& nameHierarchy, s
 NameHierarchy NameHierarchy::deserialize(const std::wstring& serializedName) {
   size_t mpos = serializedName.find(META_DELIMITER);
   if(mpos == std::wstring::npos) {
-    LOG_ERROR_W(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate
-                                                                                // serializedName!
+    LOG_ERROR(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate
+                                                                              // serializedName!
     return NameHierarchy(NAME_DELIMITER_UNKNOWN);
   }
 
@@ -48,7 +48,7 @@ NameHierarchy NameHierarchy::deserialize(const std::wstring& serializedName) {
     // name
     size_t spos = serializedName.find(PART_DELIMITER, npos);
     if(spos == std::wstring::npos) {
-      LOG_ERROR_W(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate serializedName!
+      LOG_ERROR(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate serializedName!
       return NameHierarchy(NAME_DELIMITER_UNKNOWN);
     }
 
@@ -58,7 +58,7 @@ NameHierarchy NameHierarchy::deserialize(const std::wstring& serializedName) {
     // signature
     size_t ppos = serializedName.find(SIGNATURE_DELIMITER, spos);
     if(ppos == std::wstring::npos) {
-      LOG_ERROR_W(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate serializedName!
+      LOG_ERROR(L"unable to deserialize name hierarchy: " + serializedName);    // todo: obfuscate serializedName!
       return NameHierarchy(NAME_DELIMITER_UNKNOWN);
     }
 

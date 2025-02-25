@@ -59,7 +59,7 @@ NetworkProtocolHelper::SetActiveTokenMessage NetworkProtocolHelper::parseSetActi
         }
       }
     } else {
-      LOG_ERROR_W(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_setActiveTokenPrefix);
+      LOG_ERROR(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_setActiveTokenPrefix);
     }
   }
 
@@ -77,7 +77,7 @@ NetworkProtocolHelper::CreateProjectMessage NetworkProtocolHelper::parseCreatePr
         LOG_ERROR("Failed to parse createProject message, invalid token count");
       }
     } else {
-      LOG_ERROR_W(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_createProjectPrefix);
+      LOG_ERROR(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_createProjectPrefix);
     }
   }
 
@@ -110,7 +110,7 @@ NetworkProtocolHelper::CreateCDBProjectMessage NetworkProtocolHelper::parseCreat
 
           networkMessage.ideId = nonConstId;
         } else {
-          LOG_WARNING_W(L"Failed to parse ide ID string. Is " + ideId);
+          LOG_WARNING(L"Failed to parse ide ID string. Is " + ideId);
         }
 
         if(!networkMessage.cdbFileLocation.empty() && !networkMessage.ideId.empty()) {
@@ -118,7 +118,7 @@ NetworkProtocolHelper::CreateCDBProjectMessage NetworkProtocolHelper::parseCreat
         }
       }
     } else {
-      LOG_ERROR_W(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_createCDBProjectPrefix);
+      LOG_ERROR(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_createCDBProjectPrefix);
     }
   }
 
@@ -145,11 +145,11 @@ NetworkProtocolHelper::PingMessage NetworkProtocolHelper::parsePingMessage(const
 
           pingMessage.valid = true;
         } else {
-          LOG_WARNING_W(L"Failed to parse ide ID string: " + ideId);
+          LOG_WARNING(L"Failed to parse ide ID string: " + ideId);
         }
       }
     } else {
-      LOG_ERROR_W(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_pingPrefix);
+      LOG_ERROR(L"Failed to parse message, invalid type token: " + subMessages[0] + L". Expected " + s_pingPrefix);
     }
   }
 

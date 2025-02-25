@@ -38,7 +38,7 @@ bool Settings::load(const FilePath& filePath, bool readOnly) {
 
   clear();
   m_filePath = filePath;
-  LOG_WARNING_W(L"File for Settings not found: " + filePath.wstr());
+  LOG_WARNING(L"File for Settings not found: " + filePath.wstr());
   return false;
 }
 
@@ -61,7 +61,7 @@ bool Settings::save() {
   }
 
   if(!success) {
-    LOG_WARNING_W(L"Settings were not saved: " + m_filePath.wstr());
+    LOG_WARNING(L"Settings were not saved: " + m_filePath.wstr());
   }
 
   return success;
