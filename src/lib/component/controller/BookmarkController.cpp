@@ -59,7 +59,7 @@ void BookmarkController::createBookmark(const std::wstring& name,
                                         const std::wstring& comment,
                                         const std::wstring& category,
                                         GlobalId nodeId) {
-  LOG_INFO_W(fmt::format(L"Attempting to create new bookmark ({}, {}, {})", name, comment, category));
+  LOG_INFO(fmt::format(L"Attempting to create new bookmark ({}, {}, {})", name, comment, category));
 
   const GlobalId tabId = TabId::currentTab();
 
@@ -141,7 +141,7 @@ void BookmarkController::deleteBookmarkCategory(Id categoryId) {
 
 void BookmarkController::deleteBookmarkForActiveTokens() {
   if(std::shared_ptr<Bookmark> bookmark = getBookmarkForActiveToken(TabId::currentTab())) {
-    LOG_INFO_W(L"Deleting bookmark " + bookmark->getName());
+    LOG_INFO(L"Deleting bookmark " + bookmark->getName());
 
     mStorageAccess->removeBookmark(bookmark->getId());
 

@@ -32,7 +32,7 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
   }
 
   if(!pchInputFilePath.exists()) {
-    LOG_ERROR_W(L"Precompiled header input file \"" + pchInputFilePath.wstr() + L"\" does not exist.");
+    LOG_ERROR(L"Precompiled header input file \"" + pchInputFilePath.wstr() + L"\" does not exist.");
     return std::make_shared<TaskLambda>([]() {});
   }
 
@@ -47,8 +47,8 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
 
   return std::make_shared<TaskLambda>([dialogView, storageProvider, pchInputFilePath, pchOutputFilePath, compilerFlags]() {
     dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Processing Precompiled Headers");
-    LOG_INFO_W(L"Generating precompiled header output for input file \"" + pchInputFilePath.wstr() + L"\" at location \"" +
-               pchOutputFilePath.wstr() + L"\"");
+    LOG_INFO(L"Generating precompiled header output for input file \"" + pchInputFilePath.wstr() + L"\" at location \"" +
+             pchOutputFilePath.wstr() + L"\"");
 
     CxxParser::initializeLLVM();
 

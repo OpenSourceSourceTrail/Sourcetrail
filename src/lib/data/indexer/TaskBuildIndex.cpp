@@ -126,7 +126,7 @@ void TaskBuildIndex::doExit(std::shared_ptr<Blackboard> blackboard) {
           true,
           path,
           ParseLocation(fileId, 1, 1));
-      LOG_INFO_W(L"crashed translation unit: " + path.wstr());
+      LOG_INFO(L"crashed translation unit: " + path.wstr());
     }
     m_storageProvider->insert(storage);
   }
@@ -154,7 +154,7 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& logFil
   const FilePath indexerProcessPath = AppPath::getCxxIndexerFilePath();
   if(!indexerProcessPath.exists()) {
     m_interrupted = true;
-    LOG_ERROR_W(L"Cannot start indexer process because executable is missing at \"" + indexerProcessPath.wstr() + L"\"");
+    LOG_ERROR(L"Cannot start indexer process because executable is missing at \"" + indexerProcessPath.wstr() + L"\"");
     return;
   }
 

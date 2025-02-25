@@ -80,7 +80,7 @@ void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) noexcept {
 
 void MessageQueue::processMessage(const std::shared_ptr<MessageBase>& message, bool asNextTask) noexcept {
   if(message->isLogged()) {
-    LOG_INFO_W(L"send " + message->str());
+    LOG_INFO(L"send " + message->str());
   }
 
   if(mSendMessagesAsTasks && message->sendAsTask()) {

@@ -9,7 +9,7 @@ SqliteStorage::SqliteStorage() {
   try {
     m_database.open(":memory:");
   } catch(CppSQLite3Exception& e) {
-    LOG_ERROR_W(L"Failed to load database file \":memory:\" with message: " + utility::decodeFromUtf8(e.errorMessage()));
+    LOG_ERROR(L"Failed to load database file \":memory:\" with message: " + utility::decodeFromUtf8(e.errorMessage()));
     throw;
   }
 
@@ -24,8 +24,8 @@ SqliteStorage::SqliteStorage(const FilePath& dbFilePath) : m_dbFilePath(dbFilePa
   try {
     m_database.open(utility::encodeToUtf8(m_dbFilePath.wstr()).c_str());
   } catch(CppSQLite3Exception& e) {
-    LOG_ERROR_W(L"Failed to load database file \"" + m_dbFilePath.wstr() + L"\" with message: " +
-                utility::decodeFromUtf8(e.errorMessage()));
+    LOG_ERROR(L"Failed to load database file \"" + m_dbFilePath.wstr() + L"\" with message: " +
+              utility::decodeFromUtf8(e.errorMessage()));
     throw;
   }
 

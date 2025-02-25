@@ -131,7 +131,7 @@ bool ConfigManager::load(const std::shared_ptr<TextAccess>& textAccess) {
 bool ConfigManager::save(const std::filesystem::path& filepath) const {
   std::ofstream outStream{filepath};
   if(!outStream.is_open()) {
-    LOG_ERROR_W(fmt::format(L"Failed to open \"{}\"", filepath.wstring()));
+    LOG_ERROR(fmt::format(L"Failed to open \"{}\"", filepath.wstring()));
     return false;
   }
   createXmlDocumentToString(mConfigValues, outStream);

@@ -145,7 +145,7 @@ void Application::loadSettings() {
 
   auto settings = IApplicationSettings::getInstanceRaw();
   if(auto settingsPath = UserPaths::getAppSettingsFilePath(); !settings->load(settingsPath)) {
-    LOG_WARNING_W(fmt::format(L"Failed to load ApplicationSettings from the following path \"{}\"", settingsPath.wstr()));
+    LOG_WARNING(fmt::format(L"Failed to load ApplicationSettings from the following path \"{}\"", settingsPath.wstr()));
   }
 
   if(settings->getLoggingEnabled()) {
@@ -166,7 +166,7 @@ void Application::loadSettings() {
 
 void Application::loadStyle(const fs::path& colorSchemePath) {
   if(!ColorScheme::getInstance()->load(FilePath{colorSchemePath.wstring()})) {
-    LOG_WARNING_W(fmt::format(L"Failed to load Style from the following path \"{}\"", colorSchemePath.wstring()));
+    LOG_WARNING(fmt::format(L"Failed to load Style from the following path \"{}\"", colorSchemePath.wstring()));
   }
   GraphViewStyle::loadStyleSettings();
 }
@@ -289,17 +289,17 @@ void Application::handleMessage(MessageLoadProject* message) {
       auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with exception: {}",
                                       projectSettingsFilePath.wstr(),
                                       utility::decodeFromUtf8(e.what()));
-      LOG_ERROR_W(errorMessage);
+      LOG_ERROR(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
     } catch(CppSQLite3Exception& e) {
       auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with sqlite exception: {}",
                                       projectSettingsFilePath.wstr(),
                                       utility::decodeFromUtf8(e.errorMessage()));
-      LOG_ERROR_W(errorMessage);
+      LOG_ERROR(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
     } catch(...) {
       auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with unknown exception.", projectSettingsFilePath.wstr());
-      LOG_ERROR_W(errorMessage);
+      LOG_ERROR(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
     }
 

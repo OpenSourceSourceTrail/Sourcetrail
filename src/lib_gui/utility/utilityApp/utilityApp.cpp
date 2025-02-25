@@ -171,7 +171,7 @@ ProcessOutput executeProcess(const std::wstring& command,
     ProcessOutput ret;
     ret.error = decodeFromUtf8(e.code().message());
     ret.exitCode = e.code().value();
-    LOG_ERROR_W(fmt::format(L"Process error: {}", ret.error));
+    LOG_ERROR(fmt::format(L"Process error: {}", ret.error));
 
     return ret;
   }

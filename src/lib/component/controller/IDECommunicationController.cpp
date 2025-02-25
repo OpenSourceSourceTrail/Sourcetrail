@@ -121,7 +121,7 @@ void IDECommunicationController::handlePing(const NetworkProtocolHelper::PingMes
       msg.ideName = L"unknown IDE";
     }
 
-    LOG_INFO_W(fmt::format(L"{} instance detected via plugin port", msg.ideName));
+    LOG_INFO(fmt::format(L"{} instance detected via plugin port", msg.ideName));
     msg.dispatch();
   } else {
     LOG_ERROR("Can't handle ping, message is invalid");

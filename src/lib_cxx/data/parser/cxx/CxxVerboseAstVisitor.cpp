@@ -34,7 +34,7 @@ bool CxxVerboseAstVisitor::TraverseDecl(clang::Decl* d) {
     FilePath currentFilePath = getCanonicalFilePathCache()->getCanonicalFilePath(sm.getFileID(d->getSourceRange().getBegin()), sm);
     if(m_currentFilePath != currentFilePath) {
       m_currentFilePath = currentFilePath;
-      LOG_INFO_W(fmt::format(L"Indexer - Traversing \"{}\"", currentFilePath.wstr()));
+      LOG_INFO(fmt::format(L"Indexer - Traversing \"{}\"", currentFilePath.wstr()));
     }
 
     LOG_INFO(fmt::format("Indexer - {}", stream.str()));

@@ -112,6 +112,6 @@ void QtContextMenu::openContainingFolderActionTriggered() {
   if(dir.exists()) {
     QDesktopServices::openUrl(QUrl(QString::fromStdWString(L"file:///" + dir.wstr()), QUrl::TolerantMode));
   } else {
-    LOG_ERROR_W(L"Unable to open directory: " + dir.wstr());
+    LOG_ERROR(L"Unable to open directory: " + dir.wstr());
   }
 }

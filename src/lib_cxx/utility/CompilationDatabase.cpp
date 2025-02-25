@@ -53,8 +53,8 @@ void utility::CompilationDatabase::init() {
       utility::encodeToUtf8(m_filePath.wstr()), error, clang::tooling::JSONCommandLineSyntax::AutoDetect));
 
   if(!cdb) {
-    LOG_ERROR_W(L"Loading compilation database from file \"" + m_filePath.wstr() + L"\" failed with error: " +
-                utility::decodeFromUtf8(error));
+    LOG_ERROR(L"Loading compilation database from file \"" + m_filePath.wstr() + L"\" failed with error: " +
+              utility::decodeFromUtf8(error));
     return;
   }
 
