@@ -13,7 +13,7 @@ void SearchMatch::log(const std::vector<SearchMatch>& matches, const std::wstrin
     match.print(ss);
   }
 
-  LOG_INFO_W(ss.str());
+  LOG_INFO(ss.str());
 }
 
 std::wstring SearchMatch::getSearchTypeName(SearchType type) {
