@@ -76,7 +76,8 @@
                 "USE_ALTERNATE_LINKER": "mold",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "ON"
+                "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
+                "Clang_DIR": "${sourceDir}/external/lib/cmake/clang/"
             },
             "inherits": [
                 "all-tests",
@@ -94,7 +95,8 @@
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "ON"
+                "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
+                "Clang_DIR": "${sourceDir}/external/lib/cmake/clang/"
             },
             "inherits": [
                 "all-tests",

@@ -84,7 +84,7 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc g++ ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
+        run: sudo apt install -y gcc g++ clang ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
@@ -145,21 +145,11 @@ jobs:
           name: clang-15.0.7-linux
           path: ${{github.workspace}}/external
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 13470680180
+          run-id: 13470680180 # TODO(Hussein): Need to be fixed
 
       - name: Install llvm (Ubuntu)
         if: runner.os == 'Linux'
-        run: |
-          mkdir -p $HOME/.local/{bin,lib,include}
-          tar -xvf ${{github.workspace}}/external/clang-15.0.7-linux.tar.gz -C ${{github.workspace}}/external
-          cp -R ${{github.workspace}}/external/bin/* $HOME/.local/bin/
-          cp -R ${{github.workspace}}/external/lib/* $HOME/.local/lib/
-          cp -R ${{github.workspace}}/external/include/* $HOME/.local/include/
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          echo "$HOME/.local/lib" >> $GITHUB_PATH
-          echo "$HOME/.local/include" >> $GITHUB_PATH
-          clang --version
-          llvm-config --version
+        run: tar -xvf ${{github.workspace}}/external/clang-15.0.7-linux.tar.gz -C ${{github.workspace}}/external
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
