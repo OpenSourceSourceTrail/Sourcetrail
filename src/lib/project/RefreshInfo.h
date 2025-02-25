@@ -26,7 +26,7 @@ inline std::ostream& operator<<(std::ostream& out, const RefreshMode mode) {
     return out << "AllFiles";
   default:
     assert(false && "Unhandled RefreshMode");
-    return out << L"Unknown";
+    return out << "Unknown";
   }
 }
 
@@ -46,7 +46,7 @@ inline std::wostream& operator<<(std::wostream& out, const RefreshMode mode) {
   }
 }
 
-inline constexpr bool operator==(RefreshMode lhs, RefreshMode rhs) noexcept {
+constexpr bool operator==(RefreshMode lhs, RefreshMode rhs) noexcept {
   return utility::to_underlying(lhs) == utility::to_underlying(rhs);
 }
 

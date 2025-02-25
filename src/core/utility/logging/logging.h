@@ -23,11 +23,11 @@
  * @brief Macros to simplify usage of the log mManager
  */
 #define LOG_TRACE(__format__, ...)                                                                                               \
-  spdlog::trace(std::string{"{} {}:{} "} + __format__, REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+  spdlog::trace(fmt::runtime(std::string{"{} {}:{} "} + __format__), REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef _WIN32
 #  define LOG_TRACE_W(__format__, ...)                                                                                           \
-    spdlog::trace(std::wstring{L"{} {}:{} "} + __format__,                                                                       \
+    spdlog::trace(fmt::runtime(std::wstring{L"{} {}:{} "} + __format__),                                                         \
                   utility::decodeFromUtf8(REL_FILE_PATH),                                                                        \
                   utility::decodeFromUtf8(__FUNCTION__),                                                                         \
                   __LINE__,                                                                                                      \
@@ -37,11 +37,11 @@
 #endif
 
 #define LOG_DEBUG(__format__, ...)                                                                                               \
-  spdlog::debug(std::string{"{} {}:{} "} + __format__, REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+  spdlog::debug(fmt::runtime(std::string{"{} {}:{} "} + __format__), REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef _WIN32
 #  define LOG_DEBUG_W(__format__, ...)                                                                                           \
-    spdlog::debug(std::wstring{L"{} {}:{} "} + __format__,                                                                       \
+    spdlog::debug(fmt::runtime(std::wstring{L"{} {}:{} "} + __format__),                                                         \
                   utility::decodeFromUtf8(REL_FILE_PATH),                                                                        \
                   utility::decodeFromUtf8(__FUNCTION__),                                                                         \
                   __LINE__,                                                                                                      \
@@ -52,11 +52,11 @@
 
 
 #define LOG_INFO(__format__, ...)                                                                                                \
-  spdlog::info(std::string{"{} {}:{} "} + __format__, REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+  spdlog::info(fmt::runtime(std::string{"{} {}:{} "} + __format__), REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef _WIN32
 #  define LOG_INFO_W(__format__, ...)                                                                                            \
-    spdlog::info(std::wstring{L"{} {}:{} "} + __format__,                                                                        \
+    spdlog::info(fmt::runtime(std::wstring{L"{} {}:{} "} + __format__),                                                          \
                  utility::decodeFromUtf8(REL_FILE_PATH),                                                                         \
                  utility::decodeFromUtf8(__FUNCTION__),                                                                          \
                  __LINE__,                                                                                                       \
@@ -66,11 +66,11 @@
 #endif
 
 #define LOG_WARNING(__format__, ...)                                                                                             \
-  spdlog::warn(std::string{"{} {}:{} "} + __format__, REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+  spdlog::warn(fmt::runtime(std::string{"{} {}:{} "} + __format__), REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef _WIN32
 #  define LOG_WARNING_W(__format__, ...)                                                                                         \
-    spdlog::warn(std::wstring{L"{} {}:{} "} + __format__,                                                                        \
+    spdlog::warn(fmt::runtime(std::wstring{L"{} {}:{} "} + __format__),                                                          \
                  utility::decodeFromUtf8(REL_FILE_PATH),                                                                         \
                  utility::decodeFromUtf8(__FUNCTION__),                                                                          \
                  __LINE__,                                                                                                       \
@@ -80,11 +80,11 @@
 #endif
 
 #define LOG_ERROR(__format__, ...)                                                                                               \
-  spdlog::error(std::string{"{} {}:{} "} + __format__, REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+  spdlog::error(fmt::runtime(std::string{"{} {}:{} "} + __format__), REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef _WIN32
 #  define LOG_ERROR_W(__format__, ...)                                                                                           \
-    spdlog::error(std::wstring{L"{} {}:{} "} + __format__,                                                                       \
+    spdlog::error(fmt::runtime(std::wstring{L"{} {}:{} "} + __format__),                                                         \
                   utility::decodeFromUtf8(REL_FILE_PATH),                                                                        \
                   utility::decodeFromUtf8(__FUNCTION__),                                                                         \
                   __LINE__,                                                                                                      \
@@ -94,11 +94,11 @@
 #endif
 
 #define LOG_CRITICAL(__format__, ...)                                                                                            \
-  spdlog::critical(std::string{"{} {}:{} "} + __format__, REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
+  spdlog::critical(fmt::runtime(std::string{"{} {}:{} "} + __format__), REL_FILE_PATH, __FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 #ifdef _WIN32
 #  define LOG_CRITICAL_W(__format__, ...)                                                                                        \
-    spdlog::critical(std::wstring{L"{} {}:{} "} + __format__,                                                                    \
+    spdlog::critical(fmt::runtime(std::wstring{L"{} {}:{} "} + __format__),                                                      \
                      utility::decodeFromUtf8(REL_FILE_PATH),                                                                     \
                      utility::decodeFromUtf8(__FUNCTION__),                                                                      \
                      __LINE__,                                                                                                   \
