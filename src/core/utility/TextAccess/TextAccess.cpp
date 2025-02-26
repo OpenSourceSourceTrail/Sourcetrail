@@ -14,7 +14,7 @@ std::istream& safeGetline(std::istream& istream, std::string& text) {
   // The sentry object performs various tasks,
   // such as thread synchronization and updating the stream state.
 
-  std::istream::sentry sentry(istream, true);
+  const std::istream::sentry sentry(istream, true);
   std::streambuf* pStreambuf = istream.rdbuf();
 
   while(true) {
@@ -59,7 +59,7 @@ std::shared_ptr<TextAccess> TextAccess::createFromString(const std::string& text
 }
 
 std::shared_ptr<TextAccess> TextAccess::createFromLines(const std::vector<std::string>& lines, const FilePath& filePath) {
-  std::shared_ptr<TextAccess> result(new TextAccess());
+  const std::shared_ptr<TextAccess> result{new TextAccess};
 
   result->m_lines = lines;
   result->m_filePath = filePath;
@@ -141,7 +141,7 @@ std::vector<std::string> TextAccess::readFile(const FilePath& filePath) {
   }
 
   if(!result.empty()) {
-    std::string last = result.back().substr(0, result.back().size() - 1);
+    const std::string last = result.back().substr(0, result.back().size() - 1);
     result.pop_back();
     if(!last.empty()) {
       result.push_back(last);
