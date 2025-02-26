@@ -1,6 +1,4 @@
-#ifndef CXX_VS_10_TO_14_HEADER_PATH_DETECTOR_H
-#define CXX_VS_10_TO_14_HEADER_PATH_DETECTOR_H
-
+#pragma once
 #include "ApplicationArchitectureType.h"
 #include "PathDetector.h"
 
@@ -11,9 +9,6 @@ public:
   CxxVs10To14HeaderPathDetector(VisualStudioType type, bool isExpress, ApplicationArchitectureType architecture);
 
 private:
-  static int visualStudioTypeToVersion(const VisualStudioType t);
-  static std::string visualStudioTypeToString(const VisualStudioType t);
-
   std::vector<FilePath> doGetPaths() const override;
 
   FilePath getVsInstallPathUsingRegistry() const;
@@ -22,5 +17,3 @@ private:
   const bool m_isExpress;
   const ApplicationArchitectureType m_architecture;
 };
-
-#endif    // CXX_VS_10_TO_14_HEADER_PATH_DETECTOR_H

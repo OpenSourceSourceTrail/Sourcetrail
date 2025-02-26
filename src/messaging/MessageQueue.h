@@ -82,7 +82,7 @@ public:
   void addMessageFilter(std::shared_ptr<MessageFilter> filter) noexcept override;
 
   void pushMessage(std::shared_ptr<MessageBase> message) noexcept override;
-  void processMessage(const std::shared_ptr<MessageBase>&, bool asNextTask) noexcept override;
+  void processMessage(const std::shared_ptr<MessageBase>& message, bool asNextTask) noexcept override;
 
   void startMessageLoopThreaded() noexcept override;
   void startMessageLoop() noexcept override;

@@ -14,7 +14,7 @@ struct ProcessOutput final {
   int exitCode;
 };
 
-std::filesystem::path searchPath(const std::filesystem::path& bin, bool& ok);
+std::filesystem::path searchPath(const std::filesystem::path& bin, bool& isOk);
 
 std::filesystem::path searchPath(const std::filesystem::path& bin);
 

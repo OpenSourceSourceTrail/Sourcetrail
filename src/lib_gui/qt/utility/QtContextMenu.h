@@ -1,5 +1,4 @@
 #pragma once
-
 #include <QMenu>
 #include <QObject>
 
@@ -46,16 +45,16 @@ private:
 
   void openContainingFolderActionTriggered();
 
-  static QtContextMenu* s_instance;
+  static QtContextMenu* sInstance;
 
-  static QAction* s_undoAction;
-  static QAction* s_redoAction;
+  static QAction* sUndoAction;
+  static QAction* sRedoAction;
 
-  static QAction* s_copyFullPathAction;
-  static QAction* s_openContainingFolderAction;
+  static QAction* sCopyFullPathAction;
+  static QAction* sOpenContainingFolderAction;
 
-  static FilePath s_filePath;
+  static FilePath sFilePath;
 
-  QMenu m_menu;
-  QPoint m_point;
+  QMenu mMenu;
+  QPoint mPoint;
 };

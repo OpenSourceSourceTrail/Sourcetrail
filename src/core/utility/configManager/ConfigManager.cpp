@@ -94,6 +94,7 @@ void ConfigManager::clear() {
   mConfigValues.clear();
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 void ConfigManager::removeValues(const std::string& key) {
   for(const std::string& subLevelKey : getSublevelKeys(key)) {
     removeValues(subLevelKey);
@@ -109,9 +110,9 @@ std::vector<std::string> ConfigManager::getSublevelKeys(const std::string& key) 
   std::set<std::string> keys;
   for(const auto& m_value : mConfigValues) {
     if(utility::isPrefix(key, m_value.first)) {
-      size_t startPos = m_value.first.find("/", key.size());
+      const size_t startPos = m_value.first.find("/", key.size());
       if(startPos == key.size()) {
-        std::string subLevelKey = m_value.first.substr(0, m_value.first.find("/", startPos + 1));
+        const std::string subLevelKey = m_value.first.substr(0, m_value.first.find("/", startPos + 1));
         keys.insert(subLevelKey);
       }
     }

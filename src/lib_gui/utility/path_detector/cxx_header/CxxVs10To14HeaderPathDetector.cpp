@@ -10,6 +10,42 @@
 #include "utility.h"
 #include "utilityCxxHeaderDetection.h"
 
+namespace {
+constexpr int VisualStudio2010 = 10;
+constexpr int VisualStudio2012 = 11;
+constexpr int VisualStudio2013 = 12;
+constexpr int VisualStudio2015 = 14;
+
+constexpr int visualStudioTypeToVersion(const CxxVs10To14HeaderPathDetector::VisualStudioType type) {
+  switch(type) {
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010:
+    return VisualStudio2010;
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012:
+    return VisualStudio2012;
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013:
+    return VisualStudio2013;
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015:
+    return VisualStudio2015;
+  }
+  return 0;
+}
+
+constexpr std::string visualStudioTypeToString(const CxxVs10To14HeaderPathDetector::VisualStudioType type) {
+  std::string ret = "Visual Studio";
+  switch(type) {
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010:
+    return ret + " 2010";
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2012:
+    return ret + " 2012";
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2013:
+    return ret + " 2013";
+  case CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2015:
+    return ret + " 2015";
+  }
+  return ret;
+}
+}    // namespace
+
 CxxVs10To14HeaderPathDetector::CxxVs10To14HeaderPathDetector(VisualStudioType type,
                                                              bool isExpress,
                                                              ApplicationArchitectureType architecture)
@@ -19,42 +55,13 @@ CxxVs10To14HeaderPathDetector::CxxVs10To14HeaderPathDetector(VisualStudioType ty
     , m_isExpress(isExpress)
     , m_architecture(architecture) {}
 
-int CxxVs10To14HeaderPathDetector::visualStudioTypeToVersion(const VisualStudioType t) {
-  switch(t) {
-  case VISUAL_STUDIO_2010:
-    return 10;
-  case VISUAL_STUDIO_2012:
-    return 11;
-  case VISUAL_STUDIO_2013:
-    return 12;
-  case VISUAL_STUDIO_2015:
-    return 14;
-  }
-  return 0;
-}
-
-std::string CxxVs10To14HeaderPathDetector::visualStudioTypeToString(const VisualStudioType t) {
-  std::string ret = "Visual Studio";
-  switch(t) {
-  case VISUAL_STUDIO_2010:
-    return ret + " 2010";
-  case VISUAL_STUDIO_2012:
-    return ret + " 2012";
-  case VISUAL_STUDIO_2013:
-    return ret + " 2013";
-  case VISUAL_STUDIO_2015:
-    return ret + " 2015";
-  }
-  return ret;
-}
-
 std::vector<FilePath> CxxVs10To14HeaderPathDetector::doGetPaths() const {
   const FilePath vsInstallPath = getVsInstallPathUsingRegistry();
 
   // vc++ headers
   std::vector<FilePath> headerSearchPaths;
   if(vsInstallPath.exists()) {
-    for(const std::wstring& subdirectory : {L"vc/include", L"vc/atlmfc/include"}) {
+    for(const auto& subdirectory : {L"vc/include", L"vc/atlmfc/include"}) {
       FilePath headerSearchPath = vsInstallPath.getConcatenated(subdirectory);
       if(headerSearchPath.exists()) {
         headerSearchPaths.push_back(headerSearchPath.makeCanonical());
@@ -78,8 +85,8 @@ FilePath CxxVs10To14HeaderPathDetector::getVsInstallPathUsingRegistry() const {
   key += (m_isExpress ? QStringLiteral("VCExpress") : QStringLiteral("VisualStudio"));
   key += "\\" + QString::number(m_version) + ".0";
 
-  QSettings expressKey(key, QSettings::NativeFormat);    // NativeFormat means from Registry on Windows.
-  QString value = expressKey.value("InstallDir").toString() + "../../";
+  const QSettings expressKey(key, QSettings::NativeFormat);    // NativeFormat means from Registry on Windows.
+  const QString value = expressKey.value("InstallDir").toString() + "../../";
 
   FilePath path(value.toStdWString());
   if(path.exists()) {
@@ -87,5 +94,5 @@ FilePath CxxVs10To14HeaderPathDetector::getVsInstallPathUsingRegistry() const {
     return path;
   }
 
-  return FilePath();
+  return {};
 }

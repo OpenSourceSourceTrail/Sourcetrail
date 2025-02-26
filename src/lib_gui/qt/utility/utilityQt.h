@@ -1,5 +1,4 @@
 #pragma once
-// STL
 #include <string>
 
 class FilePath;
@@ -25,7 +24,7 @@ std::string getStyleSheet(const FilePath& path);
 
 QString getStyleSheet(const QString& resource);
 
-QPixmap colorizePixmap(const QPixmap& pixmap, QColor color);
+QPixmap colorizePixmap(const QPixmap& pixmap, const QColor& color);
 
 QIcon createButtonIcon(const FilePath& iconPath, const std::string& colorId);
 

@@ -1,34 +1,38 @@
 #include "utilityFile.h"
 
+#include <algorithm>
+
 #include "FilePath.h"
 #include "FileSystem.h"
 #include "logging.h"
 #include "utility.h"
 
-std::vector<FilePath> utility::partitionFilePathsBySize(std::vector<FilePath> filePaths, int partitionCount) {
-  typedef std::pair<unsigned long long int, FilePath> PairType;
+std::vector<FilePath> utility::partitionFilePathsBySize(const std::vector<FilePath>& filePaths, int partitionCount) {
+  using PairType = std::pair<unsigned long long, FilePath>;
   std::vector<PairType> sourceFileSizesToCommands;
   for(const FilePath& path : filePaths) {
     if(path.exists()) {
-      sourceFileSizesToCommands.push_back(std::make_pair(FileSystem::getFileByteSize(path), path));
+      sourceFileSizesToCommands.emplace_back(FileSystem::getFileByteSize(path), path);
     } else {
-      sourceFileSizesToCommands.push_back(std::make_pair(1, path));
+      sourceFileSizesToCommands.emplace_back(1, path);
     }
   }
 
-  std::sort(sourceFileSizesToCommands.begin(), sourceFileSizesToCommands.end(), [](const PairType& p, const PairType& q) {
-    return p.first > q.first;
-  });
+  std::ranges::sort(
+      sourceFileSizesToCommands, [](const PairType& item0, const PairType& item1) { return item0.first > item1.first; });
 
-  if(0 < partitionCount && partitionCount < static_cast<int>(sourceFileSizesToCommands.size())) {
-    for(int i = 0; i < partitionCount; i++) {
-      std::sort(sourceFileSizesToCommands.begin() + sourceFileSizesToCommands.size() * i / partitionCount,
-                sourceFileSizesToCommands.begin() + sourceFileSizesToCommands.size() * (i + 1) / partitionCount,
-                [](const PairType& p, const PairType& q) { return p.second.wstr() < q.second.wstr(); });
+  const auto partitionCountSize = static_cast<size_t>(partitionCount);
+  if(0 < partitionCountSize && partitionCountSize < sourceFileSizesToCommands.size()) {
+    for(size_t index = 0; index < static_cast<size_t>(partitionCount); ++index) {
+      std::sort(
+          sourceFileSizesToCommands.begin() + static_cast<long>(sourceFileSizesToCommands.size() * index / partitionCountSize),
+          sourceFileSizesToCommands.begin() + static_cast<long>(sourceFileSizesToCommands.size() * (index + 1) / partitionCountSize),
+          [](const PairType& item0, const PairType& item1) { return item0.second.wstr() < item1.second.wstr(); });
     }
   }
 
   std::vector<FilePath> sortedFilePaths;
+  sortedFilePaths.reserve(sourceFileSizesToCommands.size());
   for(const PairType& pair : sourceFileSizesToCommands) {
     sortedFilePaths.push_back(pair.second);
   }
@@ -64,7 +68,7 @@ FilePath utility::getExpandedPath(const FilePath& path) {
     }
     return paths.front();
   }
-  return FilePath();
+  return {};
 }
 
 std::vector<FilePath> utility::getExpandedPaths(const std::vector<FilePath>& paths) {
@@ -84,13 +88,13 @@ std::vector<std::filesystem::path> utility::getExpandedPaths(const std::vector<s
 }
 
 FilePath utility::getExpandedAndAbsolutePath(const FilePath& path, const FilePath& baseDirectory) {
-  FilePath p = getExpandedPath(path);
+  FilePath expandedPath = getExpandedPath(path);
 
-  if(p.empty() || p.isAbsolute()) {
-    return p;
+  if(expandedPath.empty() || expandedPath.isAbsolute()) {
+    return expandedPath;
   }
 
-  return baseDirectory.getConcatenated(p).makeCanonical();
+  return baseDirectory.getConcatenated(expandedPath).makeCanonical();
 }
 
 FilePath utility::getAsRelativeIfShorter(const FilePath& absolutePath, const FilePath& baseDirectory) {

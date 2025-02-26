@@ -1,14 +1,14 @@
 #include "utilityQt.h"
-// STL
+
 #include <set>
-// Qt5
+
 #include <QDir>
 #include <QFile>
 #include <QFontDatabase>
 #include <QIcon>
 #include <QPainter>
 #include <QWidget>
-// Internal
+
 #include "ColorScheme.h"
 #include "FilePath.h"
 #include "FileSystem.h"
@@ -42,35 +42,36 @@ void setWidgetRetainsSpaceWhenHidden(QWidget* widget) {
 void loadFontsFromDirectory(const FilePath& path, const std::wstring& extension) {
   std::vector<std::wstring> extensions;
   extensions.push_back(extension);
-  std::vector<FilePath> fontFilePaths = FileSystem::getFilePathsFromDirectory(path, extensions);
+  const std::vector<FilePath> fontFilePaths = FileSystem::getFilePathsFromDirectory(path, extensions);
 
   std::set<int> loadedFontIds;
 
   for(const FilePath& fontFilePath : fontFilePaths) {
     QFile file(QString::fromStdWString(fontFilePath.wstr()));
     if(file.open(QIODevice::ReadOnly)) {
-      int id = QFontDatabase::addApplicationFontFromData(file.readAll());
-      if(id != -1) {
-        loadedFontIds.insert(id);
+      const int fontId = QFontDatabase::addApplicationFontFromData(file.readAll());
+      if(fontId != -1) {
+        loadedFontIds.insert(fontId);
       }
     }
   }
 
-  for(int loadedFontId : loadedFontIds) {
-    for(QString& family : QFontDatabase::applicationFontFamilies(loadedFontId)) {
+  for(const int loadedFontId : loadedFontIds) {
+    for(const QString& family : QFontDatabase::applicationFontFamilies(loadedFontId)) {
       LOG_INFO(L"Loaded FontFamily: " + family.toStdWString());
     }
   }
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::string getStyleSheet(const FilePath& path) {
   std::string css = TextAccess::createFromFile(path)->getText();
 
   size_t pos = 0;
 
   while(pos != std::string::npos) {
-    size_t posA = css.find('<', pos);
-    size_t posB = css.find('>', pos);
+    const size_t posA = css.find('<', pos);
+    const size_t posB = css.find('>', pos);
 
     if(posA == std::string::npos || posB == std::string::npos) {
       break;
@@ -90,30 +91,30 @@ std::string getStyleSheet(const FilePath& path) {
         // check for modifier
         if(val.find('+') != std::string::npos) {
           const size_t findPos = val.find('+');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() + mod);
         } else if(val.find('-') != std::string::npos) {
           const size_t findPos = val.find('-');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() - mod);
         } else if(val.find('*') != std::string::npos) {
           const size_t findPos = val.find('*');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() * mod);
         } else if(val.find('/') != std::string::npos) {
           const size_t findPos = val.find('/');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() / mod);
         } else {
@@ -174,6 +175,7 @@ std::string getStyleSheet(const FilePath& path) {
   return css;
 }
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 QString getStyleSheet(const QString& resource) {
   QFile file(resource);
   if(!file.open(QIODevice::ReadOnly)) {
@@ -185,8 +187,8 @@ QString getStyleSheet(const QString& resource) {
   size_t pos = 0;
 
   while(pos != std::string::npos) {
-    size_t posA = css.find('<', pos);
-    size_t posB = css.find('>', pos);
+    const size_t posA = css.find('<', pos);
+    const size_t posB = css.find('>', pos);
 
     if(posA == std::string::npos || posB == std::string::npos) {
       break;
@@ -206,30 +208,30 @@ QString getStyleSheet(const QString& resource) {
         // check for modifier
         if(val.find('+') != std::string::npos) {
           const size_t findPos = val.find('+');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() + mod);
         } else if(val.find('-') != std::string::npos) {
           const size_t findPos = val.find('-');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() - mod);
         } else if(val.find('*') != std::string::npos) {
           const size_t findPos = val.find('*');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() * mod);
         } else if(val.find('/') != std::string::npos) {
           const size_t findPos = val.find('/');
-          std::string sub = val.substr(findPos + 1);
+          const std::string sub = val.substr(findPos + 1);
 
-          int mod = std::stoi(sub);
+          const int mod = std::stoi(sub);
 
           val = std::to_string(IApplicationSettings::getInstanceRaw()->getFontSize() / mod);
         } else {
@@ -291,7 +293,7 @@ QString getStyleSheet(const QString& resource) {
   return QString::fromStdString(css);
 }
 
-QPixmap colorizePixmap(const QPixmap& pixmap, QColor color) {
+QPixmap colorizePixmap(const QPixmap& pixmap, const QColor& color) {
   QImage image = pixmap.toImage();
   QImage colorImage(image.size(), image.format());
   QPainter colorPainter(&colorImage);
@@ -304,41 +306,42 @@ QPixmap colorizePixmap(const QPixmap& pixmap, QColor color) {
 }
 
 QIcon createButtonIcon(const FilePath& iconPath, const std::string& colorId) {
-  ColorScheme* scheme = ColorScheme::getInstance().get();
+  const ColorScheme* scheme = ColorScheme::getInstance().get();
 
-  QPixmap pixmap(QString::fromStdWString(iconPath.wstr()));
-  QIcon icon(utility::colorizePixmap(pixmap, scheme->getColor(colorId + "/icon").c_str()));
+  const QPixmap pixmap(QString::fromStdWString(iconPath.wstr()));
+  QIcon icon(colorizePixmap(pixmap, scheme->getColor(colorId + "/icon").c_str()));
 
   if(scheme->hasColor(colorId + "/icon_disabled")) {
-    icon.addPixmap(utility::colorizePixmap(pixmap, scheme->getColor(colorId + "/icon_disabled").c_str()), QIcon::Disabled);
+    icon.addPixmap(colorizePixmap(pixmap, scheme->getColor(colorId + "/icon_disabled").c_str()), QIcon::Disabled);
   }
 
   return icon;
 }
 
 QtMainWindow* getMainWindowforMainView(ViewLayout* viewLayout) {
-  if(QtMainView* mainView = dynamic_cast<QtMainView*>(viewLayout)) {
+  if(const auto* mainView = dynamic_cast<QtMainView*>(viewLayout); nullptr != mainView) {
     return mainView->getMainWindow();
   }
   return nullptr;
 }
 
+// NOLINTNEXTLINE(misc-no-recursion)
 void copyNewFilesFromDirectory(const QString& src, const QString& dst) {
-  QDir dir(src);
+  const QDir dir(src);
   if(!dir.exists()) {
     return;
   }
 
-  foreach(QString d, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
-    QString dst_path = dst + QDir::separator() + d;
+  foreach(const QString currentDir, dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
+    const QString dst_path = dst + QDir::separator() + currentDir;
 
-    dir.mkpath(dst_path);
-    copyNewFilesFromDirectory(src + QDir::separator() + d, dst_path);
+    std::ignore = dir.mkpath(dst_path);
+    copyNewFilesFromDirectory(src + QDir::separator() + currentDir, dst_path);
   }
 
-  foreach(QString f, dir.entryList(QDir::Files)) {
-    if(!QFile::exists(dst + QDir::separator() + f)) {
-      QFile::copy(src + QDir::separator() + f, dst + QDir::separator() + f);
+  foreach(const QString currentFile, dir.entryList(QDir::Files)) {
+    if(!QFile::exists(dst + QDir::separator() + currentFile)) {
+      QFile::copy(src + QDir::separator() + currentFile, dst + QDir::separator() + currentFile);
     }
   }
 }

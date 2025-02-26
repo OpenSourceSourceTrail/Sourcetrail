@@ -11,45 +11,75 @@
 #include "ParserClient.h"
 #include "ScopedSwitcher.h"
 
+namespace {
+
+std::string typeLocClassToString(clang::TypeLoc typeLoc) {
+  switch(typeLoc.getTypeLocClass()) {
+// NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define STRINGIFY(X) #X
+    // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define ABSTRACT_TYPE(Class, Base)
+    // NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
+#define TYPE(Class, Base)                                                                                                        \
+  case clang::TypeLoc::Class:                                                                                                    \
+    return STRINGIFY(Class);
+#include <clang/AST/TypeLoc.h>
+  case clang::TypeLoc::TypeLocClass::Qualified:
+    return "Qualified";
+  default:
+    return "";
+  }
+}
+
+std::string obfuscateName(const std::string& name) {
+  if(name.length() <= 2) {
+    return name;
+  }
+  return name.substr(0, 1) + ".." + name.substr(name.length() - 1);
+}
+
+}    // namespace
+
 CxxVerboseAstVisitor::CxxVerboseAstVisitor(clang::ASTContext* context,
                                            clang::Preprocessor* preprocessor,
-                                           std::shared_ptr<ParserClient> client,
-                                           std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache,
-                                           std::shared_ptr<IndexerStateInfo> indexerStateInfo)
-    : base(context, preprocessor, client, canonicalFilePathCache, indexerStateInfo), m_indentation(0) {}
+                                           const std::shared_ptr<ParserClient>& client,
+                                           const std::shared_ptr<CanonicalFilePathCache>& canonicalFilePathCache,
+                                           const std::shared_ptr<IndexerStateInfo>& indexerStateInfo)
+    : base(context, preprocessor, client, canonicalFilePathCache, indexerStateInfo) {}
 
-bool CxxVerboseAstVisitor::TraverseDecl(clang::Decl* d) {
-  if(d) {
+bool CxxVerboseAstVisitor::TraverseDecl(clang::Decl* decl) {
+  if(nullptr != decl) {
     std::stringstream stream;
-    stream << getIndentString() << d->getDeclKindName() << "Decl";
-    if(clang::NamedDecl* namedDecl = clang::dyn_cast_or_null<clang::NamedDecl>(d)) {
+    stream << getIndentString() << decl->getDeclKindName() << "Decl";
+    if(auto* namedDecl = clang::dyn_cast_or_null<clang::NamedDecl>(decl)) {
       stream << " [" << obfuscateName(namedDecl->getNameAsString()) << "]";
     }
 
-    ParseLocation loc = getParseLocation(d->getSourceRange());
+    const ParseLocation loc = getParseLocation(decl->getSourceRange());
     stream << " <" << loc.startLineNumber << ":" << loc.startColumnNumber << ", " << loc.endLineNumber << ":"
            << loc.endColumnNumber << ">";
 
-    const clang::SourceManager& sm = m_astContext->getSourceManager();
-    FilePath currentFilePath = getCanonicalFilePathCache()->getCanonicalFilePath(sm.getFileID(d->getSourceRange().getBegin()), sm);
-    if(m_currentFilePath != currentFilePath) {
-      m_currentFilePath = currentFilePath;
-      LOG_INFO(fmt::format(L"Indexer - Traversing \"{}\"", currentFilePath.wstr()));
+    const clang::SourceManager& sourceManager = m_astContext->getSourceManager();
+    const FilePath currentFilePath = getCanonicalFilePathCache()->getCanonicalFilePath(
+        sourceManager.getFileID(decl->getSourceRange().getBegin()), sourceManager);
+    if(mCurrentFilePath != currentFilePath) {
+      mCurrentFilePath = currentFilePath;
+      LOG_INFO(L"Indexer - Traversing \"{}\"", currentFilePath.wstr());
     }
 
-    LOG_INFO(fmt::format("Indexer - {}", stream.str()));
+    LOG_INFO("Indexer - {}", stream.str());
 
     {
-      ScopedSwitcher<unsigned int> switcher(m_indentation, m_indentation + 1);
-      return base::TraverseDecl(d);
+      const ScopedSwitcher<unsigned int> switcher(mIndentation, mIndentation + 1);
+      return base::TraverseDecl(decl);
     }
   }
   return true;
 }
 
 bool CxxVerboseAstVisitor::TraverseStmt(clang::Stmt* stmt) {
-  if(stmt) {
-    ParseLocation loc = getParseLocation(stmt->getSourceRange());
+  if(nullptr != stmt) {
+    const ParseLocation loc = getParseLocation(stmt->getSourceRange());
     LOG_INFO(fmt::format("Indexer - {}{} <{}:{}, {}:{}>",
                          getIndentString(),
                          stmt->getStmtClassName(),
@@ -58,41 +88,34 @@ bool CxxVerboseAstVisitor::TraverseStmt(clang::Stmt* stmt) {
                          loc.endLineNumber,
                          loc.endColumnNumber));
     {
-      ScopedSwitcher<unsigned int> switcher(m_indentation, m_indentation + 1);
+      const ScopedSwitcher<unsigned int> switcher(mIndentation, mIndentation + 1);
       return base::TraverseStmt(stmt);
     }
   }
   return true;
 }
 
-bool CxxVerboseAstVisitor::TraverseTypeLoc(clang::TypeLoc tl) {
-  if(!tl.isNull()) {
-    ParseLocation loc = getParseLocation(tl.getSourceRange());
+bool CxxVerboseAstVisitor::TraverseTypeLoc(clang::TypeLoc type) {
+  if(!type.isNull()) {
+    const ParseLocation loc = getParseLocation(type.getSourceRange());
     LOG_INFO(fmt::format(fmt::runtime("Indexer - {}{}TypeLoc <{}:{}, {}:{}>"),
                          getIndentString(),
-                         typeLocClassToString(tl),
+                         typeLocClassToString(type),
                          loc.startColumnNumber,
                          loc.endLineNumber,
                          loc.endColumnNumber));
     {
-      ScopedSwitcher<unsigned int> switcher(m_indentation, m_indentation + 1);
-      return base::TraverseTypeLoc(tl);
+      const ScopedSwitcher<unsigned int> switcher(mIndentation, mIndentation + 1);
+      return base::TraverseTypeLoc(type);
     }
   }
   return true;
 }
 
 std::string CxxVerboseAstVisitor::getIndentString() const {
-  std::string indentString = "";
-  for(unsigned int i = 0; i < m_indentation; i++) {
-    indentString += "| ";
+  std::stringstream indentString;
+  for(unsigned int i = 0; i < mIndentation; i++) {
+    indentString << "| ";
   }
-  return indentString;
-}
-
-std::string CxxVerboseAstVisitor::obfuscateName(const std::string& name) const {
-  if(name.length() <= 2) {
-    return name;
-  }
-  return name.substr(0, 1) + ".." + name.substr(name.length() - 1);
+  return indentString.str();
 }

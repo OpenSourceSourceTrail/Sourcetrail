@@ -1,6 +1,4 @@
-#ifndef SOURCE_GROUP_CXX_EMPTY_H
-#define SOURCE_GROUP_CXX_EMPTY_H
-
+#pragma once
 #include <memory>
 #include <set>
 
@@ -24,7 +22,5 @@ private:
   std::shared_ptr<const SourceGroupSettings> getSourceGroupSettings() const override;
   std::vector<std::wstring> getBaseCompilerFlags() const;
 
-  std::shared_ptr<SourceGroupSettings> m_settings;
+  std::shared_ptr<SourceGroupSettings> mSettings;
 };
-
-#endif    // SOURCE_GROUP_CXX_EMPTY_H

@@ -16,7 +16,7 @@
 
 std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const FilePath& cdbPath) {
   std::string error;
-  std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
+  const std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
 
   if(!error.empty()) {
     const auto message = fmt::format(
@@ -28,7 +28,7 @@ std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const FilePath& c
   return getSourceFilesFromCDB(cdb, cdbPath);
 }
 
-std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb,
+std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
                                                                const FilePath& cdbPath) {
   std::vector<FilePath> filePaths;
   if(cdb) {
@@ -61,7 +61,7 @@ std::vector<std::wstring> IndexerCommandCxx::getCompilerFlagsForSystemHeaderSear
   compilerFlags.reserve(systemHeaderSearchPaths.size() * 2);
 
   for(const FilePath& path : systemHeaderSearchPaths) {
-    compilerFlags.push_back(L"-isystem");
+    compilerFlags.emplace_back(L"-isystem");
     compilerFlags.push_back(path.wstr());
   }
 
@@ -70,7 +70,7 @@ std::vector<std::wstring> IndexerCommandCxx::getCompilerFlagsForSystemHeaderSear
   compilerFlags = utility::concat({L"-isystem", ResourcePaths::getCxxCompilerHeaderDirectoryPath().wstr()}, compilerFlags);
 #else
   // append otherwise
-  compilerFlags.push_back(L"-isystem");
+  compilerFlags.emplace_back(L"-isystem");
   compilerFlags.push_back(ResourcePaths::getCxxCompilerHeaderDirectoryPath().wstr());
 #endif
 
@@ -82,7 +82,7 @@ std::vector<std::wstring> IndexerCommandCxx::getCompilerFlagsForFrameworkSearchP
   std::vector<std::wstring> compilerFlags;
   compilerFlags.reserve(frameworkSearchPaths.size() * 2);
   for(const FilePath& path : frameworkSearchPaths) {
-    compilerFlags.push_back(L"-iframework");
+    compilerFlags.emplace_back(L"-iframework");
     compilerFlags.push_back(path.wstr());
   }
   return compilerFlags;
@@ -95,14 +95,14 @@ IndexerCommandCxx::IndexerCommandCxx(const FilePath& sourceFilePath,
                                      const std::set<FilePath>& indexedPaths,
                                      const std::set<FilePathFilter>& excludeFilters,
                                      const std::set<FilePathFilter>& includeFilters,
-                                     const FilePath& workingDirectory,
+                                     FilePath workingDirectory,
                                      const std::vector<std::wstring>& compilerFlags)
     : IndexerCommand(sourceFilePath)
-    , m_indexedPaths(indexedPaths)
-    , m_excludeFilters(excludeFilters)
-    , m_includeFilters(includeFilters)
-    , m_workingDirectory(workingDirectory)
-    , m_compilerFlags(compilerFlags) {}
+    , mIndexedPaths(indexedPaths)
+    , mExcludeFilters(excludeFilters)
+    , mIncludeFilters(includeFilters)
+    , mWorkingDirectory(std::move(workingDirectory))
+    , mCompilerFlags(compilerFlags) {}
 
 IndexerCommandType IndexerCommandCxx::getIndexerCommandType() const {
   return getStaticIndexerCommandType();
@@ -111,19 +111,19 @@ IndexerCommandType IndexerCommandCxx::getIndexerCommandType() const {
 size_t IndexerCommandCxx::getByteSize(size_t stringSize) const {
   size_t size = IndexerCommand::getByteSize(stringSize);
 
-  for(const FilePath& path : m_indexedPaths) {
+  for(const FilePath& path : mIndexedPaths) {
     size += stringSize + utility::encodeToUtf8(path.wstr()).size();
   }
 
-  for(const FilePathFilter& filter : m_excludeFilters) {
+  for(const FilePathFilter& filter : mExcludeFilters) {
     size += stringSize + utility::encodeToUtf8(filter.wstr()).size();
   }
 
-  for(const FilePathFilter& filter : m_includeFilters) {
+  for(const FilePathFilter& filter : mIncludeFilters) {
     size += stringSize + utility::encodeToUtf8(filter.wstr()).size();
   }
 
-  for(const std::wstring& flag : m_compilerFlags) {
+  for(const std::wstring& flag : mCompilerFlags) {
     size += stringSize + flag.size();
   }
 
@@ -131,23 +131,23 @@ size_t IndexerCommandCxx::getByteSize(size_t stringSize) const {
 }
 
 const std::set<FilePath>& IndexerCommandCxx::getIndexedPaths() const {
-  return m_indexedPaths;
+  return mIndexedPaths;
 }
 
 const std::set<FilePathFilter>& IndexerCommandCxx::getExcludeFilters() const {
-  return m_excludeFilters;
+  return mExcludeFilters;
 }
 
 const std::set<FilePathFilter>& IndexerCommandCxx::getIncludeFilters() const {
-  return m_includeFilters;
+  return mIncludeFilters;
 }
 
 const std::vector<std::wstring>& IndexerCommandCxx::getCompilerFlags() const {
-  return m_compilerFlags;
+  return mCompilerFlags;
 }
 
 const FilePath& IndexerCommandCxx::getWorkingDirectory() const {
-  return m_workingDirectory;
+  return mWorkingDirectory;
 }
 
 QJsonObject IndexerCommandCxx::doSerialize() const {
@@ -155,21 +155,21 @@ QJsonObject IndexerCommandCxx::doSerialize() const {
 
   {
     QJsonArray indexedPathsArray;
-    for(const FilePath& indexedPath : m_indexedPaths) {
+    for(const FilePath& indexedPath : mIndexedPaths) {
       indexedPathsArray.append(QString::fromStdWString(indexedPath.wstr()));
     }
     jsonObject["indexed_paths"] = indexedPathsArray;
   }
   {
     QJsonArray excludeFiltersArray;
-    for(const FilePathFilter& excludeFilter : m_excludeFilters) {
+    for(const FilePathFilter& excludeFilter : mExcludeFilters) {
       excludeFiltersArray.append(QString::fromStdWString(excludeFilter.wstr()));
     }
     jsonObject["exclude_filters"] = excludeFiltersArray;
   }
   {
     QJsonArray includeFiltersArray;
-    for(const FilePathFilter& includeFilter : m_includeFilters) {
+    for(const FilePathFilter& includeFilter : mIncludeFilters) {
       includeFiltersArray.append(QString::fromStdWString(includeFilter.wstr()));
     }
     jsonObject["include_filters"] = includeFiltersArray;
@@ -177,7 +177,7 @@ QJsonObject IndexerCommandCxx::doSerialize() const {
   { jsonObject["working_directory"] = QString::fromStdWString(getWorkingDirectory().wstr()); }
   {
     QJsonArray compilerFlagsArray;
-    for(const std::wstring& compilerFlag : m_compilerFlags) {
+    for(const std::wstring& compilerFlag : mCompilerFlags) {
       compilerFlagsArray.append(QString::fromStdWString(compilerFlag));
     }
     jsonObject["compiler_flags"] = compilerFlagsArray;

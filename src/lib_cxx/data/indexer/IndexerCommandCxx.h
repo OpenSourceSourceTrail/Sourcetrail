@@ -1,20 +1,18 @@
-#ifndef INDEXER_COMMAND_CXX_H
-#define INDEXER_COMMAND_CXX_H
-
+#pragma once
 #include <string>
 #include <vector>
 
 #include "IndexerCommand.h"
 
 class FilePath;
-namespace clang { namespace tooling {
+namespace clang::tooling {
 class JSONCompilationDatabase;
-}}    // namespace clang::tooling
+}    // namespace clang::tooling
 
 class IndexerCommandCxx : public IndexerCommand {
 public:
   static std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath);
-  static std::vector<FilePath> getSourceFilesFromCDB(std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb,
+  static std::vector<FilePath> getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
                                                      const FilePath& cdbPath);
 
   static std::wstring getCompilerFlagLanguageStandard(const std::wstring& languageStandard);
@@ -27,27 +25,25 @@ public:
                     const std::set<FilePath>& indexedPaths,
                     const std::set<FilePathFilter>& excludeFilters,
                     const std::set<FilePathFilter>& includeFilters,
-                    const FilePath& workingDirectory,
+                    FilePath workingDirectory,
                     const std::vector<std::wstring>& compilerFlags);
 
-  IndexerCommandType getIndexerCommandType() const override;
-  size_t getByteSize(size_t stringSize) const override;
+  [[nodiscard]] IndexerCommandType getIndexerCommandType() const override;
+  [[nodiscard]] size_t getByteSize(size_t stringSize) const override;
 
-  const std::set<FilePath>& getIndexedPaths() const;
-  const std::set<FilePathFilter>& getExcludeFilters() const;
-  const std::set<FilePathFilter>& getIncludeFilters() const;
-  const std::vector<std::wstring>& getCompilerFlags() const;
-  const FilePath& getWorkingDirectory() const;
+  [[nodiscard]] const std::set<FilePath>& getIndexedPaths() const;
+  [[nodiscard]] const std::set<FilePathFilter>& getExcludeFilters() const;
+  [[nodiscard]] const std::set<FilePathFilter>& getIncludeFilters() const;
+  [[nodiscard]] const std::vector<std::wstring>& getCompilerFlags() const;
+  [[nodiscard]] const FilePath& getWorkingDirectory() const;
 
 protected:
-  QJsonObject doSerialize() const override;
+  [[nodiscard]] QJsonObject doSerialize() const override;
 
 private:
-  std::set<FilePath> m_indexedPaths;
-  std::set<FilePathFilter> m_excludeFilters;
-  std::set<FilePathFilter> m_includeFilters;
-  FilePath m_workingDirectory;
-  std::vector<std::wstring> m_compilerFlags;
+  std::set<FilePath> mIndexedPaths;
+  std::set<FilePathFilter> mExcludeFilters;
+  std::set<FilePathFilter> mIncludeFilters;
+  FilePath mWorkingDirectory;
+  std::vector<std::wstring> mCompilerFlags;
 };
-
-#endif    // INDEXER_COMMAND_CXXL_H

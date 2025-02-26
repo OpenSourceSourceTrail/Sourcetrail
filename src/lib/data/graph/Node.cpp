@@ -8,104 +8,98 @@
 #include "TokenComponentStatic.h"
 #include "utilityString.h"
 
-Node::Node(Id id, NodeType type, NameHierarchy nameHierarchy, DefinitionKind definitionKind)
-    : Token(id), m_type(type), m_nameHierarchy(std::move(nameHierarchy)), m_definitionKind(definitionKind), m_childCount(0) {}
+Node::Node(Id nodeId, NodeType type, NameHierarchy nameHierarchy, DefinitionKind definitionKind)
+    : Token(nodeId), mType(type), mNameHierarchy(std::move(nameHierarchy)), mDefinitionKind(definitionKind) {}
 
 Node::Node(const Node& other)
     : Token(other)
-    , m_type(other.m_type)
-    , m_nameHierarchy(other.m_nameHierarchy)
-    , m_definitionKind(other.m_definitionKind)
-    , m_childCount(other.m_childCount) {}
+    , mType(other.mType)
+    , mNameHierarchy(other.mNameHierarchy)
+    , mDefinitionKind(other.mDefinitionKind)
+    , mChildCount(other.mChildCount) {}
 
-Node::~Node() {}
-
-NodeType Node::getType() const {
-  return m_type;
-}
+Node::~Node() = default;
 
 void Node::setType(NodeType type) {
-  if(!isType(type.getKind() | NODE_SYMBOL)) {
+  if(!isType(type.getKind() | NODE_SYMBOL)) {    // NOLINT(hicpp-signed-bitwise)
     LOG_WARNING(L"Cannot change NodeType after it was already set from " + getReadableTypeString() + L" to " +
                 type.getReadableTypeWString());
     return;
   }
-  m_type = type;
+  mType = type;
 }
 
 bool Node::isType(NodeKindMask mask) const {
-  return (m_type.getKind() & mask) > 0;
+  return (mType.getKind() & mask) > 0;    // NOLINT(hicpp-signed-bitwise)
 }
 
 std::wstring Node::getName() const {
-  return m_nameHierarchy.getRawName();
+  return mNameHierarchy.getRawName();
 }
 
 std::wstring Node::getFullName() const {
-  return m_nameHierarchy.getQualifiedName();
+  return mNameHierarchy.getQualifiedName();
 }
 
 const NameHierarchy& Node::getNameHierarchy() const {
-  return m_nameHierarchy;
+  return mNameHierarchy;
 }
 
 bool Node::isDefined() const {
-  return m_definitionKind != DEFINITION_NONE;
+  return mDefinitionKind != DEFINITION_NONE;
 }
 
 bool Node::isImplicit() const {
-  return m_definitionKind == DEFINITION_IMPLICIT;
+  return mDefinitionKind == DEFINITION_IMPLICIT;
 }
 
 bool Node::isExplicit() const {
-  return m_definitionKind == DEFINITION_EXPLICIT;
+  return mDefinitionKind == DEFINITION_EXPLICIT;
 }
 
 size_t Node::getChildCount() const {
-  return m_childCount;
+  return mChildCount;
 }
 
 void Node::setChildCount(size_t childCount) {
-  m_childCount = childCount;
+  mChildCount = childCount;
 }
 
 size_t Node::getEdgeCount() const {
-  return m_edges.size();
+  return mEdges.size();
 }
 
 void Node::addEdge(Edge* edge) {
-  m_edges.emplace(edge->getId(), edge);
+  mEdges.emplace(edge->getId(), edge);
 }
 
 void Node::removeEdge(Edge* edge) {
-  auto it = m_edges.find(edge->getId());
-  if(it != m_edges.end()) {
-    m_edges.erase(it);
+  auto iterator = mEdges.find(edge->getId());
+  if(iterator != mEdges.end()) {
+    mEdges.erase(iterator);
   }
 }
 
 Node* Node::getParentNode() const {
-  Edge* edge = getMemberEdge();
-  if(edge) {
+  if(Edge* edge = getMemberEdge(); nullptr != edge) {
     return edge->getFrom();
   }
   return nullptr;
 }
 
-Node* Node::getLastParentNode() {
-  Node* parent = getParentNode();
-  if(parent) {
+Node* Node::getLastParentNode() {    // NOLINT(misc-no-recursion)
+  if(Node* parent = getParentNode(); nullptr != parent) {
     return parent->getLastParentNode();
   }
   return this;
 }
 
 Edge* Node::getMemberEdge() const {
-  return findEdgeOfType(Edge::EDGE_MEMBER, [this](Edge* e) { return e->getTo() == this; });
+  return findEdgeOfType(Edge::EDGE_MEMBER, [this](Edge* edge) { return edge->getTo() == this; });
 }
 
 bool Node::isParentOf(const Node* node) const {
-  while((node = node->getParentNode())) {
+  while((node = node->getParentNode()) != nullptr) {
     if(node == this) {
       return true;
     }
@@ -113,11 +107,11 @@ bool Node::isParentOf(const Node* node) const {
   return false;
 }
 
-Edge* Node::findEdge(std::function<bool(Edge*)> func) const {
-  auto it = find_if(m_edges.begin(), m_edges.end(), [func](std::pair<Id, Edge*> p) { return func(p.second); });
+Edge* Node::findEdge(const std::function<bool(Edge*)>& func) const {
+  auto iterator = std::ranges::find_if(mEdges, [func](const std::pair<Id, Edge*>& pair) { return func(pair.second); });
 
-  if(it != m_edges.end()) {
-    return it->second;
+  if(iterator != mEdges.end()) {
+    return iterator->second;
   }
 
   return nullptr;
@@ -127,92 +121,85 @@ Edge* Node::findEdgeOfType(Edge::TypeMask mask) const {
   return findEdgeOfType(mask, [](Edge*) { return true; });
 }
 
-Edge* Node::findEdgeOfType(Edge::TypeMask mask, std::function<bool(Edge*)> func) const {
-  auto it = find_if(m_edges.begin(), m_edges.end(), [mask, func](std::pair<Id, Edge*> p) {
-    if(p.second->isType(mask)) {
-      return func(p.second);
+Edge* Node::findEdgeOfType(Edge::TypeMask mask, const std::function<bool(Edge*)>& func) const {
+  auto iterator = std::ranges::find_if(mEdges, [mask, func](const std::pair<Id, Edge*>& pair) {
+    if(pair.second->isType(mask)) {
+      return func(pair.second);
     }
     return false;
   });
 
-  if(it != m_edges.end()) {
-    return it->second;
+  if(iterator != mEdges.end()) {
+    return iterator->second;
   }
 
   return nullptr;
 }
 
-Node* Node::findChildNode(std::function<bool(Node*)> func) const {
-  auto it = find_if(m_edges.begin(), m_edges.end(), [&func](std::pair<Id, Edge*> p) {
-    if(p.second->getType() == Edge::EDGE_MEMBER) {
-      return func(p.second->getTo());
+Node* Node::findChildNode(const std::function<bool(Node*)>& func) const {
+  auto iterator = std::ranges::find_if(mEdges, [&func](const std::pair<Id, Edge*>& item) {
+    if(item.second->getType() == Edge::EDGE_MEMBER) {
+      return func(item.second->getTo());
     }
     return false;
   });
 
-  if(it != m_edges.end()) {
-    return it->second->getTo();
+  if(iterator != mEdges.end()) {
+    return iterator->second->getTo();
   }
 
   return nullptr;
 }
 
-void Node::forEachEdge(std::function<void(Edge*)> func) const {
-  for_each(m_edges.begin(), m_edges.end(), [func](std::pair<Id, Edge*> p) { func(p.second); });
+void Node::forEachEdge(const std::function<void(Edge*)>& func) const {
+  std::ranges::for_each(mEdges, [func](const std::pair<Id, Edge*>& pair) { func(pair.second); });
 }
 
-void Node::forEachEdgeOfType(Edge::TypeMask mask, std::function<void(Edge*)> func) const {
-  for_each(m_edges.begin(), m_edges.end(), [mask, func](std::pair<Id, Edge*> p) {
-    if(p.second->isType(mask)) {
-      func(p.second);
+void Node::forEachEdgeOfType(Edge::TypeMask mask, const std::function<void(Edge*)>& func) const {
+  // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks): FIXME
+  std::ranges::for_each(mEdges, [mask, func](const std::pair<Id, Edge*>& edgePair) {
+    if(edgePair.second->isType(mask)) {
+      func(edgePair.second);
     }
   });
 }
 
-void Node::forEachChildNode(std::function<void(Node*)> func) const {
-  forEachEdgeOfType(Edge::EDGE_MEMBER, [func, this](Edge* e) {
-    if(this != e->getTo()) {
-      func(e->getTo());
+void Node::forEachChildNode(const std::function<void(Node*)>& func) const {
+  forEachEdgeOfType(Edge::EDGE_MEMBER, [func, this](Edge* edge) {
+    if(this != edge->getTo()) {
+      func(edge->getTo());
     }
   });
 }
 
-void Node::forEachNodeRecursive(std::function<void(const Node*)> func) const {
+void Node::forEachNodeRecursive(const std::function<void(const Node*)>& func) const {
   func(this);
 
-  forEachEdgeOfType(Edge::EDGE_MEMBER, [func, this](Edge* e) {
-    if(this != e->getTo()) {
-      e->getTo()->forEachNodeRecursive(func);
+  forEachEdgeOfType(Edge::EDGE_MEMBER, [func, this](const Edge* edge) {
+    if(this != edge->getTo()) {
+      edge->getTo()->forEachNodeRecursive(func);
     }
   });
-}
-
-bool Node::isNode() const {
-  return true;
-}
-
-bool Node::isEdge() const {
-  return false;
 }
 
 std::wstring Node::getReadableTypeString() const {
-  return m_type.getReadableTypeWString();
+  return mType.getReadableTypeWString();
 }
 
 std::wstring Node::getAsString() const {
   std::wstringstream str;
   str << L"[" << getId() << L"] " << getReadableTypeString() << L": " << L"\"" << getName() << L"\"";
 
-  TokenComponentAccess* access = getComponent<TokenComponentAccess>();
-  if(access) {
+  auto* access = getComponent<TokenComponentAccess>();
+  if(nullptr != access) {
     str << L" " << access->getAccessString();
   }
 
-  if(getComponent<TokenComponentStatic>()) {
+  if(nullptr != getComponent<TokenComponentStatic>()) {
     str << L" static";
   }
 
-  if(getComponent<TokenComponentConst>()) {
+  if(nullptr != getComponent<TokenComponentConst>()) {
     str << L" const";
   }
 
@@ -220,6 +207,5 @@ std::wstring Node::getAsString() const {
 }
 
 std::wostream& operator<<(std::wostream& ostream, const Node& node) {
-  ostream << node.getAsString();
-  return ostream;
+  return ostream << node.getAsString();
 }

@@ -171,6 +171,6 @@ SharedIndexerCommand::Type SharedIndexerCommand::getType() const {
   return m_type;
 }
 
-void SharedIndexerCommand::setType(const SharedIndexerCommand::Type type) {
+void SharedIndexerCommand::setType(const Type type) {
   m_type = type;
 }

@@ -7,7 +7,7 @@
 #include "TextAccess.h"
 
 Settings::Settings() {
-  clear();
+  clear();    // NOLINT(clang-analyzer-optin.cplusplus.VirtualCall):  TODO fix the following
 }
 
 Settings::Settings(const Settings& other) : m_config(other.m_config->createCopy()), m_filePath(other.m_filePath) {}
@@ -106,14 +106,14 @@ std::vector<std::filesystem::path> Settings::getPathValuesStl(const std::string&
 }
 
 bool Settings::setPathValues(const std::string& key, const std::vector<FilePath>& paths) {
-  std::vector<std::wstring> values = paths | ranges::cpp20::views::transform([](const auto& value) { return value.wstr(); }) |
-      ranges::to<std::vector>();
+  const std::vector<std::wstring> values = paths |
+      ranges::cpp20::views::transform([](const auto& value) { return value.wstr(); }) | ranges::to<std::vector>();
   return setValues(key, values);
 }
 
 bool Settings::setPathValues(const std::string& key, const std::vector<std::filesystem::path>& paths) noexcept {
-  std::vector<std::wstring> values = paths | ranges::cpp20::views::transform([](const auto& value) { return value.wstring(); }) |
-      ranges::to<std::vector>();
+  const std::vector<std::wstring> values = paths |
+      ranges::cpp20::views::transform([](const auto& value) { return value.wstring(); }) | ranges::to<std::vector>();
   return setValues(key, values);
 }
 

@@ -39,15 +39,15 @@ public:
   void deleteBookmarkCategory(Id categoryId);
   void deleteBookmarkForActiveTokens();
 
-  void activateBookmark(const std::shared_ptr<Bookmark> bookmark);
+  void activateBookmark(const std::shared_ptr<Bookmark>& bookmark);
 
   void showBookmarkCreator(Id nodeId = 0);
-  void showBookmarkEditor(const std::shared_ptr<Bookmark> bookmark);
+  void showBookmarkEditor(const std::shared_ptr<Bookmark>& bookmark);
 
 private:
   class BookmarkCache {
   public:
-    BookmarkCache(StorageAccess* storageAccess);
+    explicit BookmarkCache(StorageAccess* storageAccess);
 
     void clear();
 
@@ -55,11 +55,11 @@ private:
     std::vector<EdgeBookmark> getAllEdgeBookmarks();
 
   private:
-    StorageAccess* m_storageAccess;
-    std::vector<NodeBookmark> m_nodeBookmarks;
-    std::vector<EdgeBookmark> m_edgeBookmarks;
-    bool m_nodeBookmarksValid;
-    bool m_edgeBookmarksValid;
+    StorageAccess* mStorageAccess;
+    std::vector<NodeBookmark> mNodeBookmarks;
+    std::vector<EdgeBookmark> mEdgeBookmarks;
+    bool mNodeBookmarksValid = false;
+    bool mEdgeBookmarksValid = false;
   };
 
   void handleActivation(const MessageActivateBase* message) override;
@@ -89,7 +89,7 @@ private:
 
   [[nodiscard]] std::vector<std::wstring> getActiveNodeDisplayNames() const;
   [[nodiscard]] std::vector<std::wstring> getActiveEdgeDisplayNames() const;
-  [[nodiscard]] std::wstring getNodeDisplayName(const Id id) const;
+  [[nodiscard]] std::wstring getNodeDisplayName(Id nodeId) const;
 
   [[nodiscard]] std::vector<std::shared_ptr<Bookmark>> getFilteredBookmarks(const std::vector<std::shared_ptr<Bookmark>>& bookmarks,
                                                                             Bookmark::Filter filter) const;
@@ -102,13 +102,10 @@ private:
 
   void cleanBookmarkCategories();
 
-  static bool bookmarkDateCompare(const std::shared_ptr<Bookmark>& a, const std::shared_ptr<Bookmark>& b);
-  static bool bookmarkNameCompare(const std::shared_ptr<Bookmark>& a, const std::shared_ptr<Bookmark>& b);
+  static bool bookmarkDateCompare(const std::shared_ptr<Bookmark>& item0, const std::shared_ptr<Bookmark>& item1);
+  static bool bookmarkNameCompare(const std::shared_ptr<Bookmark>& item0, const std::shared_ptr<Bookmark>& item1);
 
   void update();
-
-  static const std::wstring sEdgeSeparatorToken;
-  static const std::wstring sDefaultCategoryName;
 
   StorageAccess* const mStorageAccess;
   mutable BookmarkCache mBookmarkCache;

@@ -1,9 +1,8 @@
 #pragma once
-// Qt5
 #include <QCoreApplication>
 #include <QDir>
 #include <QDirIterator>
-// internal
+
 #include "AppPath.h"
 #include "FilePath.h"
 #include "ResourcePaths.h"
@@ -13,8 +12,8 @@
 #include "details/ApplicationSettings.h"
 
 inline void setupPlatform(int /*argc*/, [[maybe_unused]] char* argv[]) {
-  std::string home = std::getenv("HOME");
-  UserPaths::setUserDataDirectoryPath(FilePath(home + "/.config/sourcetrail/"));
+  auto home = qEnvironmentVariable("HOME", "~");
+  UserPaths::setUserDataDirectoryPath(FilePath{(home + "/.config/sourcetrail/").toStdString()});
 
   // Set QT screen scaling factor
   ApplicationSettings appSettings;
@@ -48,11 +47,15 @@ inline void setupApp([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
     AppPath::setSharedDataDirectoryPath(appPath.getConcatenated(L"/../share").getAbsolute());
   }
 
-  std::string userdir(std::getenv("HOME"));
+
+  QString userdir;
+  if(auto value = qEnvironmentVariable("HOME"); !value.isEmpty()) {
+    userdir = std::move(value);
+  }
   userdir.append("/.config/sourcetrail/");
 
-  QString userDataPath(userdir.c_str());
-  QDir dataDir(userdir.c_str());
+  QString userDataPath{userdir};
+  QDir dataDir{userdir};
   if(!dataDir.exists()) {
     dataDir.mkpath(userDataPath);
   }
@@ -62,9 +65,9 @@ inline void setupApp([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
       QString::fromStdWString(AppPath::getSharedDataDirectoryPath().concatenate(L"user/").wstr()), userDataPath);
 
   // Add u+w permissions because the source files may be marked read-only in some distros
-  QDirIterator it(userDataPath, QDir::Files, QDirIterator::Subdirectories);
-  while(it.hasNext()) {
-    QFile f(it.next());
-    f.setPermissions(f.permissions() | QFile::WriteOwner);
+  QDirIterator dirIterator(userDataPath, QDir::Files, QDirIterator::Subdirectories);
+  while(dirIterator.hasNext()) {
+    QFile file(dirIterator.next());
+    file.setPermissions(file.permissions() | QFile::WriteOwner);
   }
 }

@@ -1,6 +1,4 @@
-#ifndef NAME_HIERARCHY_H
-#define NAME_HIERARCHY_H
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -17,18 +15,21 @@ public:
   NameHierarchy(std::wstring name, std::wstring delimiter);
   NameHierarchy(const std::vector<std::wstring>& names, std::wstring delimiter);
 
-  NameHierarchy(const NameDelimiterType delimiterType = NAME_DELIMITER_UNKNOWN);
-  NameHierarchy(std::wstring name, const NameDelimiterType delimiterType);
-  NameHierarchy(const std::vector<std::wstring>& names, const NameDelimiterType delimiterType);
+  NameHierarchy(NameDelimiterType delimiterType = NAME_DELIMITER_UNKNOWN);
+  NameHierarchy(std::wstring name, NameDelimiterType delimiterType);
+  NameHierarchy(const std::vector<std::wstring>& names, NameDelimiterType delimiterType);
 
+
+  NameHierarchy& operator=(const NameHierarchy& other);
   NameHierarchy(const NameHierarchy& other);
-  NameHierarchy(NameHierarchy&& other);
+  NameHierarchy& operator=(NameHierarchy&& other) noexcept;
+  NameHierarchy(NameHierarchy&& other) noexcept;
   ~NameHierarchy();
 
   const std::wstring& getDelimiter() const;
   void setDelimiter(std::wstring delimiter);
 
-  void push(NameElement element);
+  void push(const NameElement& element);
   void push(std::wstring name);
   void pop();
 
@@ -36,9 +37,6 @@ public:
   const NameElement& back() const;
   NameElement& operator[](size_t pos);
   const NameElement& operator[](size_t pos) const;
-
-  NameHierarchy& operator=(const NameHierarchy& other);
-  NameHierarchy& operator=(NameHierarchy&& other);
 
   NameHierarchy getRange(size_t first, size_t last) const;
 
@@ -54,8 +52,6 @@ public:
   NameElement::Signature getSignature() const;
 
 private:
-  std::vector<NameElement> m_elements;
-  std::wstring m_delimiter;
+  std::vector<NameElement> mElements;
+  std::wstring mDelimiter;
 };
-
-#endif    // NAME_ELEMENT_H

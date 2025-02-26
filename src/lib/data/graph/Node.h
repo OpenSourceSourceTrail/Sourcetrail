@@ -1,7 +1,4 @@
-#ifndef NODE_H
-#define NODE_H
-
-#include <algorithm>
+#pragma once
 #include <functional>
 #include <map>
 #include <string>
@@ -14,11 +11,14 @@
 
 class Node : public Token {
 public:
-  Node(Id id, NodeType type, NameHierarchy nameHierarchy, DefinitionKind definitionKind);
+  Node(Id nodeId, NodeType type, NameHierarchy nameHierarchy, DefinitionKind definitionKind);
   Node(const Node& other);
-  virtual ~Node();
+  Node& operator=(const Node&) = delete;
+  ~Node() override;
 
-  NodeType getType() const;
+  NodeType getType() const {
+    return mType;
+  }
   void setType(NodeType type);
   bool isType(NodeKindMask mask) const;
 
@@ -43,36 +43,36 @@ public:
   Edge* getMemberEdge() const;
   bool isParentOf(const Node* node) const;
 
-  Edge* findEdge(std::function<bool(Edge*)> func) const;
+  Edge* findEdge(const std::function<bool(Edge*)>& func) const;
   Edge* findEdgeOfType(Edge::TypeMask mask) const;
-  Edge* findEdgeOfType(Edge::TypeMask mask, std::function<bool(Edge*)> func) const;
-  Node* findChildNode(std::function<bool(Node*)> func) const;
+  Edge* findEdgeOfType(Edge::TypeMask mask, const std::function<bool(Edge*)>& func) const;
+  Node* findChildNode(const std::function<bool(Node*)>& func) const;
 
-  void forEachEdge(std::function<void(Edge*)> func) const;
-  void forEachEdgeOfType(Edge::TypeMask mask, std::function<void(Edge*)> func) const;
-  void forEachChildNode(std::function<void(Node*)> func) const;
-  void forEachNodeRecursive(std::function<void(const Node*)> func) const;
+  void forEachEdge(const std::function<void(Edge*)>& func) const;
+  void forEachEdgeOfType(Edge::TypeMask mask, const std::function<void(Edge*)>& func) const;
+  void forEachChildNode(const std::function<void(Node*)>& func) const;
+  void forEachNodeRecursive(const std::function<void(const Node*)>& func) const;
 
   // Token implementation.
-  virtual bool isNode() const override;
-  virtual bool isEdge() const override;
+  [[nodiscard]] bool isNode() const override {
+    return true;
+  }
+  [[nodiscard]] bool isEdge() const override {
+    return false;
+  }
 
   // Logging.
   virtual std::wstring getReadableTypeString() const override;
   std::wstring getAsString() const;
 
 private:
-  void operator=(const Node&);
+  std::map<Id, Edge*> mEdges;
 
-  std::map<Id, Edge*> m_edges;
+  NodeType mType;
+  const NameHierarchy mNameHierarchy;
+  DefinitionKind mDefinitionKind;
 
-  NodeType m_type;
-  const NameHierarchy m_nameHierarchy;
-  DefinitionKind m_definitionKind;
-
-  size_t m_childCount;
+  size_t mChildCount = 0;
 };
 
 std::wostream& operator<<(std::wostream& ostream, const Node& node);
-
-#endif    // NODE_H

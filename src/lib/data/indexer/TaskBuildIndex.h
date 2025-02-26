@@ -1,13 +1,11 @@
-#ifndef TASK_BUILD_INDEX_H
-#define TASK_BUILD_INDEX_H
-
+#pragma once
 #include <thread>
 
-#include "../../../scheduling/Task.h"
 #include "InterprocessIndexerCommandManager.h"
 #include "InterprocessIndexingStatusManager.h"
 #include "InterprocessIntermediateStorageManager.h"
 #include "MessageListener.h"
+#include "Task.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 
 class DialogView;
@@ -21,7 +19,7 @@ public:
   TaskBuildIndex(size_t processCount,
                  std::shared_ptr<StorageProvider> storageProvider,
                  std::shared_ptr<DialogView> dialogView,
-                 const std::string& appUUID,
+                 std::string appUUID,
                  bool multiProcessIndexing);
 
 protected:
@@ -35,29 +33,27 @@ protected:
 
   void runIndexerProcess(int processId, const std::wstring& logFilePath);
   void runIndexerThread(int processId);
-  bool fetchIntermediateStorages(std::shared_ptr<Blackboard> blackboard);
-  void updateIndexingDialog(std::shared_ptr<Blackboard> blackboard, const std::vector<FilePath>& sourcePaths);
+  bool fetchIntermediateStorages(const std::shared_ptr<Blackboard>& blackboard);
+  void updateIndexingDialog(const std::shared_ptr<Blackboard>& blackboard, const std::vector<FilePath>& sourcePaths);
 
-  static const std::wstring s_processName;
+  static const std::wstring sProcessName;
 
-  std::shared_ptr<IndexerCommandList> m_indexerCommandList;
-  std::shared_ptr<StorageProvider> m_storageProvider;
-  std::shared_ptr<DialogView> m_dialogView;
-  const std::string m_appUUID;
-  bool m_multiProcessIndexing;
+  std::shared_ptr<IndexerCommandList> mIndexerCommandList;
+  std::shared_ptr<StorageProvider> mStorageProvider;
+  std::shared_ptr<DialogView> mDialogView;
+  const std::string mAppUUID;
+  bool mMultiProcessIndexing;
 
-  InterprocessIndexingStatusManager m_interprocessIndexingStatusManager;
-  bool m_indexerCommandQueueStopped;
-  size_t m_processCount;
-  bool m_interrupted;
-  size_t m_indexingFileCount;
+  InterprocessIndexingStatusManager mInterprocessIndexingStatusManager;
+  bool mIndexerCommandQueueStopped = false;
+  size_t mProcessCount;
+  bool mInterrupted = false;
+  size_t mIndexingFileCount = 0;
 
   // store as plain pointers to avoid deallocation issues when closing app during indexing
-  std::vector<std::thread*> m_processThreads;
-  std::vector<std::shared_ptr<InterprocessIntermediateStorageManager>> m_interprocessIntermediateStorageManagers;
+  std::vector<std::unique_ptr<std::thread>> mProcessThreads;
+  std::vector<std::shared_ptr<InterprocessIntermediateStorageManager>> mInterprocessIntermediateStorageManagers;
 
-  size_t m_runningThreadCount;
-  std::mutex m_runningThreadCountMutex;
+  size_t mRunningThreadCount = 0;
+  std::mutex mRunningThreadCountMutex;
 };
-
-#endif    // TASK_PARSE_H

@@ -1,8 +1,9 @@
 #include "utilitySourceGroupCxx.h"
 
+#include <ranges>
+
 #include <clang/Tooling/JSONCompilationDatabase.h>
 
-#include "../../scheduling/TaskLambda.h"
 #include "CanonicalFilePathCache.h"
 #include "CxxCompilationDatabaseSingle.h"
 #include "CxxDiagnosticConsumer.h"
@@ -17,22 +18,23 @@
 #include "SingleFrontendActionFactory.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"
 #include "StorageProvider.h"
+#include "TaskLambda.h"
 #include "utility.h"
 
 namespace utility {
 std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOptions* settings,
                                          std::vector<std::wstring> compilerFlags,
-                                         std::shared_ptr<StorageProvider> storageProvider,
-                                         std::shared_ptr<DialogView> dialogView) {
-  FilePath pchInputFilePath = settings->getPchInputFilePathExpandedAndAbsolute();
-  FilePath pchDependenciesDirectoryPath = settings->getPchDependenciesDirectoryPath();
+                                         const std::shared_ptr<StorageProvider>& storageProvider,
+                                         const std::shared_ptr<DialogView>& dialogView) {
+  const FilePath pchInputFilePath = settings->getPchInputFilePathExpandedAndAbsolute();
+  const FilePath pchDependenciesDirectoryPath = settings->getPchDependenciesDirectoryPath();
 
   if(pchInputFilePath.empty() || pchDependenciesDirectoryPath.empty()) {
     return std::make_shared<TaskLambda>([]() {});
   }
 
   if(!pchInputFilePath.exists()) {
-    LOG_ERROR(L"Precompiled header input file \"" + pchInputFilePath.wstr() + L"\" does not exist.");
+    LOG_ERROR(L"Precompiled header input file \"{}\" does not exist.", pchInputFilePath.wstr());
     return std::make_shared<TaskLambda>([]() {});
   }
 
@@ -47,8 +49,10 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
 
   return std::make_shared<TaskLambda>([dialogView, storageProvider, pchInputFilePath, pchOutputFilePath, compilerFlags]() {
     dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Processing Precompiled Headers");
-    LOG_INFO(L"Generating precompiled header output for input file \"" + pchInputFilePath.wstr() + L"\" at location \"" +
-             pchOutputFilePath.wstr() + L"\"");
+    // NOLINTNEXTLINE(bugprone-lambda-function-name): It will be solved with SOUR-125
+    LOG_INFO(L"Generating precompiled header output for input file \"{}\" at location \"{}\"",
+             pchInputFilePath.wstr(),
+             pchOutputFilePath.wstr());
 
     CxxParser::initializeLLVM();
 
@@ -56,13 +60,13 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
       FileSystem::createDirectory(pchOutputFilePath.getParentDirectory());
     }
 
-    std::shared_ptr<IntermediateStorage> storage = std::make_shared<IntermediateStorage>();
-    std::shared_ptr<ParserClientImpl> client = std::make_shared<ParserClientImpl>(storage.get());
+    const std::shared_ptr<IntermediateStorage> storage = std::make_shared<IntermediateStorage>();
+    const std::shared_ptr<ParserClientImpl> client = std::make_shared<ParserClientImpl>(storage.get());
 
-    std::shared_ptr<FileRegister> fileRegister = std::make_shared<FileRegister>(
+    const std::shared_ptr<FileRegister> fileRegister = std::make_shared<FileRegister>(
         pchInputFilePath, std::set<FilePath>{pchInputFilePath}, std::set<FilePathFilter>{});
 
-    std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache = std::make_shared<CanonicalFilePathCache>(fileRegister);
+    const std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache = std::make_shared<CanonicalFilePathCache>(fileRegister);
 
     clang::tooling::CompileCommand pchCommand;
     pchCommand.Filename = utility::encodeToUtf8(pchInputFilePath.fileName());
@@ -70,16 +74,17 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
     // DON'T use "-fsyntax-only" here because it will cause the output file to be erased
     pchCommand.CommandLine = utility::concat({"clang-tool"}, CxxParser::getCommandlineArgumentsEssential(compilerFlags));
 
-    CxxCompilationDatabaseSingle compilationDatabase(pchCommand);
+    const CxxCompilationDatabaseSingle compilationDatabase(pchCommand);
     clang::tooling::ClangTool tool(compilationDatabase, {utility::encodeToUtf8(pchInputFilePath.wstr())});
-    auto* action = new GeneratePCHAction(client, canonicalFilePathCache);
+    auto* action = new GeneratePCHAction(client, canonicalFilePathCache);    // NOLINT(cppcoreguidelines-owning-memory)
 
-    llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> options = new clang::DiagnosticOptions();
+    const llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> options =
+        new clang::DiagnosticOptions;    // NOLINT(cppcoreguidelines-owning-memory)
     CxxDiagnosticConsumer diagnostics(llvm::errs(), &*options, client, canonicalFilePathCache, pchInputFilePath, true);
 
     tool.setDiagnosticConsumer(&diagnostics);
     tool.clearArgumentsAdjusters();
-    tool.run(new SingleFrontendActionFactory(action));
+    tool.run(new SingleFrontendActionFactory(action));    // NOLINT(cppcoreguidelines-owning-memory)
 
     storageProvider->insert(storage);
   });
@@ -102,7 +107,7 @@ std::shared_ptr<clang::tooling::JSONCompilationDatabase> loadCDB(const FilePath&
   return cdb;
 }
 
-bool containsIncludePchFlags(std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb) {
+bool containsIncludePchFlags(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb) {
   for(const clang::tooling::CompileCommand& command : cdb->getAllCompileCommands()) {
     if(containsIncludePchFlag(command.CommandLine)) {
       return true;
@@ -114,7 +119,7 @@ bool containsIncludePchFlags(std::shared_ptr<clang::tooling::JSONCompilationData
 bool containsIncludePchFlag(const std::vector<std::string>& args) {
   const std::string includePchPrefix = "-include-pch";
   for(const auto& item : args) {
-    const auto arg = utility::trim(item);
+    const std::string arg = utility::trim(item);
     if(utility::isPrefix(includePchPrefix, arg)) {
       return true;
     }
