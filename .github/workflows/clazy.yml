@@ -1,8 +1,10 @@
 name: Manual Build with Clazy Analysis
 
 on:
-  workflow_dispatch:
-    # This makes the workflow manually triggerable from the GitHub UI
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual execution
 
 jobs:
   build:
