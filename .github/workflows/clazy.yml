@@ -4,7 +4,15 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:  # Allows manual execution
+  workflow_dispatch:
+    inputs:
+      clazy_checks:
+        description: 'Clazy checks'
+        required: false
+        default: 'qt6-deprecated-api-fixes,qt6-header-fixes,qt6-qhash-signature,qt6-fwd-fixes,missing-qobject-macro'
+
+env:
+  CLAZY_CHECKS: ${{ github.event.inputs.clazy_checks }}
 
 jobs:
   build:
@@ -14,7 +22,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive  # This clones all submodules
+          submodules: recursive
       
       - name: Install dependencies
         run: |
@@ -22,7 +30,10 @@ jobs:
           sudo apt-get install -y software-properties-common
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo apt-get update
-          
+
+          # Install gcc/clang
+          sudo apt-get install -y gcc g++ clang
+
           # Install Qt5
           sudo apt-get install -y qtbase5-dev libqt5svg5-dev
           
@@ -34,13 +45,6 @@ jobs:
 
           # Install pip
           sudo apt-get install -y python3-pip
-          
-          # Install newer CMake (3.23)
-          wget https://cmake.org/files/v3.23/cmake-3.23.0-linux-x86_64.sh -q -O /tmp/cmake-install.sh
-          chmod u+x /tmp/cmake-install.sh
-          sudo mkdir /opt/cmake-3.23.0
-          sudo /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake-3.23.0
-          sudo ln -sf /opt/cmake-3.23.0/bin/* /usr/local/bin/
           
           # Verify installed versions
           cmake --version
@@ -66,23 +70,53 @@ jobs:
           conan install . -s build_type=Release -of .conan/clang --build=missing -pr:a .conan/clang/profile
       
       - name: Configure with Clazy
-        run: |
-          # Set environment variables for Clazy
-          export CXX="clazy"
-          export CLAZY_CHECKS="level2"  # You can adjust the level or specify individual checks
-          cmake --preset="clazy"
+        run: cmake --preset="clazy"
         
-      - name: Build
+      - name: Run Clazy-standalone
         run: |
-          cd build
-          export CLAZY_CHECKS="level2"
-          ninja > build_log.txt 2>&1 || true  # Continue even if build fails, to capture the logs
+          # Create output directory
+          mkdir -p clazy-results
+          
+          # Get list of cpp files to analyze
+          find src -type f -name "*.h" -o -name "*.hpp" -o -name "*.cpp" -not -path "*test*" > cpp_files.txt
+          
+          # Run clazy-standalone with the specified checks
+          cat cpp_files.txt | xargs clazy-standalone \
+            --checks=${{ github.event.inputs.clazy_checks }} \
+            -p build/compile_commands.json \
+            > clazy-results/clazy-output.txt 2>&1 || true
+          
+          # Generate summary
+          echo "# Clazy Analysis Summary" > clazy-results/summary.md
+          echo "## Configuration" >> clazy-results/summary.md
+          echo "- Checks: ${{ github.event.inputs.clazy_checks }}" >> clazy-results/summary.md
+          echo "- Path: ${{ github.event.inputs.path }}" >> clazy-results/summary.md
+          echo "## Results" >> clazy-results/summary.md
+          WARNINGS=$(grep -c "warning:" clazy-results/clazy-output.txt || echo "0")
+          echo "- Total warnings: $WARNINGS" >> clazy-results/summary.md
+          
+          # List all warning types
+          echo "## Warning Categories" >> clazy-results/summary.md
+          grep "warning:" clazy-results/clazy-output.txt | sed 's/.*\[\(.*\)\].*/\1/' | sort | uniq -c | sort -nr | \
+            awk '{print "- " $1 " occurrences: " $2}' >> clazy-results/summary.md
       
-      - name: Archive build logs
+      - name: Archive analysis results
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs
-          path: |
-            build/build_log.txt
-            build/CMakeFiles/CMakeError.log
-            build/CMakeFiles/CMakeOutput.log
+          name: clazy-analysis
+          path: clazy-results/
+      
+      - name: Check for warnings
+        run: |
+          # Display summary in the log
+          cat clazy-results/summary.md
+          
+          # Count warnings
+          WARNINGS=$(grep -c "warning:" clazy-results/clazy-output.txt || echo "0")
+          echo "Found $WARNINGS warnings"
+          
+          # Optional: fail the workflow if warnings exceed a threshold
+          # if [ "$WARNINGS" -gt "10" ]; then
+          #   echo "::error::Clazy found $WARNINGS warnings, exceeding the threshold of 10!"
+          #   exit 1
+          # fi

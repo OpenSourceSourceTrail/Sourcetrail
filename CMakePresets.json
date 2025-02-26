@@ -109,7 +109,7 @@
             "binaryDir": "${sourceDir}/build/",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "clang",
-                "CMAKE_CXX_COMPILER": "clazy",
+                "CMAKE_CXX_COMPILER": "clang++",
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake"
