@@ -1,0 +1,68 @@
+name: Manual Build with Clazy Analysis
+
+on:
+  workflow_dispatch:
+    # This makes the workflow manually triggerable from the GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive  # This clones all submodules
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          
+          # Install Qt5
+          sudo apt-get install -y qtbase5-dev qt5-qmake qttools5-dev libqt5svg5-dev
+          
+          # Install Ninja
+          sudo apt-get install -y ninja-build
+          
+          # Install Clazy
+          sudo apt-get install -y clazy
+          
+          # Install newer CMake (3.23)
+          wget https://cmake.org/files/v3.23/cmake-3.23.0-linux-x86_64.sh -q -O /tmp/cmake-install.sh
+          chmod u+x /tmp/cmake-install.sh
+          sudo mkdir /opt/cmake-3.23.0
+          sudo /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake-3.23.0
+          sudo ln -sf /opt/cmake-3.23.0/bin/* /usr/local/bin/
+          
+          # Verify installed versions
+          cmake --version
+          clazy --version
+          ninja --version
+      
+      - name: Configure with Clazy
+        run: |
+          # Set environment variables for Clazy
+          export CXX="clazy"
+          export CLAZY_CHECKS="level2"  # You can adjust the level or specify individual checks
+          
+          # Configure with CMake using Ninja generator
+          mkdir build
+          cd build
+          cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+        
+      - name: Build
+        run: |
+          cd build
+          ninja > build_log.txt 2>&1 || true  # Continue even if build fails, to capture the logs
+      
+      - name: Archive build logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            build/build_log.txt
+            build/CMakeFiles/CMakeError.log
+            build/CMakeFiles/CMakeOutput.log
