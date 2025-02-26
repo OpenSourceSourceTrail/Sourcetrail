@@ -24,13 +24,16 @@ jobs:
           sudo apt-get update
           
           # Install Qt5
-          sudo apt-get install -y qtbase5-dev qt5-qmake qttools5-dev libqt5svg5-dev
+          sudo apt-get install -y qtbase5-dev libqt5svg5-dev
           
           # Install Ninja
           sudo apt-get install -y ninja-build
           
           # Install Clazy
           sudo apt-get install -y clazy
+
+          # Install pip
+          sudo apt-get install -y python3-pip
           
           # Install newer CMake (3.23)
           wget https://cmake.org/files/v3.23/cmake-3.23.0-linux-x86_64.sh -q -O /tmp/cmake-install.sh
@@ -43,6 +46,24 @@ jobs:
           cmake --version
           clazy --version
           ninja --version
+          pip --version
+
+      - name: Install conan
+        run: |
+          python3 -m venv venv
+          source venv/bin/activate
+          pip install conan
+
+      - name: Cache Conan packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.conan2
+          key: conan-${{ runner.os }}-${{ matrix.config.tag }}-${{ hashFiles('**/conanfile.txt') }}
+
+      - name: Install conan dependencies
+        run: |
+          source venv/bin/activate
+          conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
       
       - name: Configure with Clazy
         run: |
@@ -53,7 +74,7 @@ jobs:
           # Configure with CMake using Ninja generator
           mkdir build
           cd build
-          cmake -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+          cmake -G Ninja ..
         
       - name: Build
         run: |
