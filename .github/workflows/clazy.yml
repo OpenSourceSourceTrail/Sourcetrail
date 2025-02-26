@@ -55,30 +55,27 @@ jobs:
           pip install conan
 
       - name: Cache Conan packages
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.conan2
-          key: conan-${{ runner.os }}-${{ matrix.config.tag }}-${{ hashFiles('**/conanfile.txt') }}
+          key: conan-Linux-clang-${{ hashFiles('**/conanfile.txt') }}
 
       - name: Install conan dependencies
         run: |
           source venv/bin/activate
-          conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
+          conan install . -s build_type=Release -of .conan/clang --build=missing -pr:a .conan/clang/profile
       
       - name: Configure with Clazy
         run: |
           # Set environment variables for Clazy
           export CXX="clazy"
           export CLAZY_CHECKS="level2"  # You can adjust the level or specify individual checks
-          
-          # Configure with CMake using Ninja generator
-          mkdir build
-          cd build
-          cmake -G Ninja ..
+          cmake --preset="clazy"
         
       - name: Build
         run: |
           cd build
+          export CLAZY_CHECKS="level2"
           ninja > build_log.txt 2>&1 || true  # Continue even if build fails, to capture the logs
       
       - name: Archive build logs
