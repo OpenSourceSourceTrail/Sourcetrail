@@ -24,7 +24,7 @@ public:
   QtDialogView(QtMainWindow* mainWindow, UseCase useCase, StorageAccess* storageAccess);
   ~QtDialogView() override;
 
-  bool dialogsHidden() const override;
+  [[nodiscard]] bool dialogsHidden() const override;
   void clearDialogs() override;
 
   void showUnknownProgressDialog(const std::wstring& title, const std::wstring& message) override;

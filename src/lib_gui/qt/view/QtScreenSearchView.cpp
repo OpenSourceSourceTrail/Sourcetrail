@@ -1,5 +1,7 @@
 #include "QtScreenSearchView.h"
 
+#include <tuple>
+
 #include <QToolBar>
 
 #include "QtMainWindow.h"
@@ -10,39 +12,41 @@
 #include "utilityQt.h"
 
 QtScreenSearchView::QtScreenSearchView(ViewLayout* viewLayout)
-    : ScreenSearchView(viewLayout), m_controllerProxy(this, TabId::app()) {
-  m_widget = new QtScreenSearchBox(&m_controllerProxy);
-
-  m_bar = new QToolBar;
+    : ScreenSearchView(viewLayout)
+    , m_controllerProxy(this, TabId::app())
+    , m_widget{new QtScreenSearchBox(&m_controllerProxy)}
+    , m_bar{new QToolBar} {
   m_bar->setObjectName(QStringLiteral("screen_search_bar"));
   m_bar->setMovable(false);
   m_bar->addWidget(m_widget);
 
-  QObject::connect(m_widget, &QtScreenSearchBox::closePressed, this, &QtScreenSearchView::hide);
+  std::ignore = connect(m_widget, &QtScreenSearchBox::closePressed, this, &QtScreenSearchView::hide);
 
   if(QtMainWindow* mainWindow = utility::getMainWindowforMainView(getViewLayout())) {
-    QObject::connect(mainWindow, &QtMainWindow::showScreenSearch, this, &QtScreenSearchView::show);
-    QObject::connect(mainWindow, &QtMainWindow::hideScreenSearch, this, &QtScreenSearchView::hide);
+    std::ignore = connect(mainWindow, &QtMainWindow::showScreenSearch, this, &QtScreenSearchView::show);
+    std::ignore = connect(mainWindow, &QtMainWindow::hideScreenSearch, this, &QtScreenSearchView::hide);
   }
 }
+
+QtScreenSearchView::~QtScreenSearchView() = default;
 
 void QtScreenSearchView::createWidgetWrapper() {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(m_widget));
 }
 
 void QtScreenSearchView::refreshView() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     m_bar->setStyleSheet(
         utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"screen_search_view/screen_search_view.css")).c_str());
   });
 }
 
 void QtScreenSearchView::setMatchCount(size_t matchCount) {
-  m_onQtThread([=]() { m_widget->setMatchCount(matchCount); });
+  m_onQtThread([this, matchCount]() { m_widget->setMatchCount(matchCount); });
 }
 
 void QtScreenSearchView::setMatchIndex(size_t matchIndex) {
-  m_onQtThread([=]() { m_widget->setMatchIndex(matchIndex); });
+  m_onQtThread([this, matchIndex]() { m_widget->setMatchIndex(matchIndex); });
 }
 
 void QtScreenSearchView::addResponder(const std::string& name) {

@@ -9,12 +9,12 @@
 #include "ResourcePaths.h"
 #include "utilityQt.h"
 
-QtCodeView::QtCodeView(ViewLayout* viewLayout) : CodeView(viewLayout) {
-  m_widget = new QtCodeNavigator();
-
-  m_widget->connect(m_widget, &QtCodeNavigator::focusIn, [this]() { setNavigationFocus(true); });
-  m_widget->connect(m_widget, &QtCodeNavigator::focusOut, [this]() { setNavigationFocus(false); });
+QtCodeView::QtCodeView(ViewLayout* viewLayout) : CodeView(viewLayout), m_widget{new QtCodeNavigator} {
+  std::ignore = QObject::connect(m_widget, &QtCodeNavigator::focusIn, m_widget, [this]() { setNavigationFocus(true); });
+  std::ignore = QObject::connect(m_widget, &QtCodeNavigator::focusOut, m_widget, [this]() { setNavigationFocus(false); });
 }
+
+QtCodeView::~QtCodeView() = default;
 
 void QtCodeView::createWidgetWrapper() {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(m_widget));
@@ -25,7 +25,7 @@ void QtCodeView::refreshView() {
     m_widget->setSchedulerId(getController()->getTabId());
   }
 
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     setStyleSheet();
 
     QtCodeArea::clearAnnotationColors();
@@ -63,7 +63,7 @@ void QtCodeView::clearMatches() {
 }
 
 void QtCodeView::clear() {
-  m_onQtThread([=]() { m_widget->clear(); });
+  m_onQtThread([this]() { m_widget->clear(); });
 }
 
 bool QtCodeView::showsErrors() const {
@@ -73,7 +73,7 @@ bool QtCodeView::showsErrors() const {
 void QtCodeView::showSnippets(const std::vector<CodeFileParams>& files,
                               const CodeParams& params,
                               const CodeScrollParams& scrollParams) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, params, files, scrollParams]() {
     m_widget->setMode(QtCodeNavigator::MODE_LIST);
 
     if(params.clearSnippets) {
@@ -93,7 +93,7 @@ void QtCodeView::showSnippets(const std::vector<CodeFileParams>& files,
 }
 
 void QtCodeView::showSingleFile(const CodeFileParams& file, const CodeParams& params, const CodeScrollParams& scrollParams) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, file, params, scrollParams]() {
     bool animatedScroll = !m_widget->isInListMode();
 
     m_widget->setMode(QtCodeNavigator::MODE_SINGLE);
@@ -119,7 +119,7 @@ void QtCodeView::showSingleFile(const CodeFileParams& file, const CodeParams& pa
 }
 
 void QtCodeView::updateSourceLocations(const std::vector<CodeFileParams>& files) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, files]() {
     for(const CodeFileParams& file : files) {
       for(const CodeSnippetParams& snippet : file.snippetParams) {
         if(snippet.hasAllSourceLocations) {
@@ -137,15 +137,15 @@ void QtCodeView::updateSourceLocations(const std::vector<CodeFileParams>& files)
 }
 
 void QtCodeView::scrollTo(const CodeScrollParams& params, bool animated) {
-  m_onQtThread([=]() { m_widget->scrollTo(params, animated, true); });
+  m_onQtThread([this, params, animated]() { m_widget->scrollTo(params, animated, true); });
 }
 
 void QtCodeView::coFocusTokenIds(const std::vector<Id>& coFocusedTokenIds) {
-  m_onQtThread([=]() { m_widget->coFocusTokenIds(coFocusedTokenIds); });
+  m_onQtThread([this, coFocusedTokenIds]() { m_widget->coFocusTokenIds(coFocusedTokenIds); });
 }
 
 void QtCodeView::deCoFocusTokenIds() {
-  m_onQtThread([=]() { m_widget->deCoFocusTokenIds(); });
+  m_onQtThread([this]() { m_widget->deCoFocusTokenIds(); });
 }
 
 bool QtCodeView::isInListMode() const {

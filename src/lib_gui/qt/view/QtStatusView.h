@@ -17,7 +17,7 @@ class QtStatusView
 
 public:
   QtStatusView(ViewLayout* viewLayout);
-  ~QtStatusView() = default;
+  ~QtStatusView() override;
 
   // View implementation
   void createWidgetWrapper() override;

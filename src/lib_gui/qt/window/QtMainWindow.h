@@ -183,17 +183,17 @@ private:
   QMenu* m_viewMenu;
   QAction* m_viewSeparator;
 
-  QMenu* m_historyMenu;
+  QMenu* m_historyMenu = nullptr;
   std::vector<std::shared_ptr<MessageBase>> m_history;
 
-  QMenu* m_bookmarksMenu;
+  QMenu* m_bookmarksMenu = nullptr;
   std::vector<std::shared_ptr<Bookmark>> m_bookmarks;
 
   QMenu* m_recentProjectsMenu;
 
   QAction* m_showTitleBarsAction;
 
-  bool m_showDockWidgetTitleBars;
+  bool m_showDockWidgetTitleBars = true;
 
   QtWindowStack m_windowStack;
 

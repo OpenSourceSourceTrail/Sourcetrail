@@ -11,7 +11,7 @@
 #include "utilityQt.h"
 
 QLabel* QtIndexingDialog::createTitleLabel(const QString& title, QBoxLayout* layout) {
-  auto* label = new QLabel(title);    // NOLINT(cppcoreguidelines-owning-memory)
+  auto* label = new QLabel{title};    // NOLINT(cppcoreguidelines-owning-memory)
   label->setObjectName(QStringLiteral("title"));
   label->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
@@ -59,7 +59,7 @@ QLabel* QtIndexingDialog::createFlagLabel(QWidget* parent) {
       QString::fromStdWString(ResourcePaths::getGuiDirectoryPath().concatenate(L"indexing_dialog/flag.png").wstr()));
   flag.scaleToWidth(120);
 
-  auto* flagLabel = new QLabel(parent);    // NOLINT(cppcoreguidelines-owning-memory)
+  auto* flagLabel = new QLabel{parent};    // NOLINT(cppcoreguidelines-owning-memory)
   flagLabel->setPixmap(flag.pixmap());
   flagLabel->resize(static_cast<int>(flag.width()), static_cast<int>(flag.height()));
   flagLabel->move(15, 75);
@@ -70,7 +70,7 @@ QLabel* QtIndexingDialog::createFlagLabel(QWidget* parent) {
 
 
 QtIndexingDialog::QtIndexingDialog(bool isSubWindow, QWidget* parent)
-    : QtWindowBase(isSubWindow, parent), m_layout(new QVBoxLayout(this)) {
+    : QtWindowBase(isSubWindow, parent), m_layout(new QVBoxLayout{this}) {
   m_window->setStyleSheet(m_window->styleSheet() +
                           QStringLiteral("#window { "
                                          "background: #2E3C86;"
@@ -112,11 +112,10 @@ void QtIndexingDialog::resizeEvent(QResizeEvent* event) {
 }
 
 void QtIndexingDialog::setupDone() {
-  QSize actualSize = m_window->sizeHint() + QSize(50, 50);
-  QSize preferredSize = sizeHint();
+  const QSize actualSize = m_window->sizeHint() + QSize(50, 50);
+  const QSize preferredSize = sizeHint();
 
-  QSize size(qMax(actualSize.width(), preferredSize.width()), qMax(actualSize.height(), preferredSize.height()));
-  resize(size);
+  resize(QSize{qMax(actualSize.width(), preferredSize.width()), qMax(actualSize.height(), preferredSize.height())});
 
   moveToCenter();
 }

@@ -1,6 +1,7 @@
 #include "QtSelectPathsDialog.h"
 
 #include <set>
+#include <tuple>
 
 #include <QLabel>
 #include <QListWidget>
@@ -31,7 +32,7 @@ void QtSelectPathsDialog::setPathsList(const std::vector<FilePath>& paths,
   std::set<FilePath> checked(checkedPaths.begin(), checkedPaths.end());
 
   for(FilePath filePath : utility::unique(utility::concat(paths, checkedPaths))) {
-    auto* item = new QListWidgetItem(QString::fromStdWString(filePath.wstr()), m_list);
+    auto* item = new QListWidgetItem{QString::fromStdWString(filePath.wstr()), m_list};
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);    // set checkable flag
 
     if(checked.find(filePath) == checked.end()) {
@@ -65,7 +66,7 @@ void QtSelectPathsDialog::populateWindow(QWidget* widget) {
   auto* layout = new QVBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   layout->setContentsMargins(0, 0, 0, 0);
 
-  auto* description = new QLabel(m_description);    // NOLINT(cppcoreguidelines-owning-memory)
+  auto* description = new QLabel{m_description};    // NOLINT(cppcoreguidelines-owning-memory)
   description->setObjectName(QStringLiteral("description"));
   description->setWordWrap(true);
   layout->addWidget(description);
@@ -80,32 +81,32 @@ void QtSelectPathsDialog::populateWindow(QWidget* widget) {
   auto* buttonLayout = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   buttonLayout->setContentsMargins(0, 0, 0, 0);
 
-  auto* checkAllButton = new QPushButton(QStringLiteral("check all"));
+  auto* checkAllButton = new QPushButton{QStringLiteral("check all")};
   checkAllButton->setObjectName(QStringLiteral("windowButton"));
-  connect(checkAllButton, &QPushButton::clicked, [=]() {
+  std::ignore = connect(checkAllButton, &QPushButton::clicked, [this]() {
     m_list->selectAll();
     checkSelected(true);
     m_list->clearSelection();
   });
   buttonLayout->addWidget(checkAllButton);
 
-  auto* unCheckAllButton = new QPushButton(QStringLiteral("uncheck all"));
+  auto* unCheckAllButton = new QPushButton{QStringLiteral("uncheck all")};
   unCheckAllButton->setObjectName(QStringLiteral("windowButton"));
-  connect(unCheckAllButton, &QPushButton::clicked, [=]() {
+  std::ignore = connect(unCheckAllButton, &QPushButton::clicked, [this]() {
     m_list->selectAll();
     checkSelected(false);
     m_list->clearSelection();
   });
   buttonLayout->addWidget(unCheckAllButton);
 
-  auto* checkSelectedButton = new QPushButton(QStringLiteral("check selected"));
+  auto* checkSelectedButton = new QPushButton{QStringLiteral("check selected")};
   checkSelectedButton->setObjectName(QStringLiteral("windowButton"));
-  connect(checkSelectedButton, &QPushButton::clicked, [=]() { checkSelected(true); });
+  std::ignore = connect(checkSelectedButton, &QPushButton::clicked, this, [this]() { checkSelected(true); });
   buttonLayout->addWidget(checkSelectedButton);
 
-  auto* unCheckSelectedButton = new QPushButton(QStringLiteral("uncheck selected"));
+  auto* unCheckSelectedButton = new QPushButton{QStringLiteral("uncheck selected")};
   unCheckSelectedButton->setObjectName(QStringLiteral("windowButton"));
-  connect(unCheckSelectedButton, &QPushButton::clicked, [=]() { checkSelected(false); });
+  std::ignore = connect(unCheckSelectedButton, &QPushButton::clicked, this, [this]() { checkSelected(false); });
   buttonLayout->addWidget(unCheckSelectedButton);
 
   layout->addLayout(buttonLayout);

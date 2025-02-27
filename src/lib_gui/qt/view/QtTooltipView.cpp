@@ -7,23 +7,24 @@
 #include "ResourcePaths.h"
 #include "utilityQt.h"
 
-QtTooltipView::QtTooltipView(ViewLayout* viewLayout) : TooltipView(viewLayout) {
-  m_widget = new QtTooltip(utility::getMainWindowforMainView(viewLayout));
-}
+QtTooltipView::QtTooltipView(ViewLayout* viewLayout)
+    : TooltipView(viewLayout), m_widget{new QtTooltip(utility::getMainWindowforMainView(viewLayout))} {}
+
+QtTooltipView::~QtTooltipView() = default;
 
 void QtTooltipView::createWidgetWrapper() {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(m_widget));
 }
 
 void QtTooltipView::refreshView() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     m_widget->setStyleSheet(
         utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"tooltip_view/tooltip_view.css")).c_str());
   });
 }
 
 void QtTooltipView::showTooltip(const TooltipInfo& info, const View* parent) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, info, parent]() {
     if(m_widget->isHovered()) {
       return;
     }
@@ -40,7 +41,7 @@ void QtTooltipView::showTooltip(const TooltipInfo& info, const View* parent) {
 }
 
 void QtTooltipView::hideTooltip(bool force) {
-  m_onQtThread([=]() { m_widget->hide(force); });
+  m_onQtThread([this, force]() { m_widget->hide(force); });
 }
 
 bool QtTooltipView::tooltipVisible() const {

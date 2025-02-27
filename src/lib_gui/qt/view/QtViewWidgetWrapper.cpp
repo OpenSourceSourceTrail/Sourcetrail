@@ -5,13 +5,13 @@
 #include "logging.h"
 #include "View.h"
 
-QWidget* QtViewWidgetWrapper::getWidgetOfView(const View* pView) {
-  if(pView == nullptr) {
+QWidget* QtViewWidgetWrapper::getWidgetOfView(const View* view) {
+  if(view == nullptr) {
     LOG_ERROR("Input argment is nullptr.");
     return nullptr;
   }
 
-  auto* pWidgetWrapper = dynamic_cast<QtViewWidgetWrapper*>(pView->getWidgetWrapper());
+  auto* pWidgetWrapper = dynamic_cast<QtViewWidgetWrapper*>(view->getWidgetWrapper());
   if(pWidgetWrapper == nullptr) {
     LOG_ERROR("Trying to get the qt widget of non qt view.");
     return nullptr;
@@ -25,17 +25,17 @@ QWidget* QtViewWidgetWrapper::getWidgetOfView(const View* pView) {
   return pWidgetWrapper->getWidget();
 }
 
-QtViewWidgetWrapper::QtViewWidgetWrapper(QWidget* pWidget) : m_pWidget(pWidget) {}
+QtViewWidgetWrapper::QtViewWidgetWrapper(QWidget* widget) : mWidget(widget) {}
 
 QtViewWidgetWrapper::~QtViewWidgetWrapper() {
-  if(m_pWidget == nullptr) {
+  if(mWidget == nullptr) {
     LOG_WARNING("Widget is nullptr.");
     return;
   }
-  m_pWidget->hide();
-  m_pWidget->deleteLater();
+  mWidget->hide();
+  mWidget->deleteLater();
 }
 
 QWidget* QtViewWidgetWrapper::getWidget() const {
-  return m_pWidget;
+  return mWidget;
 }

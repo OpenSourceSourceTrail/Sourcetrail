@@ -1,5 +1,6 @@
 #include "QtRefreshView.h"
 
+#include <QCoreApplication>
 #include <QFrame>
 #include <QHBoxLayout>
 
@@ -10,20 +11,19 @@
 #include "type/MessageRefresh.h"
 #include "utilityQt.h"
 
-QtRefreshView::QtRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout) {
-  m_widget = new QFrame();
+QtRefreshView::QtRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout), m_widget{new QFrame} {
   m_widget->setObjectName(QStringLiteral("refresh_bar"));
 
-  QBoxLayout* layout = new QHBoxLayout();
+  QBoxLayout* layout = new QHBoxLayout;
   layout->setSpacing(0);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setAlignment(Qt::AlignTop);
 
-  QtSearchBarButton* refreshButton = new QtSearchBarButton(
-      ResourcePaths::getGuiDirectoryPath().concatenate(L"refresh_view/images/refresh.png"));
+  auto* refreshButton = new QtSearchBarButton{
+      ResourcePaths::getGuiDirectoryPath().concatenate(L"refresh_view/images/refresh.png")};
   refreshButton->setObjectName(QStringLiteral("refresh_button"));
   refreshButton->setToolTip(QStringLiteral("refresh"));
-  m_widget->connect(refreshButton, &QPushButton::clicked, []() {
+  std::ignore = QObject::connect(refreshButton, &QPushButton::clicked, QCoreApplication::instance(), []() {
     MessageIndexingShowDialog().dispatch();
     MessageRefresh().dispatch();
   });
@@ -31,6 +31,8 @@ QtRefreshView::QtRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout) {
   layout->addWidget(refreshButton);
   m_widget->setLayout(layout);
 }
+
+QtRefreshView::~QtRefreshView() = default;
 
 void QtRefreshView::createWidgetWrapper() {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(m_widget));

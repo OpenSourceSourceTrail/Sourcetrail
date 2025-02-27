@@ -14,17 +14,17 @@
 #include "TextCodec.h"
 #include "TooltipInfo.h"
 
-QtTooltip::QtTooltip(QWidget* parent) : QFrame(parent), m_parentView(nullptr), m_isHovered(false) {
+QtTooltip::QtTooltip(QWidget* parent) : QFrame{parent} {
   QWidget::setWindowFlags(Qt::ToolTip);
   setObjectName(QStringLiteral("tooltip"));
 
-  QVBoxLayout* layout = new QVBoxLayout();
+  auto* layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   setLayout(layout);
 }
 
-QtTooltip::~QtTooltip() {}
+QtTooltip::~QtTooltip() = default;
 
 void QtTooltip::setTooltipInfo(const TooltipInfo& info) {
   int maxWidth = 600;
@@ -113,7 +113,11 @@ void QtTooltip::leaveEvent(QEvent* /*event*/) {
   QTimer::singleShot(500, this, SLOT(hide()));
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void QtTooltip::enterEvent(QEnterEvent* /*event*/) {
+#else
 void QtTooltip::enterEvent(QEvent* /*event*/) {
+#endif
   m_isHovered = true;
 }
 

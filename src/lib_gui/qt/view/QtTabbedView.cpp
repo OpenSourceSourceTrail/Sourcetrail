@@ -13,10 +13,10 @@
 #include "utilityQt.h"
 
 QtTabbedView::QtTabbedView(ViewLayout* viewLayout, const std::string& name) : TabbedView(viewLayout, name) {
-  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame()));
+  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame));
   QWidget* widget = QtViewWidgetWrapper::getWidgetOfView(this);
 
-  QVBoxLayout* layout = new QVBoxLayout();
+  auto* layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   widget->setLayout(layout);
@@ -32,15 +32,17 @@ QtTabbedView::QtTabbedView(ViewLayout* viewLayout, const std::string& name) : Ta
   m_closeButton->setIconSize(QSize(15, 15));
   m_closeButton->setStyleSheet(QStringLiteral("background: transparent; border: none;"));
 
-  widget->connect(m_closeButton, &QPushButton::clicked, [this]() { hideView(this); });
+  std::ignore = connect(m_closeButton, &QPushButton::clicked, this, [this]() { hideView(this); });
   m_widget->tabBar()->installEventFilter(this);
   widget->installEventFilter(this);
 }
 
+QtTabbedView::~QtTabbedView() = default;
+
 void QtTabbedView::createWidgetWrapper() {}
 
 void QtTabbedView::refreshView() {
-  m_onQtThread([=]() { setStyleSheet(); });
+  m_onQtThread([this]() { setStyleSheet(); });
 }
 
 void QtTabbedView::addViewWidget(View* view) {
