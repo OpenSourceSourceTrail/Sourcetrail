@@ -9,7 +9,7 @@ class QFrame;
 class QtRefreshView : public RefreshView {
 public:
   QtRefreshView(ViewLayout* viewLayout);
-  ~QtRefreshView() = default;
+  ~QtRefreshView() override;
 
   // View implementation
   void createWidgetWrapper() override;

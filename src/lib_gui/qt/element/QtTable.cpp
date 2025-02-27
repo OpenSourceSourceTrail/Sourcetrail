@@ -13,22 +13,21 @@
 
 class SelectableCellDelegate : public QStyledItemDelegate {
 public:
-  SelectableCellDelegate(QObject* parent = Q_NULLPTR);
-  QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+  SelectableCellDelegate(QObject* parent = nullptr);
+  QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
 SelectableCellDelegate::SelectableCellDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
 
 QWidget* SelectableCellDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const {
   QWidget* editor = QStyledItemDelegate::createEditor(parent, option, index);
-  QLineEdit* lineEdit = dynamic_cast<QLineEdit*>(editor);
-  if(lineEdit != nullptr) {
+  if(auto* lineEdit = dynamic_cast<QLineEdit*>(editor); lineEdit != nullptr) {
     lineEdit->setReadOnly(true);
   }
   return editor;
 }
 
-QtTable::QtTable(QWidget* parent) : QTableView(parent), m_rowsToFill(0) {
+QtTable::QtTable(QWidget* parent) : QTableView(parent) {
   setAlternatingRowColors(true);
   setShowGrid(false);
   setMouseTracking(true);
@@ -44,10 +43,10 @@ QtTable::QtTable(QWidget* parent) : QTableView(parent), m_rowsToFill(0) {
   setSelectionBehavior(QAbstractItemView::SelectRows);
   setSelectionMode(QAbstractItemView::SingleSelection);
 
-  connect(horizontalHeader(), &QHeaderView::sectionResized, this, &QtTable::columnResized);
+  std::ignore = connect(horizontalHeader(), &QHeaderView::sectionResized, this, &QtTable::columnResized);
 }
 
-QtTable::~QtTable() {}
+QtTable::~QtTable() = default;
 
 void QtTable::updateRows() {
   while(model()->rowCount() <= m_rowsToFill) {

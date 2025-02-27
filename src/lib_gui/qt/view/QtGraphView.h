@@ -34,7 +34,7 @@ class QtGraphView
 
 public:
   QtGraphView(ViewLayout* viewLayout);
-  ~QtGraphView() = default;
+  ~QtGraphView() override;
 
   // View implementation
   void createWidgetWrapper() override;
@@ -154,11 +154,11 @@ private:
   std::vector<QtGraphNode*> m_activeNodes;
   QtGraphNode* m_oldActiveNode = nullptr;
 
-  bool m_centerActiveNode;
-  bool m_scrollToTop;
-  bool m_restoreScroll;
+  bool m_centerActiveNode = false;
+  bool m_scrollToTop = false;
+  bool m_restoreScroll = false;
   QVector2D m_scrollValues;
-  bool m_isIndexedList;
+  bool m_isIndexedList = false;
 
   std::shared_ptr<QSequentialAnimationGroup> m_transition;
   QPointF m_sceneRectOffset;

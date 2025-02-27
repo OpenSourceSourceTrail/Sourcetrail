@@ -36,11 +36,11 @@ protected:
 
   bool m_isSubWindow;
 
-  QWidget* m_window;
-  QWidget* m_content;
+  QWidget* m_window = nullptr;
+  QWidget* m_content = nullptr;
 
   QPoint m_dragPosition;
-  bool m_mousePressedInWindow;
+  bool m_mousePressedInWindow = false;
 
-  QSizeGrip* m_sizeGrip;
+  QSizeGrip* m_sizeGrip = nullptr;
 };

@@ -7,8 +7,8 @@ class QtAbout : public QtWindow {
   Q_OBJECT
 
 public:
-  QtAbout(QWidget* parent = 0);
-  QSize sizeHint() const override;
+  QtAbout(QWidget* parent = nullptr);
+  [[nodiscard]] QSize sizeHint() const override;
 
   void setupAbout();
 };

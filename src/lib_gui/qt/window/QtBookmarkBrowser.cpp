@@ -11,7 +11,7 @@
 #include "utilityQt.h"
 
 QtBookmarkBrowser::QtBookmarkBrowser(ControllerProxy<BookmarkController>* controllerProxy, QWidget* parent)
-    : QtWindow(false, parent), mControllerProxy(controllerProxy) {
+    : QtWindow{false, parent}, mControllerProxy{controllerProxy} {
   assert(controllerProxy != nullptr);
 }
 
@@ -57,7 +57,8 @@ void QtBookmarkBrowser::setupBookmarkBrowser() {
     mFilterComboBox->setObjectName(QStringLiteral("filter_box"));
     headerLayout->addWidget(mFilterComboBox);
 
-    connect(mFilterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QtBookmarkBrowser::filterOrOrderChanged);
+    std::ignore = connect(
+        mFilterComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QtBookmarkBrowser::filterOrOrderChanged);
 
     headerLayout->addSpacing(40);
 
@@ -79,7 +80,8 @@ void QtBookmarkBrowser::setupBookmarkBrowser() {
     mOrderComboBox->setObjectName(QStringLiteral("order_box"));
     headerLayout->addWidget(mOrderComboBox);
 
-    connect(mOrderComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QtBookmarkBrowser::filterOrOrderChanged);
+    std::ignore = connect(
+        mOrderComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QtBookmarkBrowser::filterOrOrderChanged);
   }
 
   {
@@ -97,7 +99,7 @@ void QtBookmarkBrowser::setupBookmarkBrowser() {
     mBookmarkTree->setIndentation(0);
     mBookmarkTree->setHeaderLabel(QStringLiteral("Bookmarks"));
 
-    connect(mBookmarkTree, &QTreeWidget::itemClicked, this, &QtBookmarkBrowser::treeItemClicked);
+    std::ignore = connect(mBookmarkTree, &QTreeWidget::itemClicked, this, &QtBookmarkBrowser::treeItemClicked);
 
     bodyLayout->addWidget(mBookmarkTree);
 
@@ -224,7 +226,7 @@ QTreeWidgetItem* QtBookmarkBrowser::findOrCreateTreeCategory(const BookmarkCateg
   }
 
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handles the memory
-  auto* categoryItem = new QtBookmarkCategory(mControllerProxy);
+  auto* categoryItem = new QtBookmarkCategory{mControllerProxy};
   if(category.getName().length() > 0) {
     categoryItem->setName(category.getName());
   } else {

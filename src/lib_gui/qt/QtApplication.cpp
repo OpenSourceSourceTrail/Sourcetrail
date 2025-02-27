@@ -7,17 +7,17 @@
 #include "type/MessageWindowFocus.h"
 
 QtApplication::QtApplication(int& argc, char** argv) : QApplication(argc, argv) {
-  connect(this, &QGuiApplication::applicationStateChanged, [](auto state) {
+  std::ignore = connect(this, &QGuiApplication::applicationStateChanged, this, [](auto state) {
     MessageWindowFocus(state == Qt::ApplicationActive).dispatch();
   });
   Q_INIT_RESOURCE(resources);
 }
 
-bool QtApplication::event(QEvent* pEvent) {
-  if(pEvent->type() == QEvent::FileOpen) {
-    auto* pFileEvent = dynamic_cast<QFileOpenEvent*>(pEvent);
-    if(pFileEvent != nullptr) {
-      FilePath path(pFileEvent->file().toStdWString());
+bool QtApplication::event(QEvent* event) {
+  if(event->type() == QEvent::FileOpen) {
+    auto* fileEvent = dynamic_cast<QFileOpenEvent*>(event);
+    if(fileEvent != nullptr) {
+      FilePath path(fileEvent->file().toStdWString());
 
       if(path.exists() && path.extension() == L".srctrlprj") {
         MessageLoadProject(path).dispatch();
@@ -26,5 +26,5 @@ bool QtApplication::event(QEvent* pEvent) {
     }
   }
 
-  return QApplication::event(pEvent);
+  return QApplication::event(event);
 }

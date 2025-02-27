@@ -1,5 +1,7 @@
 #include "QtIndexingStartDialog.h"
 
+#include <tuple>
+
 #include <QCheckBox>
 #include <QHBoxLayout>
 #include <QKeyEvent>
@@ -29,13 +31,13 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
 
   m_layout->addStretch();
 
-  auto* subLayout = new QHBoxLayout();    // NOLINT(cppcoreguidelines-owning-memory)
+  auto* subLayout = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   subLayout->addStretch();
 
-  auto* modeLayout = new QVBoxLayout();    // NOLINT(cppcoreguidelines-owning-memory)
+  auto* modeLayout = new QVBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   modeLayout->setSpacing(7);
 
-  auto* modeTitleLayout = new QHBoxLayout();    // NOLINT(cppcoreguidelines-owning-memory)
+  auto* modeTitleLayout = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   modeTitleLayout->setSpacing(7);
 
   QLabel* modeLabel = QtIndexingDialog::createMessageLabel(modeTitleLayout);
@@ -75,7 +77,7 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
   m_refreshModeButtons.emplace(
       RefreshMode::AllFiles, new QRadioButton(QStringLiteral("All files")));    // NOLINT(cppcoreguidelines-owning-memory)
 
-  std::function<void(bool)> func = [=](bool checked) {
+  std::function<void(bool)> func = [this](bool checked) {
     if(!checked) {
       return;
     }
@@ -95,7 +97,7 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
       button->setChecked(true);
     }
     modeLayout->addWidget(button);
-    connect(button, &QRadioButton::toggled, func);
+    std::ignore = connect(button, &QRadioButton::toggled, button, func);
   }
 
   for(RefreshMode mode : enabledModes) {
@@ -103,8 +105,10 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
   }
 
   if(enabledShallowOption) {
-    auto* shallowIndexingCheckBox = new QCheckBox(QStringLiteral("Shallow Python Indexing"));
-    connect(shallowIndexingCheckBox, &QCheckBox::toggled, [=]() { emit setShallowIndexing(shallowIndexingCheckBox->isChecked()); });
+    auto* shallowIndexingCheckBox = new QCheckBox{QStringLiteral("Shallow Python Indexing")};
+    std::ignore = connect(shallowIndexingCheckBox, &QCheckBox::toggled, [this, shallowIndexingCheckBox]() {
+      emit setShallowIndexing(shallowIndexingCheckBox->isChecked());
+    });
     shallowIndexingCheckBox->setChecked(initialShallowState);
     modeLayout->addWidget(shallowIndexingCheckBox);
   }
@@ -115,10 +119,10 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
   m_layout->addSpacing(20);
 
   {
-    auto* buttons = new QHBoxLayout();                                 // NOLINT(cppcoreguidelines-owning-memory)
-    auto* cancelButton = new QPushButton(QStringLiteral("Cancel"));    // NOLINT(cppcoreguidelines-owning-memory)
+    auto* buttons = new QHBoxLayout;                                   // NOLINT(cppcoreguidelines-owning-memory)
+    auto* cancelButton = new QPushButton{QStringLiteral("Cancel")};    // NOLINT(cppcoreguidelines-owning-memory)
     cancelButton->setObjectName(QStringLiteral("windowButton"));
-    connect(cancelButton, &QPushButton::clicked, this, &QtIndexingStartDialog::onCancelPressed);
+    std::ignore = connect(cancelButton, &QPushButton::clicked, this, &QtIndexingStartDialog::onCancelPressed);
     buttons->addWidget(cancelButton);
 
     buttons->addStretch();
@@ -176,9 +180,9 @@ void QtIndexingStartDialog::keyPressEvent(QKeyEvent* event) {
 }
 
 void QtIndexingStartDialog::onStartPressed() {
-  for(auto p : m_refreshModeButtons) {
-    if(p.second->isChecked()) {
-      emit startIndexing(p.first);
+  for(const auto& [mode, button] : m_refreshModeButtons) {
+    if(nullptr != button && button->isChecked()) {
+      emit startIndexing(mode);
       return;
     }
   }

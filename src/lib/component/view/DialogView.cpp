@@ -2,6 +2,8 @@
 
 DialogView::DialogView(UseCase useCase, StorageAccess* storageAccess) : m_useCase(useCase), m_storageAccess(storageAccess) {}
 
+DialogView::~DialogView() = default;
+
 DialogView::UseCase DialogView::getUseCase() const {
   return m_useCase;
 }

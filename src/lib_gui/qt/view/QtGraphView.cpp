@@ -40,24 +40,18 @@
 #include "type/MessageStatus.h"
 #include "utilityQt.h"
 
-QtGraphView::QtGraphView(ViewLayout* viewLayout)
-    : GraphView(viewLayout)
-    , m_focusHandler(this)
-    , m_centerActiveNode(false)
-    , m_scrollToTop(false)
-    , m_restoreScroll(false)
-    , m_isIndexedList(false) {
-  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame()));
+QtGraphView::QtGraphView(ViewLayout* viewLayout) : GraphView(viewLayout), m_focusHandler(this) {
+  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame));
 
   QWidget* widget = QtViewWidgetWrapper::getWidgetOfView(this);
 
-  QBoxLayout* layout = new QBoxLayout(QBoxLayout::TopToBottom);
+  auto* layout = new QBoxLayout{QBoxLayout::TopToBottom};
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   widget->setLayout(layout);
 
-  QGraphicsScene* scene = new QGraphicsScene(widget);
-  QtGraphicsView* view = new QtGraphicsView(&m_focusHandler, widget);
+  auto* scene = new QGraphicsScene(widget);
+  auto* view = new QtGraphicsView(&m_focusHandler, widget);
   view->setScene(scene);
   view->setDragMode(QGraphicsView::ScrollHandDrag);
   view->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -65,16 +59,16 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
 
   widget->layout()->addWidget(view);
 
-  connect(view, &QtGraphicsView::emptySpaceClicked, this, &QtGraphView::clickedInEmptySpace);
-  connect(view, &QtGraphicsView::resized, this, &QtGraphView::resized);
-  connect(view, &QtGraphicsView::focusIn, [this]() { setNavigationFocus(true); });
-  connect(view, &QtGraphicsView::focusOut, [this]() { setNavigationFocus(false); });
+  std::ignore = connect(view, &QtGraphicsView::emptySpaceClicked, this, &QtGraphView::clickedInEmptySpace);
+  std::ignore = connect(view, &QtGraphicsView::resized, this, &QtGraphView::resized);
+  std::ignore = connect(view, &QtGraphicsView::focusIn, [this]() { setNavigationFocus(true); });
+  std::ignore = connect(view, &QtGraphicsView::focusOut, [this]() { setNavigationFocus(false); });
 
   m_scrollSpeedChangeListenerHorizontal.setScrollBar(view->horizontalScrollBar());
   m_scrollSpeedChangeListenerVertical.setScrollBar(view->verticalScrollBar());
 
-  connect(view->horizontalScrollBar(), &QScrollBar::valueChanged, this, &QtGraphView::scrolled);
-  connect(view->verticalScrollBar(), &QScrollBar::valueChanged, this, &QtGraphView::scrolled);
+  std::ignore = connect(view->horizontalScrollBar(), &QScrollBar::valueChanged, this, &QtGraphView::scrolled);
+  std::ignore = connect(view->verticalScrollBar(), &QScrollBar::valueChanged, this, &QtGraphView::scrolled);
 
   // trail controls
   {
@@ -92,7 +86,7 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
     }
 
     {
-      QWidget* ui = new QWidget();
+      auto* ui = new QWidget;
       ui->setGeometry(0, 0, 26, 210);
       stack->addWidget(ui);
 
@@ -205,6 +199,8 @@ QtGraphView::QtGraphView(ViewLayout* viewLayout)
   }
 }
 
+QtGraphView::~QtGraphView() = default;
+
 void QtGraphView::createWidgetWrapper() {}
 
 void QtGraphView::refreshView() {
@@ -286,7 +282,7 @@ void QtGraphView::rebuildGraph(std::shared_ptr<Graph> graph,
                                const std::vector<std::shared_ptr<DummyNode>>& nodes,
                                const std::vector<std::shared_ptr<DummyEdge>>& edges,
                                const GraphParams params) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, graph, nodes, edges, params]() {
     if(isTransitioning()) {
       m_transition->stop();
       m_transition.reset();
@@ -406,7 +402,7 @@ void QtGraphView::clear() {
 }
 
 void QtGraphView::coFocusTokenIds(const std::vector<Id>& focusedTokenIds) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, focusedTokenIds]() {
     for(const Id& tokenId : focusedTokenIds) {
       QtGraphNode* node = QtGraphNode::findNodeRecursive(m_oldNodes, tokenId);
       if(node && !node->getIsFocused()) {
@@ -425,7 +421,7 @@ void QtGraphView::coFocusTokenIds(const std::vector<Id>& focusedTokenIds) {
 }
 
 void QtGraphView::deCoFocusTokenIds(const std::vector<Id>& defocusedTokenIds) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, defocusedTokenIds]() {
     for(const Id& tokenId : defocusedTokenIds) {
       QtGraphNode* node = QtGraphNode::findNodeRecursive(m_oldNodes, tokenId);
       if(node && !node->getIsFocused()) {
@@ -470,7 +466,7 @@ void QtGraphView::scrollToValues(int xValue, int yValue) {
 }
 
 void QtGraphView::activateEdge(Id edgeId) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, edgeId]() {
     if(isTransitioning()) {
       m_transition->stop();
       m_transition.reset();
