@@ -164,13 +164,6 @@ find_package(
              Network
              Svg
              Core5Compat)
-
-if(WIN32)
-  find_package(
-    Qt6 6.8
-    COMPONENTS WinExtras
-    REQUIRED)
-endif()
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(cmake/copy_qt_binaries.cmake)
@@ -299,7 +292,6 @@ target_link_libraries(
          Sourcetrail::core::utility::file::FilePathFilter
          Sourcetrail::core::utility::file::FileSystem
          Sourcetrail::libGui::utility::utilityApp
-         $<$<PLATFORM_ID:Windows>:Qt6::WinExtras>
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::OrderedCache

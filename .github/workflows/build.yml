@@ -112,22 +112,39 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc g++ clang ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
+        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep
+
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.2.*'
+          dir: '${{github.workspace}}/Qt/'
+          install-deps: 'true'
+          version: '6.8.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+          modules: 'qt5compat'
+          archives: 'icu qtbase qtdeclarative qtsvg'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action-linux'
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
           dir: '${{github.workspace}}/Qt/'
           install-deps: 'true'
-          version: '5.15.2'
+          version: '6.8.2'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          archives: 'qtwinextras qtsvg qtbase icu'
+          arch: 'win64_msvc2022_64'
+          modules: 'qt5compat'
+          archives: 'qtbase qtdeclarative qtsvg'
           cache: 'true'
-          cache-key-prefix: 'install-qt-action'
+          cache-key-prefix: 'install-qt-action-windows'
 
       - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'
