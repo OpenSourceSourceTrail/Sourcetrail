@@ -45,29 +45,24 @@ set(test_lib_names
     UserPathsTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
-  add_executable(${test_name} ${test_name}.cpp)
-
-  target_link_libraries(
+  add_sourcetrail_test(
+    NAME
     ${test_name}
-    PUBLIC lib_test_utilities
-           lib::mocks
-           GTest::gmock
-           GTest::gtest
-           Sourcetrail::lib
-           Sourcetrail::gtest_main
-           Sourcetrail::core::utility::TextAccess
-           Qt5::Gui
-           $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-           $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
-
-  set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+    SOURCES
+    ${test_name}.cpp
+    DEPS
+    lib_test_utilities
+    lib::mocks
+    Sourcetrail::lib
+    Sourcetrail::gtest_main
+    Sourcetrail::core::utility::TextAccess
+    Qt5::Gui
+    TEST_PREFIX
+    "unittests.lib."
+    WORKING_DIRECTORY
+    "${CMAKE_BINARY_DIR}/test/")
 
   target_compile_definitions(${test_name} PUBLIC ST_TESTING=1)
-
-  gtest_discover_tests(
-    ${test_name}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "unittests.lib.")
 endforeach()
 
 target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::core::utility::ScopedFunctor)
