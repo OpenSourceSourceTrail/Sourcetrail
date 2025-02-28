@@ -41,7 +41,7 @@ void SearchController::handleMessage(MessageSearchAutocomplete* message) {
     return;
   }
 
-  LOG_INFO_W(L"autocomplete string: \"" + message->query + L"\"");
+  LOG_INFO(L"autocomplete string: \"" + message->query + L"\"");
   view->setAutocompletionList(m_storageAccess->getAutocompletionMatches(message->query, message->acceptedNodeTypes, true));
 }
 

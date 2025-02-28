@@ -64,7 +64,7 @@ void StatusBarController::handleMessage(MessageStatus* message) {
 
 void StatusBarController::setStatus(const std::wstring& status, bool isError, bool showLoader) {
   if(!status.empty()) {
-    LOG_INFO_W(L"STATUS " + status);
+    LOG_INFO(L"STATUS " + status);
   }
 
   getView()->showMessage(status, isError, showLoader);

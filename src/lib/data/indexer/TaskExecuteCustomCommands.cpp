@@ -152,9 +152,9 @@ void TaskExecuteCustomCommands::executeParallelIndexerCommands(int threadId, std
 
       if(!databaseFilePathKnown) {
         if(databaseFilePath.exists()) {
-          LOG_WARNING_W(L"Temporary storage \"" + databaseFilePath.wstr() +
-                        L"\" already exists on file system. File will be removed to avoid "
-                        L"conflicts.");
+          LOG_WARNING(L"Temporary storage \"" + databaseFilePath.wstr() +
+                      L"\" already exists on file system. File will be removed to avoid "
+                      L"conflicts.");
           FileSystem::remove(databaseFilePath);
         }
         storage = std::make_shared<PersistentStorage>(databaseFilePath, FilePath());
@@ -215,7 +215,7 @@ void TaskExecuteCustomCommands::runIndexerCommand(std::shared_ptr<IndexerCommand
     }
 
     if(out.exitCode == 0 && out.error.empty()) {
-      LOG_INFO_W(L"Process returned successfully.");
+      LOG_INFO(L"Process returned successfully.");
     } else {
       std::wstring statusText = L"command \"" + indexerCommand->getCommand() + L" " + utility::join(arguments, L" ") +
           L"\" returned";
@@ -227,7 +227,7 @@ void TaskExecuteCustomCommands::runIndexerCommand(std::shared_ptr<IndexerCommand
       }
       statusText += L".";
 
-      LOG_ERROR_W(statusText);
+      LOG_ERROR(statusText);
       MessageShowStatus().dispatch();
       MessageStatus(statusText, true, false, true).dispatch();
     }
