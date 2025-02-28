@@ -19,9 +19,9 @@ foreach(test_name IN LISTS test_lib_names)
     DEPS
     GTest::gtest
     GTest::gmock
-    Qt5::Core
-    Qt5::Gui
-    Qt5::Sql
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Sql
     Sourcetrail::messaging
     Sourcetrail::gtest_main
     Sourcetrail::core::utility::TextAccess
