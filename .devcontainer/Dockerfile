@@ -14,24 +14,21 @@ RUN apt-get update &&                                                    \
     wget                                                                 \
     curl                                                                 \
     locales                                                              \
-    gcc-12                                                               \
-    g++-12                                                               \
+    gcc                                                                  \
+    g++                                                                  \
     mold                                                                 \
     gdb                                                                  \
     valgrind                                                             \
     git                                                                  \
     git-lfs                                                              \
     ninja-build                                                          \
-    python3-venv                                                          \
+    python3-venv                                                         \
     qtbase5-dev                                                          \
     libqt5svg5-dev                                                       \
     graphviz                                                             \
     cppcheck                                                             \
-    doxygen &&                                                           \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 10 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 10 && \
-    update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcc-12 10 && \
-    apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
+    doxygen                                                              \
+    clang                                                           
 
 # Generate en_US.UTF-8 locale on the system
 RUN locale-gen en_US.UTF-8
@@ -55,11 +52,6 @@ RUN INSTALL_PREFIX="/opt/llvm-15.0.7" && \
     cmake --build /tmp/build &&                                                                                           \
     cmake --install /tmp/build &&                                                                                         \
     rm -rf /tmp/llvmorg-15.0.7.tar.gz /tmp/llvm-project-llvmorg-15.0.7 /tmp/build
-
-# Update environment variables
-ENV PATH="/opt/llvm-15.0.7/bin:$PATH"
-ENV LD_LIBRARY_PATH="/opt/llvm-15.0.7/lib:$LD_LIBRARY_PATH"
-ENV CMAKE_PREFIX_PATH="/opt/llvm-15.0.7:$CMAKE_PREFIX_PATH"
 
 # Add a non-root user in one step
 # For further details check https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
