@@ -157,44 +157,20 @@ find_package(
              system
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
-set(QT_MIN_VERSION "5.15.0")
-set(QT_MIN_VERSION_HEX 0x051500)
 find_package(
-  Qt5 ${QT_MIN_VERSION}
+  Qt6 6.8
+  REQUIRED
   COMPONENTS Widgets
              PrintSupport
              Network
              Svg
-  REQUIRED)
+             Core5Compat)
 
 if(WIN32)
   find_package(
-    Qt5 ${QT_MIN_VERSION}
+    Qt6 6.8
     COMPONENTS WinExtras
     REQUIRED)
-endif()
-
-if(Qt5Widgets_FOUND)
-  if(SOURCETRAIL_CMAKE_VERBOSE)
-    message(STATUS "Found Qt ${Qt5Widgets_VERSION_STRING}")
-  endif()
-
-  # FIX: Qt was built with -reduce-relocations
-  if(Qt5_POSITION_INDEPENDENT_CODE)
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-  endif()
-
-  # The following define makes your compiler emit warnings if you use
-  # any feature of Qt which as been marked as deprecated (the exact warnings
-  # depend on your compiler). Please consult the documentation of the
-  # deprecated API in order to know how to port your code away from it.
-  add_definitions(-DQT_DEPRECATED_WARNINGS)
-
-  # You can also make your code fail to compile if you use deprecated APIs.
-  # In order to do so, uncomment the following line.
-  # You can also select to disable deprecated APIs only up to a certain version of Qt.
-  #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX}    # disables all the APIs deprecated at or before the specified Qt version
-  add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=${QT_MIN_VERSION_HEX})
 endif()
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
@@ -296,7 +272,7 @@ target_link_libraries(
   Sourcetrail_lib_gui_utility
   PUBLIC Sourcetrail::core::utility::ApplicationArchitectureType Sourcetrail::core::utility::OsType
   PRIVATE Boost::system
-          Qt5::Core
+          Qt6::Core
           Sourcetrail::core
           Sourcetrail::lib
           Sourcetrail::core::utility::ScopedFunctor
@@ -315,16 +291,16 @@ add_library(Sourcetrail::lib_gui ALIAS Sourcetrail_lib_gui)
 target_link_libraries(
   Sourcetrail_lib_gui
   PUBLIC Sourcetrail::lib
-         Qt5::Widgets
-         Qt5::Network
-         Qt5::Svg
+         Qt6::Widgets
+         Qt6::Network
+         Qt6::Svg
          Sourcetrail::core::utility::SingleValueCache
          Sourcetrail::core::utility::LowMemoryStringMap
          Sourcetrail::core::utility::Migrator
          Sourcetrail::core::utility::file::FilePathFilter
          Sourcetrail::core::utility::file::FileSystem
          Sourcetrail::libGui::utility::utilityApp
-         $<$<PLATFORM_ID:Windows>:Qt5::WinExtras>
+         $<$<PLATFORM_ID:Windows>:Qt6::WinExtras>
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::OrderedCache
@@ -395,7 +371,7 @@ if(ENABLE_UNIT_TEST
   create_symlink("${CMAKE_SOURCE_DIR}/bin/test/data" "${CMAKE_BINARY_DIR}/test/data")
 
   find_package(
-    Qt5 ${QT_MIN_VERSION}
+    Qt6 6.8
     COMPONENTS Test Sql
     REQUIRED)
 

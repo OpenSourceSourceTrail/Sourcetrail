@@ -48,7 +48,7 @@
 #   - GTest::gtest
 #   - Sourcetrail::lib
 #   - Sourcetrail::gtest_main
-#   - Qt5::Gui
+#   - Qt6::Gui
 #   - sanitizer::address (if ENABLE_SANITIZER_ADDRESS is ON)
 #   - sanitizer::undefined (if ENABLE_SANITIZER_UNDEFINED_BEHAVIOR is ON)
 #
