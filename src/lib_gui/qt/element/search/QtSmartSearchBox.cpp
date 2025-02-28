@@ -42,7 +42,11 @@ void QtSmartSearchBox::startSearch() {
         addMatchAndUpdate(m_oldMatch);
       } else {
         QString text = QString::fromStdWString(match.name);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+        if(m_supportsFullTextSearch && !text.startsWith(QChar{SearchMatch::FULLTEXT_SEARCH_CHARACTER})) {
+#else
         if(m_supportsFullTextSearch && !text.startsWith(SearchMatch::FULLTEXT_SEARCH_CHARACTER)) {
+#endif
           text = QChar(SearchMatch::FULLTEXT_SEARCH_CHARACTER) + text;
         }
 
@@ -186,7 +190,11 @@ void QtSmartSearchBox::focusInEvent(QFocusEvent* event) {
     return;
   }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  if(text().size() == 1 && text().startsWith(QChar{SearchMatch::FULLTEXT_SEARCH_CHARACTER})) {
+#else
   if(text().size() == 1 && text().startsWith(SearchMatch::FULLTEXT_SEARCH_CHARACTER)) {
+#endif
     setEditText(QLatin1String(""));
   } else {
     editTextToElement();
@@ -217,7 +225,11 @@ void QtSmartSearchBox::keyPressEvent(QKeyEvent* event) {
   bool layout = false;
 
   if(event->key() == Qt::Key_Return) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    if(text().startsWith(QChar{SearchMatch::FULLTEXT_SEARCH_CHARACTER})) {
+#else
     if(text().startsWith(SearchMatch::FULLTEXT_SEARCH_CHARACTER)) {
+#endif
       startFullTextSearch();
       return;
     } else if(!m_completer->popup()->isVisible()) {
@@ -829,7 +841,11 @@ void QtSmartSearchBox::clearLineEdit() {
 }
 
 void QtSmartSearchBox::requestAutoCompletions() {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  if(!text().isEmpty() && !text().startsWith(QChar{SearchMatch::FULLTEXT_SEARCH_CHARACTER})) {
+#else
   if(!text().isEmpty() && !text().startsWith(SearchMatch::FULLTEXT_SEARCH_CHARACTER)) {
+#endif
     emit autocomplete(text().toStdWString(), getMatchAcceptedNodeTypes());
   } else {
     hideAutoCompletions();

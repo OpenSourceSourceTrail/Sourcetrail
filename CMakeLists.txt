@@ -158,8 +158,7 @@ find_package(
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
 find_package(
-  Qt6 6.8
-  REQUIRED
+  Qt6 6.8 REQUIRED
   COMPONENTS Widgets
              PrintSupport
              Network
@@ -317,6 +316,7 @@ target_link_libraries(
           Sourcetrail::lib_gui::utility
           Sourcetrail::libGui::utility::utilityApp
           Sourcetrail::messaging
+          Qt6::Core5Compat
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
 
 # command for versioning script

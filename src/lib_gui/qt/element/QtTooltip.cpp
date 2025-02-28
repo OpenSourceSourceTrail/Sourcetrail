@@ -113,7 +113,7 @@ void QtTooltip::leaveEvent(QEvent* /*event*/) {
   QTimer::singleShot(500, this, SLOT(hide()));
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
 void QtTooltip::enterEvent(QEnterEvent* /*event*/) {
 #else
 void QtTooltip::enterEvent(QEvent* /*event*/) {

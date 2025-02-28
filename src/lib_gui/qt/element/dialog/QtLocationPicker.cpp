@@ -39,7 +39,11 @@ QtLocationPicker::QtLocationPicker(QWidget* parent) : QWidget(parent), m_pickDir
 
 void QtLocationPicker::paintEvent(QPaintEvent*) {
   QStyleOption opt;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  opt.initFrom(this);
+#else
   opt.init(this);
+#endif
 
   QPainter p(this);
   style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);

@@ -163,7 +163,11 @@ void QtBookmark::showEvent(QShowEvent* /*event*/) {
   elideButtonText();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+void QtBookmark::enterEvent(QEnterEvent* /*event*/) {
+#else
 void QtBookmark::enterEvent(QEvent* /*event*/) {
+#endif
   m_editButton->show();
   m_deleteButton->show();
 
