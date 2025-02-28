@@ -27,6 +27,7 @@ foreach(test_name IN LISTS test_lib_names)
     Sourcetrail::core::utility::TextAccess
     Sourcetrail::core::utility::file::FileSystem
     Sourcetrail::core::utility::file::utilityFile
+    $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
     lib::mocks
     Boost::date_time
     spdlog::spdlog

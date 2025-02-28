@@ -224,32 +224,33 @@ DatabasePolicy QtDialogView::finishedIndexingDialog(size_t indexedFileCount,
   DatabasePolicy policy = DATABASE_POLICY_UNKNOWN;
   m_resultReady = false;
 
-  m_onQtThread([this, &policy, indexedFileCount, totalIndexedFileCount, completedFileCount, totalFileCount, time, errorInfo, interrupted, shallow]() {
-    m_dialogsVisible = true;
-    m_windowStack.clearWindows();
+  m_onQtThread(
+      [this, &policy, indexedFileCount, totalIndexedFileCount, completedFileCount, totalFileCount, time, errorInfo, interrupted, shallow]() {
+        m_dialogsVisible = true;
+        m_windowStack.clearWindows();
 
-    QtIndexingReportDialog* window = createWindow<QtIndexingReportDialog>(
-        indexedFileCount, totalIndexedFileCount, completedFileCount, totalFileCount, time, interrupted, shallow);
-    window->updateErrorCount(errorInfo.total, errorInfo.fatal);
-    std::ignore = connect(window, &QtIndexingDialog::finished, [this, &policy]() {
-      setUIBlocked(false);
-      policy = DATABASE_POLICY_KEEP;
-      m_resultReady = true;
-    });
-    std::ignore = connect(window, &QtIndexingDialog::canceled, [this, &policy]() {
-      setUIBlocked(false);
-      policy = DATABASE_POLICY_DISCARD;
-      m_resultReady = true;
-    });
-    std::ignore = connect(window, &QtIndexingReportDialog::requestReindexing, [this, &policy]() {
-      setUIBlocked(false);
-      policy = DATABASE_POLICY_REFRESH;
-      m_resultReady = true;
-    });
+        QtIndexingReportDialog* window = createWindow<QtIndexingReportDialog>(
+            indexedFileCount, totalIndexedFileCount, completedFileCount, totalFileCount, time, interrupted, shallow);
+        window->updateErrorCount(errorInfo.total, errorInfo.fatal);
+        std::ignore = connect(window, &QtIndexingDialog::finished, [this, &policy]() {
+          setUIBlocked(false);
+          policy = DATABASE_POLICY_KEEP;
+          m_resultReady = true;
+        });
+        std::ignore = connect(window, &QtIndexingDialog::canceled, [this, &policy]() {
+          setUIBlocked(false);
+          policy = DATABASE_POLICY_DISCARD;
+          m_resultReady = true;
+        });
+        std::ignore = connect(window, &QtIndexingReportDialog::requestReindexing, [this, &policy]() {
+          setUIBlocked(false);
+          policy = DATABASE_POLICY_REFRESH;
+          m_resultReady = true;
+        });
 
-    m_mainWindow->hideWindowsTaskbarProgress();
-    setUIBlocked(true);
-  });
+        m_mainWindow->hideWindowsTaskbarProgress();
+        setUIBlocked(true);
+      });
 
   while(!m_resultReady) {
     std::this_thread::sleep_for(std::chrono::milliseconds(25));
