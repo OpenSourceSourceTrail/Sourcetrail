@@ -2,6 +2,7 @@
 
 #include <QFileDialog>
 #include <QListView>
+#include <QRegExp>
 #include <QTreeView>
 
 #include "FilePath.h"

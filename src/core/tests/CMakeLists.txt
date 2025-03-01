@@ -1,40 +1,30 @@
 # ${CMAKE_SOURCE_DIR}/src/core/tests/CMakeLists.txt
-
-# ================================================================================================================================
-add_executable(ConfigManagerTestSuite ConfigManagerTestSuite.cpp)
-
-target_link_libraries(
+add_sourcetrail_test(
+  NAME
   ConfigManagerTestSuite
-  PUBLIC Sourcetrail::gtest_main
-         Sourcetrail::core
-         Sourcetrail::core::utility::ConfigManager
-         Sourcetrail::core::utility::TextAccess
-         $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-         $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
+  SOURCES
+  ConfigManagerTestSuite.cpp
+  DEPS
+  Sourcetrail::core
+  Sourcetrail::core::utility::ConfigManager
+  Sourcetrail::core::utility::TextAccess
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
 
-set_target_properties(ConfigManagerTestSuite PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
-
-gtest_discover_tests(
-  ConfigManagerTestSuite
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-  TEST_PREFIX "unittests.core.")
-# ================================================================================================================================
-add_executable(UtilityStringTestSuite UtilityStringTestSuite.cpp)
-
-target_link_libraries(
+add_sourcetrail_test(
+  NAME
   UtilityStringTestSuite
-  PUBLIC Sourcetrail::gtest_main
-         Sourcetrail::core::utility::utilityString
-         $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-         $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
+  SOURCES
+  UtilityStringTestSuite.cpp
+  DEPS
+  Sourcetrail::core::utility::utilityString
+  TEST_PREFIX
+  "unittests.core."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
 
-set_target_properties(UtilityStringTestSuite PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
-
-gtest_discover_tests(
-  UtilityStringTestSuite
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-  TEST_PREFIX "unittests.core.")
-# ================================================================================================================================
 add_sourcetrail_test(
   NAME
   TextAccessTestSuite
@@ -206,7 +196,6 @@ add_sourcetrail_test(
 if(TARGET CommandlineHelperTestSuite AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_options(CommandlineHelperTestSuite PRIVATE -Wno-write-strings)
 endif()
-
 add_sourcetrail_test(
   NAME
   CommandLineParserTestSuite

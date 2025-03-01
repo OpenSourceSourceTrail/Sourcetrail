@@ -13,7 +13,7 @@ foreach(test_name IN LISTS test_lib_gui_names)
 
   target_link_libraries(
     ${test_name}
-    PUBLIC Qt5::Test
+    PUBLIC Qt6::Test
            GTest::gmock
            Sourcetrail::lib
            Sourcetrail::lib_gui

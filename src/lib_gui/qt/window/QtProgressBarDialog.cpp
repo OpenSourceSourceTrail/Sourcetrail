@@ -7,11 +7,11 @@
 
 QtProgressBarDialog::QtProgressBarDialog(float topRatio, QWidget* parent)
     : QtIndexingDialog(true, parent)
-    , m_title(new QLabel(QLatin1String(""), this))
-    , m_top(new QWidget(m_window))
+    , m_title{new QLabel(QLatin1String(""), this)}
+    , m_top{new QWidget(m_window)}
     , m_topRatio(topRatio)
-    , m_progressBar(new QtProgressBar(m_window))
-    , m_percentLabel(new QLabel(QStringLiteral("0% Progress")))
+    , m_progressBar{new QtProgressBar(m_window)}
+    , m_percentLabel{new QLabel(QStringLiteral("0% Progress"))}
     , m_messageLabel(QtIndexingDialog::createMessageLabel(m_layout)) {
   m_top->setObjectName(QStringLiteral("topHalf"));
   m_top->setGeometry(0, 0, 0, 0);

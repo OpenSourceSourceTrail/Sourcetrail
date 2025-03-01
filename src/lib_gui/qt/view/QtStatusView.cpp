@@ -1,5 +1,7 @@
 #include "QtStatusView.h"
 
+#include <tuple>
+
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QFrame>
@@ -17,7 +19,7 @@
 #include "utilityQt.h"
 
 QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
-  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame()));
+  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame));
 
   QWidget* widget = QtViewWidgetWrapper::getWidgetOfView(this);
 
@@ -26,8 +28,8 @@ QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
   layout->setSpacing(0);
   widget->setLayout(layout);
 
-  m_table = new QtTable(this);
-  m_model = new QStandardItemModel(this);
+  m_table = new QtTable{this};
+  m_model = new QStandardItemModel{this};
   m_table->setModel(m_model);
 
   m_model->setColumnCount(2);
@@ -41,7 +43,7 @@ QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
   layout->addWidget(m_table);
 
   // Setup filters
-  QHBoxLayout* filters = new QHBoxLayout();
+  auto* filters = new QHBoxLayout;
   filters->setContentsMargins(10, 3, 0, 3);
   filters->setSpacing(25);
 
@@ -51,15 +53,17 @@ QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
 
   filters->addStretch();
 
-  QPushButton* clearButton = new QPushButton(QStringLiteral("Clear Table"));
+  auto* clearButton = new QPushButton(QStringLiteral("Clear Table"));
   clearButton->setObjectName(QStringLiteral("screen_button"));
-  connect(clearButton, &QPushButton::clicked, [=]() { MessageClearStatusView().dispatch(); });
+  std::ignore = connect(clearButton, &QPushButton::clicked, this, []() { MessageClearStatusView().dispatch(); });
 
   filters->addWidget(clearButton);
   filters->addSpacing(10);
 
   layout->addLayout(filters);
 }
+
+QtStatusView::~QtStatusView() = default;
 
 void QtStatusView::createWidgetWrapper() {}
 
@@ -91,7 +95,7 @@ void QtStatusView::clear() {
 }
 
 void QtStatusView::addStatus(const std::vector<Status>& listOfStatus) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, listOfStatus]() {
     for(const Status& status : listOfStatus) {
       const int rowNumber = m_table->getFilledRowCount();
       if(rowNumber < m_model->rowCount()) {
@@ -116,10 +120,10 @@ void QtStatusView::addStatus(const std::vector<Status>& listOfStatus) {
 }
 
 QCheckBox* QtStatusView::createFilterCheckbox(const QString& name, QBoxLayout* layout, bool checked) {
-  QCheckBox* checkbox = new QCheckBox(name);
+  auto* checkbox = new QCheckBox{name};
   checkbox->setChecked(checked);
 
-  connect(checkbox, &QCheckBox::stateChanged, [=](int) {
+  std::ignore = connect(checkbox, &QCheckBox::stateChanged, this, [this](int) {
     m_table->selectionModel()->clearSelection();
 
     const StatusFilter statusMask = (m_showInfo->isChecked() ? utility::to_underlying(StatusType::Info) :

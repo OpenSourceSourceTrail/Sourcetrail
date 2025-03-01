@@ -12,13 +12,14 @@ QtUnknownProgressDialog::QtUnknownProgressDialog(bool hideable, QWidget* parent)
   m_layout->addStretch();
 
   if(hideable) {
-    auto* buttons = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
+    auto* buttons = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory): Qt handle the memory
     buttons->addStretch();
 
-    auto* hideButton = new QPushButton(QStringLiteral("Hide"));
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handle the memory
+    auto* hideButton = new QPushButton{QStringLiteral("Hide")};
     hideButton->setObjectName(QStringLiteral("windowButton"));
     hideButton->setDefault(true);
-    connect(hideButton, &QPushButton::clicked, this, &QtUnknownProgressDialog::onHidePressed);
+    std::ignore = connect(hideButton, &QPushButton::clicked, this, &QtUnknownProgressDialog::onHidePressed);
     buttons->addWidget(hideButton);
 
     m_layout->addLayout(buttons);

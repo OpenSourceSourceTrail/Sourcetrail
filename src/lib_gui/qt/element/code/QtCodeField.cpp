@@ -229,7 +229,11 @@ void QtCodeField::paintEvent(QPaintEvent* event) {
   QPlainTextEdit::paintEvent(event);
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+void QtCodeField::enterEvent(QEnterEvent* /*event*/) {}
+#else
 void QtCodeField::enterEvent(QEvent* /*event*/) {}
+#endif
 
 void QtCodeField::leaveEvent(QEvent* /*event*/) {
   setHoveredAnnotations(std::vector<const Annotation*>());

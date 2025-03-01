@@ -11,14 +11,14 @@ class QtSearchBar;
 class QtSearchView : public SearchView {
 public:
   QtSearchView(ViewLayout* viewLayout);
-  ~QtSearchView() = default;
+  ~QtSearchView() override;
 
   // View implementation
   void createWidgetWrapper() override;
   void refreshView() override;
 
   // SearchView implementation
-  std::wstring getQuery() const override;
+  [[nodiscard]] std::wstring getQuery() const override;
   void setMatches(const std::vector<SearchMatch>& matches) override;
   void setFocus() override;
   void findFulltext() override;

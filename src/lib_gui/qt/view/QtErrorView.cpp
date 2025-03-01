@@ -1,5 +1,5 @@
 #include "QtErrorView.h"
-// Qt5
+
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QFrame>
@@ -12,7 +12,7 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
-// internal
+
 #include "ColorScheme.h"
 #include "ErrorController.h"
 #include "ErrorFilter.h"
@@ -62,7 +62,7 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
           << QStringLiteral("Line") << QStringLiteral("Indexed") << QStringLiteral("Translation Unit");
   m_model->setHorizontalHeaderLabels(headers);
 
-  connect(m_table, &QTableView::clicked, [=](const QModelIndex& index) {
+  std::ignore = connect(m_table, &QTableView::clicked, [this](const QModelIndex& index) {
     if(index.isValid()) {
       if(m_model->item(index.row(), static_cast<int>(Column::File)) == nullptr) {
         return;
@@ -77,7 +77,7 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
   layout->addWidget(m_table);
 
   // Setup Checkboxes
-  QBoxLayout* checkboxes = new QHBoxLayout();
+  auto* checkboxes = new QHBoxLayout;
   checkboxes->setContentsMargins(10, 3, 0, 3);
   checkboxes->setSpacing(0);
 
@@ -105,7 +105,7 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
 
     m_allButton = new QPushButton(QLatin1String(""));
     m_allButton->setObjectName(QStringLiteral("screen_button"));
-    connect(m_allButton, &QPushButton::clicked, [=]() {
+    std::ignore = connect(m_allButton, &QPushButton::clicked, [this]() {
       m_errorFilter.limit = 0;
       errorFilterChanged();
     });
@@ -139,11 +139,11 @@ QtErrorView::~QtErrorView() = default;
 void QtErrorView::createWidgetWrapper() {}
 
 void QtErrorView::refreshView() {
-  m_onQtThread([=]() { setStyleSheet(); });
+  m_onQtThread([this]() { setStyleSheet(); });
 }
 
 void QtErrorView::clear() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     if(!m_model->index(0, 0).data(Qt::DisplayRole).toString().isEmpty()) {
       m_model->removeRows(0, m_model->rowCount());
     }
@@ -157,7 +157,7 @@ void QtErrorView::clear() {
 }
 
 void QtErrorView::addErrors(const std::vector<ErrorInfo>& errors, const ErrorCountInfo& errorCount, bool scrollTo) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, errors, errorCount, scrollTo]() {
     for(const ErrorInfo& error : errors) {
       addErrorToTable(error);
     }
@@ -185,7 +185,7 @@ void QtErrorView::addErrors(const std::vector<ErrorInfo>& errors, const ErrorCou
 }
 
 void QtErrorView::setErrorId(Id errorId) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, errorId]() {
     QList<QStandardItem*> items = m_model->findItems(QString::number(errorId), Qt::MatchExactly, static_cast<int>(Column::ID));
 
     if(items.size() == 1) {
@@ -205,7 +205,7 @@ void QtErrorView::setErrorFilter(const ErrorFilter& filter) {
 
   m_errorFilter = filter;
 
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     m_showErrors->blockSignals(true);
     m_showFatals->blockSignals(true);
     m_showNonIndexedErrors->blockSignals(true);

@@ -15,10 +15,7 @@ std::string TextCodec::getName() const {
 }
 
 bool TextCodec::isValid() const {
-  if(mCodec) {
-    return true;
-  }
-  return false;
+  return nullptr != mCodec;
 }
 
 std::wstring TextCodec::decode(const std::string& unicodeString) const {

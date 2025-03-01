@@ -10,7 +10,7 @@ class QtTooltip;
 class QtTooltipView : public TooltipView {
 public:
   QtTooltipView(ViewLayout* viewLayout);
-  ~QtTooltipView() = default;
+  ~QtTooltipView() override;
 
   // View implementation
   void createWidgetWrapper() override;

@@ -48,7 +48,7 @@
 #   - GTest::gtest
 #   - Sourcetrail::lib
 #   - Sourcetrail::gtest_main
-#   - Qt5::Gui
+#   - Qt6::Gui
 #   - sanitizer::address (if ENABLE_SANITIZER_ADDRESS is ON)
 #   - sanitizer::undefined (if ENABLE_SANITIZER_UNDEFINED_BEHAVIOR is ON)
 #
@@ -133,6 +133,6 @@ function(add_sourcetrail_test)
   # Configure test discovery
   gtest_discover_tests(
     ${ARG_NAME}
-    WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}"
+    WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}" DISCOVERY_MODE PRE_TEST
     TEST_PREFIX "${ARG_TEST_PREFIX}")
 endfunction()

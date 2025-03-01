@@ -15,5 +15,5 @@ public:
   [[nodiscard]] QWidget* getWidget() const;
 
 private:
-  QWidget* m_pWidget;
+  QWidget* mWidget;
 };
