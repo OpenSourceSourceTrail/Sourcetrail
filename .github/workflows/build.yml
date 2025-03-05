@@ -62,14 +62,32 @@ jobs:
               os: ubuntu-24.04,
               tag: gnu,
               cc: "gcc",
-              cxx: "g++"
+              cxx: "g++",
+              "with_cxx": ""
+            }
+          - {
+              name: "Ubuntu Latest GCC with cxx_build",
+              os: ubuntu-24.04,
+              tag: gnu,
+              cc: "gcc",
+              cxx: "g++",
+              "with_cxx": "_build_cxx"
             }
           - {
               name: "Ubuntu Latest CLang",
               os: ubuntu-24.04,
               tag: "clang",
               cc: "clang",
-              cxx: "clang++"
+              cxx: "clang++",
+              "with_cxx": ""
+            }
+          - {
+              name: "Ubuntu Latest CLang cxx_build",
+              os: ubuntu-24.04,
+              tag: "clang",
+              cc: "clang",
+              cxx: "clang++",
+              "with_cxx": "_build_cxx"
             }
 
     name: ${{ matrix.config.name }}
@@ -155,7 +173,7 @@ jobs:
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
-        run: cmake --preset="ci_${{ matrix.config.tag }}_release"
+        run: cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
