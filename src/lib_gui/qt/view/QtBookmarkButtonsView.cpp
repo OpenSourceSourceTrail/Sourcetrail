@@ -15,8 +15,7 @@
 #include "utilityQt.h"
 
 QtBookmarkButtonsView::QtBookmarkButtonsView(ViewLayout* viewLayout)
-    : BookmarkButtonsView(viewLayout), m_createButtonState(MessageBookmarkButtonState::CANNOT_CREATE) {
-  m_widget = new QFrame();
+    : BookmarkButtonsView(viewLayout), m_createButtonState(MessageBookmarkButtonState::CANNOT_CREATE), m_widget{new QFrame} {
   m_widget->setObjectName(QStringLiteral("bookmark_bar"));
 
   QBoxLayout* layout = new QHBoxLayout();
@@ -32,7 +31,7 @@ QtBookmarkButtonsView::QtBookmarkButtonsView(ViewLayout* viewLayout)
   m_createBookmarkButton->setEnabled(false);
   layout->addWidget(m_createBookmarkButton);
 
-  connect(m_createBookmarkButton, &QPushButton::clicked, this, &QtBookmarkButtonsView::createBookmarkClicked);
+  std::ignore = connect(m_createBookmarkButton, &QPushButton::clicked, this, &QtBookmarkButtonsView::createBookmarkClicked);
 
   m_showBookmarksButton = new QtSearchBarButton(
       ResourcePaths::getGuiDirectoryPath().concatenate(L"bookmark_view/images/bookmark_list_icon.png"));
@@ -40,22 +39,24 @@ QtBookmarkButtonsView::QtBookmarkButtonsView(ViewLayout* viewLayout)
   m_showBookmarksButton->setToolTip(QStringLiteral("Show bookmarks"));
   layout->addWidget(m_showBookmarksButton);
 
-  connect(m_showBookmarksButton, &QPushButton::clicked, this, &QtBookmarkButtonsView::showBookmarksClicked);
+  std::ignore = connect(m_showBookmarksButton, &QPushButton::clicked, this, &QtBookmarkButtonsView::showBookmarksClicked);
 }
+
+QtBookmarkButtonsView::~QtBookmarkButtonsView() = default;
 
 void QtBookmarkButtonsView::createWidgetWrapper() {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(m_widget));
 }
 
 void QtBookmarkButtonsView::refreshView() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     m_widget->setStyleSheet(
         utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"bookmark_view/bookmark_view.css")).c_str());
   });
 }
 
 void QtBookmarkButtonsView::setCreateButtonState(const MessageBookmarkButtonState::ButtonState& state) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, state]() {
     m_createButtonState = state;
 
     m_createBookmarkButton->setIconPath(

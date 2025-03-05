@@ -24,21 +24,21 @@ void QtStatusBarView::createWidgetWrapper() {}
 void QtStatusBarView::refreshView() {}
 
 void QtStatusBarView::showMessage(const std::wstring& message, bool isError, bool showLoader) {
-  m_onQtThread([=]() { m_widget->setText(message, isError, showLoader); });
+  m_onQtThread([this, message, isError, showLoader]() { m_widget->setText(message, isError, showLoader); });
 }
 
 void QtStatusBarView::setErrorCount(ErrorCountInfo errorCount) {
-  m_onQtThread([=]() { m_widget->setErrorCount(errorCount); });
+  m_onQtThread([this, errorCount]() { m_widget->setErrorCount(errorCount); });
 }
 
 void QtStatusBarView::showIdeStatus(const std::wstring& message) {
-  m_onQtThread([=]() { m_widget->setIdeStatus(message); });
+  m_onQtThread([this, message]() { m_widget->setIdeStatus(message); });
 }
 
 void QtStatusBarView::showIndexingProgress(size_t progressPercent) {
-  m_onQtThread([=]() { m_widget->showIndexingProgress(progressPercent); });
+  m_onQtThread([this, progressPercent]() { m_widget->showIndexingProgress(progressPercent); });
 }
 
 void QtStatusBarView::hideIndexingProgress() {
-  m_onQtThread([=]() { m_widget->hideIndexingProgress(); });
+  m_onQtThread([this]() { m_widget->hideIndexingProgress(); });
 }

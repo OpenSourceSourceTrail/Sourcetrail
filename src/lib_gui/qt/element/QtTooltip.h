@@ -23,8 +23,12 @@ public slots:
   virtual void hide(bool force = false);
 
 protected:
-  virtual void leaveEvent(QEvent* event);
-  virtual void enterEvent(QEvent* event);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  void enterEvent(QEnterEvent* event) override;
+#else
+  void enterEvent(QEvent* event) override;
+#endif
+  void leaveEvent(QEvent* event) override;
 
 private:
   void addTitle(const QString& title, int count, const QString& countText);
@@ -32,10 +36,10 @@ private:
 
   void clearLayout(QLayout* layout);
 
-  QWidget* m_parentView;
+  QWidget* m_parentView = nullptr;
   QPoint m_offset;
 
-  bool m_isHovered;
+  bool m_isHovered = false;
 };
 
 #endif    // QT_TOOLTIP_H

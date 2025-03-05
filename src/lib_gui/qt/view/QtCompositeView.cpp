@@ -24,9 +24,9 @@ QtCompositeView::QtCompositeView(ViewLayout* viewLayout, CompositeDirection dire
   }
 
   if(getDirection() == CompositeView::DIRECTION_HORIZONTAL) {
-    m_layout = new QHBoxLayout();
+    m_layout = new QHBoxLayout;
   } else {
-    m_layout = new QVBoxLayout();
+    m_layout = new QVBoxLayout;
   }
 
   m_layout->setSpacing(5);
@@ -35,7 +35,7 @@ QtCompositeView::QtCompositeView(ViewLayout* viewLayout, CompositeDirection dire
 
   topLayout->addLayout(m_layout);
 
-  m_widget = new QWidget();
+  m_widget = new QWidget;
   m_widget->setLayout(topLayout);
 
   refreshView();
@@ -46,7 +46,7 @@ void QtCompositeView::createWidgetWrapper() {
 }
 
 void QtCompositeView::refreshView() {
-  m_onQtThread([=]() { utility::setWidgetBackgroundColor(m_widget, ColorScheme::getInstance()->getColor("search/background")); });
+  m_onQtThread([this]() { utility::setWidgetBackgroundColor(m_widget, ColorScheme::getInstance()->getColor("search/background")); });
 
   showFocusIndicator(false);
 }
@@ -56,7 +56,7 @@ void QtCompositeView::addViewWidget(View* view) {
 }
 
 void QtCompositeView::showFocusIndicator(bool focus) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, focus]() {
     const std::string& colorName = focus ? "window/focus" : "search/background";
     utility::setWidgetBackgroundColor(m_focusIndicator, ColorScheme::getInstance()->getColor(colorName));
   });

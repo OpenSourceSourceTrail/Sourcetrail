@@ -7,4 +7,5 @@ add_sourcetrail_library(
   PUBLIC_HEADERS
   TextCodec.h
   PRIVATE_DEPS
-  Qt5::Core)
+  Qt6::Core
+  Qt6::Core5Compat)

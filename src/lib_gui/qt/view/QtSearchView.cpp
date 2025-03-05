@@ -5,9 +5,9 @@
 #include "ResourcePaths.h"
 #include "utilityQt.h"
 
-QtSearchView::QtSearchView(ViewLayout* viewLayout) : SearchView(viewLayout) {
-  m_widget = new QtSearchBar();
-}
+QtSearchView::QtSearchView(ViewLayout* viewLayout) : SearchView(viewLayout), m_widget{new QtSearchBar} {}
+
+QtSearchView::~QtSearchView() = default;
 
 void QtSearchView::createWidgetWrapper() {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(m_widget));
@@ -25,7 +25,7 @@ std::wstring QtSearchView::getQuery() const {
 }
 
 void QtSearchView::setMatches(const std::vector<SearchMatch>& matches) {
-  m_onQtThread([=]() { m_widget->setMatches(matches); });
+  m_onQtThread([this, matches]() { m_widget->setMatches(matches); });
 }
 
 void QtSearchView::setFocus() {
@@ -43,7 +43,7 @@ void QtSearchView::findFulltext() {
 }
 
 void QtSearchView::setAutocompletionList(const std::vector<SearchMatch>& autocompletionList) {
-  m_onQtThread([=]() { m_widget->setAutocompletionList(autocompletionList); });
+  m_onQtThread([this, autocompletionList]() { m_widget->setAutocompletionList(autocompletionList); });
 }
 
 void QtSearchView::setStyleSheet() {

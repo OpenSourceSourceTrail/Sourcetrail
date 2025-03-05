@@ -142,7 +142,7 @@ target_link_libraries(
           Sourcetrail::scheduling
           ${REQ_LLVM_LIBS}
           ${CLANG_LIBRARIES}
-          Qt5::Core)
+          Qt6::Core)
 
 if(WIN32)
   target_compile_definitions(Sourcetrail_lib_cxx PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS) # Due to Clang

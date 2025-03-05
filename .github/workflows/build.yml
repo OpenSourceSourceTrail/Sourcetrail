@@ -86,7 +86,21 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc g++ clang ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
+        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep
+
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          dir: '${{github.workspace}}/Qt/'
+          install-deps: 'true'
+          version: '6.8.2'
+          host: 'linux'
+          target: 'desktop'
+          archives: 'qtbase qtsvg qt5compat icu'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action'
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
@@ -95,11 +109,11 @@ jobs:
           aqtversion: '==3.1.*'
           dir: '${{github.workspace}}/Qt/'
           install-deps: 'true'
-          version: '5.15.2'
+          version: '6.8.2'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          archives: 'qtwinextras qtsvg qtbase icu'
+          arch: 'win64_msvc2022_64'
+          archives: 'qtbase qtsvg qt5compat qtwinextras icu'
           cache: 'true'
           cache-key-prefix: 'install-qt-action'
 

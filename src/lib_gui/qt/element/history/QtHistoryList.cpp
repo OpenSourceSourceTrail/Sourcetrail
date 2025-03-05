@@ -72,7 +72,9 @@ const SearchMatch& QtHistoryItem::getMatch() const {
 }
 
 void QtHistoryItem::enterEvent(QEvent* event) {
-  QWidget::enterEvent(event);
+  if(auto* enterEvent = dynamic_cast<QEnterEvent*>(event); nullptr != enterEvent) {
+    QWidget::enterEvent(enterEvent);
+  }
 
   std::stringstream css;
   css << "QWidget { background-color:" << m_indicatorHoverColor << ";}";
