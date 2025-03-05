@@ -11,37 +11,28 @@ set(test_lib_names
     StorageTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
-  add_executable(${test_name} ${test_name}.cpp)
-
-  target_link_libraries(
+  add_sourcetrail_test(
+    NAME
     ${test_name}
-    PUBLIC GTest::gtest
-           GTest::gmock
-           Qt5::Core
-           Qt5::Gui
-           Qt5::Sql
-           Sourcetrail::messaging
-           Sourcetrail::gtest_main
-           Sourcetrail::core::utility::TextAccess
-           Sourcetrail::core::utility::file::FileSystem
-           Sourcetrail::core::utility::file::utilityFile
-           lib::mocks
-           Boost::date_time
-           spdlog::spdlog
-           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
-           $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-           $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
-
-  set_target_properties(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
-
-  # TODO(Hussein): Missing from some library
-  target_link_libraries(${test_name} PRIVATE Boost::date_time)
-
-  gtest_discover_tests(
-    ${test_name}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/"
-    TEST_PREFIX "integration.")
+    SOURCES
+    ${test_name}.cpp
+    DEPS
+    GTest::gtest
+    GTest::gmock
+    Qt5::Core
+    Qt5::Gui
+    Qt5::Sql
+    Sourcetrail::messaging
+    Sourcetrail::gtest_main
+    Sourcetrail::core::utility::TextAccess
+    Sourcetrail::core::utility::file::FileSystem
+    Sourcetrail::core::utility::file::utilityFile
+    $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
+    lib::mocks
+    Boost::date_time
+    spdlog::spdlog
+    TEST_PREFIX
+    "integration.lib."
+    WORKING_DIRECTORY
+    "${CMAKE_BINARY_DIR}/test/")
 endforeach()
-
-target_link_libraries(SourceGroupTestSuite PRIVATE Boost::date_time # TODO(Hussein): Missing from some library
-)

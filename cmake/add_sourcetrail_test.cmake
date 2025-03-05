@@ -133,6 +133,6 @@ function(add_sourcetrail_test)
   # Configure test discovery
   gtest_discover_tests(
     ${ARG_NAME}
-    WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}"
+    WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}" DISCOVERY_MODE PRE_TEST
     TEST_PREFIX "${ARG_TEST_PREFIX}")
 endfunction()
