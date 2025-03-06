@@ -1,9 +1,7 @@
 #pragma once
-// internal
 #include "Controller.h"
-#include "Status.h"
-// Messages
 #include "MessageListener.h"
+#include "Status.h"
 #include "type/MessageClearStatusView.h"
 #include "type/MessageShowStatus.h"
 #include "type/MessageStatus.h"
@@ -19,10 +17,12 @@ class StatusController final
     , public MessageListener<MessageStatusFilterChanged> {
 public:
   StatusController();
-  StatusController(const StatusController& pViewLayout) = delete;
-  StatusController(StatusController&& pViewLayout) = delete;
-  StatusController& operator=(const StatusController& pViewLayout) = delete;
-  StatusController& operator=(StatusController&& pViewLayout) = delete;
+
+  StatusController(const StatusController& viewLayout) = delete;
+  StatusController(StatusController&& viewLayout) = delete;
+  StatusController& operator=(const StatusController& viewLayout) = delete;
+  StatusController& operator=(StatusController&& viewLayout) = delete;
+
   ~StatusController() override;
 
 private:
@@ -37,6 +37,6 @@ private:
 
   void addStatus(const std::vector<Status>& statuses);
 
-  std::vector<Status> m_status;
-  StatusFilter m_statusFilter;
+  std::vector<Status> mStatus;
+  StatusFilter mStatusFilter;
 };
