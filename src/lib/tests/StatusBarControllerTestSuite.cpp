@@ -8,9 +8,13 @@
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#define private public
+#ifndef _WIN32
+#  define private public    // NOLINT
+#endif
 #include "StatusBarController.h"
-#undef private
+#ifndef _WIN32
+#  undef private
+#endif
 #include "StatusView.h"
 
 
@@ -53,6 +57,7 @@ TEST_F(StatusBarControllerFix, clear) {
   controller->clear();
 }
 
+#ifndef _WIN32
 TEST_F(StatusBarControllerFix, MessageErrorCountClear) {
   EXPECT_CALL(*statusBarView, setErrorCount(_)).WillOnce(Return());
   MessageErrorCountClear message{};
@@ -124,3 +129,4 @@ TEST_F(StatusBarControllerFix, MessageStatus) {
   MessageStatus message{L"", false, false, false};
   controller->handleMessage(&message);
 }
+#endif
