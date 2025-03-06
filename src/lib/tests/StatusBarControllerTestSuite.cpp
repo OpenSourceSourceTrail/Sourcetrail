@@ -8,9 +8,13 @@
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#define private public
+#ifndef _WIN32
+#  define private public    // NOLINT
+#endif
 #include "StatusBarController.h"
-#undef private
+#ifndef _WIN32
+#  undef private
+#endif
 #include "StatusView.h"
 
 
@@ -99,6 +103,7 @@ TEST_F(StatusBarControllerFix, NoConnectionMessagePingReceived) {
   controller->handleMessage(&message);
 }
 
+#ifndef _WIN32
 TEST_F(StatusBarControllerFix, MessagePingReceived) {
   EXPECT_CALL(*statusBarView, showIdeStatus(_)).WillOnce(Return());
   MessagePingReceived message{};
@@ -124,3 +129,4 @@ TEST_F(StatusBarControllerFix, MessageStatus) {
   MessageStatus message{L"", false, false, false};
   controller->handleMessage(&message);
 }
+#endif
