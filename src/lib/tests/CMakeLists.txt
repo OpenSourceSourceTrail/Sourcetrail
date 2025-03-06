@@ -36,7 +36,7 @@ set(test_lib_names
     SourceLocationTestSuite
     StorageCacheTestSuite
     StorageProviderTestSuite
-    # StatusBarControllerTestSuite TODO(SOUR-95)
+    StatusBarControllerTestSuite
     # StatusControllerTestSuite TODO(SOUR-96)
     TabIdTestSuite
     TabTestSuite
