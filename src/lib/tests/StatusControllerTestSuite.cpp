@@ -8,9 +8,13 @@
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "Status.h"
-#define private public
+#ifndef _WIN32
+#  define private public
+#endif
 #include "StatusController.h"
-#undef private
+#ifndef _WIN32
+#  undef private
+#endif
 #include "StatusView.h"
 
 using namespace testing;
@@ -51,6 +55,7 @@ struct StatusControllerFix : Test {
   std::shared_ptr<Component> component;
 };
 
+#ifndef _WIN32
 TEST_F(StatusControllerFix, getView) {
   const auto* view = controller->getView();
   ASSERT_NE(nullptr, view);
@@ -87,3 +92,4 @@ TEST_F(StatusControllerFix, MessageStatusFilterChanged) {
   MessageStatusFilterChanged message{static_cast<int>(StatusType::Info)};
   controller->handleMessage(&message);
 }
+#endif
