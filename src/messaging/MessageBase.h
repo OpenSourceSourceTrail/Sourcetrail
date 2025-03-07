@@ -21,7 +21,14 @@ public:
   }
 
   Id getSchedulerId() const {
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
     return m_schedulerId;
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
   }
 
   void setSchedulerId(Id schedulerId) {

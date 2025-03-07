@@ -293,11 +293,11 @@ void QtProjectWizardContentPreferences::load() {
   m_textEncoding->setCurrentText(QString::fromStdString(appSettings->getTextEncoding()));
 
   FilePath colorSchemePath = FilePath{appSettings->getColorSchemePath().wstring()};
-  for(int i = 0; i < static_cast<int>(m_colorSchemePaths.size()); i++) {
+  for(size_t i = 0; i < m_colorSchemePaths.size(); i++) {
     if(colorSchemePath == m_colorSchemePaths[i]) {
-      m_colorSchemes->setCurrentIndex(i);
-      m_oldColorSchemeIndex = i;
-      m_newColorSchemeIndex = i;
+      m_colorSchemes->setCurrentIndex(static_cast<int>(i));
+      m_oldColorSchemeIndex = static_cast<int>(i);
+      m_newColorSchemeIndex = static_cast<int>(i);
       break;
     }
   }
@@ -344,7 +344,8 @@ void QtProjectWizardContentPreferences::save() {
 
   appSettings->setTextEncoding(m_textEncoding->currentText().toStdString());
 
-  appSettings->setColorSchemeName(m_colorSchemePaths[m_colorSchemes->currentIndex()].withoutExtension().fileName());
+  appSettings->setColorSchemeName(
+      m_colorSchemePaths[static_cast<std::size_t>(m_colorSchemes->currentIndex())].withoutExtension().fileName());
   m_oldColorSchemeIndex = -1;
 
   appSettings->setUseAnimations(m_useAnimations->isChecked());
@@ -403,7 +404,7 @@ bool QtProjectWizardContentPreferences::check() {
 
 void QtProjectWizardContentPreferences::colorSchemeChanged(int index) {
   m_newColorSchemeIndex = index;
-  MessageSwitchColorScheme(m_colorSchemePaths[index]).dispatch();
+  MessageSwitchColorScheme(m_colorSchemePaths[static_cast<std::size_t>(index)]).dispatch();
 }
 
 void QtProjectWizardContentPreferences::loggingEnabledChanged() {

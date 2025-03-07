@@ -88,8 +88,8 @@ void QtViewToggle::toggledByUI() {
 
 
 MouseReleaseFilter::MouseReleaseFilter(QObject* parent) : QObject(parent) {
-  m_backButton = IApplicationSettings::getInstanceRaw()->getControlsMouseBackButton();
-  m_forwardButton = IApplicationSettings::getInstanceRaw()->getControlsMouseForwardButton();
+  m_backButton = static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getControlsMouseBackButton());
+  m_forwardButton = static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getControlsMouseForwardButton());
 }
 
 bool MouseReleaseFilter::eventFilter(QObject* obj, QEvent* event) {
@@ -233,7 +233,7 @@ void QtMainWindow::removeView(View* view) {
   for(size_t i = 0; i < m_dockWidgets.size(); i++) {
     if(m_dockWidgets[i].view == view) {
       removeDockWidget(m_dockWidgets[i].widget);
-      m_dockWidgets.erase(m_dockWidgets.begin() + i);
+      m_dockWidgets.erase(m_dockWidgets.begin() + static_cast<ptrdiff_t>(i));
       return;
     }
   }
@@ -357,7 +357,7 @@ void QtMainWindow::refreshStyle() {
   QToolTip::setFont(tooltipFont);
 }
 
-void QtMainWindow::setWindowsTaskbarProgress(float progress) {}
+void QtMainWindow::setWindowsTaskbarProgress([[maybe_unused]] float progress) {}
 
 void QtMainWindow::hideWindowsTaskbarProgress() {}
 
@@ -681,7 +681,7 @@ void QtMainWindow::showBookmarkBrowser() {
 void QtMainWindow::openHistoryAction() {
   auto* action = qobject_cast<QAction*>(sender());
   if(action != nullptr) {
-    std::shared_ptr<MessageBase> m = m_history[action->data().toInt()];
+    std::shared_ptr<MessageBase> m = m_history[static_cast<std::size_t>(action->data().toInt())];
     m->setSchedulerId(TabId::currentTab());
     m->setIsReplayed(false);
     m->dispatch();
@@ -691,7 +691,7 @@ void QtMainWindow::openHistoryAction() {
 void QtMainWindow::activateBookmarkAction() {
   auto* action = qobject_cast<QAction*>(sender());
   if(action != nullptr) {
-    std::shared_ptr<Bookmark> bookmark = m_bookmarks[action->data().toInt()];
+    std::shared_ptr<Bookmark> bookmark = m_bookmarks[static_cast<std::size_t>(action->data().toInt())];
     MessageBookmarkActivate(bookmark).dispatch();
   }
 }

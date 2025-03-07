@@ -172,10 +172,12 @@ void QtProjectWizardContentPathsHeaderSearch::validateIncludesButtonClicked() {
               sourceFilePaths,
               utility::toSet(indexedFilePaths),
               utility::toSet(headerSearchPaths),
-              static_cast<size_t>(log2(sourceFilePaths.size())),
+              static_cast<size_t>(log2(static_cast<double>(sourceFilePaths.size()))),
               [&](const float progress) {
                 dialogView->showProgressDialog(
-                    L"Processing", std::to_wstring(int(progress * sourceFilePaths.size())) + L" Files", int(progress * 100.0f));
+                    L"Processing",
+                    std::to_wstring(static_cast<int>(progress * static_cast<float>(sourceFilePaths.size()))) + L" Files",
+                    static_cast<size_t>(progress * 100.0f));
               });
         }
       }
@@ -190,7 +192,7 @@ void QtProjectWizardContentPathsHeaderSearch::finishedSelectDetectIncludesRootPa
   const std::vector<FilePath> searchedPaths = m_settings->makePathsExpandedAndAbsolute(m_pathsDialog->getPaths());
   closedPathsDialog();
 
-  std::thread([=]() {
+  std::thread([this, searchedPaths]() {
     std::shared_ptr<SourceGroupSettingsWithSourceExtensions> extensionSettings =
         std::dynamic_pointer_cast<SourceGroupSettingsWithSourceExtensions>(m_settings);
     std::shared_ptr<SourceGroupSettingsWithSourcePaths> pathSettings =
@@ -232,10 +234,12 @@ void QtProjectWizardContentPathsHeaderSearch::finishedSelectDetectIncludesRootPa
               sourceFilePaths,
               utility::toSet(searchedPaths),
               utility::toSet(headerSearchPaths),
-              static_cast<size_t>(log2(sourceFilePaths.size())),
+              static_cast<size_t>(log2(static_cast<double>(sourceFilePaths.size()))),
               [&](const float progress) {
                 dialogView->showProgressDialog(
-                    L"Processing", std::to_wstring(int(progress * sourceFilePaths.size())) + L" Files", int(progress * 100.0f));
+                    L"Processing",
+                    std::to_wstring(static_cast<int>(progress * static_cast<float>(sourceFilePaths.size()))) + L" Files",
+                    static_cast<size_t>(progress * 100.0f));
               });
         }
       }

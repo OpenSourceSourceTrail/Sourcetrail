@@ -1320,7 +1320,7 @@ void GraphController::groupNodesByParents(GroupType groupType) {
   }
 
   for(int i = 0; i < int(m_dummyNodes.size()); i++) {
-    if(groupedNodeIds.find(m_dummyNodes[i]->tokenId) != groupedNodeIds.end()) {
+    if(groupedNodeIds.find(m_dummyNodes[static_cast<size_t>(i)]->tokenId) != groupedNodeIds.end()) {
       m_dummyNodes.erase(m_dummyNodes.begin() + i);
       i--;
     }
@@ -1475,7 +1475,7 @@ void GraphController::groupTrailNodes(GroupType groupType) {
   }
 
   for(int i = 0; i < int(m_dummyNodes.size()); i++) {
-    if(groupedNodeIds.find(m_dummyNodes[i]->tokenId) != groupedNodeIds.end()) {
+    if(groupedNodeIds.find(m_dummyNodes[static_cast<size_t>(i)]->tokenId) != groupedNodeIds.end()) {
       m_dummyNodes.erase(m_dummyNodes.begin() + i);
       i--;
     }
@@ -1553,15 +1553,15 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
 
   if(node->isGraphNode()) {
     node->name = utility::elide(node->name, utility::ElideMode::RIGHT, node->active ? 100 : 50);
-    width = static_cast<int>(margins.charWidth * node->name.size());
+    width = static_cast<int>(margins.charWidth * static_cast<float>(node->name.size()));
 
     if(node->data->getType().isCollapsible() && node->data->getChildCount() > 0) {
       addExpandToggleNode(node);
     }
   } else if(node->isBundleNode() || node->isTextNode()) {
-    width = static_cast<int>(margins.charWidth * node->name.size());
+    width = static_cast<int>(margins.charWidth * static_cast<float>(node->name.size()));
   } else if(node->isGroupNode()) {
-    width = static_cast<int>(margins.charWidth * node->name.size() + 5);
+    width = static_cast<int>(margins.charWidth * static_cast<float>(node->name.size()) + 5.0f);
   }
 
   width += margins.iconWidth;
@@ -1575,7 +1575,7 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
       if(!subNode->visible) {
         continue;
       } else if(subNode->isQualifierNode()) {
-        subNode->position.setY(margins.top + margins.charHeight / 2);
+        subNode->position.setY(static_cast<float>(margins.top) + margins.charHeight / 2.0f);
         width += 5;
         continue;
       }
@@ -1583,9 +1583,9 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
       QVector4D rect = layoutNestingRecursive(subNode.get());
 
       if(subNode->isExpandToggleNode()) {
-        width += margins.spacingX + subNode->size.x();
-      } else if(subNode->isAccessNode() && rect.z() > maxAccessWidth) {
-        maxAccessWidth = rect.z();
+        width += static_cast<int>(static_cast<float>(margins.spacingX) + subNode->size.x());
+      } else if(subNode->isAccessNode() && rect.z() > static_cast<float>(maxAccessWidth)) {
+        maxAccessWidth = static_cast<int>(rect.z());
         maxWidthAccessNode = subNode;
       }
     }
@@ -1610,7 +1610,7 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
         break;
 
       case GroupLayout::SKEWED:
-        ListLayouter::layoutSkewed(&node->subNodes, margins.spacingX, margins.spacingY, static_cast<int>(viewSize.x() * 1.5));
+        ListLayouter::layoutSkewed(&node->subNodes, margins.spacingX, margins.spacingY, static_cast<int>(viewSize.x() * 1.5f));
         break;
 
       case GroupLayout::BUCKET:
@@ -1636,13 +1636,16 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
   }
 
   QVector2D size = ListLayouter::offsetNodes(
-      node->subNodes, static_cast<int>(margins.top + margins.charHeight + margins.spacingA), margins.left);
+      node->subNodes,
+      static_cast<int>(static_cast<float>(margins.top) + margins.charHeight + static_cast<float>(margins.spacingA)),
+      margins.left);
 
   width = std::max(static_cast<int>(size.x()), width);
-  height = size.y();
+  height = static_cast<int>(size.y());
 
-  node->size.setX(margins.left + width + margins.right);
-  node->size.setY(margins.top + margins.charHeight + margins.spacingA + height + margins.bottom);
+  node->size.setX(static_cast<float>(margins.left + width + margins.right));
+  node->size.setY(static_cast<float>(margins.top) + margins.charHeight + static_cast<float>(margins.spacingA) +
+                  static_cast<float>(height) + static_cast<float>(margins.bottom));
 
   for(const std::shared_ptr<DummyNode>& subNode : node->subNodes) {
     if(!subNode->visible) {
@@ -1650,9 +1653,9 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
     }
 
     if(subNode->isAccessNode()) {
-      subNode->size.setX(width);
+      subNode->size.setX(static_cast<float>(width));
     } else if(subNode->isExpandToggleNode()) {
-      subNode->position.setX(margins.left + width - subNode->size.x());
+      subNode->position.setX(static_cast<float>(margins.left) + static_cast<float>(width) - subNode->size.x());
       subNode->position.setY(6);
     }
   }
@@ -1670,7 +1673,7 @@ void GraphController::addExpandToggleNode(DummyNode* node) const {
     DummyNode* subNode = node->subNodes[i].get();
 
     if(subNode->isExpandToggleNode()) {
-      node->subNodes.erase(node->subNodes.begin() + i);
+      node->subNodes.erase(node->subNodes.begin() + static_cast<ptrdiff_t>(i));
       i--;
       continue;
     }
@@ -1700,11 +1703,11 @@ void GraphController::layoutToGrid(DummyNode* node) const {
 
   // Increase size of nodes with visible children to cover full grid cells
 
-  size_t width = GraphViewStyle::toGridSize(node->size.x());
-  size_t height = GraphViewStyle::toGridSize(node->size.y());
+  size_t width = static_cast<size_t>(GraphViewStyle::toGridSize(static_cast<int>(node->size.x())));
+  size_t height = static_cast<size_t>(GraphViewStyle::toGridSize(static_cast<int>(node->size.y())));
 
-  size_t incX = width - node->size.x();
-  size_t incY = height - node->size.y();
+  size_t incX = static_cast<size_t>(static_cast<float>(width) - node->size.x());
+  size_t incY = static_cast<size_t>(static_cast<float>(height) - node->size.y());
 
   DummyNode* lastAccessNode = nullptr;
   DummyNode* expandToggleNode = nullptr;
@@ -1715,7 +1718,7 @@ void GraphController::layoutToGrid(DummyNode* node) const {
     }
 
     if(subNode->isAccessNode()) {
-      subNode->size.setX(subNode->size.x() + incX);
+      subNode->size.setX(subNode->size.x() + static_cast<float>(incX));
       lastAccessNode = subNode.get();
     } else if(subNode->isExpandToggleNode()) {
       expandToggleNode = subNode.get();
@@ -1723,14 +1726,14 @@ void GraphController::layoutToGrid(DummyNode* node) const {
   }
 
   if(lastAccessNode) {
-    lastAccessNode->size.setY(lastAccessNode->size.y() + incY);
+    lastAccessNode->size.setY(lastAccessNode->size.y() + static_cast<float>(incY));
 
     if(expandToggleNode) {
-      expandToggleNode->position.setX(expandToggleNode->position.x() + incX);
+      expandToggleNode->position.setX(expandToggleNode->position.x() + static_cast<float>(incX));
     }
 
-    node->size.setX(width);
-    node->size.setY(height);
+    node->size.setX(static_cast<float>(width));
+    node->size.setY(static_cast<float>(height));
   }
 }
 

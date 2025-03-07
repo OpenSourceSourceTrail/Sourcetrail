@@ -174,7 +174,7 @@ void QtDialogView::updateIndexingDialog(size_t startedFileCount,
                                         size_t finishedFileCount,
                                         size_t totalFileCount,
                                         const std::vector<FilePath>& sourcePaths) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, sourcePaths, startedFileCount, totalFileCount, finishedFileCount]() {
     if(!sourcePaths.empty()) {
       std::vector<std::wstring> stati;
       for(const FilePath& path : sourcePaths) {
@@ -193,7 +193,7 @@ void QtDialogView::updateIndexingDialog(size_t startedFileCount,
 
     window->updateIndexingProgress(finishedFileCount, totalFileCount, sourcePaths.empty() ? FilePath() : sourcePaths.back());
 
-    m_mainWindow->setWindowsTaskbarProgress(float(finishedFileCount) / totalFileCount);
+    m_mainWindow->setWindowsTaskbarProgress(float(finishedFileCount) / static_cast<float>(totalFileCount));
 
     setUIBlocked(m_dialogsVisible);
   });
@@ -205,7 +205,7 @@ void QtDialogView::updateCustomIndexingDialog(size_t startedFileCount,
                                               const std::vector<FilePath>& sourcePaths) {
   updateIndexingDialog(startedFileCount, finishedFileCount, totalFileCount, sourcePaths);
 
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     QtIndexingProgressDialog* window = dynamic_cast<QtIndexingProgressDialog*>(m_windowStack.getTopWindow());
     if(window) {
       window->updateTitle(QStringLiteral("Executing Commands"));

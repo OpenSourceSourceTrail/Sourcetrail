@@ -56,7 +56,7 @@ void QtTooltip::setTooltipInfo(const TooltipInfo& info) {
     addWidget(field);
   }
 
-  m_offset = QPoint(info.offset.x(), info.offset.y());
+  m_offset = QPoint(static_cast<int>(info.offset.x()), static_cast<int>(info.offset.y()));
 }
 
 void QtTooltip::setParentView(QWidget* parentView) {

@@ -44,7 +44,7 @@ void ListLayouter::layoutMultiColumn(QVector2D viewSize, std::vector<std::shared
       if(i % nodesPerCol == 0) {
         height = -gapY;
       }
-      height += visibleNodes[i]->size.y() + gapY;
+      height += static_cast<int>(visibleNodes[i]->size.y()) + gapY;
 
       maxWidths[j] = std::max(static_cast<int>(visibleNodes[i]->size.x()), maxWidths[j]);
       maxHeight = std::max(height, maxHeight);
@@ -55,7 +55,7 @@ void ListLayouter::layoutMultiColumn(QVector2D viewSize, std::vector<std::shared
       width += maxWidths[j] + gapX;
     }
 
-    if(width > viewSize.x()) {
+    if(static_cast<float>(width) > viewSize.x()) {
       if(!maxWidthsFinal.size()) {
         colsFinal = 1;
         maxWidthsFinal = maxWidths;
@@ -66,7 +66,7 @@ void ListLayouter::layoutMultiColumn(QVector2D viewSize, std::vector<std::shared
     colsFinal = cols;
     maxWidthsFinal = maxWidths;
 
-    if(height < viewSize.y()) {
+    if(static_cast<float>(height) < viewSize.y()) {
       break;
     }
   }
@@ -102,10 +102,10 @@ void ListLayouter::layoutMultiColumn(QVector2D viewSize, std::vector<std::shared
       x += maxWidthsFinal[j - 1] + gapX;
     }
 
-    visibleNodes[i]->position.setX(x);
-    visibleNodes[i]->position.setY(y);
+    visibleNodes[i]->position.setX(static_cast<float>(x));
+    visibleNodes[i]->position.setY(static_cast<float>(y));
 
-    y += visibleNodes[i]->size.y() + gapY;
+    y += static_cast<int>(visibleNodes[i]->size.y() + static_cast<float>(gapY));
 
     if(visibleNodes[i]->isTextNode()) {
       lastTextNode = visibleNodes[i];
@@ -126,7 +126,7 @@ void ListLayouter::layoutSquare(std::vector<std::shared_ptr<DummyNode>>* nodes, 
 
   int totalHeight = 0;
   for(size_t i = 0; i < visibleNodes.size(); i++) {
-    totalHeight += visibleNodes[i]->size.y() + gapY;
+    totalHeight += static_cast<int>(visibleNodes[i]->size.y() + static_cast<float>(gapY));
   }
 
   int diff = -1;
@@ -138,9 +138,9 @@ void ListLayouter::layoutSquare(std::vector<std::shared_ptr<DummyNode>>* nodes, 
                             {static_cast<float>(gapX), static_cast<float>(gapY)})) {
       QVector4D rect = boundingRect(visibleNodes);
 
-      int newDiff = rect.z() * rect.w() + (rect.z() - rect.w()) * (rect.z() - rect.w()) / 4;
+      int newDiff = static_cast<int>(rect.z() * rect.w() + (rect.z() - rect.w()) * (rect.z() - rect.w()) / 4);
       if(maxWidth >= 0) {
-        newDiff = rect.w();
+        newDiff = static_cast<int>(rect.w());
       }
 
       if(diff < 0 || newDiff <= diff) {
@@ -164,19 +164,19 @@ bool ListLayouter::layoutSquareInternal(std::vector<std::shared_ptr<DummyNode>>&
   int width = 0;
 
   for(std::shared_ptr<DummyNode> node : visibleNodes) {
-    node->position.setX(x);
-    node->position.setY(y);
+    node->position.setX(static_cast<float>(x));
+    node->position.setY(static_cast<float>(y));
 
-    y += node->size.y() + gap.y();
+    y += static_cast<int>(node->size.y() + gap.y());
     width = std::max(width, static_cast<int>(node->size.x()));
 
-    if(maxSize.x() > 0 && x + width > maxSize.x()) {
+    if(maxSize.x() > 0.0f && static_cast<float>(x + width) > maxSize.x()) {
       return false;
     }
 
-    if(y >= maxSize.y()) {
+    if(static_cast<float>(y) >= maxSize.y()) {
       y = 0;
-      x += width + gap.x();
+      x += static_cast<int>(static_cast<float>(width) + gap.x());
 
       width = 0;
     }
@@ -191,7 +191,7 @@ void ListLayouter::layoutSkewed(std::vector<std::shared_ptr<DummyNode>>* nodes, 
   for(auto node : *nodes) {
     if(node->getsLayouted()) {
       visibleNodes.push_back(node);
-      nodeWidths.insert(node->size.x());
+      nodeWidths.insert(static_cast<int>(node->size.x()));
     }
   }
 
@@ -224,8 +224,8 @@ void ListLayouter::layoutSkewed(std::vector<std::shared_ptr<DummyNode>>* nodes, 
       }
 
       DummyNode* node = visibleNodes[i].get();
-      node->position.setX(x + (nodeWidth - node->size.x()) / 2);
-      node->position.setY(height);
+      node->position.setX(static_cast<float>(x) + (static_cast<float>(nodeWidth) - node->size.x()) / 2);
+      node->position.setY(static_cast<float>(height));
 
       rowHeight = std::max(rowHeight, static_cast<int>(node->size.y()));
       x += nodeWidth + gapX;
@@ -255,10 +255,10 @@ QVector4D ListLayouter::boundingRect(const std::vector<std::shared_ptr<DummyNode
       rect.setZ(node->position.x() + node->size.x());
       rect.setW(node->position.y() + node->size.y());
     } else {
-      rect.setX(std::min(static_cast<int>(rect.x()), static_cast<int>(node->position.x())));
-      rect.setY(std::min(static_cast<int>(rect.y()), static_cast<int>(node->position.y())));
-      rect.setZ(std::max(static_cast<int>(rect.z()), static_cast<int>(node->position.x() + node->size.x())));
-      rect.setW(std::max(static_cast<int>(rect.w()), static_cast<int>(node->position.y() + node->size.y())));
+      rect.setX(static_cast<float>(std::min(static_cast<int>(rect.x()), static_cast<int>(node->position.x()))));
+      rect.setY(static_cast<float>(std::min(static_cast<int>(rect.y()), static_cast<int>(node->position.y()))));
+      rect.setZ(static_cast<float>(std::max(static_cast<int>(rect.z()), static_cast<int>(node->position.x() + node->size.x()))));
+      rect.setW(static_cast<float>(std::max(static_cast<int>(rect.w()), static_cast<int>(node->position.y() + node->size.y()))));
     }
   }
 
@@ -267,7 +267,7 @@ QVector4D ListLayouter::boundingRect(const std::vector<std::shared_ptr<DummyNode
 
 QVector2D ListLayouter::offsetNodes(const std::vector<std::shared_ptr<DummyNode>>& nodes, int top, int left) {
   QVector4D rect = boundingRect(nodes);
-  QVector2D offset(left - rect.x(), top - rect.y());
+  QVector2D offset(static_cast<float>(left) - rect.x(), static_cast<float>(top) - rect.y());
 
   for(auto node : nodes) {
     if(node->getsLayouted()) {
@@ -287,13 +287,13 @@ void ListLayouter::layoutSimple(std::vector<std::shared_ptr<DummyNode>>* nodes, 
       continue;
     }
 
-    node->position.setX(x);
-    node->position.setY(y);
+    node->position.setX(static_cast<float>(x));
+    node->position.setY(static_cast<float>(y));
 
     if(horizontal) {
-      x += node->size.x() + gapX;
+      x += static_cast<int>(node->size.x() + static_cast<float>(gapX));
     } else {
-      y += node->size.y() + gapY;
+      y += static_cast<int>(node->size.y() + static_cast<float>(gapY));
     }
   }
 }

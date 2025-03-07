@@ -14,7 +14,7 @@ class MessageFilterFocusInOut : public MessageFilter {
     MessageBase* message = messageBuffer->front().get();
     if(message->getType() == MessageFocusIn::getStaticType()) {
       for(auto it = messageBuffer->begin() + 1; it != messageBuffer->end(); it++) {
-        if((*it)->getType() == MessageFocusOut::getStaticType() &&
+        if((*it)->getType() == MessageFocusOut::getStaticType() && dynamic_cast<MessageFocusOut*>(it->get()) &&
            dynamic_cast<MessageFocusIn*>(message)->tokenIds == dynamic_cast<MessageFocusOut*>(it->get())->tokenIds) {
           messageBuffer->erase(it);
           messageBuffer->pop_front();

@@ -44,11 +44,14 @@ template <typename Rep, typename Period>
 bool safely_wait_for(boost::process::child& process, const std::chrono::duration<Rep, Period>& rel_time) {
   // This wrapper around boost::process::wait_for handles the following edge case:
   // Calling wait_for on an already exited process will wait for the entire timeout.
-  if(process.running()) {
-    return process.wait_for(rel_time);    // NOLINT(clang-diagnostic-deprecated-declarations): It will be fixed in SOUR-124
-  } else {
-    return true;    // The process exited
+  const auto start = std::chrono::steady_clock::now();
+  const auto end = start + rel_time;
+
+  while(process.running() && std::chrono::steady_clock::now() < end) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
+
+  return !process.running();    // Return true if process has exited
 }
 
 constexpr int ErrorExitCode = 255;

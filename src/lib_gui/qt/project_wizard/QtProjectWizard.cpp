@@ -477,7 +477,7 @@ void QtProjectWizard::selectedSourceGroupChanged(int index) {
   m_removeButton->setEnabled(true);
   m_duplicateButton->setEnabled(true);
 
-  std::shared_ptr<SourceGroupSettings> group = m_allSourceGroupSettings[index];
+  std::shared_ptr<SourceGroupSettings> group = m_allSourceGroupSettings[static_cast<std::size_t>(index)];
 
   QtProjectWizardContentGroup* summary = new QtProjectWizardContentGroup(this);
 
@@ -564,7 +564,8 @@ void QtProjectWizard::duplicateSelectedSourceGroup() {
     return;
   }
 
-  std::shared_ptr<const SourceGroupSettings> oldSourceGroup = m_allSourceGroupSettings[m_sourceGroupList->currentRow()];
+  std::shared_ptr<const SourceGroupSettings> oldSourceGroup =
+      m_allSourceGroupSettings[static_cast<std::size_t>(m_sourceGroupList->currentRow())];
 
   std::shared_ptr<SourceGroupSettings> newSourceGroup = oldSourceGroup->createCopy();
 

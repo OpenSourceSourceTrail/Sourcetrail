@@ -35,7 +35,7 @@ QVariant QtAutocompletionModel::data(const QModelIndex& index, int role) const {
     return QVariant();
   }
 
-  const SearchMatch& match = m_matchList[index.row()];
+  const SearchMatch& match = m_matchList[static_cast<std::size_t>(index.row())];
 
   switch(index.column()) {
   case 0:
@@ -62,7 +62,7 @@ QVariant QtAutocompletionModel::data(const QModelIndex& index, int role) const {
 
 const SearchMatch* QtAutocompletionModel::getSearchMatchAt(int idx) const {
   if(idx >= 0 && size_t(idx) < m_matchList.size()) {
-    return &m_matchList[idx];
+    return &m_matchList[static_cast<std::size_t>(idx)];
   }
   return nullptr;
 }
@@ -122,7 +122,7 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
   QColor textColor(0, 0, 0);
 
   if(type.size() && type != QLatin1String("command") && type != QLatin1String("filter")) {
-    const GraphViewStyle::NodeColor& nodeColor = GraphViewStyle::getNodeColor(nodeType.getUnderscoredTypeString(), false);
+    const auto nodeColor = GraphViewStyle::getNodeColor(nodeType.getUnderscoredTypeString(), false);
     fillColor = QColor(nodeColor.fill.c_str());
     textColor = QColor(nodeColor.text.c_str());
   } else {
@@ -143,12 +143,12 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
   QString highlightText(text.size(), QChar(' '));
   if(!indices.empty()) {
     for(int i = 0; i < indices.size(); i++) {
-      int idx = indices[i].toInt() - (name.size() - text.size());
+      int idx = indices[i].toInt() - static_cast<int>(name.size() - text.size());
       if(idx < 0) {
         continue;
       }
 
-      QRect rect(static_cast<int>(option.rect.left() + m_charWidth1 * (idx + 1) + 2),
+      QRect rect(static_cast<int>(static_cast<float>(option.rect.left()) + m_charWidth1 * static_cast<float>(idx + 1) + 2),
                  option.rect.top() + top1 - 1,
                  static_cast<int>(m_charWidth1 + 1),
                  static_cast<int>(m_charHeight1 - 1));
@@ -177,10 +177,10 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
   // draw subtext
   if(subtext.size()) {
     // draw arrow icon
-    painter->drawPixmap(static_cast<int>(static_cast<float>(option.rect.left()) + m_charWidth2 * 2.0F),
-                        static_cast<int>(option.rect.top() + top2 + 1 +
-                                         static_cast<int>((m_charHeight2 - static_cast<float>(m_arrow.height())) / 2.0F)),
-                        m_arrow.pixmap());
+    painter->drawPixmap(
+        static_cast<int>(static_cast<float>(option.rect.left()) + m_charWidth2 * 2.0F),
+        option.rect.top() + top2 + 1 + static_cast<int>((m_charHeight2 - static_cast<float>(m_arrow.height())) / 2.0F),
+        m_arrow.pixmap());
 
     painter->setFont(m_font2);
 
@@ -192,7 +192,7 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
           continue;
         }
 
-        QRect rect(static_cast<int>(option.rect.left() + m_charWidth2 * (idx + 3) + 2),
+        QRect rect(static_cast<int>(static_cast<float>(option.rect.left()) + m_charWidth2 * static_cast<float>(idx + 3) + 2),
                    option.rect.top() + top2 + 1,
                    static_cast<int>(m_charWidth2 + 1),
                    static_cast<int>(m_charHeight2));
@@ -227,14 +227,18 @@ void QtAutocompletionDelegate::paint(QPainter* painter, const QStyleOptionViewIt
     typePen.setColor(scheme->getColor("search/popup/by_text").c_str());
     painter->setPen(typePen);
 
-    int width = static_cast<int>(m_charWidth2 * type.size());
-    int x = static_cast<int>(painter->viewport().right() - width - m_charWidth2);
+    int width = static_cast<int>(m_charWidth2 * static_cast<float>(type.size()));
+    int x = static_cast<int>(static_cast<float>(painter->viewport().right() - width) - m_charWidth2);
     int y = option.rect.top() + top2;
 
-    painter->fillRect(
-        QRect(static_cast<int>(x - m_charWidth2), y, static_cast<int>(width + m_charWidth2 * 3), static_cast<int>(m_charHeight2 + 2)),
-        backgroundColor);
-    painter->drawText(QRect(x, y, static_cast<int>(width + m_charWidth2), static_cast<int>(m_charHeight2)), Qt::AlignRight, type);
+    painter->fillRect(QRect(static_cast<int>(static_cast<float>(x) - m_charWidth2),
+                            y,
+                            static_cast<int>(static_cast<float>(width) + m_charWidth2 * 3),
+                            static_cast<int>(m_charHeight2 + 2)),
+                      backgroundColor);
+    painter->drawText(QRect(x, y, static_cast<int>(static_cast<float>(width) + m_charWidth2), static_cast<int>(m_charHeight2)),
+                      Qt::AlignRight,
+                      type);
   }
 
   // draw bottom line
@@ -251,7 +255,8 @@ QSize QtAutocompletionDelegate::sizeHint(const QStyleOptionViewItem& option, con
   QString subtext = m_model->longestSubText();
   QString type = m_model->longestType();
 
-  return QSize(static_cast<int>(std::max((text.size() + 2) * m_charWidth1, (subtext.size() + type.size() + 6) * m_charWidth2)),
+  return QSize(static_cast<int>(std::max(static_cast<float>(text.size() + 2) * m_charWidth1,
+                                         static_cast<float>(subtext.size() + type.size() + 6) * m_charWidth2)),
                static_cast<int>(m_charHeight1 * 2 + 3));
 }
 
@@ -263,38 +268,36 @@ void QtAutocompletionDelegate::calculateCharSizes(QFont font) {
   m_font1 = font;
 
   QFontMetrics metrics1(font);
-  m_charWidth1 = metrics1
-                     .boundingRect(QStringLiteral("---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"))
-                     .width() /
-      500.0f;
+  const auto boundingRect1 = metrics1.boundingRect(
+      QStringLiteral("---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"));
+  m_charWidth1 = static_cast<float>(boundingRect1.width()) / 500.0f;
   m_charHeight1 = static_cast<float>(metrics1.height());
 
   font.setPixelSize(IApplicationSettings::getInstanceRaw()->getFontSize() - 3);
   m_font2 = font;
 
   QFontMetrics metrics2(font);
-  m_charWidth2 = metrics2
-                     .boundingRect(QStringLiteral("---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"
-                                                  "---------------------------------------------------------------------------"
-                                                  "-------------------------"))
-                     .width() /
-      500.0f;
+  const auto boundingRect2 = metrics2.boundingRect(
+      QStringLiteral("---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"
+                     "---------------------------------------------------------------------------"
+                     "-------------------------"));
+  m_charWidth2 = static_cast<float>(boundingRect2.width()) / 500.0f;
   m_charHeight2 = static_cast<float>(metrics2.height());
 
   m_arrow = QtDeviceScaledPixmap(

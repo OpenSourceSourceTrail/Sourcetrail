@@ -43,7 +43,7 @@ void QtProgressBar::paintEvent(QPaintEvent* /*event*/) {
   if(m_count != 0U) {
     const QPixmap& pixmap = m_pixmap.pixmap();
 
-    for(int x = -36 + (m_count % 36); x < static_cast<int>(geometry().width()); x += 18) {
+    for(int x = -36 + static_cast<int>(m_count % 36); x < geometry().width(); x += 18) {
       painter.drawPixmap(QPointF(x, -5), pixmap);
     }
   } else {

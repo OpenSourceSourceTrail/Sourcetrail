@@ -63,7 +63,7 @@ void PreprocessorCallbacks::InclusionDirective(clang::SourceLocation /*hashLocat
                                                clang::SrcMgr::CharacteristicKind /*fileType*/) {
 #endif
   if(m_currentFileSymbolId && fileEntry) {
-    const FilePath includedFilePath = m_canonicalFilePathCache->getCanonicalFilePath(fileEntry.value());
+    const FilePath includedFilePath = m_canonicalFilePathCache->getCanonicalFilePath(*fileEntry);
     const NameHierarchy includedFileNameHierarchy(includedFilePath.wstr(), NAME_DELIMITER_FILE);
 
     Id includedFileSymbolId = m_client->recordSymbol(includedFileNameHierarchy);

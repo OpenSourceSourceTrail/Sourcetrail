@@ -382,7 +382,7 @@ void CodeController::handleMessage(MessageScrollToLine* message) {
 
 void CodeController::handleMessage(MessageScrollCode* message) {
   if(message->isReplayed()) {
-    m_scrollParams = CodeScrollParams::toValue(message->value, message->inListMode);
+    m_scrollParams = CodeScrollParams::toValue(static_cast<std::size_t>(message->value), message->inListMode);
   }
 }
 
@@ -398,7 +398,7 @@ void CodeController::handleMessage(MessageShowReference* message) {
   [[maybe_unused]] bool replayed = message->isReplayed();
 
   if(m_referenceIndex >= 0 && m_referenceIndex < static_cast<int>(m_references.size())) {
-    const Reference& ref = m_references[m_referenceIndex];
+    const Reference& ref = m_references[static_cast<std::size_t>(m_referenceIndex)];
     m_codeParams.activeLocationIds = {ref.locationId};
 
     setFileState(ref.filePath,
@@ -458,31 +458,44 @@ void CodeController::handleMessage(MessageToNextCodeReference* message) {
   if(referenceIndex >= 0 && localReferenceIndex >= 0) {
     if(referenceFileIndex == localReferenceFileIndex) {
       if(referenceFileIndex < 0) {
-        if(m_references[referenceIndex].filePath != m_localReferences[localReferenceIndex].filePath ||
-           m_references[referenceIndex].lineNumber > m_localReferences[localReferenceIndex].lineNumber) {
+        if(m_references[static_cast<std::size_t>(referenceIndex)].filePath !=
+               m_localReferences[static_cast<std::size_t>(localReferenceIndex)].filePath ||
+           m_references[static_cast<std::size_t>(referenceIndex)].lineNumber >
+               m_localReferences[static_cast<std::size_t>(localReferenceIndex)].lineNumber) {
           localReferenceIndex = -1;
         } else {
           referenceIndex = -1;
         }
       } else if(referenceFileIndex == 0) {
-        if(m_references[referenceIndex].lineNumber == m_localReferences[localReferenceIndex].lineNumber) {
-          if((next && m_references[referenceIndex].columnNumber < m_localReferences[localReferenceIndex].columnNumber) ||
-             (!next && m_references[referenceIndex].columnNumber > m_localReferences[localReferenceIndex].columnNumber)) {
+        if(m_references[static_cast<std::size_t>(referenceIndex)].lineNumber ==
+           m_localReferences[static_cast<std::size_t>(localReferenceIndex)].lineNumber) {
+          if((next &&
+              m_references[static_cast<std::size_t>(referenceIndex)].columnNumber <
+                  m_localReferences[static_cast<std::size_t>(localReferenceIndex)].columnNumber) ||
+             (!next &&
+              m_references[static_cast<std::size_t>(referenceIndex)].columnNumber >
+                  m_localReferences[static_cast<std::size_t>(localReferenceIndex)].columnNumber)) {
             localReferenceIndex = -1;
           } else {
             referenceIndex = -1;
           }
         } else {
-          if((next && m_references[referenceIndex].lineNumber < m_localReferences[localReferenceIndex].lineNumber) ||
-             (!next && m_references[referenceIndex].lineNumber > m_localReferences[localReferenceIndex].lineNumber)) {
+          if((next &&
+              m_references[static_cast<std::size_t>(referenceIndex)].lineNumber <
+                  m_localReferences[static_cast<std::size_t>(localReferenceIndex)].lineNumber) ||
+             (!next &&
+              m_references[static_cast<std::size_t>(referenceIndex)].lineNumber >
+                  m_localReferences[static_cast<std::size_t>(localReferenceIndex)].lineNumber)) {
             localReferenceIndex = -1;
           } else {
             referenceIndex = -1;
           }
         }
       } else {
-        if(m_references[referenceIndex].filePath != m_localReferences[localReferenceIndex].filePath ||
-           m_references[referenceIndex].lineNumber < m_localReferences[localReferenceIndex].lineNumber) {
+        if(m_references[static_cast<std::size_t>(referenceIndex)].filePath !=
+               m_localReferences[static_cast<std::size_t>(localReferenceIndex)].filePath ||
+           m_references[static_cast<std::size_t>(referenceIndex)].lineNumber <
+               m_localReferences[static_cast<std::size_t>(localReferenceIndex)].lineNumber) {
           localReferenceIndex = -1;
         } else {
           referenceIndex = -1;
@@ -624,8 +637,10 @@ std::vector<CodeSnippetParams> CodeController::getSnippetsForFile(std::shared_pt
 
   for(const SnippetMerger::Range& range : ranges) {
     CodeSnippetParams params;
-    params.startLineNumber = std::max<int>(1, range.start.row - (range.start.strong ? 0 : snippetExpandRange));
-    params.endLineNumber = std::min<int>(static_cast<int>(lineCount), range.end.row + (range.end.strong ? 0 : snippetExpandRange));
+    params.startLineNumber = static_cast<std::size_t>(
+        std::max<int>(1, range.start.row - (range.start.strong ? 0 : snippetExpandRange)));
+    params.endLineNumber = static_cast<std::size_t>(
+        std::min<int>(static_cast<int>(lineCount), range.end.row + (range.end.strong ? 0 : snippetExpandRange)));
 
     params.locationFile = activeSourceLocations->getFilteredByLines(params.startLineNumber, params.endLineNumber);
 
@@ -907,12 +922,12 @@ void CodeController::iterateLocalReference(bool next, bool updateView) {
 }
 
 void CodeController::showCurrentReference() {
-  const Reference& ref = m_references[m_referenceIndex];
-  MessageShowReference(m_referenceIndex, ref.tokenId, ref.locationId, true).dispatch();
+  const Reference& ref = m_references[static_cast<std::size_t>(m_referenceIndex)];
+  MessageShowReference(static_cast<std::size_t>(m_referenceIndex), ref.tokenId, ref.locationId, true).dispatch();
 }
 
 void CodeController::showCurrentLocalReference(bool updateView) {
-  const Reference& ref = m_localReferences[m_localReferenceIndex];
+  const Reference& ref = m_localReferences[static_cast<std::size_t>(m_localReferenceIndex)];
   m_codeParams.currentActiveLocalLocationIds = {ref.locationId};
 
   // synchronise reference navigation with local reference navigation
@@ -962,7 +977,7 @@ std::pair<int, int> CodeController::findClosestReferenceIndex(const std::vector<
   }
 
   int fileIndex = beforeCurrentFile ? -1 : 1;
-  if(referenceIndex >= 0 && references[referenceIndex].filePath == currentFilePath) {
+  if(referenceIndex >= 0 && references[static_cast<std::size_t>(referenceIndex)].filePath == currentFilePath) {
     fileIndex = 0;
   }
 
@@ -975,7 +990,7 @@ void CodeController::expandVisibleFiles(bool useSingleFileCache) {
   }
 
   bool inListMode = getView()->isInListMode();
-  size_t filesToExpand = inListMode ? std::min(int(m_files.size()), 3) : 1;
+  size_t filesToExpand = inListMode ? std::min<std::size_t>(m_files.size(), 3) : 1;
   MessageChangeFileView::FileState state = inListMode ? MessageChangeFileView::FILE_SNIPPETS :
                                                         MessageChangeFileView::FILE_MAXIMIZED;
 
@@ -1040,10 +1055,10 @@ CodeFileParams* CodeController::addSourceLocations(std::shared_ptr<SourceLocatio
         newSnippet.locationFile->copySourceLocations(oldSnippet.locationFile);
       }
 
-      file->snippetParams.erase(file->snippetParams.begin() + i);
+      file->snippetParams.erase(file->snippetParams.begin() + static_cast<std::ptrdiff_t>(i));
     }
 
-    file->snippetParams.insert(file->snippetParams.begin() + i, newSnippet);
+    file->snippetParams.insert(file->snippetParams.begin() + static_cast<std::ptrdiff_t>(i), newSnippet);
   }
 
   setFileState(*file,
@@ -1276,10 +1291,11 @@ void CodeController::showFiles(CodeView::CodeParams params, CodeScrollParams scr
     addModificationTimes();
 
     params.referenceCount = m_references.size();
-    params.referenceIndex = m_referenceIndex >= 0 ? m_referenceIndex : m_references.size();
+    params.referenceIndex = m_referenceIndex >= 0 ? static_cast<std::size_t>(m_referenceIndex) : m_references.size();
 
     params.localReferenceCount = m_localReferences.size();
-    params.localReferenceIndex = m_localReferenceIndex >= 0 ? m_localReferenceIndex : m_localReferences.size();
+    params.localReferenceIndex = m_localReferenceIndex >= 0 ? static_cast<std::size_t>(m_localReferenceIndex) :
+                                                              m_localReferences.size();
 
     if(getView()->isInListMode()) {
       getView()->showSnippets(m_files, params, scrollParams);

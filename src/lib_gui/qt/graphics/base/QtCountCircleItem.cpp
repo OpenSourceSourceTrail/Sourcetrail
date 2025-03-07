@@ -26,11 +26,11 @@ void QtCountCircleItem::setPosition(const QVector2D& pos) {
   qreal height = QFontMetrics(m_number->font()).height();
 
   this->setRadius(height / 2 + 1);
-  this->setRect(pos.x() - std::max(width / 2.0 + 4.0, height / 2.0 + 1.0),
-                pos.y() - height / 2.0 - 1.0,
+  this->setRect(static_cast<qreal>(pos.x()) - std::max(width / 2.0 + 4.0, height / 2.0 + 1.0),
+                static_cast<qreal>(pos.y()) - height / 2.0 - 1.0,
                 std::max(width + 8.0, height + 2.0),
                 height + 2);
-  m_number->setPos(pos.x() - width / 2.0, pos.y() - height / 2.0);
+  m_number->setPos(static_cast<qreal>(pos.x()) - width / 2.0, static_cast<qreal>(pos.y()) - height / 2.0);
 }
 
 void QtCountCircleItem::setNumber(size_t number) {
