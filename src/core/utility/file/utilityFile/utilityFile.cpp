@@ -22,9 +22,11 @@ std::vector<FilePath> utility::partitionFilePathsBySize(std::vector<FilePath> fi
 
   if(0 < partitionCount && partitionCount < static_cast<int>(sourceFileSizesToCommands.size())) {
     for(int i = 0; i < partitionCount; i++) {
-      std::sort(sourceFileSizesToCommands.begin() + sourceFileSizesToCommands.size() * i / partitionCount,
-                sourceFileSizesToCommands.begin() + sourceFileSizesToCommands.size() * (i + 1) / partitionCount,
-                [](const PairType& p, const PairType& q) { return p.second.wstr() < q.second.wstr(); });
+      auto start = sourceFileSizesToCommands.begin();
+      std::advance(start, static_cast<int>(sourceFileSizesToCommands.size()) * i / partitionCount);
+      auto end = sourceFileSizesToCommands.begin();
+      std::advance(end, static_cast<int>(sourceFileSizesToCommands.size()) * (i + 1) / partitionCount);
+      std::sort(start, end, [](const PairType& p, const PairType& q) { return p.second.wstr() < q.second.wstr(); });
     }
   }
 

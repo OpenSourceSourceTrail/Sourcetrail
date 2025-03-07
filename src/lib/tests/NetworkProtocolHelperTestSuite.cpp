@@ -9,8 +9,8 @@ TEST(NetworkProtocolHelper, parseMessage) {
   std::wstring divider = L">>";
   std::wstring filePath = L"C:/Users/Manuel/important/file/location/fileName.cpp";
   std::wstring endOfMessageToken = L"<EOM>";
-  int row = 1;
-  int column = 2;
+  unsigned int row = 1U;
+  unsigned int column = 2U;
 
   // valid message
   std::wstringstream message;

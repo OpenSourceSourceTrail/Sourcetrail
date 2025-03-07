@@ -121,8 +121,8 @@ bool SearchMatch::operator<(const SearchMatch& other) const {
 
   // lower case
   for(size_t i = 0; i < str->size(); i++) {
-    if(towlower(str->at(i)) != towlower(otherStr->at(i))) {
-      return towlower(str->at(i)) < towlower(otherStr->at(i));
+    if(towlower(static_cast<wint_t>(str->at(i))) != towlower(static_cast<wint_t>(otherStr->at(i)))) {
+      return towlower(static_cast<wint_t>(str->at(i))) < towlower(static_cast<wint_t>(otherStr->at(i)));
     } else {
       // alphabetical
       if(str->at(i) < otherStr->at(i)) {
