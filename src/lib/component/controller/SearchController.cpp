@@ -5,18 +5,20 @@
 #include "StorageAccess.h"
 #include "type/tab/MessageTabState.h"
 
-SearchController::SearchController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
+SearchController::SearchController(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
+
+SearchController::~SearchController() = default;
 
 Id SearchController::getSchedulerId() const {
-  return Controller::getTabId();
+  return getTabId();
 }
 
 void SearchController::handleActivation(const MessageActivateBase* message) {
-  if(const MessageActivateTokens* m = dynamic_cast<const MessageActivateTokens*>(message)) {
-    if(!m->isEdge) {
-      updateMatches(message, !m->keepContent());
+  if(const auto* messageActivateTokens = dynamic_cast<const MessageActivateTokens*>(message)) {
+    if(!messageActivateTokens->isEdge) {
+      updateMatches(message, !messageActivateTokens->keepContent());
     }
-  } else if(const MessageActivateTrail* messageActivateTrail = dynamic_cast<const MessageActivateTrail*>(message)) {
+  } else if(const auto* messageActivateTrail = dynamic_cast<const MessageActivateTrail*>(message)) {
     if(messageActivateTrail->custom) {
       updateMatches(message);
     }
@@ -41,11 +43,11 @@ void SearchController::handleMessage(MessageSearchAutocomplete* message) {
     return;
   }
 
-  LOG_INFO_W(L"autocomplete string: \"" + message->query + L"\"");
-  view->setAutocompletionList(m_storageAccess->getAutocompletionMatches(message->query, message->acceptedNodeTypes, true));
+  LOG_INFO(L"autocomplete string: \"{}\"", message->query);
+  view->setAutocompletionList(mStorageAccess->getAutocompletionMatches(message->query, message->acceptedNodeTypes, true));
 }
 
-SearchView* SearchController::getView() {
+SearchView* SearchController::getView() const {
   return Controller::getView<SearchView>();
 }
 
@@ -56,7 +58,7 @@ void SearchController::clear() {
 void SearchController::updateMatches(const MessageActivateBase* message, bool updateView) {
   std::vector<SearchMatch> matches;
 
-  if(message) {
+  if(nullptr != message) {
     matches = message->getSearchMatches();
   }
 
@@ -64,5 +66,5 @@ void SearchController::updateMatches(const MessageActivateBase* message, bool up
     getView()->setMatches(matches);
   }
 
-  MessageTabState(Controller::getTabId(), matches).dispatch();
+  MessageTabState(getTabId(), matches).dispatch();
 }

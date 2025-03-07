@@ -1,20 +1,18 @@
 #pragma once
-// STL
-#include <ostream>
-#include <set>
 #include <string>
 #include <vector>
-// internal
+
 #include "GlobalId.hpp"
 #include "Node.h"
+#include "NodeKind.h"
 
 class NodeTypeSet;
 
 // SearchMatch is used to display the search result in the UI
 struct SearchMatch {
-  enum SearchType { SEARCH_NONE, SEARCH_TOKEN, SEARCH_COMMAND, SEARCH_OPERATOR, SEARCH_FULLTEXT };
+  enum SearchType : uint8_t { SEARCH_NONE, SEARCH_TOKEN, SEARCH_COMMAND, SEARCH_OPERATOR, SEARCH_FULLTEXT };
 
-  enum CommandType { COMMAND_ALL, COMMAND_ERROR, COMMAND_NODE_FILTER, COMMAND_LEGEND };
+  enum CommandType : uint8_t { COMMAND_ALL, COMMAND_ERROR, COMMAND_NODE_FILTER, COMMAND_LEGEND };
 
   static void log(const std::vector<SearchMatch>& matches, const std::wstring& query);
 
@@ -28,21 +26,21 @@ struct SearchMatch {
   static const wchar_t FULLTEXT_SEARCH_CHARACTER = L'?';
 
   SearchMatch();
-  SearchMatch(const std::wstring& query);
+  explicit SearchMatch(const std::wstring& query);
 
   bool operator<(const SearchMatch& other) const;
   bool operator==(const SearchMatch& other) const;
 
-  size_t getTextSizeForSorting(const std::wstring* str) const;
+  static size_t getTextSizeForSorting(const std::wstring* str);
 
-  bool isValid() const;
-  bool isFilterCommand() const;
+  [[nodiscard]] bool isValid() const;
+  [[nodiscard]] bool isFilterCommand() const;
 
   void print(std::wostream& ostream) const;
 
-  std::wstring getFullName() const;
-  std::wstring getSearchTypeName() const;
-  CommandType getCommandType() const;
+  [[nodiscard]] std::wstring getFullName() const;
+  [[nodiscard]] std::wstring getSearchTypeName() const;
+  [[nodiscard]] CommandType getCommandType() const;
 
   std::wstring name;
 
@@ -54,8 +52,8 @@ struct SearchMatch {
 
   std::wstring typeName;
 
-  NodeType nodeType;
-  SearchType searchType;
+  NodeType nodeType = static_cast<NodeType>(NODE_SYMBOL);
+  SearchType searchType = SEARCH_NONE;
   std::vector<size_t> indices;
 
   int score = 0;

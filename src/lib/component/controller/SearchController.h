@@ -1,5 +1,4 @@
 #pragma once
-
 #include "ActivationListener.h"
 #include "Controller.h"
 #include "MessageListener.h"
@@ -15,10 +14,10 @@ class SearchController
     , public MessageListener<MessageFind>
     , public MessageListener<MessageSearchAutocomplete> {
 public:
-  SearchController(StorageAccess* storageAccess);
-  ~SearchController() = default;
+  explicit SearchController(StorageAccess* storageAccess);
+  ~SearchController() override;
 
-  Id getSchedulerId() const override;
+  [[nodiscard]] Id getSchedulerId() const override;
 
 private:
   void handleActivation(const MessageActivateBase* message) override;
@@ -26,11 +25,11 @@ private:
   void handleMessage(MessageFind* message) override;
   void handleMessage(MessageSearchAutocomplete* message) override;
 
-  SearchView* getView();
+  [[nodiscard]] SearchView* getView() const;
 
   void clear() override;
 
   void updateMatches(const MessageActivateBase* message, bool updateView = true);
 
-  StorageAccess* m_storageAccess;
+  StorageAccess* mStorageAccess;
 };

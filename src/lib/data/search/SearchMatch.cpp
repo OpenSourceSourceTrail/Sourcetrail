@@ -6,14 +6,14 @@
 #include "NodeTypeSet.h"
 
 void SearchMatch::log(const std::vector<SearchMatch>& matches, const std::wstring& query) {
-  std::wstringstream ss;
-  ss << std::endl << matches.size() << " matches for \"" << query << "\":" << std::endl;
+  std::wstringstream sStream;
+  sStream << '\n' << matches.size() << " matches for \"" << query << "\":" << '\n';
 
   for(const SearchMatch& match : matches) {
-    match.print(ss);
+    match.print(sStream);
   }
 
-  LOG_INFO_W(ss.str());
+  LOG_INFO(sStream.str());
 }
 
 std::wstring SearchMatch::getSearchTypeName(SearchType type) {
@@ -34,13 +34,13 @@ std::wstring SearchMatch::getSearchTypeName(SearchType type) {
 }
 
 std::wstring SearchMatch::searchMatchesToString(const std::vector<SearchMatch>& matches) {
-  std::wstringstream ss;
+  std::wstringstream sStream;
 
   for(const SearchMatch& match : matches) {
-    ss << L'@' << match.getFullName() << L':' << getReadableNodeKindWString(match.nodeType.getKind()) << L' ';
+    sStream << L'@' << match.getFullName() << L':' << getReadableNodeKindWString(match.nodeType.getKind()) << L' ';
   }
 
-  return ss.str();
+  return sStream.str();
 }
 
 SearchMatch SearchMatch::createCommand(CommandType type) {
@@ -83,10 +83,9 @@ std::wstring SearchMatch::getCommandName(CommandType type) {
   return L"none";
 }
 
-SearchMatch::SearchMatch() : typeName(L""), nodeType(NODE_SYMBOL), searchType(SEARCH_NONE), hasChildren(false) {}
+SearchMatch::SearchMatch() = default;
 
-SearchMatch::SearchMatch(const std::wstring& query)
-    : name(query), text(query), typeName(L""), nodeType(NODE_SYMBOL), searchType(SEARCH_NONE), hasChildren(false) {
+SearchMatch::SearchMatch(const std::wstring& query) : name(query), text(query) {
   tokenNames.emplace_back(query, NAME_DELIMITER_UNKNOWN);
 }
 
@@ -105,24 +104,29 @@ bool SearchMatch::operator<(const SearchMatch& other) const {
     otherStr = &other.name;
   }
 
-  size_t size = getTextSizeForSorting(str);
-  size_t otherSize = other.getTextSizeForSorting(otherStr);
+  const size_t size = getTextSizeForSorting(str);
+  const size_t otherSize = other.getTextSizeForSorting(otherStr);
 
   // text size
   if(size < otherSize) {
     return true;
-  } else if(size > otherSize) {
+  }
+  if(size > otherSize) {
     return false;
-  } else if(str->size() < otherStr->size()) {
+  }
+  if(str->size() < otherStr->size()) {
     return true;
-  } else if(str->size() > otherStr->size()) {
+  }
+  if(str->size() > otherStr->size()) {
     return false;
   }
 
   // lower case
   for(size_t i = 0; i < str->size(); i++) {
-    if(towlower(str->at(i)) != towlower(otherStr->at(i))) {
-      return towlower(str->at(i)) < towlower(otherStr->at(i));
+    const auto value0 = towlower(static_cast<std::uint32_t>(str->at(i)));
+    const auto value1 = towlower(static_cast<std::uint32_t>(otherStr->at(i)));
+    if(value0 != value1) {
+      return value0 < value1;
     } else {
       // alphabetical
       if(str->at(i) < otherStr->at(i)) {
@@ -140,9 +144,9 @@ bool SearchMatch::operator==(const SearchMatch& other) const {
   return text == other.text && searchType == other.searchType;
 }
 
-size_t SearchMatch::getTextSizeForSorting(const std::wstring* str) const {
+size_t SearchMatch::getTextSizeForSorting(const std::wstring* str) {
   // check if templated symbol and only use size up to template stuff
-  size_t pos = str->find(L'<');
+  const size_t pos = str->find(L'<');
   if(pos != std::wstring::npos) {
     return pos;
   }
@@ -159,17 +163,17 @@ bool SearchMatch::isFilterCommand() const {
 }
 
 void SearchMatch::print(std::wostream& ostream) const {
-  ostream << name << std::endl << L'\t';
-  size_t i = 0;
-  for(size_t index : indices) {
-    while(i < index) {
-      i++;
+  ostream << name << '\n' << L'\t';
+  size_t count = 0;
+  for(const size_t index : indices) {
+    while(count < index) {
+      ++count;
       ostream << L' ';
     }
     ostream << L'^';
-    i++;
+    ++count;
   }
-  ostream << std::endl;
+  ostream << '\n';
 }
 
 std::wstring SearchMatch::getFullName() const {

@@ -99,8 +99,8 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  LOG_INFO_W(L"sharedDataPath: " + AppPath::getSharedDataDirectoryPath().wstr());
-  LOG_INFO_W(L"userDataPath: " + UserPaths::getUserDataDirectoryPath().wstr());
+  LOG_INFO(L"sharedDataPath: " + AppPath::getSharedDataDirectoryPath().wstr());
+  LOG_INFO(L"userDataPath: " + UserPaths::getUserDataDirectoryPath().wstr());
 
 
 #if BUILD_CXX_LANGUAGE_PACKAGE

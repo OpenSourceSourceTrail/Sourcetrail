@@ -43,9 +43,10 @@
 #  include "SourceGroupFactoryModuleCxx.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
+namespace {
 void signalHandler(int /*signum*/) {
   std::cout << "interrupt indexing\n";
-  MessageIndexingInterrupted().dispatch();
+  MessageIndexingInterrupted{}.dispatch();
 }
 
 void setupLogging() {
@@ -83,7 +84,7 @@ void addLanguagePackages() {
 }
 
 void checkRunFromScript() {
-#ifndef _WIN32
+#ifndef D_WINDOWS
   const auto expectedShareDirectory = FilePath(QCoreApplication::applicationDirPath().toStdWString() + L"/../share");
   if(qEnvironmentVariableIsEmpty("SOURCETRAIL_VIA_SCRIPT") && !expectedShareDirectory.exists()) {
     LOG_WARNING("Please run Sourcetrail via the Sourcetrail.sh script!");
@@ -92,7 +93,7 @@ void checkRunFromScript() {
 }
 
 int runConsole(int argc, char** argv, const Version& version, commandline::CommandLineParser& commandLineParser) {
-  QtCoreApplication qtApp(argc, argv);
+  const QtCoreApplication qtApp(argc, argv);
 
   checkRunFromScript();
 
@@ -102,15 +103,15 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
 
   auto factory = std::make_shared<lib::Factory>();
   Application::createInstance(version, factory, nullptr, nullptr);
-  [[maybe_unused]] ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
+  [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
   addLanguagePackages();
 
   // TODO(Hussein): Replace with Boost or Qt
-  std::signal(SIGINT, signalHandler);
-  std::signal(SIGTERM, signalHandler);
-  std::signal(SIGABRT, signalHandler);
+  std::ignore = std::signal(SIGINT, signalHandler);
+  std::ignore = std::signal(SIGTERM, signalHandler);
+  std::ignore = std::signal(SIGABRT, signalHandler);
 
   commandLineParser.parse();
 
@@ -119,12 +120,12 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
   }
 
   if(commandLineParser.hasError()) {
-    std::wcout << commandLineParser.getError() << std::endl;
+    std::wcout << commandLineParser.getError() << L'\n';
   } else {
-    MessageLoadProject(commandLineParser.getProjectFilePath(),
+    MessageLoadProject{commandLineParser.getProjectFilePath(),
                        false,
                        commandLineParser.getRefreshMode(),
-                       commandLineParser.getShallowIndexingRequested())
+                       commandLineParser.getShallowIndexingRequested()}
         .dispatch();
   }
 
@@ -142,7 +143,7 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
     }
   }
 #endif
-  QtApplication qtApp(argc, argv);
+  const QtApplication qtApp(argc, argv);
 
   checkRunFromScript();
 
@@ -157,10 +158,10 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 
   auto factory = std::make_shared<lib::Factory>();
   Application::createInstance(version, factory, &viewFactory, &networkFactory);
-  [[maybe_unused]] ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
+  [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());
-  MessageStatus(utility::decodeFromUtf8(message)).dispatch();
+  MessageStatus{utility::decodeFromUtf8(message)}.dispatch();
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
   addLanguagePackages();
@@ -172,11 +173,12 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   if(commandLineParser.hasError()) {
     Application::getInstance()->handleDialog(commandLineParser.getError());
   } else {
-    MessageLoadProject(commandLineParser.getProjectFilePath(), false, RefreshMode::None).dispatch();
+    MessageLoadProject{commandLineParser.getProjectFilePath(), false, RefreshMode::None}.dispatch();
   }
 
   return QApplication::exec();
 }
+}    // namespace
 
 int main(int argc, char* argv[]) {
   QCoreApplication::addLibraryPath(QStringLiteral("."));

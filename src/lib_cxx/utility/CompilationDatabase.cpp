@@ -1,6 +1,5 @@
 #include "CompilationDatabase.h"
 
-#include <iostream>
 #include <set>
 #include <string>
 #include <utility>
@@ -15,46 +14,46 @@
 #include "utility.h"
 #include "utilityString.h"
 
-utility::CompilationDatabase::CompilationDatabase(FilePath filePath) : m_filePath(std::move(filePath)) {
+utility::CompilationDatabase::CompilationDatabase(FilePath filePath) : mFilePath(std::move(filePath)) {
   init();
 }
 
 std::vector<FilePath> utility::CompilationDatabase::getAllHeaderPaths() const {
-  std::vector<FilePath> paths = utility::concat(m_headers, m_systemHeaders);
+  std::vector<FilePath> paths = utility::concat(mHeaders, mSystemHeaders);
   paths = utility::unique(paths);
   return paths;
 }
 
 std::vector<FilePath> utility::CompilationDatabase::getHeaderPaths() const {
-  return m_headers;
+  return mHeaders;
 }
 
 std::vector<FilePath> utility::CompilationDatabase::getSystemHeaderPaths() const {
-  return m_systemHeaders;
+  return mSystemHeaders;
 }
 
 std::vector<FilePath> utility::CompilationDatabase::getFrameworkHeaderPaths() const {
-  return m_frameworkHeaders;
+  return mFrameworkHeaders;
 }
 
 void utility::CompilationDatabase::init() {
-  if(m_filePath.empty()) {
+  if(mFilePath.empty()) {
     LOG_WARNING("CompilationDatabase filePath is empty nothing to parse.");
     return;
   }
 
-  if(!m_filePath.exists()) {
-    LOG_WARNING(fmt::format("CompilationDatabase \"{}\" is missing.", m_filePath.str()));
+  if(!mFilePath.exists()) {
+    LOG_WARNING(fmt::format("CompilationDatabase \"{}\" is missing.", mFilePath.str()));
     return;
   }
 
   std::string error;
-  std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb(clang::tooling::JSONCompilationDatabase::loadFromFile(
-      utility::encodeToUtf8(m_filePath.wstr()), error, clang::tooling::JSONCommandLineSyntax::AutoDetect));
+  const std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb(clang::tooling::JSONCompilationDatabase::loadFromFile(
+      utility::encodeToUtf8(mFilePath.wstr()), error, clang::tooling::JSONCommandLineSyntax::AutoDetect));
 
   if(!cdb) {
-    LOG_ERROR_W(L"Loading compilation database from file \"" + m_filePath.wstr() + L"\" failed with error: " +
-                utility::decodeFromUtf8(error));
+    LOG_ERROR(L"Loading compilation database from file \"" + mFilePath.wstr() + L"\" failed with error: " +
+              utility::decodeFromUtf8(error));
     return;
   }
 
@@ -90,7 +89,7 @@ void utility::CompilationDatabase::init() {
     }
   }
 
-  m_headers = utility::toVector(headers);
-  m_frameworkHeaders = utility::toVector(frameworkHeaders);
-  m_systemHeaders = utility::toVector(systemHeaders);
+  mHeaders = utility::toVector(headers);
+  mFrameworkHeaders = utility::toVector(frameworkHeaders);
+  mSystemHeaders = utility::toVector(systemHeaders);
 }

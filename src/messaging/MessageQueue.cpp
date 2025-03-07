@@ -23,13 +23,13 @@ namespace details {
 MessageQueue::MessageQueue() noexcept = default;
 
 MessageQueue::~MessageQueue() noexcept {
-  std::scoped_lock<std::mutex> lock(mListenersMutex);
+  const std::scoped_lock<std::mutex> lock(mListenersMutex);
   ranges::for_each(mListeners, [](auto& listener) { listener->removedListener(); });
   mListeners.clear();
 }
 
 void MessageQueue::registerListener(MessageListenerBase* listener) noexcept {
-  std::scoped_lock<std::mutex> lock(mListenersMutex);
+  const std::scoped_lock<std::mutex> lock(mListenersMutex);
   if(ranges::find(mListeners, listener) != mListeners.end()) {
     return;
   }
@@ -37,7 +37,7 @@ void MessageQueue::registerListener(MessageListenerBase* listener) noexcept {
 }
 
 void MessageQueue::unregisterListener(MessageListenerBase* listener) noexcept {
-  std::scoped_lock<std::mutex> lock(mListenersMutex);
+  const std::scoped_lock<std::mutex> lock(mListenersMutex);
   if(auto found = ranges::find(mListeners, listener); found != mListeners.end()) {
     mListeners.erase(found);
 
@@ -58,7 +58,7 @@ void MessageQueue::unregisterListener(MessageListenerBase* listener) noexcept {
 }
 
 MessageListenerBase* MessageQueue::getListenerById(Id listenerId) const noexcept {
-  std::scoped_lock<std::mutex> lock(mListenersMutex);
+  const std::scoped_lock<std::mutex> lock(mListenersMutex);
   auto found = ranges::find_if(mListeners, [listenerId](auto* listener) { return listener->getId() == listenerId; });
   return found == mListeners.end() ? nullptr : *found;
 }
@@ -71,7 +71,7 @@ void MessageQueue::addMessageFilter(std::shared_ptr<MessageFilter> filter) noexc
 }
 
 void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) noexcept {
-  std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
+  const std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
   if(ranges::find(mMessageBuffer, message) != mMessageBuffer.end()) {
     return;
   }
@@ -80,7 +80,7 @@ void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) noexcept {
 
 void MessageQueue::processMessage(const std::shared_ptr<MessageBase>& message, bool asNextTask) noexcept {
   if(message->isLogged()) {
-    LOG_INFO_W(L"send " + message->str());
+    LOG_INFO(L"send " + message->str());
   }
 
   if(mSendMessagesAsTasks && message->sendAsTask()) {
@@ -142,7 +142,7 @@ bool MessageQueue::loopIsRunning() const noexcept {
 }
 
 bool MessageQueue::hasMessagesQueued() const noexcept {
-  std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
+  const std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
   return !mMessageBuffer.empty();
 }
 
@@ -154,7 +154,7 @@ void MessageQueue::processMessages() {
   while(true) {
     std::shared_ptr<MessageBase> message;
     {
-      std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
+      const std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
 
       ranges::for_each(mFilters, [this](const auto& filter) {
         if(mMessageBuffer.empty()) {
@@ -177,7 +177,7 @@ void MessageQueue::processMessages() {
 }
 
 void MessageQueue::sendMessage(const std::shared_ptr<MessageBase>& message) {
-  std::scoped_lock<std::mutex> lock(mListenersMutex);
+  const std::scoped_lock<std::mutex> lock(mListenersMutex);
 
   // mListenersLength is saved, so that new listeners registered within message handling don't
   // get the current message and the length can be reduced when a listener gets unregistered.
@@ -208,12 +208,12 @@ void MessageQueue::sendMessageAsTask(const std::shared_ptr<MessageBase>& message
   }
 
   {
-    std::scoped_lock<std::mutex> lock(mListenersMutex);
+    const std::scoped_lock<std::mutex> lock(mListenersMutex);
     for(auto* pListener : mListeners) {
       if(pListener->getType() == message->getType() &&
          (message->getSchedulerId() == 0 || pListener->getSchedulerId() == 0 ||
           pListener->getSchedulerId() == message->getSchedulerId())) {
-        Id listenerId = pListener->getId();
+        const Id listenerId = pListener->getId();
         taskGroup->addTask(std::make_shared<TaskLambda>([listenerId, message]() {
           auto* pInnerListener = MessageQueue::getInstance()->getListenerById(listenerId);
           if(pInnerListener != nullptr) {

@@ -1,13 +1,11 @@
-#ifndef TASK_EXECUTE_CUSTOM_COMMANDS_H
-#define TASK_EXECUTE_CUSTOM_COMMANDS_H
-
+#pragma once
 #include <set>
 #include <vector>
 
-#include "../../../scheduling/Task.h"
 #include "ErrorCountInfo.h"
 #include "FilePath.h"
 #include "MessageListener.h"
+#include "Task.h"
 #include "TimeStamp.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 
@@ -24,7 +22,7 @@ public:
                             std::shared_ptr<PersistentStorage> storage,
                             std::shared_ptr<DialogView> dialogView,
                             size_t indexerThreadCount,
-                            const FilePath& projectDirectory);
+                            FilePath projectDirectory);
 
 private:
   void doEnter(std::shared_ptr<Blackboard> blackboard) override;
@@ -34,28 +32,26 @@ private:
 
   void handleMessage(MessageIndexingInterrupted* message) override;
 
-  void executeParallelIndexerCommands(int threadId, std::shared_ptr<Blackboard> blackboard);
-  void runIndexerCommand(std::shared_ptr<IndexerCommandCustom> indexerCommand,
-                         std::shared_ptr<Blackboard> blackboard,
-                         std::shared_ptr<PersistentStorage> storage);
+  void executeParallelIndexerCommands(int threadId, const std::shared_ptr<Blackboard>& blackboard);
+  void runIndexerCommand(const std::shared_ptr<IndexerCommandCustom>& indexerCommand,
+                         const std::shared_ptr<Blackboard>& blackboard,
+                         const std::shared_ptr<PersistentStorage>& storage);
 
-  std::unique_ptr<IndexerCommandProvider> m_indexerCommandProvider;
-  std::shared_ptr<PersistentStorage> m_storage;
-  std::shared_ptr<DialogView> m_dialogView;
-  const size_t m_indexerThreadCount;
-  const FilePath m_projectDirectory;
+  std::unique_ptr<IndexerCommandProvider> mIndexerCommandProvider;
+  std::shared_ptr<PersistentStorage> mStorage;
+  std::shared_ptr<DialogView> mDialogView;
+  const size_t mIndexerThreadCount;
+  const FilePath mProjectDirectory;
 
-  TimeStamp m_start;
-  bool m_interrupted = false;
-  size_t m_indexerCommandCount;
-  std::vector<std::shared_ptr<IndexerCommandCustom>> m_serialCommands;
-  std::vector<std::shared_ptr<IndexerCommandCustom>> m_parallelCommands;
-  std::mutex m_parallelCommandsMutex;
-  ErrorCountInfo m_errorCount;
-  std::mutex m_errorCountMutex;
-  FilePath m_targetDatabaseFilePath;
-  std::set<FilePath> m_sourceDatabaseFilePaths;
-  std::mutex m_sourceDatabaseFilePathsMutex;
+  TimeStamp mStart;
+  bool mInterrupted = false;
+  size_t mIndexerCommandCount;
+  std::vector<std::shared_ptr<IndexerCommandCustom>> mSerialCommands;
+  std::vector<std::shared_ptr<IndexerCommandCustom>> mParallelCommands;
+  std::mutex mParallelCommandsMutex;
+  ErrorCountInfo mErrorCount;
+  std::mutex mErrorCountMutex;
+  FilePath mTargetDatabaseFilePath;
+  std::set<FilePath> mSourceDatabaseFilePaths;
+  std::mutex mSourceDatabaseFilePathsMutex;
 };
-
-#endif    // TASK_EXECUTE_CUSTOM_COMMANDS_H

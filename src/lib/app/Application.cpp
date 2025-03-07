@@ -7,8 +7,6 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-// internal
-#include "../../scheduling/ITaskManager.hpp"
 #include "ColorScheme.h"
 #include "CppSQLite3.h"
 #include "DialogView.h"
@@ -20,6 +18,7 @@
 #include "IDECommunicationController.h"
 #include "impls/Factory.hpp"
 #include "ISharedMemoryGarbageCollector.hpp"
+#include "ITaskManager.hpp"
 #include "logging.h"
 #include "MainView.h"
 #include "MessageQueue.h"
@@ -42,18 +41,18 @@ namespace fs = std::filesystem;
 
 namespace {
 std::wstring generateDatedFileName(const std::wstring& prefix, const std::wstring& suffix = L"", int offsetDays = 0) {
-  time_t time;
-  std::time(&time);
+  time_t time{};
+  std::time(&time);    // NOLINT
 
 #ifdef _WIN32
 #  pragma warning(push)
 #  pragma warning(disable : 4996)
 #endif
-  tm t = *std::localtime(&time);
+  tm localTime = *std::localtime(&time);    // NOLINT
 
   if(0 != offsetDays) {
-    time = mktime(&t) + offsetDays * 24 * 60 * 60;
-    t = *std::localtime(&time);
+    time = mktime(&localTime) + offsetDays * 24 * 60 * 60;    // NOLINT
+    localTime = *std::localtime(&time);                       // NOLINT
   }
 #ifdef _WIN32
 #  pragma warning(pop)
@@ -64,12 +63,12 @@ std::wstring generateDatedFileName(const std::wstring& prefix, const std::wstrin
     filename << prefix << L"_";
   }
 
-  filename << t.tm_year + 1900 << L"-";
-  filename << (t.tm_mon < 9 ? L"0" : L"") << t.tm_mon + 1 << L"-";
-  filename << (t.tm_mday < 10 ? L"0" : L"") << t.tm_mday << L"_";
-  filename << (t.tm_hour < 10 ? L"0" : L"") << t.tm_hour << L"-";
-  filename << (t.tm_min < 10 ? L"0" : L"") << t.tm_min << L"-";
-  filename << (t.tm_sec < 10 ? L"0" : L"") << t.tm_sec;
+  filename << localTime.tm_year + 1900 << L"-";                                       // NOLINT
+  filename << (localTime.tm_mon < 9 ? L"0" : L"") << localTime.tm_mon + 1 << L"-";    // NOLINT
+  filename << (localTime.tm_mday < 10 ? L"0" : L"") << localTime.tm_mday << L"_";     // NOLINT
+  filename << (localTime.tm_hour < 10 ? L"0" : L"") << localTime.tm_hour << L"-";     // NOLINT
+  filename << (localTime.tm_min < 10 ? L"0" : L"") << localTime.tm_min << L"-";       // NOLINT
+  filename << (localTime.tm_sec < 10 ? L"0" : L"") << localTime.tm_sec;               // NOLINT
 
   if(!suffix.empty()) {
     filename << L"_" << suffix;
@@ -143,15 +142,15 @@ std::string Application::getUUID() {
 void Application::loadSettings() {
   MessageStatus(fmt::format(L"Load settings: {}", UserPaths::getAppSettingsFilePath().wstr())).dispatch();
 
-  auto settings = IApplicationSettings::getInstanceRaw();
+  auto* settings = IApplicationSettings::getInstanceRaw();
   if(auto settingsPath = UserPaths::getAppSettingsFilePath(); !settings->load(settingsPath)) {
-    LOG_WARNING_W(fmt::format(L"Failed to load ApplicationSettings from the following path \"{}\"", settingsPath.wstr()));
+    LOG_WARNING(fmt::format(L"Failed to load ApplicationSettings from the following path \"{}\"", settingsPath.wstr()));
   }
 
   if(settings->getLoggingEnabled()) {
     namespace fs = std::filesystem;
     auto loggerPath = (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
-    auto dLogger = spdlog::default_logger_raw();
+    auto* dLogger = spdlog::default_logger_raw();
     if(nullptr == dLogger) {
       return;
     }
@@ -166,7 +165,7 @@ void Application::loadSettings() {
 
 void Application::loadStyle(const fs::path& colorSchemePath) {
   if(!ColorScheme::getInstance()->load(FilePath{colorSchemePath.wstring()})) {
-    LOG_WARNING_W(fmt::format(L"Failed to load Style from the following path \"{}\"", colorSchemePath.wstring()));
+    LOG_WARNING(fmt::format(L"Failed to load Style from the following path \"{}\"", colorSchemePath.wstring()));
   }
   GraphViewStyle::loadStyleSettings();
 }
@@ -285,21 +284,22 @@ void Application::handleMessage(MessageLoadProject* message) {
       }
 
       updateTitle();
-    } catch(std::exception& e) {
-      auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with exception: {}",
-                                      projectSettingsFilePath.wstr(),
-                                      utility::decodeFromUtf8(e.what()));
-      LOG_ERROR_W(errorMessage);
+    } catch(CppSQLite3Exception& cppSQLite3Exception) {
+      const auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with sqlite exception: {}",
+                                            projectSettingsFilePath.wstr(),
+                                            utility::decodeFromUtf8(cppSQLite3Exception.errorMessage()));
+      LOG_ERROR(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
-    } catch(CppSQLite3Exception& e) {
-      auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with sqlite exception: {}",
-                                      projectSettingsFilePath.wstr(),
-                                      utility::decodeFromUtf8(e.errorMessage()));
-      LOG_ERROR_W(errorMessage);
+    } catch(std::exception& exception) {
+      const auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with exception: {}",
+                                            projectSettingsFilePath.wstr(),
+                                            utility::decodeFromUtf8(exception.what()));
+      LOG_ERROR(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
     } catch(...) {
-      auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with unknown exception.", projectSettingsFilePath.wstr());
-      LOG_ERROR_W(errorMessage);
+      const auto errorMessage = fmt::format(
+          L"Failed to load project at \"{}\" with unknown exception.", projectSettingsFilePath.wstr());
+      LOG_ERROR(errorMessage);
       MessageStatus(errorMessage, true).dispatch();
     }
 
@@ -343,6 +343,7 @@ void Application::handleMessage(MessageBookmarkUpdate* message) {
   mMainView->updateBookmarksMenu(message->mBookmarks);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Application::startMessagingAndScheduling() {
   scheduling::ITaskManager::getInstanceRaw()->getScheduler(TabId::app())->startSchedulerLoopThreaded();
   scheduling::ITaskManager::getInstanceRaw()->getScheduler(TabId::background())->startSchedulerLoopThreaded();
@@ -385,10 +386,9 @@ void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRe
 
 void Application::updateRecentProjects(const fs::path& projectSettingsFilePath) {
   if(mHasGui) {
-    auto appSettings = IApplicationSettings::getInstanceRaw();
+    auto* appSettings = IApplicationSettings::getInstanceRaw();
     std::vector<fs::path> recentProjects = appSettings->getRecentProjects();
-    if(auto found = std::find(recentProjects.begin(), recentProjects.end(), projectSettingsFilePath);
-       found != recentProjects.end()) {
+    if(auto found = std::ranges::find(recentProjects, projectSettingsFilePath); found != recentProjects.end()) {
       recentProjects.erase(found);
     }
 
@@ -435,7 +435,7 @@ void Application::updateTitle() {
     std::wstring title = L"Sourcetrail";
 
     if(mProject) {
-      FilePath projectPath = mProject->getProjectSettingsFilePath();
+      const FilePath projectPath = mProject->getProjectSettingsFilePath();
 
       if(!projectPath.empty()) {
         title += L" - " + projectPath.fileName();
@@ -447,7 +447,7 @@ void Application::updateTitle() {
 }
 
 bool Application::checkSharedMemory() {
-  std::wstring error = utility::decodeFromUtf8(SharedMemory::checkSharedMemory(getUUID()));
+  const std::wstring error = utility::decodeFromUtf8(SharedMemory::checkSharedMemory(getUUID()));
   if(error.empty()) {
     return true;
   }

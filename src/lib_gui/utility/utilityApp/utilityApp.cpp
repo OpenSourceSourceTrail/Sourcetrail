@@ -8,7 +8,6 @@
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/process.hpp>
-#include <boost/process/child.hpp>
 #include <boost/process/io.hpp>
 #include <boost/process/search_path.hpp>
 #include <boost/process/start_dir.hpp>
@@ -21,23 +20,23 @@
 
 namespace utility {
 
-std::mutex s_runningProcessesMutex;
+std::mutex sRunningProcessesMutex;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-std::set<std::shared_ptr<boost::process::child>> s_runningProcesses;
+std::set<std::shared_ptr<boost::process::child>> sRunningProcesses;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
-std::filesystem::path searchPath(const std::filesystem::path& bin, bool& ok) {
-  ok = false;
+std::filesystem::path searchPath(const std::filesystem::path& bin, bool& isOk) {
+  isOk = false;
   auto searchPath = boost::process::search_path(bin.wstring()).generic_wstring();
   if(!searchPath.empty()) {
-    ok = true;
+    isOk = true;
     return searchPath;
   }
   return bin;
 }
 
 std::filesystem::path searchPath(const std::filesystem::path& bin) {
-  bool ok = false;
-  return searchPath(bin, ok);
+  bool isOk = false;
+  return searchPath(bin, isOk);
 }
 
 namespace {
@@ -46,13 +45,17 @@ bool safely_wait_for(boost::process::child& process, const std::chrono::duration
   // This wrapper around boost::process::wait_for handles the following edge case:
   // Calling wait_for on an already exited process will wait for the entire timeout.
   if(process.running()) {
-    return process.wait_for(rel_time);
+    return process.wait_for(rel_time);    // NOLINT(clang-diagnostic-deprecated-declarations): It will be fixed in SOUR-124
   } else {
     return true;    // The process exited
   }
 }
+
+constexpr int ErrorExitCode = 255;
+constexpr auto DefaultBufferSize = 128U;
 }    // namespace
 
+// NOLINTNEXTLINE(readability-function-cognitive-complexity)
 ProcessOutput executeProcess(const std::wstring& command,
                              const std::vector<std::wstring>& arguments,
                              const FilePath& workingDirectory,
@@ -60,10 +63,10 @@ ProcessOutput executeProcess(const std::wstring& command,
                              const int timeout,
                              bool logProcessOutput) {
   std::string output;
-  int exitCode = 255;
+  int exitCode = ErrorExitCode;
   try {
     boost::asio::io_service ios;
-    boost::process::async_pipe ap(ios);
+    boost::process::async_pipe asyncPipe(ios);
 
     std::shared_ptr<boost::process::child> process;
 
@@ -79,37 +82,37 @@ ProcessOutput executeProcess(const std::wstring& command,
                                                         boost::process::args(arguments),
                                                         env,
                                                         boost::process::std_in.close(),
-                                                        (boost::process::std_out & boost::process::std_err) > ap);
+                                                        (boost::process::std_out & boost::process::std_err) > asyncPipe);
     } else {
       process = std::make_shared<boost::process::child>(searchPath(command).wstring(),
                                                         boost::process::args(arguments),
                                                         boost::process::start_dir(workingDirectory.wstr()),
                                                         env,
                                                         boost::process::std_in.close(),
-                                                        (boost::process::std_out & boost::process::std_err) > ap);
+                                                        (boost::process::std_out & boost::process::std_err) > asyncPipe);
     }
 
     {
-      const std::lock_guard<std::mutex> lock(s_runningProcessesMutex);
-      s_runningProcesses.insert(process);
+      const std::lock_guard<std::mutex> lock(sRunningProcessesMutex);
+      sRunningProcesses.insert(process);
     }
 
     [[maybe_unused]] ScopedFunctor const remover([process]() {
-      const std::lock_guard<std::mutex> lock(s_runningProcessesMutex);
-      s_runningProcesses.erase(process);
+      const std::lock_guard<std::mutex> lock(sRunningProcessesMutex);
+      sRunningProcesses.erase(process);
     });
 
     bool outputReceived = false;
-    std::vector<char> buf(128U);
+    std::vector<char> buf(DefaultBufferSize);
     auto stdOutBuffer = boost::asio::buffer(buf);
     std::string logBuffer;
 
-    std::function<void(const boost::system::error_code& ec, std::size_t n)> onStdOut =
-        [&output, &buf, &stdOutBuffer, &ap, &onStdOut, &outputReceived, &logBuffer, logProcessOutput](
-            const boost::system::error_code& ec, std::size_t size) {
+    std::function<void(const boost::system::error_code& errorCode, std::size_t n)> onStdOut =
+        [&output, &buf, &stdOutBuffer, &asyncPipe, &onStdOut, &outputReceived, &logBuffer, logProcessOutput](
+            const boost::system::error_code& errorCode, std::size_t size) {
           std::string text;
           text.reserve(size);
-          text.insert(text.end(), buf.begin(), buf.begin() + size);
+          text.insert(text.end(), buf.begin(), std::next(buf.begin(), static_cast<long>(size)));
 
           if(!text.empty()) {
             outputReceived = true;
@@ -121,7 +124,7 @@ ProcessOutput executeProcess(const std::wstring& command,
             const bool isEndOfLine = (logBuffer.back() == '\n');
             const std::vector<std::string> lines = splitToVector(logBuffer, "\n");
             for(size_t i = 0; i < lines.size() - (isEndOfLine ? 0 : 1); i++) {
-              LOG_INFO(fmt::format("Process output: {}", lines[i]));
+              LOG_INFO("Process output: {}", lines[i]);    // NOLINT(bugprone-lambda-function-name): It will be solved with SOUR-125
             }
             if(isEndOfLine) {
               logBuffer.clear();
@@ -129,12 +132,12 @@ ProcessOutput executeProcess(const std::wstring& command,
               logBuffer = lines.back();
             }
           }
-          if(!ec) {
-            boost::asio::async_read(ap, stdOutBuffer, onStdOut);
+          if(!errorCode) {
+            boost::asio::async_read(asyncPipe, stdOutBuffer, onStdOut);
           }
         };
 
-    boost::asio::async_read(ap, stdOutBuffer, onStdOut);
+    boost::asio::async_read(asyncPipe, stdOutBuffer, onStdOut);
     ios.run();
 
     if(timeout > 0) {
@@ -171,7 +174,7 @@ ProcessOutput executeProcess(const std::wstring& command,
     ProcessOutput ret;
     ret.error = decodeFromUtf8(e.code().message());
     ret.exitCode = e.code().value();
-    LOG_ERROR_W(fmt::format(L"Process error: {}", ret.error));
+    LOG_ERROR(fmt::format(L"Process error: {}", ret.error));
 
     return ret;
   }
@@ -183,15 +186,15 @@ ProcessOutput executeProcess(const std::wstring& command,
 }
 
 void killRunningProcesses() {
-  const std::lock_guard<std::mutex> lock(s_runningProcessesMutex);
-  for(const auto& process : s_runningProcesses) {
+  const std::lock_guard<std::mutex> lock(sRunningProcessesMutex);
+  for(const auto& process : sRunningProcesses) {
     process->terminate();
   }
 }
 
 int getIdealThreadCount() {
   int threadCount = QThread::idealThreadCount();
-  if(getOsType() == OsType::Windows) {
+  if constexpr(getOsType() == OsType::Windows) {
     threadCount -= 1;
   }
   return std::max(1, threadCount);

@@ -12,17 +12,17 @@
 #include "type/history/MessageHistoryRedo.h"
 #include "type/history/MessageHistoryUndo.h"
 
-QtContextMenu* QtContextMenu::s_instance = nullptr;
+QtContextMenu* QtContextMenu::sInstance = nullptr;
 
-QAction* QtContextMenu::s_undoAction = nullptr;
-QAction* QtContextMenu::s_redoAction = nullptr;
+QAction* QtContextMenu::sUndoAction = nullptr;
+QAction* QtContextMenu::sRedoAction = nullptr;
 
-QAction* QtContextMenu::s_copyFullPathAction = nullptr;
-QAction* QtContextMenu::s_openContainingFolderAction = nullptr;
+QAction* QtContextMenu::sCopyFullPathAction = nullptr;
+QAction* QtContextMenu::sOpenContainingFolderAction = nullptr;
 
-FilePath QtContextMenu::s_filePath;
+FilePath QtContextMenu::sFilePath;
 
-QtContextMenu::QtContextMenu(const QContextMenuEvent* event, QWidget* origin) : m_menu(origin), m_point(event->globalPos()) {
+QtContextMenu::QtContextMenu(const QContextMenuEvent* event, QWidget* origin) : mMenu(origin), mPoint(event->globalPos()) {
   getInstance();
 }
 
@@ -31,87 +31,98 @@ QtContextMenu::QtContextMenu() = default;
 QtContextMenu::~QtContextMenu() = default;
 
 void QtContextMenu::addAction(QAction* action) {
-  m_menu.addAction(action);
+  mMenu.addAction(action);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void QtContextMenu::enableUndo(bool enabled) {
-  s_undoAction->setEnabled(enabled);
+  sUndoAction->setEnabled(enabled);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void QtContextMenu::enableRedo(bool enabled) {
-  s_redoAction->setEnabled(enabled);
+  sRedoAction->setEnabled(enabled);
 }
 
 void QtContextMenu::addUndoActions() {
-  addAction(s_undoAction);
-  addAction(s_redoAction);
+  addAction(sUndoAction);
+  addAction(sRedoAction);
 }
 
 void QtContextMenu::addFileActions(const FilePath& filePath) {
-  s_filePath = filePath;
+  sFilePath = filePath;
 
-  s_copyFullPathAction->setEnabled(!s_filePath.empty());
-  s_openContainingFolderAction->setEnabled(!s_filePath.empty());
+  sCopyFullPathAction->setEnabled(!sFilePath.empty());
+  sOpenContainingFolderAction->setEnabled(!sFilePath.empty());
 
-  addAction(s_copyFullPathAction);
-  addAction(s_openContainingFolderAction);
+  addAction(sCopyFullPathAction);
+  addAction(sOpenContainingFolderAction);
 }
 
 QtContextMenu* QtContextMenu::getInstance() {
-  if(s_instance != nullptr) {
-    return s_instance;
+  if(nullptr != sInstance) {
+    return sInstance;
   }
 
-  s_instance = new QtContextMenu;
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handles it
+  sInstance = new QtContextMenu;
 
-  s_undoAction = new QAction(tr("Back"), s_instance);
-  s_undoAction->setStatusTip(tr("Go back to last active symbol"));
-  s_undoAction->setToolTip(tr("Go back to last active symbol"));
-  connect(s_undoAction, &QAction::triggered, s_instance, &QtContextMenu::undoActionTriggered);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handles it
+  sUndoAction = new QAction(tr("Back"), sInstance);
+  sUndoAction->setStatusTip(tr("Go back to last active symbol"));
+  sUndoAction->setToolTip(tr("Go back to last active symbol"));
+  connect(sUndoAction, &QAction::triggered, sInstance, &QtContextMenu::undoActionTriggered);
 
-  s_redoAction = new QAction(tr("Forward"), s_instance);
-  s_redoAction->setStatusTip(tr("Go forward to next active symbol"));
-  s_redoAction->setToolTip(tr("Go forward to next active symbol"));
-  connect(s_redoAction, &QAction::triggered, s_instance, &QtContextMenu::redoActionTriggered);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handles it
+  sRedoAction = new QAction(tr("Forward"), sInstance);
+  sRedoAction->setStatusTip(tr("Go forward to next active symbol"));
+  sRedoAction->setToolTip(tr("Go forward to next active symbol"));
+  connect(sRedoAction, &QAction::triggered, sInstance, &QtContextMenu::redoActionTriggered);
 
-  s_copyFullPathAction = new QAction(tr("Copy Full Path"), s_instance);
-  s_copyFullPathAction->setStatusTip(tr("Copies the path of this file to the clipboard"));
-  s_copyFullPathAction->setToolTip(tr("Copies the path of this file to the clipboard"));
-  connect(s_copyFullPathAction, &QAction::triggered, s_instance, &QtContextMenu::copyFullPathActionTriggered);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handles it
+  sCopyFullPathAction = new QAction(tr("Copy Full Path"), sInstance);
+  sCopyFullPathAction->setStatusTip(tr("Copies the path of this file to the clipboard"));
+  sCopyFullPathAction->setToolTip(tr("Copies the path of this file to the clipboard"));
+  connect(sCopyFullPathAction, &QAction::triggered, sInstance, &QtContextMenu::copyFullPathActionTriggered);
 
-  s_openContainingFolderAction = new QAction(tr("Open Containing Folder"), s_instance);
-  s_openContainingFolderAction->setStatusTip(tr("Opens the folder that contains this file"));
-  s_openContainingFolderAction->setToolTip(tr("Opens the folder that contains this file"));
-  connect(s_openContainingFolderAction, &QAction::triggered, s_instance, &QtContextMenu::openContainingFolderActionTriggered);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory): Qt handles it
+  sOpenContainingFolderAction = new QAction(tr("Open Containing Folder"), sInstance);
+  sOpenContainingFolderAction->setStatusTip(tr("Opens the folder that contains this file"));
+  sOpenContainingFolderAction->setToolTip(tr("Opens the folder that contains this file"));
+  connect(sOpenContainingFolderAction, &QAction::triggered, sInstance, &QtContextMenu::openContainingFolderActionTriggered);
 
-  return s_instance;
+  return sInstance;
 }
 
 void QtContextMenu::addSeparator() {
-  m_menu.addSeparator();
+  mMenu.addSeparator();
 }
 
 void QtContextMenu::show() {
-  m_menu.exec(m_point);
+  mMenu.exec(mPoint);
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void QtContextMenu::undoActionTriggered() {
-  MessageHistoryUndo().dispatch();
+  MessageHistoryUndo{}.dispatch();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void QtContextMenu::redoActionTriggered() {
-  MessageHistoryRedo().dispatch();
+  MessageHistoryRedo{}.dispatch();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void QtContextMenu::copyFullPathActionTriggered() {
-  QApplication::clipboard()->setText(QDir::toNativeSeparators(QString::fromStdWString(s_filePath.wstr())));
+  QApplication::clipboard()->setText(QDir::toNativeSeparators(QString::fromStdWString(sFilePath.wstr())));
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void QtContextMenu::openContainingFolderActionTriggered() {
-  const auto dir = s_filePath.getParentDirectory();
+  const auto dir = sFilePath.getParentDirectory();
   if(dir.exists()) {
     QDesktopServices::openUrl(QUrl(QString::fromStdWString(L"file:///" + dir.wstr()), QUrl::TolerantMode));
   } else {
-    LOG_ERROR_W(L"Unable to open directory: " + dir.wstr());
+    LOG_ERROR(L"Unable to open directory: {}", dir.wstr());
   }
 }

@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 
 #include <QDir>
@@ -57,8 +56,8 @@ void setupApp([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
         userDataPath.makeCanonical();
       } else {
         userDataPath = AppPath::getSharedDataDirectoryPath().concatenate(L"user_fallback/");
-        LOG_ERROR_W(L"The \"%LOCALAPPDATA%\" path could not be found. Falling back to \"" + userDataPath.wstr() +
-                    L"\" to store settings data.");
+        LOG_ERROR(L"The \"%LOCALAPPDATA%\" path could not be found. Falling back to \"" + userDataPath.wstr() +
+                  L"\" to store settings data.");
         FileSystem::createDirectory(userDataPath);
       }
     }

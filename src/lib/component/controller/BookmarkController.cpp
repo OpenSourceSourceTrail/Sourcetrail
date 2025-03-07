@@ -1,5 +1,7 @@
 #include "BookmarkController.h"
 
+#include <algorithm>
+
 #include <range/v3/algorithm/any_of.hpp>
 #include <range/v3/to_container.hpp>
 #include <range/v3/view/transform.hpp>
@@ -19,8 +21,10 @@
 #include "utility.h"
 #include "utilityString.h"
 
-const std::wstring BookmarkController::sEdgeSeparatorToken = L" => ";
-const std::wstring BookmarkController::sDefaultCategoryName = L"default";
+namespace {
+constexpr std::wstring_view EdgeSeparatorToken = L" => ";
+constexpr std::wstring_view DefaultCategoryName = L"default";
+}    // namespace
 
 BookmarkController::BookmarkController(StorageAccess* storageAccess)
     : mStorageAccess(storageAccess), mBookmarkCache(storageAccess) {
@@ -35,7 +39,7 @@ void BookmarkController::clear() {
 }
 
 void BookmarkController::displayBookmarks() {
-  BookmarkView* view = getView<BookmarkView>();
+  auto* view = getView<BookmarkView>();
   if(view == nullptr) {
     LOG_WARNING("Failed to get view");
     return;
@@ -59,11 +63,11 @@ void BookmarkController::createBookmark(const std::wstring& name,
                                         const std::wstring& comment,
                                         const std::wstring& category,
                                         GlobalId nodeId) {
-  LOG_INFO_W(fmt::format(L"Attempting to create new bookmark ({}, {}, {})", name, comment, category));
+  LOG_INFO(L"Attempting to create new bookmark ({}, {}, {})", name, comment, category);
 
   const GlobalId tabId = TabId::currentTab();
 
-  const BookmarkCategory bookmarkCategory(0, category.empty() ? sDefaultCategoryName : category);
+  const BookmarkCategory bookmarkCategory(0, category.empty() ? std::wstring{DefaultCategoryName} : category);
 
   if(const auto activeEdgeIds = mActiveEdgeIds[tabId]; activeEdgeIds.empty()) {
     LOG_INFO("Creating Node Bookmark");
@@ -104,9 +108,9 @@ void BookmarkController::editBookmark(Id bookmarkId,
                                       const std::wstring& name,
                                       const std::wstring& comment,
                                       const std::wstring& category) {
-  LOG_INFO(fmt::format("Attempting to update Bookmark {}", bookmarkId));
+  LOG_INFO("Attempting to update Bookmark {}", bookmarkId);
 
-  mStorageAccess->updateBookmark(bookmarkId, name, comment, category.size() ? category : sDefaultCategoryName);
+  mStorageAccess->updateBookmark(bookmarkId, name, comment, category.empty() ? std::wstring{DefaultCategoryName} : category);
 
   cleanBookmarkCategories();
 
@@ -114,7 +118,7 @@ void BookmarkController::editBookmark(Id bookmarkId,
 }
 
 void BookmarkController::deleteBookmark(Id bookmarkId) {
-  LOG_INFO(fmt::format("Attempting to delete Bookmark {}", bookmarkId));
+  LOG_INFO("Attempting to delete Bookmark {}", bookmarkId);
 
   mStorageAccess->removeBookmark(bookmarkId);
 
@@ -140,8 +144,8 @@ void BookmarkController::deleteBookmarkCategory(Id categoryId) {
 }
 
 void BookmarkController::deleteBookmarkForActiveTokens() {
-  if(std::shared_ptr<Bookmark> bookmark = getBookmarkForActiveToken(TabId::currentTab())) {
-    LOG_INFO_W(L"Deleting bookmark " + bookmark->getName());
+  if(const std::shared_ptr<Bookmark> bookmark = getBookmarkForActiveToken(TabId::currentTab())) {
+    LOG_INFO(L"Deleting bookmark {}", bookmark->getName());
 
     mStorageAccess->removeBookmark(bookmark->getId());
 
@@ -154,10 +158,10 @@ void BookmarkController::deleteBookmarkForActiveTokens() {
   }
 }
 
-void BookmarkController::activateBookmark(const std::shared_ptr<Bookmark> bookmark) {
+void BookmarkController::activateBookmark(const std::shared_ptr<Bookmark>& bookmark) {
   LOG_INFO("Attempting to activate Bookmark");
 
-  if(std::shared_ptr<EdgeBookmark> edgeBookmark = std::dynamic_pointer_cast<EdgeBookmark>(bookmark)) {
+  if(const std::shared_ptr<EdgeBookmark> edgeBookmark = std::dynamic_pointer_cast<EdgeBookmark>(bookmark)) {
     if(!edgeBookmark->getEdgeIds().empty()) {
       const Id firstEdgeId = edgeBookmark->getEdgeIds().front();
       const StorageEdge storageEdge = mStorageAccess->getEdgeById(firstEdgeId);
@@ -166,8 +170,8 @@ void BookmarkController::activateBookmark(const std::shared_ptr<Bookmark> bookma
       const NameHierarchy targetName = mStorageAccess->getNameHierarchyForNodeId(storageEdge.targetNodeId);
 
       if(edgeBookmark->getEdgeIds().size() == 1) {
-        Id activeNodeId = edgeBookmark->getActiveNodeId();
-        if(activeNodeId) {
+        const Id activeNodeId = edgeBookmark->getActiveNodeId();
+        if(activeNodeId != 0U) {
           MessageActivateNodes(activeNodeId).dispatch();
         }
 
@@ -182,10 +186,10 @@ void BookmarkController::activateBookmark(const std::shared_ptr<Bookmark> bookma
     } else {
       LOG_ERROR("Failed to activate bookmark, did not find edges to activate");
     }
-  } else if(std::shared_ptr<NodeBookmark> nodeBookmark = std::dynamic_pointer_cast<NodeBookmark>(bookmark)) {
+  } else if(const std::shared_ptr<NodeBookmark> nodeBookmark = std::dynamic_pointer_cast<NodeBookmark>(bookmark)) {
     MessageActivateNodes activateNodes;
 
-    for(Id nodeId : nodeBookmark->getNodeIds()) {
+    for(const Id nodeId : nodeBookmark->getNodeIds()) {
       activateNodes.addNode(nodeId);
     }
 
@@ -195,26 +199,26 @@ void BookmarkController::activateBookmark(const std::shared_ptr<Bookmark> bookma
 
 void BookmarkController::showBookmarkCreator(Id nodeId) {
   const Id tabId = TabId::currentTab();
-  if(!mActiveNodeIds[tabId].size() && !mActiveEdgeIds[tabId].size() && !nodeId) {
+  if(mActiveNodeIds[tabId].empty() && mActiveEdgeIds[tabId].empty() && (nodeId == 0U)) {
     return;
   }
 
-  BookmarkView* view = getView<BookmarkView>();
-  if(view == nullptr) {
+  auto* view = getView<BookmarkView>();
+  if(nullptr == view) {
     LOG_WARNING("Failed to get view");
     return;
   }
 
-  if(nodeId) {
-    std::shared_ptr<Bookmark> bookmark = getBookmarkForNodeId(nodeId);
+  if(0 != nodeId) {
+    const std::shared_ptr<Bookmark> bookmark = getBookmarkForNodeId(nodeId);
     if(bookmark) {
       view->displayBookmarkEditor(bookmark, getAllBookmarkCategories());
     } else {
       view->displayBookmarkCreator(getDisplayNamesForNodeId(nodeId), getAllBookmarkCategories(), nodeId);
     }
   } else {
-    std::shared_ptr<Bookmark> bookmark = getBookmarkForActiveToken(tabId);
-    if(bookmark != nullptr) {
+    const std::shared_ptr<Bookmark> bookmark = getBookmarkForActiveToken(tabId);
+    if(bookmark) {
       view->displayBookmarkEditor(bookmark, getAllBookmarkCategories());
     } else {
       view->displayBookmarkCreator(getActiveTokenDisplayNames(), getAllBookmarkCategories(), 0);
@@ -222,8 +226,8 @@ void BookmarkController::showBookmarkCreator(Id nodeId) {
   }
 }
 
-void BookmarkController::showBookmarkEditor(const std::shared_ptr<Bookmark> bookmark) {
-  BookmarkView* view = getView<BookmarkView>();
+void BookmarkController::showBookmarkEditor(const std::shared_ptr<Bookmark>& bookmark) {
+  auto* view = getView<BookmarkView>();
   if(view == nullptr) {
     LOG_WARNING("Failed to get view");
     return;
@@ -231,27 +235,27 @@ void BookmarkController::showBookmarkEditor(const std::shared_ptr<Bookmark> book
   view->displayBookmarkEditor(bookmark, getAllBookmarkCategories());
 }
 
-BookmarkController::BookmarkCache::BookmarkCache(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
+BookmarkController::BookmarkCache::BookmarkCache(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 
 void BookmarkController::BookmarkCache::clear() {
-  m_nodeBookmarksValid = false;
-  m_edgeBookmarksValid = false;
+  mNodeBookmarksValid = false;
+  mEdgeBookmarksValid = false;
 }
 
 std::vector<NodeBookmark> BookmarkController::BookmarkCache::getAllNodeBookmarks() {
-  if(!m_nodeBookmarksValid) {
-    m_nodeBookmarks = m_storageAccess->getAllNodeBookmarks();
-    m_nodeBookmarksValid = true;
+  if(!mNodeBookmarksValid) {
+    mNodeBookmarks = mStorageAccess->getAllNodeBookmarks();
+    mNodeBookmarksValid = true;
   }
-  return m_nodeBookmarks;
+  return mNodeBookmarks;
 }
 
 std::vector<EdgeBookmark> BookmarkController::BookmarkCache::getAllEdgeBookmarks() {
-  if(!m_edgeBookmarksValid) {
-    m_edgeBookmarks = m_storageAccess->getAllEdgeBookmarks();
-    m_edgeBookmarksValid = true;
+  if(!mEdgeBookmarksValid) {
+    mEdgeBookmarks = mStorageAccess->getAllEdgeBookmarks();
+    mEdgeBookmarksValid = true;
   }
-  return m_edgeBookmarks;
+  return mEdgeBookmarks;
 }
 
 void BookmarkController::handleActivation(const MessageActivateBase* /*message*/) {
@@ -259,7 +263,7 @@ void BookmarkController::handleActivation(const MessageActivateBase* /*message*/
 }
 
 void BookmarkController::handleMessage(MessageActivateTokens* message) {
-  Id tabId = message->getSchedulerId();
+  const Id tabId = message->getSchedulerId();
   mActiveEdgeIds[tabId].clear();
 
   if(message->isEdge || message->isBundledEdges) {
@@ -308,7 +312,7 @@ void BookmarkController::handleMessage(MessageIndexingFinished* /*message*/) {
 }
 
 std::vector<std::wstring> BookmarkController::getActiveTokenDisplayNames() const {
-  if(mActiveEdgeIds[TabId::currentTab()].size() > 0) {
+  if(!mActiveEdgeIds[TabId::currentTab()].empty()) {
     return getActiveEdgeDisplayNames();
   } else {
     return getActiveNodeDisplayNames();
@@ -316,7 +320,7 @@ std::vector<std::wstring> BookmarkController::getActiveTokenDisplayNames() const
 }
 
 std::vector<std::wstring> BookmarkController::getDisplayNamesForNodeId(Id nodeId) const {
-  return std::vector<std::wstring>({getNodeDisplayName(nodeId)});
+  return {getNodeDisplayName(nodeId)};
 }
 
 std::vector<BookmarkCategory> BookmarkController::getAllBookmarkCategories() const {
@@ -328,28 +332,28 @@ std::shared_ptr<Bookmark> BookmarkController::getBookmarkForActiveToken(Id tabId
     for(const std::shared_ptr<EdgeBookmark>& edgeBookmark : getAllEdgeBookmarks()) {
       if(!mActiveNodeIds[tabId].empty() && edgeBookmark->getActiveNodeId() == mActiveNodeIds[tabId].front() &&
          utility::isPermutation(edgeBookmark->getEdgeIds(), mActiveEdgeIds[tabId])) {
-        return std::make_shared<EdgeBookmark>(*(edgeBookmark.get()));
+        return std::make_shared<EdgeBookmark>(*(edgeBookmark));
       }
     }
   } else {
     for(const std::shared_ptr<NodeBookmark>& nodeBookmark : getAllNodeBookmarks()) {
       if(utility::isPermutation(nodeBookmark->getNodeIds(), mActiveNodeIds[tabId])) {
-        return std::make_shared<NodeBookmark>(*(nodeBookmark.get()));
+        return std::make_shared<NodeBookmark>(*(nodeBookmark));
       }
     }
   }
 
-  return std::shared_ptr<Bookmark>();
+  return {};
 }
 
 std::shared_ptr<Bookmark> BookmarkController::getBookmarkForNodeId(Id nodeId) const {
   for(const std::shared_ptr<NodeBookmark>& nodeBookmark : getAllNodeBookmarks()) {
-    if(nodeBookmark->getNodeIds().size() == 1 && nodeBookmark->getNodeIds()[0] == nodeId) {
-      return std::make_shared<NodeBookmark>(*(nodeBookmark.get()));
+    if(nodeBookmark->getNodeIds().size() == 1 && nodeBookmark->getNodeIds().front() == nodeId) {
+      return std::make_shared<NodeBookmark>(*(nodeBookmark));
     }
   }
 
-  return std::shared_ptr<Bookmark>();
+  return {};
 }
 
 std::vector<std::shared_ptr<Bookmark>> BookmarkController::getAllBookmarks() const {
@@ -401,18 +405,18 @@ std::vector<std::wstring> BookmarkController::getActiveNodeDisplayNames() const 
 
 std::vector<std::wstring> BookmarkController::getActiveEdgeDisplayNames() const {
   std::vector<std::wstring> activeEdgeDisplayNames;
-  for(Id activeEdgeId : mActiveEdgeIds[TabId::currentTab()]) {
+  for(const Id activeEdgeId : mActiveEdgeIds[TabId::currentTab()]) {
     const StorageEdge activeEdge = mStorageAccess->getEdgeById(activeEdgeId);
     const std::wstring sourceDisplayName = getNodeDisplayName(activeEdge.sourceNodeId);
     const std::wstring targetDisplayName = getNodeDisplayName(activeEdge.targetNodeId);
-    activeEdgeDisplayNames.push_back(sourceDisplayName + sEdgeSeparatorToken + targetDisplayName);
+    activeEdgeDisplayNames.push_back(std::format(L"{}{}{}", sourceDisplayName, EdgeSeparatorToken, targetDisplayName));
   }
   return activeEdgeDisplayNames;
 }
 
-std::wstring BookmarkController::getNodeDisplayName(const Id nodeId) const {
-  NodeType type = mStorageAccess->getNodeTypeForNodeWithId(nodeId);
-  NameHierarchy nameHierarchy = mStorageAccess->getNameHierarchyForNodeId(nodeId);
+std::wstring BookmarkController::getNodeDisplayName(Id nodeId) const {
+  const NodeType type = mStorageAccess->getNodeTypeForNodeWithId(nodeId);
+  const NameHierarchy nameHierarchy = mStorageAccess->getNameHierarchyForNodeId(nodeId);
 
   if(type.isFile()) {
     return FilePath(nameHierarchy.getQualifiedName()).fileName();
@@ -421,6 +425,7 @@ std::wstring BookmarkController::getNodeDisplayName(const Id nodeId) const {
   return nameHierarchy.getQualifiedName();
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::vector<std::shared_ptr<Bookmark>> BookmarkController::getFilteredBookmarks(
     const std::vector<std::shared_ptr<Bookmark>>& bookmarks, Bookmark::Filter filter) const {
   std::vector<std::shared_ptr<Bookmark>> result;
@@ -461,27 +466,29 @@ std::vector<std::shared_ptr<Bookmark>> BookmarkController::getOrderedBookmarks(c
   return result;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::vector<std::shared_ptr<Bookmark>> BookmarkController::getDateOrderedBookmarks(
     const std::vector<std::shared_ptr<Bookmark>>& bookmarks, const bool ascending) const {
   std::vector<std::shared_ptr<Bookmark>> result = bookmarks;
 
-  std::sort(result.begin(), result.end(), BookmarkController::bookmarkDateCompare);
+  std::ranges::sort(result, BookmarkController::bookmarkDateCompare);
 
-  if(ascending == false) {
-    std::reverse(result.begin(), result.end());
+  if(!ascending) {
+    std::ranges::reverse(result);
   }
 
   return result;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::vector<std::shared_ptr<Bookmark>> BookmarkController::getNameOrderedBookmarks(
     const std::vector<std::shared_ptr<Bookmark>>& bookmarks, const bool ascending) const {
   std::vector<std::shared_ptr<Bookmark>> result = bookmarks;
 
-  std::sort(result.begin(), result.end(), BookmarkController::bookmarkNameCompare);
+  std::ranges::sort(result, BookmarkController::bookmarkNameCompare);
 
-  if(ascending == false) {
-    std::reverse(result.begin(), result.end());
+  if(!ascending) {
+    std::ranges::reverse(result);
   }
 
   return result;
@@ -502,33 +509,33 @@ void BookmarkController::cleanBookmarkCategories() {
   }
 }
 
-bool BookmarkController::bookmarkDateCompare(const std::shared_ptr<Bookmark>& a, const std::shared_ptr<Bookmark>& b) {
-  return a->getTimeStamp() < b->getTimeStamp();
+bool BookmarkController::bookmarkDateCompare(const std::shared_ptr<Bookmark>& item0, const std::shared_ptr<Bookmark>& item1) {
+  return item0->getTimeStamp() < item1->getTimeStamp();
 }
 
-bool BookmarkController::bookmarkNameCompare(const std::shared_ptr<Bookmark>& a, const std::shared_ptr<Bookmark>& b) {
-  std::wstring aName = a->getName();
-  std::wstring bName = b->getName();
+bool BookmarkController::bookmarkNameCompare(const std::shared_ptr<Bookmark>& item0, const std::shared_ptr<Bookmark>& item1) {
+  std::wstring aName = item0->getName();
+  std::wstring bName = item1->getName();
 
   aName = utility::toLowerCase(aName);
   bName = utility::toLowerCase(bName);
 
-  unsigned int i = 0;
-  while(i < aName.length() && i < bName.length()) {
-    if(std::towlower(static_cast<wint_t>(aName[i])) < std::towlower(static_cast<wint_t>(bName[i]))) {
+  unsigned int index = 0;
+  while(index < aName.length() && index < bName.length()) {
+    if(std::towlower(static_cast<wint_t>(aName[index])) < std::towlower(static_cast<wint_t>(bName[index]))) {
       return true;
-    } else if(std::towlower(static_cast<wint_t>(aName[i])) > std::towlower(static_cast<wint_t>(bName[i]))) {
+    } else if(std::towlower(static_cast<wint_t>(aName[index])) > std::towlower(static_cast<wint_t>(bName[index]))) {
       return false;
     }
 
-    ++i;
+    ++index;
   }
 
   return aName.length() < bName.length();
 }
 
 void BookmarkController::update() {
-  BookmarkView* view = getView<BookmarkView>();
+  auto* view = getView<BookmarkView>();
   if(view == nullptr) {
     LOG_WARNING("Failed to get view");
     return;

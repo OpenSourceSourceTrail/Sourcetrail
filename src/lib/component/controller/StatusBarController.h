@@ -1,5 +1,4 @@
 #pragma once
-
 #include <string>
 
 #include "Controller.h"
@@ -46,5 +45,5 @@ private:
 
   void setStatus(const std::wstring& status, bool isError, bool showLoader);
 
-  StorageAccess* m_storageAccess;
+  StorageAccess* mStorageAccess;
 };

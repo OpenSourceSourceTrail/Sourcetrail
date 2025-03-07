@@ -4,7 +4,7 @@
 #include "StatusBarView.h"
 #include "StorageAccess.h"
 
-StatusBarController::StatusBarController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
+StatusBarController::StatusBarController(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 
 StatusBarController::~StatusBarController() = default;
 
@@ -25,7 +25,7 @@ void StatusBarController::handleMessage(MessageErrorCountUpdate* message) {
 }
 
 void StatusBarController::handleMessage(MessageIndexingFinished* /*message*/) {
-  getView()->setErrorCount(m_storageAccess->getErrorCount());
+  getView()->setErrorCount(mStorageAccess->getErrorCount());
   getView()->hideIndexingProgress();
 }
 
@@ -53,7 +53,7 @@ void StatusBarController::handleMessage(MessagePingReceived* message) {
 }
 
 void StatusBarController::handleMessage(MessageRefresh* /*message*/) {
-  getView()->setErrorCount(m_storageAccess->getErrorCount());
+  getView()->setErrorCount(mStorageAccess->getErrorCount());
 }
 
 void StatusBarController::handleMessage(MessageStatus* message) {
@@ -64,7 +64,7 @@ void StatusBarController::handleMessage(MessageStatus* message) {
 
 void StatusBarController::setStatus(const std::wstring& status, bool isError, bool showLoader) {
   if(!status.empty()) {
-    LOG_INFO_W(L"STATUS " + status);
+    LOG_INFO(L"STATUS {}", status);
   }
 
   getView()->showMessage(status, isError, showLoader);

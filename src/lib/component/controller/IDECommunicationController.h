@@ -1,6 +1,4 @@
-#ifndef IDE_COMMUNICATION_CONTROLLER_H
-#define IDE_COMMUNICATION_CONTROLLER_H
-
+#pragma once
 #include <string>
 
 #include "Controller.h"
@@ -20,10 +18,10 @@ class IDECommunicationController
     , public MessageListener<MessageMoveIDECursor>
     , public MessageListener<MessagePluginPortChange> {
 public:
-  IDECommunicationController(StorageAccess* storageAccess);
-  virtual ~IDECommunicationController();
+  explicit IDECommunicationController(StorageAccess* storageAccess);
+  ~IDECommunicationController() override;
 
-  virtual void clear();
+  void clear() override;
 
   virtual void startListening() = 0;
   virtual void stopListening() = 0;
@@ -35,23 +33,21 @@ public:
   void setEnabled(const bool enabled);
 
 protected:
-  void sendUpdatePing();
+  void sendUpdatePing() const;
 
 private:
-  void handleSetActiveTokenMessage(const NetworkProtocolHelper::SetActiveTokenMessage& message);
+  void handleSetActiveTokenMessage(const NetworkProtocolHelper::SetActiveTokenMessage& message) const;
   void handleCreateProjectMessage(const NetworkProtocolHelper::CreateProjectMessage& message);
   void handleCreateCDBProjectMessage(const NetworkProtocolHelper::CreateCDBProjectMessage& message);
   void handlePing(const NetworkProtocolHelper::PingMessage& message);
 
-  virtual void handleMessage(MessageWindowFocus* message);
-  virtual void handleMessage(MessageIDECreateCDB* message);
-  virtual void handleMessage(MessageMoveIDECursor* message);
-  virtual void handleMessage(MessagePluginPortChange* message);
+  void handleMessage(MessageWindowFocus* message) override;
+  void handleMessage(MessageIDECreateCDB* message) override;
+  void handleMessage(MessageMoveIDECursor* message) override;
+  void handleMessage(MessagePluginPortChange* message) override;
   virtual void sendMessage(const std::wstring& message) const = 0;
 
   StorageAccess* m_storageAccess;
 
-  bool m_enabled;
+  bool m_enabled = true;
 };
-
-#endif    // IDE_COMMUNICATION_CONTROLLER_H

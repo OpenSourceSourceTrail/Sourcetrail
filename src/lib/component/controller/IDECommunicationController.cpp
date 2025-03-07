@@ -10,20 +10,18 @@
 #include "type/plugin/MessagePingReceived.h"
 #include "type/tab/MessageTabOpenWith.h"
 
-IDECommunicationController::IDECommunicationController(StorageAccess* storageAccess)
-    : m_storageAccess(storageAccess), m_enabled(true) {}
+IDECommunicationController::IDECommunicationController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
 
-IDECommunicationController::~IDECommunicationController() {}
+IDECommunicationController::~IDECommunicationController() = default;
 
 void IDECommunicationController::clear() {}
 
 void IDECommunicationController::handleIncomingMessage(const std::wstring& message) {
-  if(m_enabled == false) {
+  if(!m_enabled) {
     return;
   }
 
-  NetworkProtocolHelper::MESSAGE_TYPE type = NetworkProtocolHelper::getMessageType(message);
-
+  const NetworkProtocolHelper::MESSAGE_TYPE type = NetworkProtocolHelper::getMessageType(message);
   if(type == NetworkProtocolHelper::MESSAGE_TYPE::UNKNOWN) {
     LOG_ERROR("Invalid message type");
   } else if(type == NetworkProtocolHelper::MESSAGE_TYPE::SET_ACTIVE_TOKEN) {
@@ -45,15 +43,15 @@ void IDECommunicationController::setEnabled(const bool enabled) {
   m_enabled = enabled;
 }
 
-void IDECommunicationController::sendUpdatePing() {
+void IDECommunicationController::sendUpdatePing() const {
   // first reset connection status
-  MessagePingReceived().dispatch();
+  MessagePingReceived{}.dispatch();
 
   // send ping to update connection status
   sendMessage(NetworkProtocolHelper::buildPingMessage());
 }
 
-void IDECommunicationController::handleSetActiveTokenMessage(const NetworkProtocolHelper::SetActiveTokenMessage& message) {
+void IDECommunicationController::handleSetActiveTokenMessage(const NetworkProtocolHelper::SetActiveTokenMessage& message) const {
   if(message.valid) {
     const unsigned int cursorColumn = message.column;
 
@@ -63,7 +61,7 @@ void IDECommunicationController::handleSetActiveTokenMessage(const NetworkProtoc
 
     if(FileSystem::getFileInfoForPath(filePath).lastWriteTime == fileInfo.lastWriteTime) {
       // file was not modified
-      std::shared_ptr<SourceLocationFile> sourceLocationFile = m_storageAccess->getSourceLocationsForLinesInFile(
+      const std::shared_ptr<SourceLocationFile> sourceLocationFile = m_storageAccess->getSourceLocationsForLinesInFile(
           filePath, message.row, message.row);
 
       std::vector<Id> selectedLocationIds;
@@ -93,25 +91,28 @@ void IDECommunicationController::handleSetActiveTokenMessage(const NetworkProtoc
       MessageTabOpenWith(filePath, message.row).showNewTab(true).dispatch();
       MessageActivateWindow().dispatch();
     } else {
-      MessageStatus(
-          L"Activating source location from plug-in failed. File " + filePath.wstr() + L" was not found in the project.", true)
+      MessageStatus{
+          L"Activating source location from plug-in failed. File " + filePath.wstr() + L" was not found in the project.", true}
           .dispatch();
     }
   }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void IDECommunicationController::handleCreateProjectMessage(const NetworkProtocolHelper::CreateProjectMessage& /*message*/) {
   LOG_ERROR("Network Protocol CreateProjectMessage not supported anymore.");
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void IDECommunicationController::handleCreateCDBProjectMessage(const NetworkProtocolHelper::CreateCDBProjectMessage& message) {
   if(message.valid) {
-    MessageProjectNew(message.cdbFileLocation).dispatch();
+    MessageProjectNew{message.cdbFileLocation}.dispatch();
   } else {
     LOG_ERROR("Unable to parse provided CDB, invalid data received");
   }
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void IDECommunicationController::handlePing(const NetworkProtocolHelper::PingMessage& message) {
   if(message.valid) {
     MessagePingReceived msg;
@@ -121,7 +122,7 @@ void IDECommunicationController::handlePing(const NetworkProtocolHelper::PingMes
       msg.ideName = L"unknown IDE";
     }
 
-    LOG_INFO_W(fmt::format(L"{} instance detected via plugin port", msg.ideName));
+    LOG_INFO(fmt::format(L"{} instance detected via plugin port", msg.ideName));
     msg.dispatch();
   } else {
     LOG_ERROR("Can't handle ping, message is invalid");
@@ -135,7 +136,7 @@ void IDECommunicationController::handleMessage(MessageWindowFocus* message) {
 }
 
 void IDECommunicationController::handleMessage(MessageIDECreateCDB* /*message*/) {
-  std::wstring networkMessage = NetworkProtocolHelper::buildCreateCDBMessage();
+  const std::wstring networkMessage = NetworkProtocolHelper::buildCreateCDBMessage();
 
   MessageStatus(L"Requesting IDE to create Compilation Database via plug-in.").dispatch();
 
@@ -143,7 +144,8 @@ void IDECommunicationController::handleMessage(MessageIDECreateCDB* /*message*/)
 }
 
 void IDECommunicationController::handleMessage(MessageMoveIDECursor* message) {
-  std::wstring networkMessage = NetworkProtocolHelper::buildSetIDECursorMessage(message->filePath, message->row, message->column);
+  const std::wstring networkMessage = NetworkProtocolHelper::buildSetIDECursorMessage(
+      message->filePath, message->row, message->column);
 
   MessageStatus(L"Jump to source location via plug-in: " + message->filePath.wstr() + L", row: " + std::to_wstring(message->row) +
                 L", col: " + std::to_wstring(message->column))
