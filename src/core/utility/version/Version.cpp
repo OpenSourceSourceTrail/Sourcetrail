@@ -41,7 +41,7 @@ bool Version::isEmpty() const {
 }
 
 bool Version::isValid() const {
-  return (mMinor >= 0 && mMinor >= 0 && mMajor >= 1);
+  return mMajor >= 1;
 }
 
 std::string Version::toString() const {

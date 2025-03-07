@@ -12,7 +12,7 @@ void TaskParseWrapper::doEnter(std::shared_ptr<Blackboard> blackboard) {
   blackboard->get("source_file_count", sourceFileCount);
 
   m_dialogView->clearDialogs();
-  m_dialogView->updateIndexingDialog(0, 0, sourceFileCount, {});
+  m_dialogView->updateIndexingDialog(0, 0, static_cast<std::size_t>(sourceFileCount), {});
 
   m_start = TimeStamp::now();
 

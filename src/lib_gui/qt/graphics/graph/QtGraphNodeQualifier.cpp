@@ -40,26 +40,34 @@ bool QtGraphNodeQualifier::setPosition(const QVector2D& pos) {
   const int arrowWidth = static_cast<int>(height * 0.85);
 
   const float smallFactor = 0.5f;
-  const int arrowOffset = static_cast<int>(arrowWidth * smallFactor);
+  const int arrowOffset = static_cast<int>(static_cast<float>(arrowWidth) * smallFactor);
 
-  m_background->setRect(pos.x() - width - arrowWidth + arrowOffset, pos.y() - height / 2, width, height);
+  m_background->setRect(pos.x() - static_cast<float>(width) - static_cast<float>(arrowWidth) + static_cast<float>(arrowOffset),
+                        pos.y() - static_cast<float>(height) / 2.0f,
+                        width,
+                        height);
 
-  m_name->setPos(pos.x() - width - arrowWidth + arrowOffset + 6, pos.y() - height / 2 + 1);
-  m_leftBorder->setRect(pos.x() - width - arrowWidth + arrowOffset, pos.y() - height / 2, 2, height);
+  m_name->setPos(pos.x() - static_cast<float>(width) - static_cast<float>(arrowWidth) + static_cast<float>(arrowOffset) + 6.0f,
+                 pos.y() - static_cast<float>(height) / 2.0f + 1.0f);
+  m_leftBorder->setRect(pos.x() - static_cast<float>(width) - static_cast<float>(arrowWidth) + static_cast<float>(arrowOffset),
+                        pos.y() - static_cast<float>(height) / 2.0f,
+                        2,
+                        height);
 
   QPolygonF poly;
   poly.append(QPointF(-arrowWidth, -height / 2 - 0.5));
   poly.append(QPointF(-arrowWidth, height / 2 + 0.5));
   poly.append(QPointF(0, 0));
   m_rightArrow->setPolygon(poly);
-  m_rightArrow->setPos(pos.x() + arrowOffset, pos.y());
+  m_rightArrow->setPos(pos.x() + static_cast<float>(arrowOffset), pos.y());
 
   QPolygonF polySmall;
-  polySmall.append(QPointF(-arrowWidth * smallFactor, -height * smallFactor / 2));
-  polySmall.append(QPointF(-arrowWidth * smallFactor, height * smallFactor / 2));
+  polySmall.append(
+      QPointF(-1.0f * static_cast<float>(arrowWidth) * smallFactor, -1.0f * static_cast<float>(height) * smallFactor / 2.0f));
+  polySmall.append(QPointF(-1.0f * static_cast<float>(arrowWidth) * smallFactor, static_cast<float>(height) * smallFactor / 2.0f));
   polySmall.append(QPointF(0, 0));
   m_rightArrowSmall->setPolygon(polySmall);
-  m_rightArrowSmall->setPos(pos.x() + arrowOffset + 1, pos.y());
+  m_rightArrowSmall->setPos(pos.x() + static_cast<float>(arrowOffset) + 1.0f, pos.y());
 
   m_pos = pos;
 
@@ -106,10 +114,10 @@ void QtGraphNodeQualifier::hoverEnterEvent(QGraphicsSceneHoverEvent* /*event*/) 
   const int height = QFontMetrics(m_name->font()).height() + 2;
   const int arrowWidth = static_cast<int>(height * 0.85);
   const float smallFactor = 0.5f;
-  const int arrowOffset = static_cast<int>(arrowWidth * smallFactor);
+  const int arrowOffset = static_cast<int>(static_cast<float>(arrowWidth) * smallFactor);
   const int offset = width + arrowWidth - arrowOffset;
 
-  setRect(m_pos.x() - offset, m_pos.y() - height / 2, width + arrowWidth, height);
+  setRect(m_pos.x() - static_cast<float>(offset), m_pos.y() - static_cast<float>(height) / 2.0f, width + arrowWidth, height);
 
   m_background->show();
   m_name->show();
@@ -135,9 +143,12 @@ void QtGraphNodeQualifier::hoverLeaveEvent(QGraphicsSceneHoverEvent* /*event*/) 
   const int height = QFontMetrics(m_name->font()).height() + 2;
   const int arrowWidth = static_cast<int>(height * 0.85);
   const float smallFactor = 0.5f;
-  const int arrowOffset = static_cast<int>(arrowWidth * smallFactor);
+  const int arrowOffset = static_cast<int>(static_cast<float>(arrowWidth) * smallFactor);
 
-  setRect(m_pos.x() - arrowWidth + arrowOffset, m_pos.y() - height / 2, arrowWidth, height);
+  setRect(m_pos.x() - static_cast<float>(arrowWidth) + static_cast<float>(arrowOffset),
+          m_pos.y() - static_cast<float>(height) / 2.0f,
+          arrowWidth,
+          height);
 
   m_background->hide();
   m_name->hide();

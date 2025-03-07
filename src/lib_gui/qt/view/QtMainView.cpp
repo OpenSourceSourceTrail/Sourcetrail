@@ -40,11 +40,11 @@ void QtMainView::removeView(View* view) {
 }
 
 void QtMainView::showView(View* view) {
-  m_onQtThread([=]() { m_window->showView(view); });
+  m_onQtThread([=, this]() { m_window->showView(view); });
 }
 
 void QtMainView::hideView(View* view) {
-  m_onQtThread([=]() { m_window->hideView(view); });
+  m_onQtThread([=, this]() { m_window->hideView(view); });
 }
 
 void QtMainView::setViewEnabled(View* view, bool enabled) {
@@ -73,11 +73,11 @@ void QtMainView::saveLayout() {
 }
 
 void QtMainView::loadWindow(bool showStartWindow) {
-  m_onQtThread([=]() { m_window->loadWindow(showStartWindow); });
+  m_onQtThread([=, this]() { m_window->loadWindow(showStartWindow); });
 }
 
 void QtMainView::refreshView() {
-  m_onQtThread([=]() { m_window->refreshStyle(); });
+  m_onQtThread([this]() { m_window->refreshStyle(); });
 }
 
 void QtMainView::refreshUIState(bool isAfterIndexing) {
@@ -93,15 +93,15 @@ void QtMainView::setStatusBar(QStatusBar* statusbar) {
 }
 
 void QtMainView::hideStartScreen() {
-  m_onQtThread([=]() { m_window->hideStartScreen(); });
+  m_onQtThread([this]() { m_window->hideStartScreen(); });
 }
 
 void QtMainView::setTitle(const std::wstring& title) {
-  m_onQtThread([=]() { m_window->setWindowTitle(QString::fromStdWString(title)); });
+  m_onQtThread([=, this]() { m_window->setWindowTitle(QString::fromStdWString(title)); });
 }
 
 void QtMainView::activateWindow() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     // It's platform dependent which of these commands does the right thing, for now we just use
     // them all at once.
     m_window->activateWindow();
@@ -113,19 +113,19 @@ void QtMainView::activateWindow() {
 }
 
 void QtMainView::updateRecentProjectMenu() {
-  m_onQtThread([=]() { m_window->updateRecentProjectsMenu(); });
+  m_onQtThread([this]() { m_window->updateRecentProjectsMenu(); });
 }
 
 void QtMainView::updateHistoryMenu(std::shared_ptr<MessageBase> message) {
-  m_onQtThread([=]() { m_window->updateHistoryMenu(message); });
+  m_onQtThread([=, this]() { m_window->updateHistoryMenu(message); });
 }
 
 void QtMainView::clearHistoryMenu() {
-  m_onQtThread([=]() { m_window->clearHistoryMenu(); });
+  m_onQtThread([this]() { m_window->clearHistoryMenu(); });
 }
 
 void QtMainView::updateBookmarksMenu(const std::vector<std::shared_ptr<Bookmark>>& bookmarks) {
-  m_onQtThread([=]() { m_window->updateBookmarksMenu(bookmarks); });
+  m_onQtThread([=, this]() { m_window->updateBookmarksMenu(bookmarks); });
 }
 
 void QtMainView::clearBookmarksMenu() {
@@ -133,19 +133,19 @@ void QtMainView::clearBookmarksMenu() {
 }
 
 void QtMainView::handleMessage(MessageProjectEdit* /*message*/) {
-  m_onQtThread([=]() { m_window->editProject(); });
+  m_onQtThread([this]() { m_window->editProject(); });
 }
 
 void QtMainView::handleMessage(MessageProjectNew* message) {
   FilePath cdbPath = message->cdbPath;
 
-  m_onQtThread([=]() { m_window->newProjectFromCDB(cdbPath); });
+  m_onQtThread([=, this]() { m_window->newProjectFromCDB(cdbPath); });
 }
 
 void QtMainView::handleMessage(MessageWindowChanged* /*message*/) {
   // Fixes an issue where newly added QtWidgets don't fully respond to focus events on macOS
   if(utility::getOsType() == OsType::Mac) {
-    m_onQtThread([=]() {
+    m_onQtThread([this]() {
       m_window->hide();
       m_window->show();
     });

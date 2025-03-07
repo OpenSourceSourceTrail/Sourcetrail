@@ -12,7 +12,7 @@ QtIDECommunicationController::QtIDECommunicationController(QObject* parent, Stor
 QtIDECommunicationController::~QtIDECommunicationController() = default;
 
 void QtIDECommunicationController::startListening() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
     m_tcpWrapper.setServerPort(static_cast<uint16_t>(appSettings->getSourcetrailPort()));
     m_tcpWrapper.setClientPort(static_cast<uint16_t>(appSettings->getPluginPort()));
@@ -23,7 +23,7 @@ void QtIDECommunicationController::startListening() {
 }
 
 void QtIDECommunicationController::stopListening() {
-  m_onQtThread([=]() { m_tcpWrapper.stopListening(); });
+  m_onQtThread([this]() { m_tcpWrapper.stopListening(); });
 }
 
 bool QtIDECommunicationController::isListening() const {

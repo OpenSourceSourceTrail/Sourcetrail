@@ -75,7 +75,7 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
   m_refreshModeButtons.emplace(
       RefreshMode::AllFiles, new QRadioButton(QStringLiteral("All files")));    // NOLINT(cppcoreguidelines-owning-memory)
 
-  std::function<void(bool)> func = [=](bool checked) {
+  std::function<void(bool)> func = [this](bool checked) {
     if(!checked) {
       return;
     }
@@ -104,7 +104,9 @@ QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& ena
 
   if(enabledShallowOption) {
     auto* shallowIndexingCheckBox = new QCheckBox(QStringLiteral("Shallow Python Indexing"));
-    connect(shallowIndexingCheckBox, &QCheckBox::toggled, [=]() { emit setShallowIndexing(shallowIndexingCheckBox->isChecked()); });
+    connect(shallowIndexingCheckBox, &QCheckBox::toggled, [=, this]() {
+      emit setShallowIndexing(shallowIndexingCheckBox->isChecked());
+    });
     shallowIndexingCheckBox->setChecked(initialShallowState);
     modeLayout->addWidget(shallowIndexingCheckBox);
   }

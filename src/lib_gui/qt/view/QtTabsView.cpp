@@ -61,11 +61,11 @@ void QtTabsView::createWidgetWrapper() {
 }
 
 void QtTabsView::refreshView() {
-  m_onQtThread([=]() { setStyleSheet(); });
+  m_onQtThread([this]() { setStyleSheet(); });
 }
 
 void QtTabsView::clear() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     getController<TabsController>()->onClearTabs();
 
     m_tabBar->blockSignals(true);
@@ -80,19 +80,19 @@ void QtTabsView::clear() {
 }
 
 void QtTabsView::openTab(bool showTab, const SearchMatch& match) {
-  m_onQtThread([=]() { insertTab(showTab, match); });
+  m_onQtThread([=, this]() { insertTab(showTab, match); });
 }
 
 void QtTabsView::closeTab() {
-  m_onQtThread([=]() { removeTab(m_tabBar->currentIndex()); });
+  m_onQtThread([this]() { removeTab(m_tabBar->currentIndex()); });
 }
 
 void QtTabsView::destroyTab(Id tabId) {
-  m_onQtThread([=]() { getController<TabsController>()->destroyTab(tabId); });
+  m_onQtThread([=, this]() { getController<TabsController>()->destroyTab(tabId); });
 }
 
 void QtTabsView::selectTab(bool next) {
-  m_onQtThread([=]() {
+  m_onQtThread([=, this]() {
     int idx = m_tabBar->currentIndex();
     if(idx != -1) {
       idx += next ? 1 : -1;
@@ -102,7 +102,7 @@ void QtTabsView::selectTab(bool next) {
 }
 
 void QtTabsView::updateTab(Id tabId, const std::vector<SearchMatch>& matches) {
-  m_onQtThread([=]() {
+  m_onQtThread([=, this]() {
     for(int i = 0; i < m_tabBar->count(); i++) {
       if(m_tabBar->tabData(i).toInt() == int(tabId)) {
         setTabState(i, matches);
@@ -124,7 +124,8 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
   m_tabBar->blockSignals(true);
 
   m_insertedTabCount++;
-  int idx = match.isValid() ? static_cast<int>(m_tabBar->currentIndex() + m_insertedTabCount) : m_tabBar->count() + 1;
+  int idx = match.isValid() ? static_cast<int>(static_cast<std::size_t>(m_tabBar->currentIndex()) + m_insertedTabCount) :
+                              m_tabBar->count() + 1;
   idx = m_tabBar->insertTab(idx, QStringLiteral(" Empty Tab "));
   m_tabBar->setTabData(idx, QVariant(tabId));
 
@@ -158,7 +159,7 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
 
   m_tabBar->blockSignals(false);
 
-  getController<TabsController>()->addTab(tabId, match);
+  getController<TabsController>()->addTab(static_cast<Id>(tabId), match);
 
   if(m_tabBar->count() == 1) {
     changedTab(m_tabBar->currentIndex());
@@ -172,7 +173,7 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
 void QtTabsView::changedTab(int index) {
   m_insertedTabCount = 0;
 
-  getController<TabsController>()->showTab(m_tabBar->tabData(index).toInt());
+  getController<TabsController>()->showTab(static_cast<Id>(m_tabBar->tabData(index).toInt()));
 
   for(int i = 0; i < m_tabBar->count(); i++) {
     QWidget* circle = m_tabBar->tabButton(i, QTabBar::LeftSide);
@@ -188,7 +189,7 @@ void QtTabsView::changedTab(int index) {
 void QtTabsView::removeTab(int index) {
   m_insertedTabCount = 0;
 
-  getController<TabsController>()->removeTab(m_tabBar->tabData(index).toInt());
+  getController<TabsController>()->removeTab(static_cast<Id>(m_tabBar->tabData(index).toInt()));
   m_tabBar->removeTab(index);
 }
 

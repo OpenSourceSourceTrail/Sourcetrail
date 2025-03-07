@@ -246,7 +246,7 @@ void QtSmartSearchBox::keyPressEvent(QKeyEvent* event) {
 
       std::deque<std::string> parts;
       while(std::regex_search(str, match, regExp)) {
-        parts.push_back(str.substr(0, match.position(0) + match.length(0)));
+        parts.push_back(str.substr(0, static_cast<std::size_t>(match.position(0) + match.length(0))));
         str = match.suffix();
       }
 
@@ -263,7 +263,7 @@ void QtSmartSearchBox::keyPressEvent(QKeyEvent* event) {
       size_t size = 0;
       if(parts.size()) {
         size = str.size();
-        str += parts.front().substr(cursorPosition() - str.size());
+        str += parts.front().substr(static_cast<std::size_t>(cursorPosition()) - str.size());
         parts.pop_front();
       }
 
@@ -438,8 +438,8 @@ void QtSmartSearchBox::mouseReleaseEvent(QMouseEvent* event) {
   bool hasSelected = hasSelectedElements();
   selectAllElementsWith(false);
 
-  if(pos - m_cursorIndex != 0) {
-    moveCursor(static_cast<int>(pos - m_cursorIndex));
+  if(static_cast<std::size_t>(pos) - m_cursorIndex != 0) {
+    moveCursor(static_cast<int>(static_cast<std::size_t>(pos) - m_cursorIndex));
   } else if(hasSelected) {
     layoutElements();
   }
@@ -551,12 +551,12 @@ void QtSmartSearchBox::onElementSelected(QtSearchElement* element) {
 }
 
 void QtSmartSearchBox::moveCursor(int offset) {
-  moveCursorTo(static_cast<int>(m_cursorIndex + offset));
+  moveCursorTo(static_cast<int>(m_cursorIndex + static_cast<std::size_t>(offset)));
 }
 
 void QtSmartSearchBox::moveCursorTo(int target) {
   if(target >= 0 && target <= static_cast<int>(m_elements.size())) {
-    m_cursorIndex = target;
+    m_cursorIndex = static_cast<std::size_t>(target);
     layoutElements();
     hideAutoCompletions();
   }
@@ -581,7 +581,7 @@ void QtSmartSearchBox::addMatch(const SearchMatch& match) {
     clearMatches();
   }
 
-  m_matches.insert(m_matches.begin() + m_cursorIndex, *matchPtr);
+  m_matches.insert(m_matches.begin() + static_cast<std::ptrdiff_t>(m_cursorIndex), *matchPtr);
   m_cursorIndex++;
 }
 
@@ -619,14 +619,14 @@ bool QtSmartSearchBox::editTextToElement() {
 
 SearchMatch QtSmartSearchBox::editElement(QtSearchElement* element) {
   for(int i = static_cast<int>(m_elements.size() - 1); i >= 0; i--) {
-    if(m_elements[i] == element) {
-      m_cursorIndex = i;
+    if(m_elements[static_cast<std::size_t>(i)] == element) {
+      m_cursorIndex = static_cast<std::size_t>(i);
       break;
     }
   }
 
   SearchMatch match = m_matches[m_cursorIndex];
-  m_matches.erase(m_matches.begin() + m_cursorIndex);
+  m_matches.erase(m_matches.begin() + static_cast<std::ptrdiff_t>(m_cursorIndex));
 
   setEditText(QString::fromStdWString(match.getFullName()));
   updateElements();
@@ -804,7 +804,7 @@ void QtSmartSearchBox::deleteSelectedElements() {
 
   for(size_t i = m_elements.size(); i > 0; i--) {
     if(m_elements[i - 1]->isChecked()) {
-      m_matches.erase(m_matches.begin() + (i - 1));
+      m_matches.erase(m_matches.begin() + static_cast<std::ptrdiff_t>(i - 1));
 
       if((i - 1) < m_cursorIndex) {
         m_cursorIndex--;
