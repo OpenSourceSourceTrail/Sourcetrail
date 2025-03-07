@@ -32,8 +32,8 @@ private:
 
   QFrame* m_widget;
 
-  QtSearchBarButton* m_createBookmarkButton;
-  QtSearchBarButton* m_showBookmarksButton;
+  QtSearchBarButton* m_createBookmarkButton{nullptr};
+  QtSearchBarButton* m_showBookmarksButton{nullptr};
 
   MessageBookmarkButtonState::ButtonState m_createButtonState;
 };

@@ -24,6 +24,7 @@ std::wstring CxxTemplateArgumentNameResolver::getTemplateArgumentName(const clan
     return typeName->toString();
   }
   case clang::TemplateArgument::Integral:
+  case clang::TemplateArgument::StructuralValue:
   case clang::TemplateArgument::Null:
   case clang::TemplateArgument::Declaration:
   case clang::TemplateArgument::NullPtr:

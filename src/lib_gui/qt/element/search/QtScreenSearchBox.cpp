@@ -69,7 +69,7 @@ void QtScreenSearchBox::addResponder(const std::string& name) {
   m_checkBoxes.emplace(name, box);
   m_checkboxLayout->addWidget(box);
 
-  connect(box, &QCheckBox::stateChanged, this, &QtScreenSearchBox::findMatches);
+  connect(box, &QCheckBox::checkStateChanged, this, &QtScreenSearchBox::findMatches);
 }
 
 void QtScreenSearchBox::setFocus() {

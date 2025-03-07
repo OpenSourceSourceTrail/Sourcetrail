@@ -218,7 +218,7 @@ void QtCodeArea::lineNumberAreaPaintEvent(QPaintEvent* event) {
 
   while(block.isValid() && top <= drawAreaBottom) {
     if(block.isVisible() && bottom >= drawAreaTop) {
-      const int number = static_cast<int>(blockNumber + getStartLineNumber());
+      const int number = static_cast<int>(static_cast<std::size_t>(blockNumber) + getStartLineNumber());
       const int height = bottom - top - std::max(0, bottom - drawAreaBottom);
 
       p.setColor(textColor);
@@ -288,7 +288,7 @@ void QtCodeArea::setIsActiveFile(bool isActiveFile) {
 size_t QtCodeArea::getLineNumberForLocationId(Id locationId) const {
   for(const Annotation& annotation : m_annotations) {
     if(annotation.locationId == locationId) {
-      return annotation.startLine;
+      return static_cast<std::size_t>(annotation.startLine);
     }
   }
 
@@ -308,7 +308,7 @@ std::pair<size_t, size_t> QtCodeArea::getLineNumbersForLocationId(Id locationId)
 size_t QtCodeArea::getColumnNumberForLocationId(Id locationId) const {
   for(const Annotation& annotation : m_annotations) {
     if(annotation.locationId == locationId) {
-      return annotation.startCol + 1;
+      return static_cast<std::size_t>(annotation.startCol + 1);
     }
   }
 
@@ -423,11 +423,11 @@ void QtCodeArea::clearScreenMatches() {
   size_t i = m_annotations.size();
   while(i > 0 && m_annotations[i - 1].locationType == LOCATION_SCREEN_SEARCH) {
     i--;
-    m_linesToRehighlight.push_back(static_cast<int>(m_annotations[i].startLine - getStartLineNumber()));
+    m_linesToRehighlight.push_back(static_cast<int>(static_cast<std::size_t>(m_annotations[i].startLine) - getStartLineNumber()));
   }
 
   if(i != m_annotations.size()) {
-    m_annotations.erase(m_annotations.begin() + i, m_annotations.end());
+    m_annotations.erase(m_annotations.begin() + static_cast<std::ptrdiff_t>(i), m_annotations.end());
     viewport()->update();
   }
 }
@@ -531,7 +531,7 @@ bool QtCodeArea::moveFocusToLine(int lineNumber, int targetColumn, bool up) {
       break;
     }
 
-    std::vector<const Annotation*> annotations = getInteractiveAnnotationsForLineNumber(lineNumber);
+    std::vector<const Annotation*> annotations = getInteractiveAnnotationsForLineNumber(static_cast<std::size_t>(lineNumber));
     if(!annotations.empty()) {
       const Annotation* annotation = nullptr;
       int dist = -1;
@@ -695,8 +695,9 @@ void QtCodeArea::mouseMoveEvent(QMouseEvent* event) {
   } else if(m_isPanning) {
     QScrollBar* scrollbar = horizontalScrollBar();
     int visibleContentWidth = width() - lineNumberAreaWidth();
-    float deltaPosRatio = float(deltaX) / (visibleContentWidth);
-    scrollbar->setValue(static_cast<int>(scrollbar->value() - std::round(deltaPosRatio * scrollbar->pageStep())));
+    float deltaPosRatio = float(deltaX) / static_cast<float>(visibleContentWidth);
+    scrollbar->setValue(scrollbar->value() -
+                        static_cast<int>(std::round(deltaPosRatio * static_cast<float>(scrollbar->pageStep()))));
   } else if(m_isDragging) {
     if(delta >= QApplication::startDragDistance()) {
       dragSelectedText();
@@ -721,7 +722,7 @@ void QtCodeArea::mouseMoveEvent(QMouseEvent* event) {
       for(const Annotation* annotation : annotations) {
         if(annotation->locationType == LOCATION_ERROR && (!annotation->tokenIds.empty())) {
           std::wstring errorMessage = m_navigator->getErrorMessageForId(*annotation->tokenIds.begin());
-          QToolTip::showText(event->globalPos(), QString::fromStdWString(errorMessage), this);
+          QToolTip::showText(event->globalPosition().toPoint(), QString::fromStdWString(errorMessage), this);
 
           QtCodeField::focusTokenIds({*annotation->tokenIds.begin()});
           viewport()->setCursor(Qt::PointingHandCursor);

@@ -174,8 +174,8 @@ TEST(FileSystem, findSymlinkedDirectoriesFailed) {
 TEST(FileSystem, getFileByteSize) {
   // Given: filepath
   const auto filePath = fs::temp_directory_path() / "tmp.txt";
-  constexpr auto size = static_cast<const size_t>(2 * 1024 * 1024);    // 2 MB
-  const std::vector<char> buffer(size, ' ');                           // Fill with ' ' for demonstration
+  constexpr auto size = 2 * 1024 * 1024;        // 2 MB
+  const std::vector<char> buffer(size, ' ');    // Fill with ' ' for demonstration
   const std::string_view data(buffer.data(), buffer.size());
   const auto generatedFile = utility::ScopedTemporaryFile::createFile(filePath, data);
 

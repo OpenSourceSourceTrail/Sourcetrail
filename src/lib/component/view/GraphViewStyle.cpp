@@ -28,7 +28,7 @@ QVector2D GraphViewStyle::alignOnRaster(QVector2D position) {
   int rasterPosDivisor = s_gridCellSize + s_gridCellPadding;
 
   if(static_cast<int>(position.x()) % rasterPosDivisor != 0) {
-    int t = position.x() / rasterPosDivisor;
+    int t = static_cast<int>(position.x() / static_cast<float>(rasterPosDivisor));
     int r = static_cast<int>(position.x()) % rasterPosDivisor;
 
     if(std::abs(r) > rasterPosDivisor / 2) {
@@ -39,11 +39,11 @@ QVector2D GraphViewStyle::alignOnRaster(QVector2D position) {
       }
     }
 
-    position.setX(t * rasterPosDivisor);
+    position.setX(static_cast<float>(t * rasterPosDivisor));
   }
 
   if(static_cast<int>(position.y()) % rasterPosDivisor != 0) {
-    int t = position.y() / rasterPosDivisor;
+    int t = static_cast<int>(position.y() / static_cast<float>(rasterPosDivisor));
     int r = static_cast<int>(position.y()) % rasterPosDivisor;
 
     if(std::abs(r) > rasterPosDivisor / 2) {
@@ -54,7 +54,7 @@ QVector2D GraphViewStyle::alignOnRaster(QVector2D position) {
       }
     }
 
-    position.setY(t * rasterPosDivisor);
+    position.setY(static_cast<float>(t * rasterPosDivisor));
   }
 
   return position;

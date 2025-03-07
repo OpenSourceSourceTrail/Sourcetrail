@@ -36,7 +36,7 @@ void QtProjectWizardContentCrossCompilationOptions::populate(QGridLayout* layout
   {
     m_useTargetOptions = new QCheckBox("Use specific target");
     connect(m_useTargetOptions,
-            &QCheckBox::stateChanged,
+            &QCheckBox::checkStateChanged,
             this,
             &QtProjectWizardContentCrossCompilationOptions::onUseTargetOptionsChanged);
 

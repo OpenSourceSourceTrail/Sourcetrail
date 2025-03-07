@@ -518,19 +518,23 @@ void QtCodeNavigator::scrollTo(const CodeScrollParams& params, bool animated, bo
 
   switch(params.type) {
   case CodeScrollParams::Type::TO_REFERENCE:
-    func = [=]() {
+    func = [this, params, animated, focusTarget]() {
       m_current->scrollTo(params.filePath, 0, params.locationId, params.scopeLocationId, animated, params.target, focusTarget);
     };
     break;
   case CodeScrollParams::Type::TO_FILE:
-    func = [=]() { m_current->scrollTo(params.filePath, 0, 0, 0, animated, params.target, focusTarget); };
+    func = [this, params, animated, focusTarget]() {
+      m_current->scrollTo(params.filePath, 0, 0, 0, animated, params.target, focusTarget);
+    };
     break;
   case CodeScrollParams::Type::TO_LINE:
-    func = [=]() { m_current->scrollTo(params.filePath, params.line, 0, 0, animated, params.target, focusTarget); };
+    func = [this, params, animated, focusTarget]() {
+      m_current->scrollTo(params.filePath, params.line, 0, 0, animated, params.target, focusTarget);
+    };
     break;
   case CodeScrollParams::Type::TO_VALUE:
     if((m_mode == MODE_LIST) == params.inListMode) {
-      func = [=]() {
+      func = [this, params]() {
         QAbstractScrollArea* area = m_current->getScrollArea();
         if(area) {
           area->verticalScrollBar()->setValue(static_cast<int>(params.value));
@@ -586,7 +590,7 @@ void QtCodeNavigator::keyPressEvent(QKeyEvent* event) {
     currentFilePath = currentFocus.area->getFilePath();
   }
 
-  auto moveFocus = [=](CodeFocusHandler::Direction direction) {
+  auto moveFocus = [this, alt, ctrl, shift, currentFilePath, currentFocus](CodeFocusHandler::Direction direction) {
     if(!alt && !ctrl) {
       if(shift) {
         MessageToNextCodeReference(currentFilePath,
@@ -601,7 +605,7 @@ void QtCodeNavigator::keyPressEvent(QKeyEvent* event) {
     }
   };
 
-  auto moveView = [=](CodeFocusHandler::Direction direction) {
+  auto moveView = [this, alt, shift, ctrl, currentFocus](CodeFocusHandler::Direction direction) {
     if(!alt && !shift && ctrl) {
       QAbstractScrollArea* scrollArea = currentFocus.area;
       int step = currentFocus.area ? currentFocus.area->lineHeight() * 3 : 50;
@@ -772,6 +776,6 @@ void QtCodeNavigator::setModeSingle() {
 
 void QtCodeNavigator::handleMessage(MessageWindowFocus* message) {
   if(message->focusIn) {
-    m_onQtThread([=]() { m_current->onWindowFocus(); });
+    m_onQtThread([this]() { m_current->onWindowFocus(); });
   }
 }

@@ -122,7 +122,8 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
   m_tabBar->blockSignals(true);
 
   m_insertedTabCount++;
-  int idx = match.isValid() ? static_cast<int>(m_tabBar->currentIndex() + m_insertedTabCount) : m_tabBar->count() + 1;
+  int idx = match.isValid() ? static_cast<int>(static_cast<std::size_t>(m_tabBar->currentIndex()) + m_insertedTabCount) :
+                              m_tabBar->count() + 1;
   idx = m_tabBar->insertTab(idx, QStringLiteral(" Empty Tab "));
   m_tabBar->setTabData(idx, QVariant(tabId));
 
@@ -156,7 +157,7 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
 
   m_tabBar->blockSignals(false);
 
-  getController<TabsController>()->addTab(tabId, match);
+  getController<TabsController>()->addTab(static_cast<Id>(tabId), match);
 
   if(m_tabBar->count() == 1) {
     changedTab(m_tabBar->currentIndex());
@@ -170,7 +171,7 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
 void QtTabsView::changedTab(int index) {
   m_insertedTabCount = 0;
 
-  getController<TabsController>()->showTab(m_tabBar->tabData(index).toInt());
+  getController<TabsController>()->showTab(static_cast<Id>(m_tabBar->tabData(index).toInt()));
 
   for(int i = 0; i < m_tabBar->count(); i++) {
     QWidget* circle = m_tabBar->tabButton(i, QTabBar::LeftSide);
@@ -186,7 +187,7 @@ void QtTabsView::changedTab(int index) {
 void QtTabsView::removeTab(int index) {
   m_insertedTabCount = 0;
 
-  getController<TabsController>()->removeTab(m_tabBar->tabData(index).toInt());
+  getController<TabsController>()->removeTab(static_cast<Id>(m_tabBar->tabData(index).toInt()));
   m_tabBar->removeTab(index);
 }
 

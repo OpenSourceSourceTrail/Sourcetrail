@@ -15,15 +15,15 @@ void QtGraphNodeComponentMoveable::nodeMousePressEvent(QGraphicsSceneMouseEvent*
   }
 
   m_oldPos = m_graphNode->getPosition();
-  m_mouseOffset.setX(event->scenePos().x() - m_oldPos.x());
-  m_mouseOffset.setY(event->scenePos().y() - m_oldPos.y());
+  m_mouseOffset.setX(static_cast<float>(event->scenePos().x() - static_cast<qreal>(m_oldPos.x())));
+  m_mouseOffset.setY(static_cast<float>(event->scenePos().y() - static_cast<qreal>(m_oldPos.y())));
 
   event->accept();
 }
 
 void QtGraphNodeComponentMoveable::nodeMouseMoveEvent(QGraphicsSceneMouseEvent* event) {
-  m_graphNode->setPosition({static_cast<float>(event->scenePos().x() - m_mouseOffset.x()),
-                            static_cast<float>(event->scenePos().y() - m_mouseOffset.y())});
+  m_graphNode->setPosition({static_cast<float>(event->scenePos().x() - static_cast<qreal>(m_mouseOffset.x())),
+                            static_cast<float>(event->scenePos().y() - static_cast<qreal>(m_mouseOffset.y()))});
   event->accept();
 }
 
