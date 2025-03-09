@@ -4,8 +4,8 @@
 #include <clang/AST/DeclCXX.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/Basic/FileManager.h>
-#include <clang/Lex/Preprocessor.h>
 #include <clang/Basic/Version.h>
+#include <clang/Lex/Preprocessor.h>
 
 #include "CanonicalFilePathCache.h"
 #include "FilePath.h"
@@ -74,7 +74,7 @@ SymbolKind utility::convertTagKind(const clang::TagTypeKind tagKind) {
     return SYMBOL_KIND_MAX;
   }
 #else
-switch(tagKind) {
+  switch(tagKind) {
   case clang::TTK_Struct:
     return SYMBOL_STRUCT;
   case clang::TTK_Union:
@@ -99,8 +99,7 @@ bool utility::isLocalVariable(const clang::VarDecl* d) {
 }
 
 bool utility::isLocalVariable(const clang::ValueDecl* d) {
-  if(!llvm::isa<clang::ParmVarDecl>(d) &&
-     !(d->getParentFunctionOrMethod() == nullptr)) {
+  if(!llvm::isa<clang::ParmVarDecl>(d) && !(d->getParentFunctionOrMethod() == nullptr)) {
     return true;
   }
   return false;
@@ -134,10 +133,7 @@ std::wstring utility::getFileNameOfFileEntry(const clang::FileEntry* entry) {
     fileName = utility::decodeFromUtf8(entry->tryGetRealPathName().str());
 #if CLANG_VERSION_MAJOR > 15
     if(!fileName.empty()) {
-      fileName = FilePath{fileName}
-                     .getParentDirectory()
-                     .concatenate(FilePath(fileName).fileName())
-                     .wstr();
+      fileName = FilePath{fileName}.getParentDirectory().concatenate(FilePath(fileName).fileName()).wstr();
     }
 #else
     if(fileName.empty()) {

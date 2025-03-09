@@ -1,7 +1,7 @@
 #include "CxxAstVisitorComponentBraceRecorder.h"
 
-#include <clang/Lex/Preprocessor.h>
 #include <clang/Basic/Version.h>
+#include <clang/Lex/Preprocessor.h>
 
 #include "CanonicalFilePathCache.h"
 #include "CxxAstVisitor.h"

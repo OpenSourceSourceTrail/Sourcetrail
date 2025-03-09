@@ -24,7 +24,7 @@ std::wstring getFileNameOfFileEntry(const clang::FileEntry* entry, const clang::
   }
   return fileName;
 }
-}
+}    // namespace
 #endif
 
 CanonicalFilePathCache::CanonicalFilePathCache(std::shared_ptr<FileRegister> fileRegister) : m_fileRegister(fileRegister) {}
