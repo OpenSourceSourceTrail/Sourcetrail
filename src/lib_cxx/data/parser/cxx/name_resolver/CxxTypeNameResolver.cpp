@@ -3,6 +3,7 @@
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/PrettyPrinter.h>
+#include <clang/Basic/Version.h>
 
 #include "CxxDeclNameResolver.h"
 #include "CxxSpecifierNameResolver.h"
@@ -115,6 +116,15 @@ std::unique_ptr<CxxTypeName> CxxTypeNameResolver::getName(const clang::Type* typ
           std::vector<std::wstring> templateArguments;
           CxxTemplateArgumentNameResolver resolver(this);
           resolver.ignoreContextDecl(templateSpecializationType->getTemplateName().getAsTemplateDecl()->getTemplatedDecl());
+#if CLANG_VERSION_MAJOR > 15
+          for(const auto& templateArgument : templateSpecializationType->template_arguments()) {
+            if(templateArgument.isDependent()) {
+              return std::make_unique<CxxTypeName>(
+                  declName->getName(), declName->getTemplateParameterNames(), declName->getParent());
+            }
+            templateArguments.push_back(resolver.getTemplateArgumentName(templateArgument));
+          }
+#else
           for(unsigned i = 0; i < templateSpecializationType->getNumArgs(); i++) {
             if(templateSpecializationType->getArg(i).isDependent()) {
               return std::make_unique<CxxTypeName>(
@@ -122,7 +132,7 @@ std::unique_ptr<CxxTypeName> CxxTypeNameResolver::getName(const clang::Type* typ
             }
             templateArguments.push_back(resolver.getTemplateArgumentName(templateSpecializationType->getArg(i)));
           }
-
+#endif
           return std::make_unique<CxxTypeName>(declName->getName(), std::move(templateArguments), declName->getParent());
         } else {
           LOG_WARNING("no decl found");
@@ -155,9 +165,16 @@ std::unique_ptr<CxxTypeName> CxxTypeNameResolver::getName(const clang::Type* typ
 
       std::vector<std::wstring> templateArguments;
       CxxTemplateArgumentNameResolver resolver(this);
+#if CLANG_VERSION_MAJOR > 15
+      for(const auto& templateArgument : dependentType->template_arguments()) {
+        templateArguments.push_back(resolver.getTemplateArgumentName(templateArgument));
+      }
+#else
+      templateArguments.reserve(dependentType->getNumArgs());
       for(unsigned i = 0; i < dependentType->getNumArgs(); i++) {
         templateArguments.push_back(resolver.getTemplateArgumentName(dependentType->getArg(i)));
       }
+#endif
 
       return std::make_unique<CxxTypeName>(utility::decodeFromUtf8(dependentType->getIdentifier()->getName().str()),
                                            std::move(templateArguments),

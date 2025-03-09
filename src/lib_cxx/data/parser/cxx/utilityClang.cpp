@@ -5,6 +5,7 @@
 #include <clang/AST/DeclTemplate.h>
 #include <clang/Basic/FileManager.h>
 #include <clang/Lex/Preprocessor.h>
+#include <clang/Basic/Version.h>
 
 #include "CanonicalFilePathCache.h"
 #include "FilePath.h"
@@ -57,7 +58,23 @@ AccessKind utility::convertAccessSpecifier(clang::AccessSpecifier access) {
 }
 
 SymbolKind utility::convertTagKind(const clang::TagTypeKind tagKind) {
+#if CLANG_VERSION_MAJOR > 15
   switch(tagKind) {
+  case clang::TagTypeKind::Struct:
+    return SYMBOL_STRUCT;
+  case clang::TagTypeKind::Union:
+    return SYMBOL_UNION;
+  case clang::TagTypeKind::Class:
+    return SYMBOL_CLASS;
+  case clang::TagTypeKind::Enum:
+    return SYMBOL_ENUM;
+  case clang::TagTypeKind::Interface:
+    return SYMBOL_KIND_MAX;
+  default:
+    return SYMBOL_KIND_MAX;
+  }
+#else
+switch(tagKind) {
   case clang::TTK_Struct:
     return SYMBOL_STRUCT;
   case clang::TTK_Union:
@@ -71,6 +88,7 @@ SymbolKind utility::convertTagKind(const clang::TagTypeKind tagKind) {
   default:
     return SYMBOL_KIND_MAX;
   }
+#endif
 }
 
 bool utility::isLocalVariable(const clang::VarDecl* d) {
@@ -80,21 +98,21 @@ bool utility::isLocalVariable(const clang::VarDecl* d) {
   return false;
 }
 
-// bool utility::isLocalVariable(const clang::ValueDecl* pValueDecl) {
-//   if(!llvm::isa<clang::ParmVarDecl>(pValueDecl) &&
-//      !(pValueDecl->getParentFunctionOrMethod() == nullptr)) {
-//     return true;
-//   }
-//   return false;
-// }
+bool utility::isLocalVariable(const clang::ValueDecl* d) {
+  if(!llvm::isa<clang::ParmVarDecl>(d) &&
+     !(d->getParentFunctionOrMethod() == nullptr)) {
+    return true;
+  }
+  return false;
+}
 
 bool utility::isParameter(const clang::VarDecl* d) {
   return llvm::isa<clang::ParmVarDecl>(d);
 }
 
-// bool utility::isParameter(const clang::ValueDecl* pValueDecl) {
-//   return llvm::isa<clang::ParmVarDecl>(pValueDecl);
-// }
+bool utility::isParameter(const clang::ValueDecl* d) {
+  return llvm::isa<clang::ParmVarDecl>(d);
+}
 
 SymbolKind utility::getSymbolKind(const clang::VarDecl* d) {
   SymbolKind symbolKind = SYMBOL_KIND_MAX;
@@ -114,6 +132,14 @@ std::wstring utility::getFileNameOfFileEntry(const clang::FileEntry* entry) {
   std::wstring fileName = L"";
   if(entry != nullptr) {
     fileName = utility::decodeFromUtf8(entry->tryGetRealPathName().str());
+#if CLANG_VERSION_MAJOR > 15
+    if(!fileName.empty()) {
+      fileName = FilePath{fileName}
+                     .getParentDirectory()
+                     .concatenate(FilePath(fileName).fileName())
+                     .wstr();
+    }
+#else
     if(fileName.empty()) {
       fileName = utility::decodeFromUtf8(entry->getName().str());
     } else {
@@ -122,6 +148,7 @@ std::wstring utility::getFileNameOfFileEntry(const clang::FileEntry* entry) {
                      .concatenate(FilePath(fileName).fileName())
                      .wstr();
     }
+#endif
   }
   return fileName;
 }

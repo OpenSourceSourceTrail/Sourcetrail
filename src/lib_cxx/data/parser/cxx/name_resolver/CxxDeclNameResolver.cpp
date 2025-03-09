@@ -1,6 +1,7 @@
 #include "CxxDeclNameResolver.h"
 
 #include <clang/AST/ASTContext.h>
+#include <clang/Basic/Version.h>
 
 #include "CanonicalFilePathCache.h"
 #include "CxxFunctionDeclName.h"
@@ -174,12 +175,21 @@ std::unique_ptr<CxxDeclName> CxxDeclNameResolver::getDeclName(const clang::Named
       for(unsigned int i = 0; i < functionDecl->param_size(); i++) {
         if(const clang::SubstTemplateTypeParmType* substType = clang::dyn_cast_or_null<clang::SubstTemplateTypeParmType>(
                functionDecl->parameters()[i]->getType().getTypePtr())) {
+#if CLANG_VERSION_MAJOR > 15
+          if(const clang::TemplateTypeParmDecl* templateParamDecl = substType->getReplacedParameter()) {
+            if(templateParamDecl->isParameterPack()) {
+              parameterTypeNames.push_back(std::make_unique<CxxTypeName>(L"..."));
+              break;
+            }
+          }
+#else
           if(const clang::TemplateTypeParmType* templateParamType = substType->getReplacedParameter()) {
             if(templateParamType->isParameterPack()) {
               parameterTypeNames.push_back(std::make_unique<CxxTypeName>(L"..."));
               break;
             }
           }
+#endif
         }
         parameterTypeNames.push_back(
             CxxTypeName::makeUnsolvedIfNull(typenNameResolver.getName(functionDecl->parameters()[i]->getType())));
@@ -211,7 +221,11 @@ std::unique_ptr<CxxDeclName> CxxDeclNameResolver::getDeclName(const clang::Named
           std::move(declNameString), std::vector<std::wstring>(), std::move(typeName), false);
     } else if(clang::isa<clang::NamespaceDecl>(declaration) &&
               clang::dyn_cast<clang::NamespaceDecl>(declaration)->isAnonymousNamespace()) {
+#if CLANG_VERSION_MAJOR > 15
+      declaration = clang::dyn_cast<clang::NamespaceDecl>(declaration)->getCanonicalDecl();
+#else
       declaration = clang::dyn_cast<clang::NamespaceDecl>(declaration)->getOriginalNamespace();
+#endif
       return std::make_unique<CxxDeclName>(getNameForAnonymousSymbol(L"namespace", declaration));
     } else if(clang::isa<clang::EnumDecl>(declaration) && declNameString.empty()) {
       return std::make_unique<CxxDeclName>(getNameForAnonymousSymbol(L"enum", declaration));
