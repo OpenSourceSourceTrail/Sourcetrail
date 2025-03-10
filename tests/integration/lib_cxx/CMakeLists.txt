@@ -3,6 +3,7 @@ set(test_cxx_names
     CxxIncludeProcessingTestSuite
     CxxParserTestSuite
     CxxTypeNameTestSuite
+    CxxParser14TestSuite
     CxxParser17TestSuite)
 
 foreach(test_name IN LISTS test_cxx_names)
