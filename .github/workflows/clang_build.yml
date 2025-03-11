@@ -7,10 +7,6 @@ on:
         description: 'Clang version to build'
         required: false
         default: '19.1.7'
-  push:
-    branches: ["main"]
-  pull_request:
-    branches: ["main"]
 
 env:
   CLANG_VERSION: ${{ github.event.inputs.clang_version || '19.1.7' }}

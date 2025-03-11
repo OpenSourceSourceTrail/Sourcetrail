@@ -167,17 +167,17 @@ jobs:
         shell: bash
 
       - name: Download llvm build cache
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
         uses: actions/download-artifact@v4
         with:
-          name: clang-15.0.7-linux
+          name: clang-19.1.7-linux
           path: ${{github.workspace}}/external
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 13470680180 # TODO(Hussein): Need to be fixed
+          run-id: 13795569336 # TODO(Hussein): Need to be fixed
 
       - name: Install llvm (Ubuntu)
-        if: runner.os == 'Linux'
-        run: tar -xvf ${{github.workspace}}/external/clang-15.0.7-linux.tar.gz -C ${{github.workspace}}/external
+        if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
+        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
