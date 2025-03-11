@@ -6,48 +6,37 @@ on:
       clang_version:
         description: 'Clang version to build'
         required: false
-        default: '15.0.7'
+        default: '19.1.7'
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 env:
-  CLANG_VERSION: ${{ github.event.inputs.clang_version || '15.0.7' }}
+  CLANG_VERSION: ${{ github.event.inputs.clang_version || '19.1.7' }}
   INSTALL_DIR: ${{ github.workspace }}/clang-install
-  CACHE_KEY: clang-15-build-${{ github.ref_name }}
 
 jobs:
   build-clang:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Install Build Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            curl \
             cmake \
             ninja-build \
-            python3 \
             gcc \
             g++ \
-            libncurses5-dev \
-            libzip-dev
+            git
 
-      - name: Check Cache
-        id: clang-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.INSTALL_DIR }}
-          key: ${{ env.CACHE_KEY }}-${{ hashFiles('**/CMakeLists.txt') }}
-          restore-keys: |
-            ${{ env.CACHE_KEY }}
-
-      - name: Download LLVM/Clang Source
-        if: steps.clang-cache.outputs.cache-hit != 'true'
+      - name: Clone LLVM project
         run: |
-          curl -o llvmorg-15.0.7.tar.gz https://codeload.github.com/llvm/llvm-project/tar.gz/refs/tags/llvmorg-${CLANG_VERSION}
-          tar -xzf llvmorg-${CLANG_VERSION}.tar.gz
-          mv llvm-project-llvmorg-${CLANG_VERSION} llvm-project
+          git clone https://github.com/llvm/llvm-project.git
+          cd llvm-project
+          git checkout tags/llvmorg-${CLANG_VERSION}
 
       - name: Configure CMake
-        if: steps.clang-cache.outputs.cache-hit != 'true'
         working-directory: llvm-project
         run: |
           cmake -S llvm -B build \
@@ -61,19 +50,16 @@ jobs:
             -DLLVM_TARGETS_TO_BUILD=host
 
       - name: Build Clang
-        if: steps.clang-cache.outputs.cache-hit != 'true'
         working-directory: llvm-project/build
         run: |
           ninja
 
       - name: Install Clang
-        if: steps.clang-cache.outputs.cache-hit != 'true'
         working-directory: llvm-project/build
         run: |
           ninja install
 
       - name: Compress Clang Installation
-        if: steps.clang-cache.outputs.cache-hit != 'true'
         run: |
           tar -czvf clang-${CLANG_VERSION}-linux.tar.gz -C ${{ env.INSTALL_DIR }} .
 
@@ -86,4 +72,3 @@ jobs:
       - name: Cleanup
         run: |
           rm -rf llvm-project
-          rm llvmorg-${CLANG_VERSION}.tar.gz
