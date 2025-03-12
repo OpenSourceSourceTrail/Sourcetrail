@@ -46,7 +46,7 @@ void QtCompositeView::createWidgetWrapper() {
 }
 
 void QtCompositeView::refreshView() {
-  m_onQtThread([=]() { utility::setWidgetBackgroundColor(m_widget, ColorScheme::getInstance()->getColor("search/background")); });
+  m_onQtThread([this]() { utility::setWidgetBackgroundColor(m_widget, ColorScheme::getInstance()->getColor("search/background")); });
 
   showFocusIndicator(false);
 }
@@ -56,7 +56,7 @@ void QtCompositeView::addViewWidget(View* view) {
 }
 
 void QtCompositeView::showFocusIndicator(bool focus) {
-  m_onQtThread([=]() {
+  m_onQtThread([=, this]() {
     const std::string& colorName = focus ? "window/focus" : "search/background";
     utility::setWidgetBackgroundColor(m_focusIndicator, ColorScheme::getInstance()->getColor(colorName));
   });

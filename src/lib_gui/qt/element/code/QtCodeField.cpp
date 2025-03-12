@@ -124,7 +124,7 @@ size_t QtCodeField::getStartLineNumber() const {
 }
 
 size_t QtCodeField::getEndLineNumber() const {
-  return m_startLineNumber + blockCount() - 1;
+  return m_startLineNumber + static_cast<std::size_t>(blockCount()) - 1;
 }
 
 int QtCodeField::totalLineHeight() const {
@@ -212,7 +212,9 @@ void QtCodeField::paintEvent(QPaintEvent* event) {
 
     if(annotation.locationType == LOCATION_SCOPE) {
       painter.drawRoundedRect(0,
-                              static_cast<int>(top + (annotation.startLine - m_startLineNumber) * blockHeight),
+                              static_cast<int>(static_cast<std::size_t>(top) +
+                                               (static_cast<std::size_t>(annotation.startLine) - m_startLineNumber) *
+                                                   static_cast<std::size_t>(blockHeight)),
                               width(),
                               (annotation.endLine - annotation.startLine + 1) * blockHeight,
                               borderRadius,
@@ -338,7 +340,7 @@ bool QtCodeField::annotateText(const std::set<Id>& activeSymbolIds,
     }
 
     if(wasActive != annotation.isActive || wasFocused != annotation.isFocused || wasCoFocused != annotation.isCoFocused) {
-      m_linesToRehighlight.push_back(static_cast<int>(annotation.startLine - m_startLineNumber));
+      m_linesToRehighlight.push_back(static_cast<int>(static_cast<std::size_t>(annotation.startLine) - m_startLineNumber));
     }
   }
 
@@ -386,7 +388,7 @@ void QtCodeField::createAnnotations(std::shared_ptr<SourceLocationFile> location
     if(!endLocation || endLocation->getLineNumber() > endLineNumber) {
       annotation.end = endTextEditPosition();
       annotation.endLine = static_cast<int>(endLineNumber);
-      annotation.endCol = m_lineLengths[document()->blockCount() - 1];
+      annotation.endCol = m_lineLengths[static_cast<std::size_t>(document()->blockCount() - 1)];
     } else if(endLocation->getLineNumber() >= m_startLineNumber) {
       const int endLine = static_cast<int>(endLocation->getLineNumber());
       const int endCol = getColumnCorrectedForMultibyteCharacters(endLine, static_cast<int>(endLocation->getColumnNumber()));
@@ -466,7 +468,7 @@ int QtCodeField::toTextEditPosition(int lineNumber, int columnNumber) const {
   int position = 0;
 
   for(int i = 0; i < lineNumber - 1; i++) {
-    position += m_lineLengths[i];
+    position += m_lineLengths[static_cast<std::size_t>(i)];
   }
 
   position += columnNumber;
@@ -476,7 +478,7 @@ int QtCodeField::toTextEditPosition(int lineNumber, int columnNumber) const {
 std::pair<int, int> QtCodeField::toLineColumn(int textEditPosition) const {
   int lineNumber = static_cast<int>(m_startLineNumber);
   for(int i = 0; i < document()->lineCount(); i++) {
-    int nextTextEditPosition = textEditPosition - m_lineLengths[i];
+    int nextTextEditPosition = textEditPosition - m_lineLengths[static_cast<std::size_t>(i)];
     if(nextTextEditPosition >= 0) {
       textEditPosition = nextTextEditPosition;
       lineNumber++;
@@ -531,11 +533,12 @@ std::vector<QRect> QtCodeField::getCursorRectsForAnnotation(const Annotation& an
   while(line <= annotation.endLine) {
     if(line == annotation.endLine) {
       // Avoid that annotations at line end span down to first column of the next line.
-      if(annotation.startLine != annotation.endLine || m_lineLengths[line - m_startLineNumber] != annotation.endCol) {
+      if(annotation.startLine != annotation.endLine ||
+         m_lineLengths[static_cast<std::size_t>(line) - m_startLineNumber] != annotation.endCol) {
         cursor.setPosition(annotation.end);
       }
     } else {
-      cursor.setPosition(toTextEditPosition(line, m_lineLengths[line - m_startLineNumber] - 1));
+      cursor.setPosition(toTextEditPosition(line, m_lineLengths[static_cast<std::size_t>(line) - m_startLineNumber] - 1));
     }
 
     rectEnd = cursorRect(cursor);
@@ -544,7 +547,7 @@ std::vector<QRect> QtCodeField::getCursorRectsForAnnotation(const Annotation& an
 
     line++;
 
-    if(int(line - m_startLineNumber) < document()->blockCount()) {
+    if(int(static_cast<std::size_t>(line) - m_startLineNumber) < document()->blockCount()) {
       cursor.setPosition(toTextEditPosition(line, 0));
       rectStart = cursorRect(cursor);
     }
@@ -706,7 +709,7 @@ int QtCodeField::getColumnCorrectedForMultibyteCharacters(int line, int column) 
     return column;
   }
 
-  const size_t relativeLineNumber = line - m_startLineNumber;
+  const size_t relativeLineNumber = static_cast<std::size_t>(line) - m_startLineNumber;
   if(relativeLineNumber < m_multibyteCharacterLocations.size()) {
     for(const auto& multibyteCharacterLocation : m_multibyteCharacterLocations[relativeLineNumber]) {
       if(column > multibyteCharacterLocation.first) {

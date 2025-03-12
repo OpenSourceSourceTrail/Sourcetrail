@@ -184,7 +184,7 @@ Id StorageAccessProxy::addNodeBookmark(const NodeBookmark& bookmark) {
     return subject->addNodeBookmark(bookmark);
   }
 
-  return -1;
+  return static_cast<Id>(-1);
 }
 
 Id StorageAccessProxy::addEdgeBookmark(const EdgeBookmark& bookmark) {
@@ -192,7 +192,7 @@ Id StorageAccessProxy::addEdgeBookmark(const EdgeBookmark& bookmark) {
     return subject->addEdgeBookmark(bookmark);
   }
 
-  return -1;
+  return static_cast<Id>(-1);
 }
 
 Id StorageAccessProxy::addBookmarkCategory(const std::wstring& categoryName) {
@@ -200,7 +200,7 @@ Id StorageAccessProxy::addBookmarkCategory(const std::wstring& categoryName) {
     return subject->addBookmarkCategory(categoryName);
   }
 
-  return -1;
+  return static_cast<Id>(-1);
 }
 
 void StorageAccessProxy::updateBookmark(const Id bookmarkId,

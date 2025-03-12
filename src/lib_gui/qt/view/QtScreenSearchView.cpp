@@ -31,18 +31,18 @@ void QtScreenSearchView::createWidgetWrapper() {
 }
 
 void QtScreenSearchView::refreshView() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     m_bar->setStyleSheet(
         utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"screen_search_view/screen_search_view.css")).c_str());
   });
 }
 
 void QtScreenSearchView::setMatchCount(size_t matchCount) {
-  m_onQtThread([=]() { m_widget->setMatchCount(matchCount); });
+  m_onQtThread([=, this]() { m_widget->setMatchCount(matchCount); });
 }
 
 void QtScreenSearchView::setMatchIndex(size_t matchIndex) {
-  m_onQtThread([=]() { m_widget->setMatchIndex(matchIndex); });
+  m_onQtThread([=, this]() { m_widget->setMatchIndex(matchIndex); });
 }
 
 void QtScreenSearchView::addResponder(const std::string& name) {

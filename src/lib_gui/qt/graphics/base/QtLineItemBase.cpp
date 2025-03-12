@@ -73,10 +73,10 @@ QPolygon QtLineItemBase::getPath() const {
   const QVector2D& tOff = m_style.targetOffset;
 
   QVector2D oP[4];
-  getPivotPoints(oP, oR, oPR, oOff.y(), false);
+  getPivotPoints(oP, oR, oPR, static_cast<int>(oOff.y()), false);
 
   QVector2D tP[4];
-  getPivotPoints(tP, tR, tPR, tOff.y(), true);
+  getPivotPoints(tP, tR, tPR, static_cast<int>(tOff.y()), true);
 
   int io = -1;
   int it = -1;
@@ -117,10 +117,10 @@ QPolygon QtLineItemBase::getPath() const {
 
   // start/end and offsetted start/end points
   QVector2D o[4];
-  getPivotPoints(o, oR, oR, oOff.y(), false);
+  getPivotPoints(o, oR, oR, static_cast<int>(oOff.y()), false);
 
   QVector2D t[4];
-  getPivotPoints(t, tR, tR, tOff.y(), true);
+  getPivotPoints(t, tR, tR, static_cast<int>(tOff.y()), true);
 
   QPoint a(static_cast<int>(t[it].x()), static_cast<int>(t[it].y()));
   QPoint d(static_cast<int>(o[io].x()), static_cast<int>(o[io].y()));
@@ -130,31 +130,31 @@ QPolygon QtLineItemBase::getPath() const {
 
   switch(it) {
   case 0:
-    b.setY(b.y() - tOff.x());
+    b.setY(static_cast<int>(static_cast<float>(b.y()) - tOff.x()));
     break;
   case 1:
-    b.setX(b.x() + tOff.x());
+    b.setX(static_cast<int>(static_cast<float>(b.x()) + tOff.x()));
     break;
   case 2:
-    b.setY(b.y() + tOff.x());
+    b.setY(static_cast<int>(static_cast<float>(b.y()) + tOff.x()));
     break;
   case 3:
-    b.setX(b.x() - tOff.x());
+    b.setX(static_cast<int>(static_cast<float>(b.x()) - tOff.x()));
     break;
   }
 
   switch(io) {
   case 0:
-    c.setY(c.y() - oOff.x());
+    c.setY(static_cast<int>(static_cast<float>(c.y()) - oOff.x()));
     break;
   case 1:
-    c.setX(c.x() + oOff.x());
+    c.setX(static_cast<int>(static_cast<float>(c.x()) + oOff.x()));
     break;
   case 2:
-    c.setY(c.y() + oOff.x());
+    c.setY(static_cast<int>(static_cast<float>(c.y()) + oOff.x()));
     break;
   case 3:
-    c.setX(c.x() - oOff.x());
+    c.setX(static_cast<int>(static_cast<float>(c.x()) - oOff.x()));
     break;
   }
 
@@ -184,16 +184,16 @@ QPolygon QtLineItemBase::getPath() const {
 
         switch(it) {
         case 0:
-          b.setY(b.y() - tOff.x());
+          b.setY(static_cast<int>(static_cast<float>(b.y()) - tOff.x()));
           break;
         case 1:
-          b.setX(b.x() + tOff.x());
+          b.setX(static_cast<int>(static_cast<float>(b.x()) + tOff.x()));
           break;
         case 2:
-          b.setY(b.y() + tOff.x());
+          b.setY(static_cast<int>(static_cast<float>(b.y()) + tOff.x()));
           break;
         case 3:
-          b.setX(b.x() - tOff.x());
+          b.setX(static_cast<int>(static_cast<float>(b.x()) - tOff.x()));
           break;
         }
       } else {
@@ -204,16 +204,16 @@ QPolygon QtLineItemBase::getPath() const {
 
         switch(io) {
         case 0:
-          c.setY(c.y() - oOff.x());
+          c.setY(static_cast<int>(static_cast<float>(c.y()) - oOff.x()));
           break;
         case 1:
-          c.setX(c.x() + oOff.x());
+          c.setX(static_cast<int>(static_cast<float>(c.x()) + oOff.x()));
           break;
         case 2:
-          c.setY(c.y() + oOff.x());
+          c.setY(static_cast<int>(static_cast<float>(c.y()) + oOff.x()));
           break;
         case 3:
-          c.setX(c.x() - oOff.x());
+          c.setX(static_cast<int>(static_cast<float>(c.x()) - oOff.x()));
           break;
         }
       }
@@ -356,9 +356,9 @@ void QtLineItemBase::drawArrow(const QPolygon& poly, QPainterPath* path, QPainte
 void QtLineItemBase::getPivotPoints(QVector2D* p, const QVector4D& in, const QVector4D& out, int offset, bool /*target*/) const {
   float f = 1 / 2.f;
 
-  p[0] = {static_cast<float>(in.x() + (in.z() - in.x()) * f + offset), static_cast<float>(out.y())};
-  p[2] = {static_cast<float>(in.x() + (in.z() - in.x()) * f + offset), static_cast<float>(out.w())};
+  p[0] = {in.x() + (in.z() - in.x()) * f + static_cast<float>(offset), out.y()};
+  p[2] = {in.x() + (in.z() - in.x()) * f + static_cast<float>(offset), out.w()};
 
-  p[1] = {static_cast<float>(out.z()), static_cast<float>(in.y() + (in.w() - in.y()) * f + offset)};
-  p[3] = {static_cast<float>(out.x()), static_cast<float>(in.y() + (in.w() - in.y()) * f + offset)};
+  p[1] = {out.z(), in.y() + (in.w() - in.y()) * f + static_cast<float>(offset)};
+  p[3] = {out.x(), in.y() + (in.w() - in.y()) * f + static_cast<float>(offset)};
 }

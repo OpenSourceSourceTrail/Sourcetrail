@@ -86,8 +86,8 @@ void QtViewToggle::toggledByUI() {
 
 
 MouseReleaseFilter::MouseReleaseFilter(QObject* parent) : QObject(parent) {
-  m_backButton = IApplicationSettings::getInstanceRaw()->getControlsMouseBackButton();
-  m_forwardButton = IApplicationSettings::getInstanceRaw()->getControlsMouseForwardButton();
+  m_backButton = static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getControlsMouseBackButton());
+  m_forwardButton = static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getControlsMouseForwardButton());
 }
 
 bool MouseReleaseFilter::eventFilter(QObject* obj, QEvent* event) {
@@ -232,7 +232,7 @@ void QtMainWindow::removeView(View* view) {
   for(size_t i = 0; i < m_dockWidgets.size(); i++) {
     if(m_dockWidgets[i].view == view) {
       removeDockWidget(m_dockWidgets[i].widget);
-      m_dockWidgets.erase(m_dockWidgets.begin() + i);
+      m_dockWidgets.erase(m_dockWidgets.begin() + static_cast<ptrdiff_t>(i));
       return;
     }
   }
@@ -686,7 +686,7 @@ void QtMainWindow::showBookmarkBrowser() {
 void QtMainWindow::openHistoryAction() {
   auto* action = qobject_cast<QAction*>(sender());
   if(action != nullptr) {
-    std::shared_ptr<MessageBase> m = m_history[action->data().toInt()];
+    std::shared_ptr<MessageBase> m = m_history[static_cast<std::size_t>(action->data().toInt())];
     m->setSchedulerId(TabId::currentTab());
     m->setIsReplayed(false);
     m->dispatch();
@@ -696,7 +696,7 @@ void QtMainWindow::openHistoryAction() {
 void QtMainWindow::activateBookmarkAction() {
   auto* action = qobject_cast<QAction*>(sender());
   if(action != nullptr) {
-    std::shared_ptr<Bookmark> bookmark = m_bookmarks[action->data().toInt()];
+    std::shared_ptr<Bookmark> bookmark = m_bookmarks[static_cast<std::size_t>(action->data().toInt())];
     MessageBookmarkActivate(bookmark).dispatch();
   }
 }
@@ -755,7 +755,10 @@ void QtMainWindow::setupEditMenu() {
 
   menu->addSeparator();
 
-  menu->addAction(tr("&To overview"), this, &QtMainWindow::overview, QKeySequence(Qt::CTRL | Qt::Key_Home));
+  menu->addAction(tr("&To overview"),
+                  this,
+                  &QtMainWindow::overview,
+                  QKeySequence(static_cast<std::size_t>(Qt::CTRL) | static_cast<std::size_t>(Qt::Key_Home)));
 
   menu->addSeparator();
 
@@ -763,7 +766,10 @@ void QtMainWindow::setupEditMenu() {
 
   menu->addSeparator();
 
-  menu->addAction(tr("Preferences..."), this, &QtMainWindow::openSettings, QKeySequence(Qt::CTRL | Qt::Key_Comma));
+  menu->addAction(tr("Preferences..."),
+                  this,
+                  &QtMainWindow::openSettings,
+                  QKeySequence(static_cast<std::size_t>(Qt::CTRL) | static_cast<std::size_t>(Qt::Key_Comma)));
 }
 
 void QtMainWindow::setupViewMenu() {
@@ -774,10 +780,16 @@ void QtMainWindow::setupViewMenu() {
   menu->addAction(tr("Close Tab"), this, &QtMainWindow::closeTab, QKeySequence("Ctrl+W"));
 
   if(utility::getOsType() == OsType::Mac) {
-    menu->addAction(tr("Select Next Tab"), this, &QtMainWindow::nextTab, QKeySequence(Qt::META | Qt::Key_Tab));
+    menu->addAction(tr("Select Next Tab"),
+                    this,
+                    &QtMainWindow::nextTab,
+                    QKeySequence(static_cast<std::size_t>(Qt::META) | static_cast<std::size_t>(Qt::Key_Tab)));
     menu->addAction(tr("Select Previous Tab"), this, &QtMainWindow::previousTab, QKeySequence(Qt::SHIFT | Qt::META | Qt::Key_Tab));
   } else {
-    menu->addAction(tr("Select Next Tab"), this, &QtMainWindow::nextTab, QKeySequence(Qt::CTRL | Qt::Key_Tab));
+    menu->addAction(tr("Select Next Tab"),
+                    this,
+                    &QtMainWindow::nextTab,
+                    QKeySequence(static_cast<std::size_t>(Qt::CTRL) | static_cast<std::size_t>(Qt::Key_Tab)));
     menu->addAction(tr("Select Previous Tab"), this, &QtMainWindow::previousTab, QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_Tab));
   }
 

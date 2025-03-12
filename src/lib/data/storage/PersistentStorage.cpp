@@ -215,7 +215,7 @@ const std::vector<ErrorInfo> PersistentStorage::getErrorInfos() const {
 }
 
 void PersistentStorage::beforeErrorRecording() {
-  m_preInjectionErrorCount = m_sqliteIndexStorage.getErrorCount();
+  m_preInjectionErrorCount = static_cast<std::size_t>(m_sqliteIndexStorage.getErrorCount());
 
   if(!m_preIndexingErrorCountSet) {
     m_preIndexingErrorCount = m_preInjectionErrorCount;
@@ -227,7 +227,9 @@ void PersistentStorage::afterErrorRecording() {
   std::vector<ErrorInfo> errors = getErrorInfos();
   if(m_preInjectionErrorCount < errors.size()) {
     ErrorCountInfo errorCount(errors);
-    errors.erase(errors.begin(), errors.begin() + m_preInjectionErrorCount - m_preIndexingErrorCount);
+    errors.erase(errors.begin(),
+                 errors.begin() + static_cast<std::ptrdiff_t>(m_preInjectionErrorCount) -
+                     static_cast<std::ptrdiff_t>(m_preIndexingErrorCount));
     MessageErrorCountUpdate(errorCount, errors).dispatch();
     m_preIndexingErrorCount = 0;
   }
@@ -484,8 +486,8 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
   {
     std::vector<std::shared_ptr<std::thread>> threads;
     std::mutex collectionMutex;
-    for(std::vector<FullTextSearchResult> fileResults :
-        utility::splitToEquallySizedParts(m_fullTextSearchIndex.searchForTerm(searchTerm), utility::getIdealThreadCount())) {
+    for(std::vector<FullTextSearchResult> fileResults : utility::splitToEquallySizedParts(
+            m_fullTextSearchIndex.searchForTerm(searchTerm), static_cast<std::size_t>(utility::getIdealThreadCount()))) {
       std::shared_ptr<std::thread> thread = std::make_shared<std::thread>([this,
                                                                            &searchTerm,
                                                                            &caseSensitive,
@@ -499,7 +501,7 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
           std::shared_ptr<TextAccess> fileContent = getFileContent(filePath, false);
 
           int charsTotal = 0;
-          int lineNumber = 1;
+          uint32_t lineNumber = 1U;
           std::wstring line = codec.decode(fileContent->getLine(lineNumber));
 
           for(int pos : fileResult.positions) {
@@ -511,9 +513,9 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
 
             ParseLocation location;
             location.startLineNumber = lineNumber;
-            location.startColumnNumber = pos - charsTotal + 1;
+            location.startColumnNumber = static_cast<std::size_t>(pos - charsTotal + 1);
 
-            if(caseSensitive && line.substr(location.startColumnNumber - 1, termLength) != searchTerm) {
+            if(caseSensitive && line.substr(location.startColumnNumber - 1, static_cast<std::size_t>(termLength)) != searchTerm) {
               continue;
             }
             while((charsTotal + static_cast<int>(line.length())) < pos + termLength) {
@@ -522,7 +524,7 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
               line = codec.decode(fileContent->getLine(lineNumber));
             }
             location.endLineNumber = lineNumber;
-            location.endColumnNumber = pos + termLength - charsTotal;
+            location.endColumnNumber = static_cast<std::size_t>(pos + termLength - charsTotal);
 
             {
               std::lock_guard<std::mutex> lock(collectionMutex);
@@ -1419,12 +1421,12 @@ std::vector<FileInfo> PersistentStorage::getFileInfosForFilePaths(const std::vec
 StorageStats PersistentStorage::getStorageStats() const {
   StorageStats stats;
 
-  stats.nodeCount = m_sqliteIndexStorage.getNodeCount();
-  stats.edgeCount = m_sqliteIndexStorage.getEdgeCount();
+  stats.nodeCount = static_cast<std::size_t>(m_sqliteIndexStorage.getNodeCount());
+  stats.edgeCount = static_cast<std::size_t>(m_sqliteIndexStorage.getEdgeCount());
 
-  stats.fileCount = m_sqliteIndexStorage.getFileCount();
-  stats.completedFileCount = m_sqliteIndexStorage.getCompletedFileCount();
-  stats.fileLOCCount = m_sqliteIndexStorage.getFileLineSum();
+  stats.fileCount = static_cast<std::size_t>(m_sqliteIndexStorage.getFileCount());
+  stats.completedFileCount = static_cast<std::size_t>(m_sqliteIndexStorage.getCompletedFileCount());
+  stats.fileLOCCount = static_cast<std::size_t>(m_sqliteIndexStorage.getFileLineSum());
 
   stats.timestamp = m_sqliteIndexStorage.getTime();
 
@@ -1836,7 +1838,8 @@ TooltipSnippet PersistentStorage::getTooltipSnippetForNode(const StorageNode& no
 
       // format
       code = utility::convertWhiteSpacesToSingleSpaces(code);
-      snippet.code = utility::breakSignature(code, 50, IApplicationSettings::getInstanceRaw()->getCodeTabWidth());
+      snippet.code = utility::breakSignature(
+          code, 50, static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getCodeTabWidth()));
 
       // create source locations for annotations via stored texts
       size_t pos = 0;
@@ -1860,7 +1863,7 @@ TooltipSnippet PersistentStorage::getTooltipSnippetForNode(const StorageNode& no
                                            nameHierarchy.getQualifiedName(),
                                            nameHierarchy.getSignature().getPostfix(),
                                            50,
-                                           IApplicationSettings::getInstanceRaw()->getCodeTabWidth());
+                                           static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getCodeTabWidth()));
 
     std::vector<Id> typeNodeIds;
     for(const auto& edge : m_sqliteIndexStorage.getEdgesBySourceId(node.id)) {
@@ -2587,7 +2590,8 @@ void PersistentStorage::buildFullTextSearchIndex() const {
         indexedFiles.push_back(file);
       }
     }
-    for(std::vector<StorageFile> part : utility::splitToEquallySizedParts(indexedFiles, utility::getIdealThreadCount())) {
+    for(std::vector<StorageFile> part :
+        utility::splitToEquallySizedParts(indexedFiles, static_cast<std::size_t>(utility::getIdealThreadCount()))) {
       std::shared_ptr<std::thread> thread = std::make_shared<std::thread>(
           [&](const std::vector<StorageFile>& files) {
             for(const StorageFile& file : files) {

@@ -4,7 +4,7 @@
 #include <range/v3/view/transform.hpp>
 
 size_t utility::digits(size_t n) {
-  int digits = 1;
+  size_t digits = 1UL;
 
   while(n >= 10) {
     n /= 10;

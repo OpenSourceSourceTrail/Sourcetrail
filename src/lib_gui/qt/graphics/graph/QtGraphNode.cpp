@@ -138,7 +138,7 @@ void QtGraphNode::setColumnSize(const QVector2D& size) {
 }
 
 QSize QtGraphNode::size() const {
-  return QSize(m_size.x(), m_size.y());
+  return QSize(static_cast<int>(m_size.x()), static_cast<int>(m_size.y()));
 }
 
 void QtGraphNode::setSize(QSize size) {
@@ -557,23 +557,25 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style) {
 
   m_text->setFont(font);
   m_text->setBrush(QBrush(style.color.text.c_str()));
-  m_text->setPos(
-      static_cast<qreal>(style.iconOffset.x() + style.iconSize + style.textOffset.x()), static_cast<qreal>(style.textOffset.y()));
+  m_text->setPos(static_cast<qreal>(style.iconOffset.x() + static_cast<float>(style.iconSize) + style.textOffset.x()),
+                 static_cast<qreal>(style.textOffset.y()));
 
   if(m_matchLength) {
     GraphViewStyle::NodeColor color = GraphViewStyle::getScreenMatchColor(m_isActiveMatch);
 
     m_matchText->setFont(font);
     m_matchText->setBrush(QBrush(color.text.c_str()));
-    m_matchText->setPos(static_cast<qreal>(style.iconOffset.x() + style.iconSize + style.textOffset.x()),
+    m_matchText->setPos(static_cast<qreal>(style.iconOffset.x() + static_cast<float>(style.iconSize) + style.textOffset.x()),
                         static_cast<qreal>(style.textOffset.y()));
 
-    const float charWidth = QFontMetrics(font).boundingRect(QStringLiteral("QtGraphNode::QtGraphNode::QtGraphNode")).width() /
+    const float charWidth = static_cast<float>(
+                                QFontMetrics(font).boundingRect(QStringLiteral("QtGraphNode::QtGraphNode::QtGraphNode")).width()) /
         37.0f;
     const float charHeight = static_cast<float>(QFontMetrics(font).height());
-    m_matchRect->setRect(static_cast<qreal>(style.iconOffset.x() + style.iconSize + style.textOffset.x() + m_matchPos * charWidth),
+    m_matchRect->setRect(static_cast<qreal>(style.iconOffset.x() + static_cast<float>(style.iconSize) + style.textOffset.x() +
+                                            static_cast<float>(m_matchPos) * charWidth),
                          static_cast<qreal>(style.textOffset.y()),
-                         static_cast<qreal>(m_matchLength * charWidth),
+                         static_cast<qreal>(static_cast<float>(m_matchLength) * charWidth),
                          static_cast<qreal>(charHeight));
     m_matchRect->setPen(QPen(color.border.c_str()));
     m_matchRect->setBrush(QBrush(color.fill.c_str()));
