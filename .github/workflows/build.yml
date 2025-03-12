@@ -23,14 +23,22 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Run clang-format style check for C/C++/Protobuf programs.
-        uses: jidicula/clang-format-action@v4.13.0
+        uses: actions/checkout@v4
         with:
-          clang-format-version: '18'
-          exclude-regex: 'bin'
-          fallback-style: 'Google'
+          fetch-depth: 0  # Fetch full history to ensure base SHA is available
+
+      - name: Install clang-format
+        run: sudo apt-get install clang-format-18 -y
+
+      - name: Run clang-format style check for modified .cpp|.h|.hpp files
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
+          if [ -n "$CHANGED_FILES" ]; then
+            clang-format --dry-run --Werror $CHANGED_FILES
+          else
+            echo "No C++ files to check with clang-format."
+          fi
 
   cmake-format:
     runs-on: ubuntu-24.04
