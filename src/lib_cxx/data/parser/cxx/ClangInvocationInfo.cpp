@@ -7,7 +7,11 @@
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/Option/ArgList.h>
-#include <llvm/Support/Host.h>
+#if CLANG_VERSION_MAJOR > 15
+#  include <llvm/TargetParser/Host.h>
+#else
+#  include <llvm/Support/Host.h>
+#endif
 #include <llvm/Support/TargetSelect.h>
 
 #include "CxxCompilationDatabaseSingle.h"
@@ -44,7 +48,7 @@ ClangInvocationInfo ClangInvocationInfo::getClangInvocationString(const clang::t
     const char* const BinaryName = Argv[0];
     clang::IntrusiveRefCntPtr<clang::DiagnosticOptions> DiagOpts = new clang::DiagnosticOptions();
     unsigned MissingArgIndex, MissingArgCount;
-    llvm::opt::OptTable Opts = clang::driver::getDriverOptTable();
+    const llvm::opt::OptTable& Opts = clang::driver::getDriverOptTable();
     llvm::opt::InputArgList ParsedArgs = Opts.ParseArgs(
         clang::ArrayRef<const char*>(Argv).slice(1), MissingArgIndex, MissingArgCount);
     clang::ParseDiagnosticArgs(*DiagOpts, ParsedArgs);
@@ -59,7 +63,11 @@ ClangInvocationInfo ClangInvocationInfo::getClangInvocationString(const clang::t
     const std::unique_ptr<clang::driver::Driver> Driver(newDriver(&Diagnostics, BinaryName, &Files->getVirtualFileSystem()));
     // Since the input might only be virtual, don't check whether it exists.
     Driver->setCheckInputsExist(false);
+#if CLANG_VERSION_MAJOR > 15
+    const std::unique_ptr<clang::driver::Compilation> Compilation(Driver->BuildCompilation(llvm::ArrayRef<const char*>(Argv)));
+#else
     const std::unique_ptr<clang::driver::Compilation> Compilation(Driver->BuildCompilation(llvm::makeArrayRef(Argv)));
+#endif
 
     if(Compilation) {
       llvm::raw_string_ostream ss(invocationInfo.invocation);

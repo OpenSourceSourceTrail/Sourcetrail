@@ -1,5 +1,6 @@
 #include "CxxAstVisitorComponentBraceRecorder.h"
 
+#include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
 
 #include "CanonicalFilePathCache.h"
@@ -110,6 +111,17 @@ clang::SourceLocation CxxAstVisitorComponentBraceRecorder::getFirstLBraceLocatio
   }
 
   while(true) {
+#if CLANG_VERSION_MAJOR > 15
+    std::optional<clang::Token> token = clang::Lexer::findNextToken(searchStartLoc, sm, opts);
+    if(token.has_value()) {
+      if(token.value().getKind() == clang::tok::l_brace) {
+        return token.value().getLocation();
+      }
+      searchStartLoc = token.value().getLocation();
+    } else {
+      break;
+    }
+#else
     llvm::Optional<clang::Token> token = clang::Lexer::findNextToken(searchStartLoc, sm, opts);
     if(token.hasValue()) {
       if(token.getValue().getKind() == clang::tok::l_brace) {
@@ -119,7 +131,7 @@ clang::SourceLocation CxxAstVisitorComponentBraceRecorder::getFirstLBraceLocatio
     } else {
       break;
     }
-
+#endif
     if(searchEndLoc < searchStartLoc) {
       break;
     }
@@ -137,11 +149,19 @@ clang::SourceLocation CxxAstVisitorComponentBraceRecorder::getLastRBraceLocation
 
   {
     searchEndLoc = searchEndLoc.getLocWithOffset(-1);
+#if CLANG_VERSION_MAJOR > 15
+    std::optional<clang::Token> token = clang::Lexer::findNextToken(searchEndLoc, sm, opts);
+    if(token.has_value() && token.value().getKind() == clang::tok::r_brace) {
+      return token.value().getLocation();
+    }
+  }
+#else
     llvm::Optional<clang::Token> token = clang::Lexer::findNextToken(searchEndLoc, sm, opts);
     if(token.hasValue() && token.getValue().getKind() == clang::tok::r_brace) {
       return token.getValue().getLocation();
     }
   }
+#endif
 
   while(true) {
     clang::Token token;

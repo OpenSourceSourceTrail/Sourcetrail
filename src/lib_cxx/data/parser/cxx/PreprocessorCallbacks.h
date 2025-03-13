@@ -5,6 +5,7 @@
 #include <set>
 
 #include <clang/Basic/SourceManager.h>
+#include <clang/Basic/Version.h>
 #include <clang/Lex/MacroInfo.h>
 #include <clang/Lex/PPCallbacks.h>
 #include <clang/Lex/Token.h>
@@ -25,6 +26,19 @@ public:
 
   void FileChanged(clang::SourceLocation location, FileChangeReason reason, clang::SrcMgr::CharacteristicKind, clang::FileID) override;
 
+#if CLANG_VERSION_MAJOR >= 19
+  void InclusionDirective(clang::SourceLocation HashLoc,
+                          const clang::Token& IncludeTok,
+                          llvm::StringRef FileName,
+                          bool IsAngled,
+                          clang::CharSourceRange FilenameRange,
+                          clang::OptionalFileEntryRef File,
+                          llvm::StringRef SearchPath,
+                          llvm::StringRef RelativePath,
+                          const clang::Module* SuggestedModule,
+                          bool ModuleImported,
+                          clang::SrcMgr::CharacteristicKind FileType) override;
+#else
   void InclusionDirective(clang::SourceLocation hashLocation,
                           const clang::Token& includeToken,
                           llvm::StringRef fileName,
@@ -35,6 +49,7 @@ public:
                           llvm::StringRef relativePath,
                           const clang::Module* imported,
                           clang::SrcMgr::CharacteristicKind fileType) override;
+#endif
 
   void MacroDefined(const clang::Token& macroNameToken, const clang::MacroDirective* macroDirective) override;
   void MacroUndefined(const clang::Token& macroNameToken,

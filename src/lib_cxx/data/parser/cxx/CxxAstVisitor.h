@@ -1,9 +1,8 @@
 #pragma once
-// STL
 #include <memory>
-// clang
+
 #include <clang/AST/RecursiveASTVisitor.h>
-// internal
+
 #include "CxxAstVisitorComponentBraceRecorder.h"
 #include "CxxAstVisitorComponentContext.h"
 #include "CxxAstVisitorComponentDeclRefKind.h"

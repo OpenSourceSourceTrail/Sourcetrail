@@ -4,14 +4,15 @@
 #include <range/v3/view/transform.hpp>
 
 size_t utility::digits(size_t n) {
+  constexpr int DigitCount = 10;
   int digits = 1;
 
-  while(n >= 10) {
-    n /= 10;
+  while(n >= DigitCount) {
+    n /= DigitCount;
     digits++;
   }
 
-  return digits;
+  return static_cast<size_t>(digits);
 }
 
 namespace utility {

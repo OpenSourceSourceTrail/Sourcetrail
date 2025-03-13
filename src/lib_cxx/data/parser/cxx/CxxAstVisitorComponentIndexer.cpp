@@ -1,11 +1,12 @@
 #include "CxxAstVisitorComponentIndexer.h"
-// clang
+
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Decl.h>
 #include <clang/Basic/SourceLocation.h>
 #include <clang/Basic/SourceManager.h>
+#include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
-// internal
+
 #include "CanonicalFilePathCache.h"
 #include "CxxAstVisitor.h"
 #include "CxxAstVisitorComponentContext.h"
@@ -658,6 +659,25 @@ ParseLocation CxxAstVisitorComponentIndexer::getSignatureLocation(clang::Functio
     }
 
     while(sm.isBeforeInTranslationUnit(endLoc, signatureRange.getEnd())) {
+#if CLANG_VERSION_MAJOR > 15
+      std::optional<clang::Token> token = clang::Lexer::findNextToken(endLoc, sm, opts);
+      if(token.has_value()) {
+        const clang::tok::TokenKind tokenKind = token.value().getKind();
+        if(tokenKind == clang::tok::l_brace || tokenKind == clang::tok::colon) {
+          signatureRange.setEnd(endLoc);
+          return getParseLocation(signatureRange);
+        }
+
+        clang::SourceLocation nextEndLoc = token.value().getLocation();
+        if(nextEndLoc == endLoc) {
+          return ParseLocation();
+        }
+
+        endLoc = nextEndLoc;
+      } else {
+        return ParseLocation();
+      }
+#else
       llvm::Optional<clang::Token> token = clang::Lexer::findNextToken(endLoc, sm, opts);
       if(token.hasValue()) {
         const clang::tok::TokenKind tokenKind = token.getValue().getKind();
@@ -675,6 +695,7 @@ ParseLocation CxxAstVisitorComponentIndexer::getSignatureLocation(clang::Functio
       } else {
         return ParseLocation();
       }
+#endif
     }
     return ParseLocation();
   }

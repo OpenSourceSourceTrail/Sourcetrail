@@ -2,9 +2,30 @@
 
 #include <clang/AST/ASTContext.h>
 #include <clang/Basic/FileManager.h>
+#include <clang/Basic/Version.h>
 
 #include "utilityClang.h"
 #include "utilityString.h"
+
+#if CLANG_VERSION_MAJOR > 15
+namespace {
+std::wstring getFileNameOfFileEntry(const clang::FileEntry* entry, const clang::FileEntryRef& fileEntryRef) {
+  std::wstring fileName = L"";
+  if(entry != nullptr) {
+    fileName = utility::decodeFromUtf8(entry->tryGetRealPathName().str());
+    if(fileName.empty()) {
+      fileName = utility::decodeFromUtf8(fileEntryRef.getName().str());
+    } else {
+      fileName = FilePath(utility::decodeFromUtf8(fileEntryRef.getName().str()))
+                     .getParentDirectory()
+                     .concatenate(FilePath(fileName).fileName())
+                     .wstr();
+    }
+  }
+  return fileName;
+}
+}    // namespace
+#endif
 
 CanonicalFilePathCache::CanonicalFilePathCache(std::shared_ptr<FileRegister> fileRegister) : m_fileRegister(fileRegister) {}
 
@@ -26,7 +47,12 @@ FilePath CanonicalFilePathCache::getCanonicalFilePath(const clang::FileID& fileI
 
   const clang::FileEntry* fileEntry = sourceManager.getFileEntryForID(fileId);
   if(fileEntry != nullptr) {
+#if CLANG_VERSION_MAJOR > 15
+    clang::OptionalFileEntryRef fileEntryRef = sourceManager.getFileEntryRefForID(fileId);
+    filePath = getCanonicalFilePath(getFileNameOfFileEntry(fileEntry, *fileEntryRef));
+#else
     filePath = getCanonicalFilePath(fileEntry);
+#endif
     m_fileIdMap.emplace(fileId, filePath);
   }
 

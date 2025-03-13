@@ -6,7 +6,7 @@
 
 class FilePath;
 class Storage;
-class StorageSourceLocation;
+struct StorageSourceLocation;
 
 class TestStorage {
 public:

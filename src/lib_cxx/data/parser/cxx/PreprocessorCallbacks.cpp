@@ -38,6 +38,19 @@ void PreprocessorCallbacks::FileChanged(clang::SourceLocation location,
   }
 }
 
+#if CLANG_VERSION_MAJOR > 15
+void PreprocessorCallbacks::InclusionDirective(clang::SourceLocation /*hashLocation*/,
+                                               const clang::Token& /*includeToken*/,
+                                               llvm::StringRef /*fileName*/,
+                                               bool /*isAngled*/,
+                                               clang::CharSourceRange fileNameRange,
+                                               clang::OptionalFileEntryRef fileEntry,
+                                               llvm::StringRef /*searchPath*/,
+                                               llvm::StringRef /*relativePath*/,
+                                               const clang::Module* /*imported*/,
+                                               bool /*ModuleImported*/,
+                                               clang::SrcMgr::CharacteristicKind /*fileType*/) {
+#else
 void PreprocessorCallbacks::InclusionDirective(clang::SourceLocation /*hashLocation*/,
                                                const clang::Token& /*includeToken*/,
                                                llvm::StringRef /*fileName*/,
@@ -48,6 +61,7 @@ void PreprocessorCallbacks::InclusionDirective(clang::SourceLocation /*hashLocat
                                                llvm::StringRef /*relativePath*/,
                                                const clang::Module* /*imported*/,
                                                clang::SrcMgr::CharacteristicKind /*fileType*/) {
+#endif
   if(m_currentFileSymbolId && fileEntry) {
     const FilePath includedFilePath = m_canonicalFilePathCache->getCanonicalFilePath(fileEntry.value());
     const NameHierarchy includedFileNameHierarchy(includedFilePath.wstr(), NAME_DELIMITER_FILE);
