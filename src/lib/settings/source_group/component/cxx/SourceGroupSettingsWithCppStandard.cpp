@@ -1,6 +1,6 @@
 #include "SourceGroupSettingsWithCppStandard.h"
 
-#include "ProjectSettings.h"
+#include "ConfigManager.hpp"
 
 std::wstring SourceGroupSettingsWithCppStandard::getDefaultCppStandardStatic() {
 #ifdef __linux__
@@ -9,6 +9,8 @@ std::wstring SourceGroupSettingsWithCppStandard::getDefaultCppStandardStatic() {
   return L"c++17";
 #endif
 }
+
+SourceGroupSettingsWithCppStandard::~SourceGroupSettingsWithCppStandard() = default;
 
 std::wstring SourceGroupSettingsWithCppStandard::getCppStandard() const {
   if(m_cppStandard.empty()) {
@@ -21,27 +23,27 @@ void SourceGroupSettingsWithCppStandard::setCppStandard(const std::wstring& stan
   m_cppStandard = standard;
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::vector<std::wstring> SourceGroupSettingsWithCppStandard::getAvailableCppStandards() const {
   // as defined in clang/include/clang/Frontend/LangStandards.def
 
-  return {L"c++2a",
-          L"gnu++2a",
-          L"c++17",
-          L"gnu++17",
-          L"c++14",
-          L"gnu++14",
-          L"c++11",
-          L"gnu++11",
-          L"c++03",
-          L"gnu++03",
-          L"c++98",
-          L"gnu++98"};
+  // clang-format off
+  return {
+  L"c++23", L"gnu++23",
+  L"c++2c", L"gnu++2c",
+  L"c++20", L"gnu++20",
+  L"c++17", L"gnu++17",
+  L"c++14", L"gnu++14",
+  L"c++11", L"gnu++11",
+  L"c++03", L"gnu++03",
+  L"c++98", L"gnu++98"};
+  // clang-format on
 }
 
 bool SourceGroupSettingsWithCppStandard::equals(const SourceGroupSettingsBase* other) const {
-  const SourceGroupSettingsWithCppStandard* otherPtr = dynamic_cast<const SourceGroupSettingsWithCppStandard*>(other);
+  const auto* otherPtr = dynamic_cast<const SourceGroupSettingsWithCppStandard*>(other);
 
-  return (otherPtr && m_cppStandard == otherPtr->m_cppStandard);
+  return (nullptr != otherPtr && m_cppStandard == otherPtr->m_cppStandard);
 }
 
 void SourceGroupSettingsWithCppStandard::load(const ConfigManager* config, const std::string& key) {
@@ -52,6 +54,7 @@ void SourceGroupSettingsWithCppStandard::save(ConfigManager* config, const std::
   config->setValue(key + "/cpp_standard", getCppStandard());
 }
 
+// NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 std::wstring SourceGroupSettingsWithCppStandard::getDefaultCppStandard() const {
   return getDefaultCppStandardStatic();
 }
