@@ -39,19 +39,21 @@ RUN wget -q https://github.com/Kitware/CMake/releases/download/v3.24.0/cmake-3.2
     rm /tmp/cmake.tar.gz
 
 # Build Clang from source
-RUN INSTALL_PREFIX="/opt/llvm-15.0.7" && \
-    wget -q https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-15.0.7.tar.gz -O /tmp/llvmorg-15.0.7.tar.gz && \
-    tar -xzf /tmp/llvmorg-15.0.7.tar.gz -C /tmp/ &&                                                                       \
-    cmake -G Ninja                                                                                                        \
-    -DCMAKE_BUILD_TYPE=Release                                                                                      \
-    -DLLVM_ENABLE_PROJECTS=clang                                                                                    \
-    -DLLVM_ENABLE_RTTI=ON                                                                                           \
-    -DLLVM_TARGETS_TO_BUILD=host                                                                                    \
-    -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}                                                                        \
-    /tmp/llvm-project-llvmorg-15.0.7/llvm -B /tmp/build &&                                                          \
-    cmake --build /tmp/build &&                                                                                           \
-    cmake --install /tmp/build &&                                                                                         \
-    rm -rf /tmp/llvmorg-15.0.7.tar.gz /tmp/llvm-project-llvmorg-15.0.7 /tmp/build
+ENV INSTALL_PREFIX="/opt/llvm-19.1.7"
+RUN mkdir -p "/tmp/llvm" &&                                                                               \
+    git clone --depth 1 --branch llvmorg-19.1.7 "https://github.com/llvm/llvm-project.git" "/tmp/llvm" && \
+    cmake -S "/tmp/llvm/llvm" -B "/tmp/llvm/build"                                                        \
+    -G Ninja                                                                                              \
+    -DCMAKE_BUILD_TYPE=Release                                                                            \
+    -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                            \
+    -DLLVM_ENABLE_PROJECTS="clang"                                                                        \
+    -DLLVM_ENABLE_RTTI=ON                                                                                 \
+    -DCLANG_LINK_CLANG_DYLIB=ON                                                                           \
+    -DLLVM_LINK_LLVM_DYLIB=ON                                                                             \
+    -DLLVM_TARGETS_TO_BUILD=host &&                                                                       \
+    ninja -C "/tmp/llvm/build" -j"$(nproc)" &&                                                            \
+    ninja -C "/tmp/llvm/build" install &&                                                                 \
+    rm -rf "/tmp/llvm"
 
 # Add a non-root user in one step
 # For further details check https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
