@@ -1,5 +1,58 @@
 ### Changelog
 
+#### WIP
+
+* Migrate the Project from Qt5.15 to Qt6.8 (#47)
+* Docker: migrate from clang 15 to 19 (#55)
+* src: Migrate from clang 15 to 19 (#52)
+* ci: optimize clang-format CI job (#54)
+* src: Add integration tests for c++17 (#53)
+* Remove wide charcter logging macro (#44)
+* ci: CI need to build with and without cxx (#50)
+* build: unify add_unit_test (#48)
+* ci: Update github action cache to v4 (#49)
+* docker: upgrade docker env to match ci (#46)
+* src: Fix logging header (#40)
+* Migrate sourcetrail to C++20 (#42)
+* build: Store build/ctest log (#43)
+* Update CI to gcc-13 and clang-18 (#41)
+* hotfix: solve msvc build error (#39)
+* build: Add Hussein to authors
+* quality: suppress compiler warnings (#31)
+* ci: use clang build cache in linux build workflow (#34)
+* ci: upgrade upload-artifact action to version 4 (#35)
+* ci: fix clang tidy failure when no cpp file detected (#32)
+* src: Fix logging.h (#30)
+* Fix FileSystem utests (#29)
+
+#### 1.1.0
+released 2024-02-10
+
+* Refactor Application by @wow2006 in #3
+* Docker: add rules in Dockerfile to prepare dev img by @Eng-MohamedHussien in #4
+* Port TinyXML to Qt XML by @wow2006 in #5
+* Docker: solve runtime error while link with llvm by @Eng-MohamedHussien in #6
+* Replace custom math lib with modules from QT by @Eng-MohamedHussien in #8
+* Fix delete of recent projects by @Eng-MohamedHussien in #9
+* Update logging macro to use relative path by @Eng-MohamedHussien in #10
+* src: Fix Windows CI by @wow2006 in #13
+* Sour 94 by @wow2006 in #14
+* src: Move tests from src/test by @wow2006 in #15
+* Fix ctest for window by @wow2006 in #16
+* Format and increase the coverage for the Sqlite by @wow2006 in #7
+* Migrate from boost::filesystem to std::filesystem by @Eng-MohamedHussien in #11
+* src: Add filesystem by @wow2006 in #19
+* src: Add more unit-tests for buildIndex by @wow2006 in #17
+* ci: migrate to ubuntu 24.04 by @Eng-MohamedHussien in #20
+* Sour 62 pt2 by @wow2006 in #12
+* Create clang_build.yml by @wow2006 in #18
+* src: Enhance error handling and logging in indexer application by @wow2006 in #22
+* ci: Add clang-tidy for CI by @wow2006 in #23
+* ci: add cppcheck workflow by @Eng-MohamedHussien in #21
+* chore: migrate dockerfile to ubuntu 24.04 by @Eng-MohamedHussien in #26
+* Sour 106 by @wow2006 in #28
+* chore: update cppcheck cmake to generate html report by @Eng-MohamedHussien in #27
+
 #### 1.0.0
 released 2024-01-11
 

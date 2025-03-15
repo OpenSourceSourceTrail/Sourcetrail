@@ -24,8 +24,6 @@ Sourcetrail is:
 
 To setup Sourcetrail on your machine, you can either download the respective build for your operating system from our list of [Releases](https://github.com/CoatiSoftware/Sourcetrail/releases) and install it on your machine, or use one of the following package managers:
 
-* ~~Use the [Chocolatey package](https://chocolatey.org/packages/sourcetrail) with `choco install sourcetrail`~~
-
 After your installation is complete, follow our [Quick Start Guide](DOCUMENTATION.md#getting-started) to get to know Sourcetrail.
 
 ## How to Report Issues
@@ -58,7 +56,7 @@ Building Sourcetrail requires several dependencies to be in place on your machin
 
 ### Required Tools
 
-* __CMake v3.20 (required for Windows, Linux and MacOS)__
+* __CMake v3.23 (required for Windows, Linux and MacOS)__
     * __Reason__: Used to generate a build configuration for your build system
     * __Download__: https://cmake.org/download
 
@@ -71,24 +69,16 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     * __Reason__: Used for building Sourcetrail
     * __Download__: https://visualstudio.microsoft.com/downloads/
 
-* __ccache (optional for Linux and MacOS)__
-    * __Reason__: Used to speed up rebuilds if found in `PATH`
-    * __Download__: https://ccache.dev/download.html
-
 ### Required dependencies
 
-* __Boost 1.74__
-    * __Reason__: Used for file system access and interprocess communication
-    * __Prebuilt Download for Windows__: https://sourceforge.net/projects/boost/files/boost-binaries/
-    * __Building for Unix__:
-        ```
-        $ ./bootstrap.sh --with-libraries=filesystem,program_options,system,date_time
-        $ ./b2 --link=static --variant=release --threading=multi --runtime-link=static --cxxflags=-fPIC
-        ```
+* __Conan 2__
+    * __Reason__: Package Manager
+    * __Install__: pip3 install conan
 
-* __Qt 5.15__
+* __Qt 6.8.2__
     * __Reason__: Used for rendering the GUI and for starting additional (indexer) processes.
     * __Prebuilt Download__: http://download.qt.io/official_releases/qt/
+    * __aqt installer__: https://github.com/miurahr/aqtinstall
 
 ### Building
 
@@ -119,15 +109,15 @@ Building Sourcetrail requires several dependencies to be in place on your machin
 
 ### Running
 
-* Run Sourcetrail from within the build directory. During execution Sourcetrail needs resources from `bin/app/data` and `bin/app/user`. CMake creates symlinks within the build directory that make these directories accessible.
+* Run Sourcetrail from within the `bin` directory.
 
 ## Enable C/C++ Language Support
 
 ### Required dependencies
 
-* __LLVM/Clang 15.0.7__
+* __LLVM/Clang 19.1.7__
     * __Reason__: Used for running the preprocessor on the indexed source code, building and traversing an Abstract Syntax Tree and generating error messages.
-    * __Building__: Make sure to check out the correct tag: `git checkout llvmorg-15.0.7`
+    * __Building__: Make sure to check out the correct tag: `git checkout llvmorg-19.1.7`
     * __Building for Windows__: Follow [these steps](https://clang.llvm.org/get_started.html) to build the project. Run the cmake command exactly as described. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
     * __Building for Unix__: Follow this [installation guide](http://clang.llvm.org/docs/LibASTMatchersTutorial.html) to build the project. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DCLANG_LINK_CLANG_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
 
