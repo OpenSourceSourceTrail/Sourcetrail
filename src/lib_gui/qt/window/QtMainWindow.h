@@ -7,7 +7,6 @@
 
 #include "FilePath.h"
 #include "QtWindowStack.h"
-#include "QtWindowsTaskbarButton.h"
 
 class Bookmark;
 class MessageBase;
@@ -196,6 +195,4 @@ private:
   bool m_showDockWidgetTitleBars = true;
 
   QtWindowStack m_windowStack;
-
-  QtWindowsTaskbarButton m_windowsTaskbarButton;
 };
