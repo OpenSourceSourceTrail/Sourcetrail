@@ -25,8 +25,7 @@ function(copy_qt_binaries DESTINATION IS_APP)
       Qt5Gui
       Qt5Network
       Qt5Svg
-      Qt5Widgets
-      Qt5WinExtras)
+      Qt5Widgets)
 
   if(IS_APP)
     set(SETUP_URL "https://codeload.github.com/OpenSourceSourceTrail/setup/zip/refs/heads/main")

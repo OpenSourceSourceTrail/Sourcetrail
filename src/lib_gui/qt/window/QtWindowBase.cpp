@@ -1,19 +1,14 @@
 #include "QtWindowBase.h"
-// Qt5
+
 #include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>
+#include <QtGlobal>
 #include <QVBoxLayout>
-// internal
+
 #include "IApplicationSettings.hpp"
 #include "ResourcePaths.h"
 
-QtWindowBase::QtWindowBase(bool isSubWindow, QWidget* parent)
-    : QtWindowStackElement(parent)
-    , m_isSubWindow(isSubWindow)
-    , m_window(nullptr)
-    , m_content(nullptr)
-    , m_mousePressedInWindow(false)
-    , m_sizeGrip(nullptr) {
+QtWindowBase::QtWindowBase(bool isSubWindow, QWidget* parent) : QtWindowStackElement(parent), m_isSubWindow(isSubWindow) {
   if(isSubWindow) {
     setWindowFlags(Qt::SubWindow | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -111,7 +106,11 @@ void QtWindowBase::hideWindow() {
 void QtWindowBase::mouseMoveEvent(QMouseEvent* event) {
   if(event->buttons() & Qt::LeftButton && m_mousePressedInWindow) {
     if(m_isSubWindow) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      QPoint pos = event->globalPosition().toPoint() - m_dragPosition;
+#else
       QPoint pos = event->globalPos() - m_dragPosition;
+#endif
       QRect parentRect = parentWidget()->rect();
 
       if(pos.x() < parentRect.left()) {
@@ -123,7 +122,11 @@ void QtWindowBase::mouseMoveEvent(QMouseEvent* event) {
       move(pos);
       event->accept();
     } else {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+      move(event->globalPosition().toPoint() - m_dragPosition);
+#else
       move(event->globalPos() - m_dragPosition);
+#endif
       event->accept();
     }
   }
@@ -131,7 +134,11 @@ void QtWindowBase::mouseMoveEvent(QMouseEvent* event) {
 
 void QtWindowBase::mousePressEvent(QMouseEvent* event) {
   if(event->button() == Qt::LeftButton) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
+#else
     m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+#endif
     event->accept();
     m_mousePressedInWindow = true;
   }
@@ -139,7 +146,11 @@ void QtWindowBase::mousePressEvent(QMouseEvent* event) {
 
 void QtWindowBase::mouseReleaseEvent(QMouseEvent* event) {
   if(event->button() == Qt::LeftButton) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
+#else
     m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+#endif
     event->accept();
     m_mousePressedInWindow = false;
   }

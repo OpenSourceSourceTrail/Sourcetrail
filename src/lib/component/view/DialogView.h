@@ -17,7 +17,7 @@ public:
   enum class UseCase { GENERAL, INDEXING, PROJECT_SETUP };
 
   DialogView(UseCase useCase, StorageAccess* storageAccess);
-  virtual ~DialogView() = default;
+  virtual ~DialogView();
 
   [[nodiscard]] UseCase getUseCase() const;
 

@@ -56,7 +56,7 @@ foreach(test_name IN LISTS test_lib_names)
     Sourcetrail::lib
     Sourcetrail::gtest_main
     Sourcetrail::core::utility::TextAccess
-    Qt5::Gui
+    Qt6::Gui
     TEST_PREFIX
     "unittests.lib."
     WORKING_DIRECTORY

@@ -9,7 +9,7 @@ class QtCodeNavigator;
 class QtCodeView : public CodeView {
 public:
   QtCodeView(ViewLayout* viewLayout);
-  ~QtCodeView() = default;
+  ~QtCodeView() override;
 
   // View implementation
   void createWidgetWrapper() override;

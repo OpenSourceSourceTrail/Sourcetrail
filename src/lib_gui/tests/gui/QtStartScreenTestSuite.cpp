@@ -12,6 +12,12 @@ QtStartScreenTestSuite::QtStartScreenTestSuite() = default;
 
 QtStartScreenTestSuite::~QtStartScreenTestSuite() = default;
 
+void QtStartScreenTestSuite::initTestCase() {
+  testing::InitGoogleMock();
+  auto* logger = spdlog::default_logger_raw();
+  logger->set_level(spdlog::level::off);
+}
+
 void QtStartScreenTestSuite::init() {
   IApplicationSettings::setInstance(mMocked);
   EXPECT_CALL(*mMocked, getWindowBaseWidth()).WillOnce(testing::Return(600));
@@ -32,9 +38,4 @@ void QtStartScreenTestSuite::cleanup() {
   mMocked.reset();
 }
 
-int main(int argc, char* argv[]) {
-  testing::InitGoogleMock(&argc, argv);
-  auto* logger = spdlog::default_logger_raw();
-  logger->set_level(spdlog::level::off);
-  QTEST_MAIN_IMPL(QtStartScreenTestSuite)
-}
+QTEST_MAIN(QtStartScreenTestSuite)

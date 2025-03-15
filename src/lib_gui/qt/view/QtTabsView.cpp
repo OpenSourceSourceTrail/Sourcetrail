@@ -17,43 +17,41 @@
 #include "TabsController.h"
 #include "utilityQt.h"
 
-QtTabsView::QtTabsView(ViewLayout* viewLayout) : TabsView(viewLayout), m_widget(nullptr), m_insertedTabCount(0) {
-  m_widget = new QWidget();
-
-  QHBoxLayout* layout = new QHBoxLayout(m_widget);
+QtTabsView::QtTabsView(ViewLayout* viewLayout) : TabsView(viewLayout), m_widget(new QWidget), m_insertedTabCount(0) {
+  auto* layout = new QHBoxLayout{m_widget};
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
 
-  QWidget* front = new QWidget();
+  auto* front = new QWidget;
   front->setMinimumWidth(5);
   front->setObjectName(QStringLiteral("side_area"));
   layout->addWidget(front);
 
-  m_tabBar = new QtTabBar();
+  m_tabBar = new QtTabBar;
   m_tabBar->setDrawBase(false);
   m_tabBar->setMinimumWidth(0);
   m_tabBar->setMovable(true);
   m_tabBar->setElideMode(Qt::ElideMiddle);
   layout->addWidget(m_tabBar);
 
-  connect(m_tabBar, &QTabBar::currentChanged, this, &QtTabsView::changedTab);
+  std::ignore = connect(m_tabBar, &QTabBar::currentChanged, this, &QtTabsView::changedTab);
 
   QPushButton* addButton = new QtSelfRefreshIconButton(
       QLatin1String(""), ResourcePaths::getGuiDirectoryPath().concatenate(L"tabs_view/images/add.png"), "tab/bar/button");
   addButton->setObjectName(QStringLiteral("add_button"));
   addButton->setIconSize(QSize(14, 14));
 
-  QWidget* back = new QWidget();
+  auto* back = new QWidget;
   back->setObjectName(QStringLiteral("side_area"));
-  QHBoxLayout* backLayout = new QHBoxLayout(back);
+  auto* backLayout = new QHBoxLayout(back);
   backLayout->setContentsMargins(3, 0, 5, 0);
   backLayout->setSpacing(0);
   backLayout->addWidget(addButton);
   backLayout->addStretch();
   layout->addWidget(back);
 
-  connect(addButton, &QPushButton::clicked, this, &QtTabsView::addTab);
-  connect(m_tabBar, &QtTabBar::signalCloseTabsToRight, this, &QtTabsView::closeTabsToRight);
+  std::ignore = connect(addButton, &QPushButton::clicked, this, &QtTabsView::addTab);
+  std::ignore = connect(m_tabBar, &QtTabBar::signalCloseTabsToRight, this, &QtTabsView::closeTabsToRight);
 }
 
 void QtTabsView::createWidgetWrapper() {
@@ -61,17 +59,17 @@ void QtTabsView::createWidgetWrapper() {
 }
 
 void QtTabsView::refreshView() {
-  m_onQtThread([=]() { setStyleSheet(); });
+  m_onQtThread([this]() { setStyleSheet(); });
 }
 
 void QtTabsView::clear() {
-  m_onQtThread([=]() {
+  m_onQtThread([this]() {
     getController<TabsController>()->onClearTabs();
 
     m_tabBar->blockSignals(true);
 
-    int c = m_tabBar->count();
-    for(int i = c - 1; i >= 0; i--) {
+    const int count = m_tabBar->count();
+    for(int i = count - 1; i >= 0; i--) {
       removeTab(i);
     }
 
@@ -80,19 +78,19 @@ void QtTabsView::clear() {
 }
 
 void QtTabsView::openTab(bool showTab, const SearchMatch& match) {
-  m_onQtThread([=]() { insertTab(showTab, match); });
+  m_onQtThread([this, showTab, match]() { insertTab(showTab, match); });
 }
 
 void QtTabsView::closeTab() {
-  m_onQtThread([=]() { removeTab(m_tabBar->currentIndex()); });
+  m_onQtThread([this]() { removeTab(m_tabBar->currentIndex()); });
 }
 
 void QtTabsView::destroyTab(Id tabId) {
-  m_onQtThread([=]() { getController<TabsController>()->destroyTab(tabId); });
+  m_onQtThread([this, tabId]() { getController<TabsController>()->destroyTab(tabId); });
 }
 
 void QtTabsView::selectTab(bool next) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, next]() {
     int idx = m_tabBar->currentIndex();
     if(idx != -1) {
       idx += next ? 1 : -1;
@@ -102,7 +100,7 @@ void QtTabsView::selectTab(bool next) {
 }
 
 void QtTabsView::updateTab(Id tabId, const std::vector<SearchMatch>& matches) {
-  m_onQtThread([=]() {
+  m_onQtThread([this, tabId, matches]() {
     for(int i = 0; i < m_tabBar->count(); i++) {
       if(m_tabBar->tabData(i).toInt() == int(tabId)) {
         setTabState(i, matches);
@@ -128,11 +126,11 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
   idx = m_tabBar->insertTab(idx, QStringLiteral(" Empty Tab "));
   m_tabBar->setTabData(idx, QVariant(tabId));
 
-  QPushButton* typeCircle = new QPushButton();
+  auto* typeCircle = new QPushButton;
   typeCircle->setObjectName(QStringLiteral("type_circle"));
   m_tabBar->setTabButton(idx, QTabBar::LeftSide, typeCircle);
 
-  connect(typeCircle, &QPushButton::clicked, [tabId, this]() {
+  std::ignore = connect(typeCircle, &QPushButton::clicked, this, [tabId, this]() {
     for(int i = 0; i < m_tabBar->count(); i++) {
       if(m_tabBar->tabData(i).toInt() == tabId) {
         m_tabBar->setCurrentIndex(i);
@@ -147,7 +145,7 @@ void QtTabsView::insertTab(bool showTab, const SearchMatch& match) {
   closeButton->setIconSize(QSize(10, 10));
   m_tabBar->setTabButton(idx, QTabBar::RightSide, closeButton);
 
-  connect(closeButton, &QPushButton::clicked, [tabId, this]() {
+  std::ignore = connect(closeButton, &QPushButton::clicked, [tabId, this]() {
     for(int i = 0; i < m_tabBar->count(); i++) {
       if(m_tabBar->tabData(i).toInt() == tabId) {
         removeTab(i);
@@ -198,7 +196,7 @@ void QtTabsView::setTabState(int idx, const std::vector<SearchMatch>& matches) {
   std::string color;
   std::string activeColor;
 
-  if(matches.size()) {
+  if(!matches.empty()) {
     const SearchMatch& match = matches[0];
     name = match.getFullName();
 

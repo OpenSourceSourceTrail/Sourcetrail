@@ -28,12 +28,13 @@ jobs:
           fetch-depth: 0  # Fetch full history to ensure base SHA is available
 
       - name: Install clang-format
-        run: sudo apt-get install clang-format-18 -y
+        run: |
+          sudo apt-get install clang-format-18 -y
 
       - name: Run clang-format style check for modified .cpp|.h|.hpp files
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
+          CHANGED_FILES=$(git diff --name-only --diff-filter=M ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
+          echo
           if [ -n "$CHANGED_FILES" ]; then
             clang-format --dry-run --Werror $CHANGED_FILES
           else
@@ -112,22 +113,39 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc g++ clang ninja-build qtbase5-dev libqt5svg5-dev python3-pip grep
+        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep
+
+      - name: Install Qt (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.2.*'
+          dir: '${{github.workspace}}/Qt/'
+          install-deps: 'true'
+          version: '6.8.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+          modules: 'qt5compat'
+          archives: 'icu qtbase qtdeclarative qtsvg'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action-linux'
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: '==3.1.*'
+          aqtversion: '==3.2.*'
           dir: '${{github.workspace}}/Qt/'
           install-deps: 'true'
-          version: '5.15.2'
+          version: '6.8.2'
           host: 'windows'
           target: 'desktop'
-          arch: 'win64_msvc2019_64'
-          archives: 'qtwinextras qtsvg qtbase icu'
+          arch: 'win64_msvc2022_64'
+          modules: 'qt5compat'
+          archives: 'qtbase qtdeclarative qtsvg'
           cache: 'true'
-          cache-key-prefix: 'install-qt-action'
+          cache-key-prefix: 'install-qt-action-windows'
 
       - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'

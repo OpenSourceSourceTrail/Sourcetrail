@@ -27,7 +27,7 @@ jobs:
       - name: Run CppCheck
         run: |
           SKIP_NEXT_STEPS=false
-          FILES=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
+          FILES=$(git diff --name-only --diff-filter=M ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | grep -E '\.(cpp|h|hpp)$' || true)
           if [ -n "$FILES" ]; then
             # Run cppcheck on all C++ files
             cppcheck --enable=all --inline-suppr --std=c++17 \

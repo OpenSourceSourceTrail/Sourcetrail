@@ -11,7 +11,7 @@ add_sourcetrail_library(
   Sourcetrail::core::utility::file::FilePath
   Sourcetrail::core::utility::OsType
   PRIVATE_DEPS
-  Qt5::Core
+  Qt6::Core
   Boost::filesystem
   Sourcetrail::core::utility::logging
   Sourcetrail::core::utility::ScopedFunctor

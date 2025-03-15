@@ -14,7 +14,7 @@ class QtTabbedView
     , public TabbedView {
 public:
   QtTabbedView(ViewLayout* viewLayout, const std::string& name);
-  ~QtTabbedView() = default;
+  ~QtTabbedView() override;
 
   // View implementation
   void createWidgetWrapper() override;

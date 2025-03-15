@@ -1,8 +1,7 @@
 #pragma once
-// STL
 #include <string>
 #include <vector>
-// internal
+
 #include "ErrorCountInfo.h"
 #include "ErrorFilter.h"
 #include "ErrorInfo.h"

@@ -8,6 +8,10 @@
 #include "MessageQueue.h"
 #include "QtNetworkFactory.h"
 
+void QtNetworkFactoryTestSuite::initTestCase() {
+  testing::InitGoogleMock();
+}
+
 void QtNetworkFactoryTestSuite::init() {
   IMessageQueue::setInstance(std::make_shared<MockedMessageQueue>());
 }
@@ -21,7 +25,4 @@ void QtNetworkFactoryTestSuite::cleanup() {
   IMessageQueue::setInstance(nullptr);
 }
 
-int main(int argc, char* argv[]) {
-  testing::InitGoogleMock(&argc, argv);
-  QTEST_MAIN_IMPL(QtNetworkFactoryTestSuite)
-}
+QTEST_MAIN(QtNetworkFactoryTestSuite)

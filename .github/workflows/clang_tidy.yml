@@ -23,7 +23,7 @@ jobs:
 
       - name: Run clang-tidy
         run: |
-          src_files=$(git diff origin/main --name-only | grep "\.cpp" || true)
+          src_files=$(git diff origin/main --diff-filter=M --name-only | grep "\.cpp" || true)
           if [ -z "$src_files" ]; then
             echo "No files to check."
           else

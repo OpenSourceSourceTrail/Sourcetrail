@@ -74,10 +74,14 @@ QMimeData* RecentItemModel::mimeData(const QModelIndexList& indexes) const {
     return nullptr;
   }
 
-  auto* data = new QMimeData;
-  const auto& format = types.at(0);
+  auto* data = new QMimeData;    // NOLINT(cppcoreguidelines-owning-memory): Qt will take ownership of the pointer
+  const auto& format = types.front();
   QByteArray encoded;
-  QDataStream stream(&encoded, QIODevice::WriteOnly);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QDataStream stream{&encoded, QDataStream::OpenMode::enum_type::WriteOnly};
+#else
+  QDataStream stream{&encoded, QIODevice::WriteOnly};
+#endif
 
   auto item = mRecentProjects[static_cast<size_t>(indexes.front().row())];
   stream << item;
@@ -116,7 +120,11 @@ bool RecentItemModel::dropMimeData(const QMimeData* data,
   }
 
   QByteArray encodedData = data->data(MIME_TYPE);
-  QDataStream stream(&encodedData, QIODevice::ReadOnly);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+  QDataStream stream{&encodedData, QDataStream::OpenMode::enum_type::ReadOnly};
+#else
+  QDataStream stream{&encodedData, QIODevice::ReadOnly};
+#endif
   RecentItem item;
   stream >> item;
 

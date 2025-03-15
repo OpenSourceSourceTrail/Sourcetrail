@@ -27,7 +27,7 @@ public:
   void hideIndexingProgress();
 
 protected:
-  virtual void resizeEvent(QResizeEvent* event);
+  void resizeEvent(QResizeEvent* event) override;
 
 private slots:
   void showStatus();

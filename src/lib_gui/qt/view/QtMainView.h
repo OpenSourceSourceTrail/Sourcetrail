@@ -22,9 +22,9 @@ class QtMainView
     , public MessageListener<MessageWindowChanged> {
 public:
   QtMainView(const ViewFactory* viewFactory, StorageAccess* storageAccess);
-  ~QtMainView();
+  ~QtMainView() override;
 
-  QtMainWindow* getMainWindow() const;
+  [[nodiscard]] QtMainWindow* getMainWindow() const;
 
   // ViewLayout implementation
   void addView(View* view) override;
@@ -36,7 +36,7 @@ public:
 
   void setViewEnabled(View* view, bool enabled) override;
 
-  View* findFloatingView(const std::string& name) const override;
+  [[nodiscard]] View* findFloatingView(const std::string& name) const override;
 
   void showOriginalViews() override;
 

@@ -32,7 +32,7 @@ endif()
 target_link_libraries(
   Sourcetrail_indexer
   PRIVATE $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
-          Qt5::Core
+          Qt6::Core
           Sourcetrail::core
           Sourcetrail::lib
           Sourcetrail::lib_gui

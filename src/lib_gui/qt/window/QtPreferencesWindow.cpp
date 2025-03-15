@@ -41,7 +41,7 @@ QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindo
   setScrollAble(true);
 }
 
-QtPreferencesWindow::~QtPreferencesWindow() {}
+QtPreferencesWindow::~QtPreferencesWindow() = default;
 
 void QtPreferencesWindow::windowReady() {
   QtProjectWizardWindow::windowReady();

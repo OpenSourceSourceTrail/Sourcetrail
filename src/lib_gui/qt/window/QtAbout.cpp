@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "globalStrings.h"
 #include "QtDeviceScaledPixmap.h"
 #include "ResourcePaths.h"
 #include "SqliteIndexStorage.h"
@@ -12,16 +13,16 @@
 #include "utilityQt.h"
 #include "Version.h"
 
-QtAbout::QtAbout(QWidget* parent) : QtWindow(false, parent) {}
+QtAbout::QtAbout(QWidget* parent) : QtWindow{false, parent} {}
 
 QSize QtAbout::sizeHint() const {
-  return QSize(450, 480);
+  return {450, 480};
 }
 
 void QtAbout::setupAbout() {
   setStyleSheet(utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"about/about.css")).c_str());
 
-  QVBoxLayout* windowLayout = new QVBoxLayout();
+  auto* windowLayout = new QVBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory): Qt will handles it
   windowLayout->setContentsMargins(10, 10, 10, 0);
   windowLayout->setSpacing(1);
   m_content->setLayout(windowLayout);
@@ -30,7 +31,7 @@ void QtAbout::setupAbout() {
     QtDeviceScaledPixmap sourcetrailLogo(
         QString::fromStdWString(ResourcePaths::getGuiDirectoryPath().wstr() + L"about/logo_sourcetrail.png"));
     sourcetrailLogo.scaleToHeight(150);
-    QLabel* sourcetrailLogoLabel = new QLabel(this);
+    auto* sourcetrailLogoLabel = new QLabel{this};    // NOLINT(cppcoreguidelines-owning-memory): Qt will handles it
     sourcetrailLogoLabel->setPixmap(sourcetrailLogo.pixmap());
     sourcetrailLogoLabel->resize(static_cast<int>(sourcetrailLogo.width()), static_cast<int>(sourcetrailLogo.height()));
     windowLayout->addWidget(sourcetrailLogoLabel, 0, Qt::Alignment(Qt::AlignmentFlag::AlignHCenter));
@@ -39,35 +40,33 @@ void QtAbout::setupAbout() {
   windowLayout->addSpacing(10);
 
   {
-    QLabel* versionLabel = new QLabel(
+    auto* versionLabel = new QLabel{
         ("Version " + Version::getApplicationVersion().toString() + " - " +
          std::string(utility::getApplicationArchitectureType() == ApplicationArchitectureType::X86_32 ? "32" : "64") + " bit")
             .c_str(),
-        this);
+        this};
     windowLayout->addWidget(versionLabel, 0, Qt::Alignment(Qt::AlignmentFlag::AlignHCenter));
   }
 
   {
-    QLabel* dbVersionLabel = new QLabel("Database Version " + QString::number(SqliteIndexStorage::getStorageVersion()), this);
+    auto* dbVersionLabel = new QLabel{"Database Version " + QString::number(SqliteIndexStorage::getStorageVersion()), this};
     windowLayout->addWidget(dbVersionLabel, 0, Qt::Alignment(Qt::AlignmentFlag::AlignHCenter));
   }
 
   windowLayout->addStretch();
 
   {
-    QHBoxLayout* layoutHorz1 = new QHBoxLayout();
+    auto* layoutHorz1 = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory): Qt will handles it
     windowLayout->addLayout(layoutHorz1);
 
     layoutHorz1->addStretch();
 
-    QLabel* developerLabel = new QLabel(
-        QString::fromStdString("<br /><br />"
-                               "<b>Team:</b><br />"
-                               "Manuel Dobusch<br />"
-                               "Eberhard Gräther<br />"
-                               "Malte Langkabel<br />"
-                               "Viktoria Pfausler<br />"
-                               "Andreas Stallinger<br />"));
+    auto* developerLabel = new QLabel{
+        QString::fromStdString("<b>Authors: <a href=\"%1\" "
+                               "style=\"color: "
+                               "white;\">%1</a></b>")
+            .arg("https://raw.githubusercontent.com/OpenSourceSourceTrail/Sourcetrail/refs/heads/main/AUTHORS.txt")};
+
     developerLabel->setObjectName(QStringLiteral("small"));
     layoutHorz1->addWidget(developerLabel);
 
@@ -77,7 +76,7 @@ void QtAbout::setupAbout() {
   windowLayout->addStretch();
 
   {
-    QLabel* acknowledgementsLabel = new QLabel(
+    auto* acknowledgementsLabel = new QLabel{
         QString::fromStdString("<b>Acknowledgements:</b><br />"
                                "Sourcetrail (aka Coati) 0.1 was created in the context of education at "
                                "<a href=\"http://www.fh-salzburg.ac.at/en/\" style=\"color: white;\">Salzburg "
@@ -88,7 +87,7 @@ void QtAbout::setupAbout() {
                                "white;\">Startup Salzburg</a>.<br />"
                                "The development of Sourcetrail was funded by <a href=\"http://awsg.at\" "
                                "style=\"color: "
-                               "white;\">aws</a>."));
+                               "white;\">aws</a>.")};
     acknowledgementsLabel->setObjectName(QStringLiteral("small"));
     acknowledgementsLabel->setWordWrap(true);
     acknowledgementsLabel->setOpenExternalLinks(true);
@@ -97,11 +96,11 @@ void QtAbout::setupAbout() {
   }
 
   {
-    QLabel* webLabel = new QLabel(
-        "<b>Repository: <a href=\"https://github.com/CoatiSoftware/Sourcetrail\" "
-        "style=\"color: "
-        "white;\">github.com/CoatiSoftware/Sourcetrail</a></b>",
-        this);
+    auto* webLabel = new QLabel{QString{"<b>Repository: <a href=\"%1\" "
+                                        "style=\"color: "
+                                        "white;\">%1</a></b>"}
+                                    .arg("github"_g),
+                                this};
     webLabel->setObjectName(QStringLiteral("small"));
     webLabel->setOpenExternalLinks(true);
     windowLayout->addWidget(webLabel);
