@@ -23,12 +23,11 @@ RUN apt-get update &&                                                    \
     git-lfs                                                              \
     ninja-build                                                          \
     python3-venv                                                         \
-    qtbase5-dev                                                          \
-    libqt5svg5-dev                                                       \
     graphviz                                                             \
     cppcheck                                                             \
     doxygen                                                              \
-    clang                                                           
+    clang                                                                \
+    libssl-dev  
 
 # Generate en_US.UTF-8 locale on the system
 RUN locale-gen en_US.UTF-8
@@ -54,6 +53,18 @@ RUN mkdir -p "/tmp/llvm" &&                                                     
     ninja -C "/tmp/llvm/build" -j"$(nproc)" &&                                                            \
     ninja -C "/tmp/llvm/build" install &&                                                                 \
     rm -rf "/tmp/llvm"
+
+# Install Qt 6.8.2 from source
+RUN wget -q https://download.qt.io/archive/qt/6.8/6.8.2/single/qt-everywhere-src-6.8.2.tar.xz -O /tmp/qt-everywhere-src-6.8.2.tar.xz && \
+    tar -xf /tmp/qt-everywhere-src-6.8.2.tar.xz -C /tmp && \
+    mkdir -p /tmp/qt-everywhere-src-6.8.2/build
+
+WORKDIR /tmp/qt-everywhere-src-6.8.2/build
+
+RUN ../configure -prefix /usr/local/qt6.8.2 -opensource -confirm-license -nomake examples -nomake tests -submodules qtbase,qt5compat,qtsvg -no-opengl -openssl-linked && \
+    cmake --build . --parallel && \
+    cmake --install . && \
+    rm -rf /tmp/qt-everywhere-src-6.8.2 /tmp/qt-everywhere-src-6.8.2.tar.xz
 
 # Add a non-root user in one step
 # For further details check https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
