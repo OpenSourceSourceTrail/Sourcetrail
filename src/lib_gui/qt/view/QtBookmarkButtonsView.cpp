@@ -15,7 +15,7 @@
 #include "utilityQt.h"
 
 QtBookmarkButtonsView::QtBookmarkButtonsView(ViewLayout* viewLayout)
-    : BookmarkButtonsView(viewLayout), m_createButtonState(MessageBookmarkButtonState::CANNOT_CREATE), m_widget{new QFrame} {
+    : BookmarkButtonsView(viewLayout), m_widget{new QFrame}, m_createButtonState(MessageBookmarkButtonState::CANNOT_CREATE) {
   m_widget->setObjectName(QStringLiteral("bookmark_bar"));
 
   QBoxLayout* layout = new QHBoxLayout();

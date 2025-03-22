@@ -5,11 +5,11 @@ CxxQualifierFlags::CxxQualifierFlags() : m_flags(QUALIFIER_NONE) {}
 CxxQualifierFlags::CxxQualifierFlags(const char flags) : m_flags(flags) {}
 
 void CxxQualifierFlags::addQualifier(QualifierType qualifier) {
-  m_flags = m_flags | qualifier;
+  m_flags |= static_cast<char>(qualifier);
 }
 
 void CxxQualifierFlags::removeQualifier(QualifierType qualifier) {
-  m_flags = m_flags & ~qualifier;
+  m_flags &= static_cast<char>(~qualifier);
 }
 
 bool CxxQualifierFlags::empty() const {

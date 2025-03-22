@@ -33,7 +33,7 @@ void QtLineItemAngled::paint(QPainter* painter, const QStyleOptionGraphicsItem* 
   QPainterPath path;
 
   QPolygon poly = getPath();
-  int i = poly.length() - 1;
+  int i = static_cast<int>(poly.length()) - 1;
 
   path.moveTo(poly.at(i));
 

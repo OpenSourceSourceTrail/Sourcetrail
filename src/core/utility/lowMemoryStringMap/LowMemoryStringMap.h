@@ -28,10 +28,15 @@ public:
 #ifdef _WIN32
 #  pragma warning(push)
 #  pragma warning(disable : 4996)
+#elif __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wstringop-truncation"
 #endif
     return strncpy(destination, source, num);
 #ifdef _WIN32
 #  pragma warning(pop)
+#elif __GNUC__
+#  pragma GCC diagnostic pop
 #endif
   }
 };

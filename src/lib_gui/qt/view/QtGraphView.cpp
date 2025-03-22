@@ -447,7 +447,7 @@ QVector2D QtGraphView::getViewSize() const {
   QtGraphicsView* view = getView();
 
   const float zoomFactor = view->getZoomFactor();
-  return {static_cast<float>((view->width() - 50) / zoomFactor), static_cast<float>((view->height() - 100) / zoomFactor)};
+  return {static_cast<float>((view->width() - 50)) / zoomFactor, static_cast<float>((view->height() - 100)) / zoomFactor};
 }
 
 GroupType QtGraphView::getGrouping() const {
@@ -561,8 +561,8 @@ void QtGraphView::updateScrollBars() {
   QScrollBar* vb = view->verticalScrollBar();
 
   if(m_restoreScroll) {
-    performScroll(hb, m_scrollValues.x());
-    performScroll(vb, m_scrollValues.y());
+    performScroll(hb, static_cast<int>(m_scrollValues.x()));
+    performScroll(vb, static_cast<int>(m_scrollValues.y()));
   } else if(m_scrollToTop) {
     vb->setValue(vb->minimum());
   } else if(!m_centerActiveNode) {
@@ -719,7 +719,7 @@ MessageActivateTrail QtGraphView::getMessageActivateTrail(bool forward) {
       depth = 0;
     }
 
-    return MessageActivateTrail(originId, targetId, edgeTypes, depth, horizontalLayout);
+    return MessageActivateTrail(originId, targetId, edgeTypes, static_cast<std::size_t>(depth), horizontalLayout);
   }
 
   return message;
@@ -920,7 +920,7 @@ QtGraphEdge* QtGraphView::createEdge(QGraphicsView* view,
                                           owner,
                                           target,
                                           edge->data,
-                                          edge->getWeight(),
+                                          static_cast<std::size_t>(edge->getWeight()),
                                           edge->active,
                                           interactive,
                                           edge->layoutHorizontal,
@@ -929,10 +929,10 @@ QtGraphEdge* QtGraphView::createEdge(QGraphicsView* view,
     if(trailMode != Graph::TRAIL_NONE) {
       std::vector<QVector4D> path = edge->path;
       for(size_t i = 0; i < path.size(); i++) {
-        path[i].setX(path[i].x() - pathOffset.x());
-        path[i].setZ(path[i].z() - pathOffset.x());
-        path[i].setY(path[i].y() - pathOffset.y());
-        path[i].setW(path[i].w() - pathOffset.y());
+        path[i].setX(static_cast<float>(static_cast<qreal>(path[i].x()) - pathOffset.x()));
+        path[i].setZ(static_cast<float>(static_cast<qreal>(path[i].z()) - pathOffset.x()));
+        path[i].setY(static_cast<float>(static_cast<qreal>(path[i].y()) - pathOffset.y()));
+        path[i].setW(static_cast<float>(static_cast<qreal>(path[i].w()) - pathOffset.y()));
       }
 
       for(const QVector4D& rect : path) {

@@ -24,7 +24,8 @@ public:
 
   void preparse(std::vector<std::string> args);
 
-  [[deprecated]] void parse();
+  // todo: update implementation [SOUR-138]
+  void parse();
 
   [[nodiscard]] bool runWithoutGUI() const;
 

@@ -61,7 +61,7 @@ std::vector<FilePath> CxxVs10To14HeaderPathDetector::doGetPaths() const {
   // vc++ headers
   std::vector<FilePath> headerSearchPaths;
   if(vsInstallPath.exists()) {
-    for(const auto& subdirectory : {L"vc/include", L"vc/atlmfc/include"}) {
+    for(const auto subdirectory : {L"vc/include", L"vc/atlmfc/include"}) {
       FilePath headerSearchPath = vsInstallPath.getConcatenated(subdirectory);
       if(headerSearchPath.exists()) {
         headerSearchPaths.push_back(headerSearchPath.makeCanonical());

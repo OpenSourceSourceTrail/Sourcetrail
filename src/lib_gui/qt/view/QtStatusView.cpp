@@ -123,7 +123,7 @@ QCheckBox* QtStatusView::createFilterCheckbox(const QString& name, QBoxLayout* l
   auto* checkbox = new QCheckBox{name};
   checkbox->setChecked(checked);
 
-  std::ignore = connect(checkbox, &QCheckBox::stateChanged, this, [this](int) {
+  std::ignore = connect(checkbox, &QCheckBox::checkStateChanged, this, [this](int) {
     m_table->selectionModel()->clearSelection();
 
     const StatusFilter statusMask = (m_showInfo->isChecked() ? utility::to_underlying(StatusType::Info) :

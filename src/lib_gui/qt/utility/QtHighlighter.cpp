@@ -155,7 +155,7 @@ void QtHighlighter::highlightDocument() {
   applyFormat(docStart, docEnd, s_charFormats[HighlightType::TEXT]);
 
   m_highlightedLines.clear();
-  m_highlightedLines.resize(document()->blockCount(), false);
+  m_highlightedLines.resize(static_cast<std::size_t>(document()->blockCount()), false);
 
   if(m_highlightingRules.empty()) {
     return;
@@ -177,7 +177,7 @@ void QtHighlighter::highlightRange(int startLine, int endLine) {
 
   bool hasUnhighlightedLines = false;
   for(int i = startLine; i <= endLine; i++) {
-    if(!m_highlightedLines[i]) {
+    if(!m_highlightedLines[static_cast<std::size_t>(i)]) {
       hasUnhighlightedLines = true;
       break;
     }
@@ -204,7 +204,7 @@ void QtHighlighter::highlightRange(int startLine, int endLine) {
 
   int index = startLine;
   for(QTextBlock it = start; it != end; it = it.next()) {
-    if(!m_highlightedLines[index]) {
+    if(!m_highlightedLines[static_cast<std::size_t>(index)]) {
       applyFormat(it.position(), it.position() + it.length() - 1, s_charFormats[HighlightType::TEXT]);
 
       for(const HighlightingRule& rule : m_highlightingRules) {
@@ -227,14 +227,14 @@ void QtHighlighter::highlightRange(int startLine, int endLine) {
   }
 
   for(int i = startLine; i <= endLine; i++) {
-    m_highlightedLines[i] = true;
+    m_highlightedLines[static_cast<std::size_t>(i)] = true;
   }
 }
 
 void QtHighlighter::rehighlightLines(const std::vector<int>& lines) {
   for(int line : lines) {
     if(line >= 0 && line < int(m_highlightedLines.size())) {
-      m_highlightedLines[line] = false;
+      m_highlightedLines[static_cast<std::size_t>(line)] = false;
     }
   }
 }
@@ -281,7 +281,7 @@ void QtHighlighter::createRanges(QTextDocument* doc, const std::vector<Highlight
     }
 
     for(std::set<size_t>::const_reverse_iterator it = indicesToErase.rbegin(); it != indicesToErase.rend(); it++) {
-      m_singleLineRanges.erase(m_singleLineRanges.begin() + *it);
+      m_singleLineRanges.erase(m_singleLineRanges.begin() + static_cast<std::ptrdiff_t>(*it));
     }
   }
 
@@ -377,7 +377,7 @@ std::vector<std::tuple<QtHighlighter::HighlightType, int, int>> QtHighlighter::g
     const int length = expression.matchedLength();
     if(expression.capturedTexts().size() > 1) {
       const QString cap = expression.capturedTexts()[1];
-      const int start = text.indexOf(cap, index);
+      const int start = static_cast<int>(text.indexOf(cap, index));
       ranges.push_back(std::make_tuple(rule.type, pos + start, pos + start + cap.length()));
     } else {
       ranges.push_back(std::make_tuple(rule.type, pos + index, pos + index + length));
