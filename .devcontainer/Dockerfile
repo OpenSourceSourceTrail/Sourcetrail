@@ -55,6 +55,34 @@ RUN mkdir -p "/tmp/llvm" &&                                                     
     rm -rf "/tmp/llvm"
 
 # Install Qt 6.8.2 from source
+RUN apt-get update && \
+    apt-get install -y \
+    libfontconfig1-dev \
+    libfreetype-dev \
+    libx11-dev \
+    libx11-xcb-dev \
+    libxcb-cursor-dev \
+    libxcb-glx0-dev \
+    libxcb-icccm4-dev \
+    libxcb-image0-dev \
+    libxcb-keysyms1-dev \
+    libxcb-randr0-dev \
+    libxcb-render-util0-dev \
+    libxcb-shape0-dev \
+    libxcb-shm0-dev \
+    libxcb-sync-dev \
+    libxcb-util-dev \
+    libxcb-xfixes0-dev \
+    libxcb-xinerama0-dev \
+    libxcb-xkb-dev \
+    libxcb1-dev \
+    libxext-dev \
+    libxfixes-dev \
+    libxi-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    libxrender-dev
+
 RUN wget -q https://download.qt.io/archive/qt/6.8/6.8.2/single/qt-everywhere-src-6.8.2.tar.xz -O /tmp/qt-everywhere-src-6.8.2.tar.xz && \
     tar -xf /tmp/qt-everywhere-src-6.8.2.tar.xz -C /tmp && \
     mkdir -p /tmp/qt-everywhere-src-6.8.2/build
