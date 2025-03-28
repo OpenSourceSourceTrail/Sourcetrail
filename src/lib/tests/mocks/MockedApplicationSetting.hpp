@@ -75,6 +75,9 @@ struct MockedApplicationSettings : IApplicationSettings {
   MOCK_METHOD(int, getStatusFilter, (), (const, noexcept, override));
   MOCK_METHOD(void, setStatusFilter, (int), (noexcept, override));
 
+  MOCK_METHOD(int, getLoggingLevel, (), (const, noexcept, override));
+  MOCK_METHOD(void, setLoggingLevel, (int), (noexcept, override));
+
   // indexing
   MOCK_METHOD(int, getIndexerThreadCount, (), (const, noexcept, override));
   MOCK_METHOD(void, setIndexerThreadCount, (int), (noexcept, override));

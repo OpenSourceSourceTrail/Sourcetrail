@@ -80,7 +80,10 @@ struct IApplicationSettings : Settings {
   [[nodiscard]] virtual float getScreenScaleFactor() const noexcept = 0;
   virtual void setScreenScaleFactor(float scaleFactor) noexcept = 0;
 
-  // logging
+  /**
+   * @name Logging
+   */
+  /** @{ */
   [[nodiscard]] virtual bool getLoggingEnabled() const noexcept = 0;
   virtual void setLoggingEnabled(bool loggingEnabled) noexcept = 0;
 
@@ -95,6 +98,25 @@ struct IApplicationSettings : Settings {
 
   [[nodiscard]] virtual int getStatusFilter() const noexcept = 0;
   virtual void setStatusFilter(int mask) noexcept = 0;
+
+  /**
+   * @brief Get the Logging Level object
+   *
+   * @note level must map to spdlog::level::level_enum
+   *
+   * @return int Logging level
+   */
+  [[nodiscard]] virtual int getLoggingLevel() const noexcept = 0;
+
+  /**
+   * @brief Set the Logging Level object
+   *
+   * @note level must map to spdlog::level::level_enum
+   *
+   * @param level Logging level
+   */
+  virtual void setLoggingLevel(int level) noexcept = 0;
+  /** @} */
 
   // indexing
   [[nodiscard]] virtual int getIndexerThreadCount() const noexcept = 0;

@@ -5,6 +5,7 @@
 
 #include <spdlog/common.h>
 #include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
 #include "ColorScheme.h"
@@ -74,7 +75,24 @@ std::wstring generateDatedFileName(const std::wstring& prefix, const std::wstrin
     filename << L"_" << suffix;
   }
 
-  return filename.str();
+  return filename.str() + L".log";
+}
+void setupLogging(const std::string& logFileEnv) {
+  std::vector<spdlog::sink_ptr> sinkList;
+
+  try {
+    auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    consoleSink->set_level(spdlog::level::info);
+    sinkList.emplace_back(std::move(consoleSink));
+
+    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFileEnv, true);
+    fileSink->set_level(spdlog::level::info);
+    sinkList.emplace_back(std::move(fileSink));
+
+    spdlog::set_default_logger(std::make_shared<spdlog::logger>("multi_sink", sinkList.begin(), sinkList.end()));
+  } catch(const spdlog::spdlog_ex& ex) {
+    fmt::print(stderr, "{}\n", ex.what());
+  }
 }
 }    // namespace
 
@@ -148,16 +166,25 @@ void Application::loadSettings() {
   }
 
   if(settings->getLoggingEnabled()) {
-    namespace fs = std::filesystem;
-    auto loggerPath = (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
-    auto* dLogger = spdlog::default_logger_raw();
-    if(nullptr == dLogger) {
-      return;
-    }
+    if(auto* dLogger = spdlog::default_logger_raw(); nullptr != dLogger) {
+      namespace fs = std::filesystem;
+      const auto loggerPath = (fs::path{settings->getLogDirectoryPath().wstring()} / generateDatedFileName(L"log")).string();
+      if(auto& sinks = dLogger->sinks(); sinks.empty()) {
+        setupLogging(loggerPath);
+      } else {
+        if(auto itr = std::ranges::find_if(sinks, [](const auto& sink) {
+          return dynamic_cast<spdlog::sinks::basic_file_sink_mt*>(sink.get()) != nullptr;
+        }); sinks.end() != itr) {
+          sinks.erase(itr);
+        }
 
-    auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(loggerPath, true);
-    fileSink->set_level(spdlog::level::trace);
-    dLogger->sinks().push_back(std::move(fileSink));
+        sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(loggerPath, true));
+        const auto level = settings->getLoggingLevel();
+        for(auto& sink : sinks) {
+          sink->set_level(static_cast<spdlog::level::level_enum>(level));
+        }
+      }
+    }
   }
 
   loadStyle(settings->getColorSchemePath());
