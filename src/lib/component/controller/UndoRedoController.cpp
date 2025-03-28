@@ -539,13 +539,13 @@ void UndoRedoController::updateHistory() {
       }
 
       if(historyListMatches.size() == historyListSize && currentIndex != -1 &&
-         currentIndex - m_historyOffset != historyListSize - 1) {
+         static_cast<size_t>(currentIndex) - m_historyOffset != historyListSize - 1) {
         break;
       }
     }
   }
 
-  getView()->updateHistory(historyListMatches, currentIndex - m_historyOffset);
+  getView()->updateHistory(historyListMatches, static_cast<size_t>(currentIndex) - m_historyOffset);
 }
 
 void UndoRedoController::dump() const {

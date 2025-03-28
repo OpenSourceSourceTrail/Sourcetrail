@@ -55,7 +55,7 @@ QtCodeFileList::QtCodeFileList(QtCodeNavigator* navigator)
     // set style on scrollbar because it always has bright background by default
     m_lastSnippetScrollBar->setStyleSheet(
         utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"main/scrollbar.css")).c_str());
-    m_styleSize = m_lastSnippetScrollBar->styleSheet().size();
+    m_styleSize = static_cast<int>(m_lastSnippetScrollBar->styleSheet().size());
   } else {
     m_lastSnippetScrollBar->setObjectName(QStringLiteral("last_scroll_bar"));
   }

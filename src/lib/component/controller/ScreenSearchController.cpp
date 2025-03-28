@@ -27,7 +27,10 @@ void ScreenSearchController::foundMatches(ScreenSearchResponder* responder, size
     m_matchIndex = m_matches.size();
   }
 
-  getView<ScreenSearchView>()->setMatchCount(m_matches.size());
+  auto view = getView<ScreenSearchView>();
+  if(view) {
+    view->setMatchCount(m_matches.size());
+  }
 }
 
 void ScreenSearchController::addResponder(ScreenSearchResponder* responder) {
@@ -98,7 +101,10 @@ void ScreenSearchController::clearMatches() {
     m_matchIndex = 0;
   }
 
-  getView<ScreenSearchView>()->setMatchCount(0);
+  auto view = getView<ScreenSearchView>();
+  if(view) {
+    view->setMatchCount(0);
+  }
 
   for(ScreenSearchResponder* responder : m_responders) {
     responder->clearMatches();

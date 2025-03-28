@@ -49,11 +49,11 @@ QtTable::QtTable(QWidget* parent) : QTableView(parent) {
 QtTable::~QtTable() = default;
 
 void QtTable::updateRows() {
-  while(model()->rowCount() <= m_rowsToFill) {
+  while(static_cast<float>(model()->rowCount()) <= m_rowsToFill) {
     model()->insertRow(model()->rowCount());
   }
 
-  while(model()->rowCount() > m_rowsToFill + 1) {
+  while(static_cast<float>(model()->rowCount()) > m_rowsToFill + 1) {
     int row = model()->rowCount() - 1;
     if(model()->index(row, 0).data(Qt::DisplayRole).toString().isEmpty()) {
       model()->removeRow(row);
@@ -62,7 +62,8 @@ void QtTable::updateRows() {
     }
   }
 
-  const int rowCount = model()->rowCount() > m_rowsToFill ? model()->rowCount() : static_cast<int>(m_rowsToFill);
+  const int rowCount = static_cast<float>(model()->rowCount()) > m_rowsToFill ? model()->rowCount() :
+                                                                                static_cast<int>(m_rowsToFill);
   const int width = static_cast<int>(IApplicationSettings::getInstanceRaw()->getFontSize() * 0.7 * int(1 + std::log10(rowCount)));
 
   verticalHeader()->setStyleSheet("::section { width: " + QString::number(width) + "px; }");
@@ -90,7 +91,7 @@ void QtTable::showFirstRow() {
 }
 
 void QtTable::showLastRow() {
-  if(m_rowsToFill <= getFilledRowCount()) {
+  if(m_rowsToFill <= static_cast<float>(getFilledRowCount())) {
     verticalScrollBar()->setValue(verticalScrollBar()->maximum());
   }
 }

@@ -5,7 +5,10 @@
 #include "utility.h"
 
 StatusController::StatusController() {
-  m_statusFilter = IApplicationSettings::getInstanceRaw()->getStatusFilter();
+  auto instance = IApplicationSettings::getInstanceRaw();
+  if(instance) {
+    m_statusFilter = static_cast<StatusFilter>(instance->getStatusFilter());
+  }
 }
 
 StatusController::~StatusController() = default;

@@ -359,7 +359,6 @@ QtGraphNode* GraphFocusHandler::findChildNodeRecursive(const std::list<QtGraphNo
 
 QtGraphNode* GraphFocusHandler::findSibling(const QtGraphNode* node, Direction direction) {
   QtGraphNode* nextSibling = nullptr;
-  QVector2D pos = node->getPosition();
   QVector4D rect = node->getBoundingRect();
   int minDist = 0;
 
@@ -387,13 +386,13 @@ QtGraphNode* GraphFocusHandler::findSibling(const QtGraphNode* node, Direction d
         int distXMult = (direction == Direction::UP || direction == Direction::DOWN) ? 2 : 1;
         int distYMult = (direction == Direction::LEFT || direction == Direction::RIGHT) ? 2 : 1;
         if(top)
-          distY = rect.y() - rectS.w();
+          distY = static_cast<int>(rect.y() - rectS.w());
         if(bottom)
-          distY = rectS.y() - rect.w();
+          distY = static_cast<int>(rectS.y() - rect.w());
         if(left)
-          distX = rect.x() - rectS.z();
+          distX = static_cast<int>(rect.x() - rectS.z());
         if(right)
-          distX = rectS.x() - rect.z();
+          distX = static_cast<int>(rectS.x() - rect.z());
 
         int dist = distX * distXMult + distY * distYMult;
         if(!nextSibling || dist < minDist) {

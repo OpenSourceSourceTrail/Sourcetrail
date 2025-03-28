@@ -1,7 +1,7 @@
 #pragma once
 // STL
+#include <atomic>
 #include <map>
-#include <mutex>
 #include <thread>
 // internal
 #include "TaskGroup.h"
@@ -27,15 +27,12 @@ private:
   void doReset(std::shared_ptr<Blackboard> blackboard) override;
   void doTerminate() override;
 
-  void processTaskThreaded(std::shared_ptr<TaskInfo> taskInfo,
-                           std::shared_ptr<Blackboard> blackboard,
-                           std::shared_ptr<std::mutex> activeTaskCountMutex);
+  void processTaskThreaded(std::shared_ptr<TaskInfo> taskInfo, std::shared_ptr<Blackboard> blackboard);
   int getActiveTaskCount() const;
 
   std::vector<std::shared_ptr<TaskInfo>> m_tasks;
   bool m_needsToStartThreads;
 
   volatile bool m_taskFailed;
-  volatile int m_activeTaskCount;
-  mutable std::shared_ptr<std::mutex> m_activeTaskCountMutex;
+  std::atomic<int> m_activeTaskCount;
 };

@@ -151,7 +151,9 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 
   setupLogging();
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QtApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
 
   QtViewFactory viewFactory;
   QtNetworkFactory networkFactory;
@@ -185,8 +187,10 @@ int main(int argc, char* argv[]) {
 
   QApplication::setApplicationName(QStringLiteral("Sourcetrail"));
 
-#ifdef D_LINUX
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#  ifdef D_LINUX
   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling, true);
+#  endif
 #endif
 
   const Version version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);

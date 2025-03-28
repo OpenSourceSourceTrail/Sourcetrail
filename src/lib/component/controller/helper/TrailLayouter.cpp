@@ -332,8 +332,8 @@ void TrailLayouter::layout() {
     int height = -30;
 
     for(TrailNode* node : nodes) {
-      height += node->size[yIdx] + 30;
-      width = std::max(width, static_cast<int>(node->size[xIdx]));
+      height += static_cast<int>(node->size[static_cast<int>(yIdx)] + 30.0f);
+      width = std::max(width, static_cast<int>(node->size[static_cast<int>(xIdx)]));
     }
 
     widthsPerCol.push_back(width);
@@ -354,10 +354,10 @@ void TrailLayouter::layout() {
     for(TrailNode* node : nodes) {
       node->pos = horizontalLayout() ? QVector2D{static_cast<float>(x), static_cast<float>(y)} :
                                        QVector2D{static_cast<float>(y), static_cast<float>(x)};
-      y += node->size[yIdx] + 30;
+      y += static_cast<int>(node->size[static_cast<int>(yIdx)] + 30.0f);
 
       if(!node->id) {
-        node->size[xIdx] = widthsPerCol[i];
+        node->size[static_cast<int>(xIdx)] = static_cast<float>(widthsPerCol[i]);
       }
     }
 
@@ -395,12 +395,12 @@ void TrailLayouter::moveNodesToAveragePosition(std::vector<TrailNode*> nodes, bo
 
     if((forward && node->incomingEdges.size()) || (!forward && !node->outgoingEdges.size())) {
       for(TrailEdge* edge : node->incomingEdges) {
-        sum += edge->origin->pos[yIdx] + edge->origin->size[yIdx] / 2;
+        sum += static_cast<int>(edge->origin->pos[static_cast<int>(yIdx)] + edge->origin->size[static_cast<int>(yIdx)] / 2);
         count++;
       }
     } else {
       for(TrailEdge* edge : node->outgoingEdges) {
-        sum += edge->target->pos[yIdx] + edge->target->size[yIdx] / 2;
+        sum += static_cast<int>(edge->target->pos[static_cast<int>(yIdx)] + edge->target->size[static_cast<int>(yIdx)] / 2);
         count++;
       }
     }
@@ -435,7 +435,7 @@ void TrailLayouter::moveNodesToAveragePosition(std::vector<TrailNode*> nodes, bo
 
     int size = -30;
     for(TrailNode* node : nodeGroup) {
-      size += node->size[yIdx] + 30;
+      size += static_cast<int>(node->size[static_cast<int>(yIdx)] + 30.0f);
     }
 
     int top = groupAveragePosition - size / 2;
@@ -460,8 +460,8 @@ void TrailLayouter::moveNodesToAveragePosition(std::vector<TrailNode*> nodes, bo
     int y = top;
 
     for(TrailNode* node : nodeGroup) {
-      node->pos[yIdx] = y;
-      y += node->size[yIdx] + 30;
+      node->pos[static_cast<int>(yIdx)] = static_cast<float>(y);
+      y += static_cast<int>(node->size[static_cast<int>(yIdx)] + 30.0f);
     }
 
     if(currentTop == currentBottom) {
