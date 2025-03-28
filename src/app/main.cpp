@@ -5,10 +5,7 @@
 
 #include <fmt/format.h>
 
-#include <spdlog/common.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/spdlog.h>
+#include <spdlog/sinks/sink.h>
 
 #include "Application.h"
 #include "ApplicationSettings.h"
@@ -49,28 +46,6 @@ void signalHandler(int /*signum*/) {
   MessageIndexingInterrupted{}.dispatch();
 }
 
-void setupLogging() {
-  std::vector<spdlog::sink_ptr> sinkList;
-
-  try {
-    if(qEnvironmentVariableIsEmpty("ST_DISABLE_LOG_CONSOLE")) {
-      auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-      consoleSink->set_level(spdlog::level::trace);
-      sinkList.emplace_back(std::move(consoleSink));
-    }
-
-    if(auto logFileEnv = qgetenv("ST_LOG_FILE"); !logFileEnv.isEmpty()) {
-      auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFileEnv.toStdString(), true);
-      fileSink->set_level(spdlog::level::trace);
-      sinkList.emplace_back(std::move(fileSink));
-    }
-
-    spdlog::set_default_logger(std::make_shared<spdlog::logger>("multi_sink", sinkList.begin(), sinkList.end()));
-  } catch(const spdlog::spdlog_ex& ex) {
-    fmt::print(stderr, "{}\n", ex.what());
-  }
-}
-
 void addLanguagePackages() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
 
@@ -98,8 +73,6 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
   checkRunFromScript();
 
   setupApp(argc, argv);
-
-  setupLogging();
 
   auto factory = std::make_shared<lib::Factory>();
   Application::createInstance(version, factory, nullptr, nullptr);
@@ -183,6 +156,13 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 }    // namespace
 
 int main(int argc, char* argv[]) {
+  // Disable logger as default till load it from settings
+  if(auto* logger = spdlog::default_logger_raw(); nullptr != logger) {
+    for(auto& sink : logger->sinks()) {
+      sink->set_level(spdlog::level::level_enum::off);
+    }
+  }
+
   QCoreApplication::addLibraryPath(QStringLiteral("."));
 
   QApplication::setApplicationName(QStringLiteral("Sourcetrail"));
