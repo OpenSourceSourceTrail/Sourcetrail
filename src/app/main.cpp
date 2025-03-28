@@ -122,8 +122,6 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 
   setupApp(argc, argv);
 
-  setupLogging();
-
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   QtApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif

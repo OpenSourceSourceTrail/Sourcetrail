@@ -78,9 +78,10 @@ std::wstring generateDatedFileName(const std::wstring& prefix, const std::wstrin
   return filename.str() + L".log";
 }
 void setupLogging(const std::string& logFileEnv) {
-  std::vector<spdlog::sink_ptr> sinkList;
-
   try {
+    std::vector<spdlog::sink_ptr> sinkList;
+    sinkList.reserve(2);
+
     auto consoleSink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
     consoleSink->set_level(spdlog::level::info);
     sinkList.emplace_back(std::move(consoleSink));
