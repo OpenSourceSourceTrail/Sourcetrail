@@ -172,9 +172,9 @@ void Application::loadSettings() {
       if(auto& sinks = dLogger->sinks(); sinks.empty()) {
         setupLogging(loggerPath);
       } else {
-        if(auto itr = std::ranges::find_if(sinks, [](const auto& sink) {
-          return dynamic_cast<spdlog::sinks::basic_file_sink_mt*>(sink.get()) != nullptr;
-        }); sinks.end() != itr) {
+        if(auto itr = std::ranges::find_if(
+               sinks, [](const auto& sink) { return dynamic_cast<spdlog::sinks::basic_file_sink_mt*>(sink.get()) != nullptr; });
+           sinks.end() != itr) {
           sinks.erase(itr);
         }
 

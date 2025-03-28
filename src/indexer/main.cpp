@@ -23,9 +23,12 @@
 #endif
 
 namespace {
-void setupLogging(const std::string& logFilePath) {
+void setupLogging(const std::string& logFilePath, spdlog::level::level_enum level) {
+  for(auto& sink : spdlog::default_logger_raw()->sinks()) {
+    sink->set_level(level);
+  }
   auto fileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logFilePath);
-  fileSink->set_level(spdlog::level::trace);
+  fileSink->set_level(level);
   spdlog::set_default_logger(std::make_shared<spdlog::logger>("indexer", std::move(fileSink)));
 }
 
@@ -86,10 +89,6 @@ int main(int argc, char* argv[]) {
   AppPath::setSharedDataDirectoryPath(FilePath(appPath));
   UserPaths::setUserDataDirectoryPath(FilePath(userDataPath));
 
-  if(!logFilePath.empty()) {
-    setupLogging(std::string(logFilePath));
-  }
-
   suppressCrashMessage();
 
   IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
@@ -97,6 +96,14 @@ int main(int argc, char* argv[]) {
   if(!appSettings->load(UserPaths::getAppSettingsFilePath())) {
     LOG_ERROR("Failed to load application settings");
     return EXIT_FAILURE;
+  }
+
+  if(appSettings->getVerboseIndexerLoggingEnabled() && !logFilePath.empty()) {
+    setupLogging(std::string(logFilePath), spdlog::level::level_enum(appSettings->getLoggingLevel()));
+  } else {
+    for(auto& sink : spdlog::default_logger_raw()->sinks()) {
+      sink->set_level(spdlog::level::off);
+    }
   }
 
   LOG_INFO(L"sharedDataPath: " + AppPath::getSharedDataDirectoryPath().wstr());
