@@ -6,6 +6,7 @@
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/view/transform.hpp>
 
+#include <spdlog/common.h>
 #include <system_error>
 
 #include "ResourcePaths.h"
@@ -278,6 +279,14 @@ int ApplicationSettings::getLogFilter() const noexcept {
   // FIXME
   return false;
   // return getValue<int>("application/log_filter", Logger::LOG_WARNINGS | Logger::LOG_ERRORS);
+}
+
+int ApplicationSettings::getLoggingLevel() const noexcept {
+  return getValue<int>("application/logging_level", SPDLOG_LEVEL_OFF);
+}
+
+void ApplicationSettings::setLoggingLevel(int mask) noexcept {
+  setValue<int>("application/logging_level", mask);
 }
 
 int ApplicationSettings::getIndexerThreadCount() const noexcept {

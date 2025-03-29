@@ -92,6 +92,9 @@ public:
   int getStatusFilter() const noexcept override;
   void setStatusFilter(int mask) noexcept override;
 
+  [[nodiscard]] int getLoggingLevel() const noexcept override;
+  void setLoggingLevel(int mask) noexcept override;
+
   // indexing
   int getIndexerThreadCount() const noexcept override;
   void setIndexerThreadCount(int count) noexcept override;

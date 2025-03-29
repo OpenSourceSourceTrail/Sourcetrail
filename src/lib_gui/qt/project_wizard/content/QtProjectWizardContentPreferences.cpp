@@ -208,7 +208,7 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
                                  QStringLiteral("<p>Show logs in the console and save this information in files.</p>"),
                                  layout,
                                  row);
-  connect(m_loggingEnabled, &QCheckBox::clicked, this, &QtProjectWizardContentPreferences::loggingEnabledChanged);
+  std::ignore = connect(m_loggingEnabled, &QCheckBox::clicked, this, &QtProjectWizardContentPreferences::loggingEnabledChanged);
 
   m_verboseIndexerLoggingEnabled = addCheckBox(
       QStringLiteral("Indexer Logging"),
@@ -219,6 +219,15 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
                      "<p><b>Warning</b>: This slows down indexing performance a lot.</p>"),
       layout,
       row);
+
+  auto* loggingLevelComboBoxInfoLabel = new QLabel(QLatin1String(""));
+  mLoggingLevelComboBox = addComboBoxWithWidgets(
+      QStringLiteral("Logging level"), QStringLiteral("<p></p>"), {loggingLevelComboBoxInfoLabel}, layout, row);
+  // Map to spdlog::level
+  mLoggingLevelComboBox->addItems({"trace", "debug", "info", "warn", "err", "critical", "off"});
+  mLoggingLevelComboBox->setCurrentIndex(SPDLOG_LEVEL_OFF);
+
+  std::ignore = connect(m_loggingEnabled, &QCheckBox::clicked, mLoggingLevelComboBox, &QComboBox::setEnabled);
 
   m_logPath = new QtLocationPicker(this);    // NOLINT(cppcoreguidelines-owning-memory)
   m_logPath->setPickDirectory(true);
@@ -325,6 +334,7 @@ void QtProjectWizardContentPreferences::load() {
   if(m_logPath != nullptr) {
     m_logPath->setText(QString::fromStdWString(appSettings->getLogDirectoryPath().wstring()));
   }
+  mLoggingLevelComboBox->setCurrentIndex(appSettings->getLoggingLevel());
 
   m_sourcetrailPort->setText(QString::number(appSettings->getSourcetrailPort()));
   m_pluginPort->setText(QString::number(appSettings->getPluginPort()));
@@ -367,20 +377,9 @@ void QtProjectWizardContentPreferences::save() {
 
   appSettings->setControlsGraphZoomOnMouseWheel(m_graphZooming->isChecked());
 
-// FIXME(Hussein): Set the logging path using prefernces
-#if 0
   appSettings->setLoggingEnabled(m_loggingEnabled->isChecked());
   appSettings->setVerboseIndexerLoggingEnabled(m_verboseIndexerLoggingEnabled->isChecked());
-  if((m_logPath != nullptr) && m_logPath->getText().toStdWString() != appSettings->getLogDirectoryPath().wstr()) {
-    appSettings->setLogDirectoryPath(FilePath((m_logPath->getText() + '/').toStdWString()));
-    Logger* logger = LogManager::getInstance()->getLoggerByType("FileLogger");
-    if(logger != nullptr) {
-      auto* const fileLogger = dynamic_cast<FileLogger*>(logger);
-      fileLogger->setLogDirectory(appSettings->getLogDirectoryPath());
-      fileLogger->setFileName(FileLogger::generateDatedFileName(L"log"));
-    }
-  }
-#endif
+  appSettings->setLoggingLevel(mLoggingLevelComboBox->currentIndex());
 
   int sourcetrailPort = m_sourcetrailPort->text().toInt();
   if(sourcetrailPort != 0) {
