@@ -2,18 +2,31 @@
 #include <gtest/gtest.h>
 
 #include "ComponentFactory.h"
+#include "MockedApplicationSetting.hpp"
+#include "MockedMessageQueue.hpp"
 #include "mocks/MockedStatusView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "Status.h"
+#ifndef _WIN32
+#  define private public
+#endif
 #include "StatusController.h"
+#ifndef _WIN32
+#  undef private
+#endif
 #include "StatusView.h"
 
 using namespace testing;
 
 struct StatusControllerFix : Test {
   void SetUp() override {
-    IMessageQueue::getInstance()->startMessageLoopThreaded();
+    mApplicationSettings = std::make_shared<MockedApplicationSettings>();
+    IApplicationSettings::setInstance(mApplicationSettings);
+    mMessageQueue = std::make_shared<MockedMessageQueue>();
+    IMessageQueue::setInstance(mMessageQueue);
+
+    ON_CALL(*mApplicationSettings, getStatusFilter).WillByDefault(Return(0U));
 
     MockedViewFactory viewFactory;
     auto componentFactory = std::make_shared<ComponentFactory>(&viewFactory, nullptr);
@@ -27,37 +40,56 @@ struct StatusControllerFix : Test {
   }
 
   void TearDown() override {
-    IMessageQueue::getInstance()->stopMessageLoop();
+    component.reset();
+    statusView.reset();
+    IApplicationSettings::setInstance(nullptr);
+    IMessageQueue::setInstance(nullptr);
   }
 
+
+  std::shared_ptr<MockedApplicationSettings> mApplicationSettings;
+  std::shared_ptr<MockedMessageQueue> mMessageQueue;
   StatusController* controller = nullptr;
   MockedViewLayout viewLayout;
   std::shared_ptr<MockedStatusView> statusView;
   std::shared_ptr<Component> component;
 };
 
+#ifndef _WIN32
+TEST_F(StatusControllerFix, getView) {
+  const auto* view = controller->getView();
+  ASSERT_NE(nullptr, view);
+  ASSERT_EQ(statusView.get(), view);
+}
+
 TEST_F(StatusControllerFix, MessageClearStatusView) {
   EXPECT_CALL(*statusView, clear).WillOnce(Return());
-  MessageClearStatusView{}.dispatchImmediately();
+  MessageClearStatusView message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusControllerFix, MessageShowStatus) {
   EXPECT_CALL(viewLayout, showView(_)).WillOnce(Return());
-  MessageShowStatus{}.dispatchImmediately();
+  MessageShowStatus message{};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusControllerFix, EmptyMessageStatus) {
   EXPECT_CALL(*statusView, addStatus(_)).Times(0);
-  MessageStatus{L""}.dispatchImmediately();
+  MessageStatus message{L""};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusControllerFix, MessageStatus) {
   EXPECT_CALL(*statusView, addStatus(_)).WillOnce(Return());
-  MessageStatus{L"Message"}.dispatchImmediately();
+  MessageStatus message{L"Message"};
+  controller->handleMessage(&message);
 }
 
 TEST_F(StatusControllerFix, MessageStatusFilterChanged) {
   EXPECT_CALL(*statusView, clear).WillOnce(Return());
   EXPECT_CALL(*statusView, addStatus(_)).WillOnce(Return());
-  MessageStatusFilterChanged{static_cast<int>(StatusType::Info)}.dispatch();
+  MessageStatusFilterChanged message{static_cast<int>(StatusType::Info)};
+  controller->handleMessage(&message);
 }
+#endif
