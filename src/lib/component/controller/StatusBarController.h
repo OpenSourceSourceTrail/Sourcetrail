@@ -15,7 +15,7 @@
 class StatusBarView;
 class StorageAccess;
 
-class StatusBarController
+class StatusBarController final
     : public Controller
     , public MessageListener<MessageErrorCountClear>
     , public MessageListener<MessageErrorCountUpdate>
@@ -27,6 +27,12 @@ class StatusBarController
     , public MessageListener<MessageStatus> {
 public:
   explicit StatusBarController(StorageAccess* storageAccess);
+
+  StatusBarController(const StatusBarController&) = delete;
+  StatusBarController(StatusBarController&&) = delete;
+  StatusBarController& operator=(const StatusBarController&) = delete;
+  StatusBarController& operator=(StatusBarController&&) = delete;
+
   ~StatusBarController() override;
 
   [[maybe_unused]] StatusBarView* getView();
@@ -45,5 +51,5 @@ private:
 
   void setStatus(const std::wstring& status, bool isError, bool showLoader);
 
-  StorageAccess* mStorageAccess;
+  const StorageAccess* mStorageAccess;
 };
