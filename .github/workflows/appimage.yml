@@ -19,16 +19,22 @@ jobs:
         run: git fetch --tags origin
 
       - name: Install dependencies
-        run: sudo apt install -y gcc-12 g++-12 clang-15 ninja-build python3-pip
+        run: sudo apt install -y gcc g++ ninja-build python3-pip
 
-      - name: Install Qt dependencies
-        run: |
-          sudo apt-get install -y \
-            qtbase5-dev \
-            qttools5-dev \
-            qttools5-dev-tools \
-            libqt5svg5-dev \
-            libqt5x11extras5-dev
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.2.*'
+          dir: '${{github.workspace}}/Qt/'
+          install-deps: 'true'
+          version: '6.8.2'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'linux_gcc_64'
+          modules: 'qt5compat'
+          archives: 'icu qtbase qtdeclarative qtsvg'
+          cache: 'true'
+          cache-key-prefix: 'install-qt-action-linux'
 
       - name: Install AppImage tools
         run: |
@@ -57,8 +63,19 @@ jobs:
           source venv/bin/activate
           conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
 
+      - name: Download llvm build cache
+        uses: actions/download-artifact@v4
+        with:
+          name: clang-19.1.7-linux
+          path: ${{github.workspace}}/external
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 13795569336 # TODO(Hussein): Need to be fixed
+
+      - name: Install llvm
+        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
+
       - name: Configure CMake
-        run: cmake --preset="ci_gnu_release"
+        run: cmake --preset="ci_gnu_release_build_cxx"
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build
