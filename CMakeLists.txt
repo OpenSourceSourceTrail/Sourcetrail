@@ -384,7 +384,7 @@ execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" "${CMAKE_BINARY
 create_symlink("${CMAKE_SOURCE_DIR}/bin/app/data" "${CMAKE_BINARY_DIR}/app/data")
 create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user")
 # Install Executables ------------------------------------------------------------------------------------------------------------
-set(APPIMAGE_ROOT "usr")
+set(APPIMAGE_ROOT "")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
 install(TARGETS Sourcetrail Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
@@ -400,4 +400,17 @@ install(FILES "${CMAKE_SOURCE_DIR}/cmake/Sourcetrail.desktop" DESTINATION "${APP
 install(FILES "${CMAKE_SOURCE_DIR}/bin/app/data/gui/installer/Sourcetrail.png"
         DESTINATION "${APPIMAGE_ROOT}/share/icons/hicolor/256x256/apps")
 # Packaging ----------------------------------------------------------------------------------------------------------------------
-# TODO(SOUR-104)
+set(CPACK_PACKAGE_NAME "Sourcetrail")
+set(CPACK_PACKAGE_VERSION ${VERSION_STRING})
+set(CPACK_PACKAGE_VENDOR "Coati Software")
+set(CPACK_PACKAGE_CONTACT "eng.ahmedhussein89@gmail.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Interactive Source Explorer")
+set(CPACK_PACKAGE_DESCRIPTION
+    "Sourcetrail is an interactive source code explorer that helps you understand, refactor, and share C, C++, and Java code."
+)
+
+if(UNIX)
+  set(CPACK_GENERATOR "DEB;RPM;SH;TGZ")
+endif()
+
+include(CPack)

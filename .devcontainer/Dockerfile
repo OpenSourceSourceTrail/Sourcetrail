@@ -47,8 +47,6 @@ RUN mkdir -p "/tmp/llvm" &&                                                     
     -DCMAKE_INSTALL_PREFIX="${INSTALL_PREFIX}"                                                            \
     -DLLVM_ENABLE_PROJECTS="clang"                                                                        \
     -DLLVM_ENABLE_RTTI=ON                                                                                 \
-    -DCLANG_LINK_CLANG_DYLIB=ON                                                                           \
-    -DLLVM_LINK_LLVM_DYLIB=ON                                                                             \
     -DLLVM_TARGETS_TO_BUILD=host &&                                                                       \
     ninja -C "/tmp/llvm/build" -j"$(nproc)" &&                                                            \
     ninja -C "/tmp/llvm/build" install &&                                                                 \
@@ -89,7 +87,7 @@ RUN wget -q https://download.qt.io/archive/qt/6.8/6.8.2/single/qt-everywhere-src
 
 WORKDIR /tmp/qt-everywhere-src-6.8.2/build
 
-RUN ../configure -prefix /usr/local/qt6.8.2 -opensource -confirm-license -nomake examples -nomake tests -submodules qtbase,qt5compat,qtsvg -no-opengl -openssl-linked && \
+RUN ../configure -prefix /usr/local/qt6.8.2 -opensource -confirm-license -nomake examples -nomake tests -submodules qtbase,qt5compat,qtsvg -no-opengl -openssl-linked -static -release && \
     cmake --build . --parallel && \
     cmake --install . && \
     rm -rf /tmp/qt-everywhere-src-6.8.2 /tmp/qt-everywhere-src-6.8.2.tar.xz
