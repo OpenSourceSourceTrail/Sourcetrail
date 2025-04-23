@@ -67,3 +67,18 @@ file(COPY ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico DESTINATION 
 if(WIN32 AND NOT ${SR_IS_CI})
   copy_qt_binaries("${CMAKE_BINARY_DIR}/app/" TRUE)
 endif()
+
+if(UNIX)
+  set(APPIMAGE_ROOT "${CMAKE_BINARY_DIR}/AppDir")
+  find_program(LINUXDEPLOY NAMES linuxdeploy linuxdeploy-x86_64 REQUIRED)
+  add_custom_command(
+    TARGET Sourcetrail
+    POST_BUILD
+    COMMAND ${LINUXDEPLOY} --appdir=${APPIMAGE_ROOT} --executable=${CMAKE_BINARY_DIR}/app/Sourcetrail --plugin qt
+    COMMENT "Running linuxdeploy to package the application")
+
+  install(FILES "${APPIMAGE_ROOT}/usr/bin/qt.conf" DESTINATION "usr/bin")
+  install(DIRECTORY "${APPIMAGE_ROOT}/usr/lib/" DESTINATION "usr/lib")
+  install(DIRECTORY "${APPIMAGE_ROOT}/usr/plugins/" DESTINATION "usr/plugins")
+  install(DIRECTORY "${APPIMAGE_ROOT}/usr/share/" DESTINATION "usr/share")
+endif()
