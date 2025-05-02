@@ -1,4 +1,4 @@
-name: Manual Clang 15 Build and Cache
+name: Manual Clang Build and Cache for Windows
 
 on:
   workflow_dispatch:
@@ -14,18 +14,11 @@ env:
 
 jobs:
   build-clang:
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: cmd
     steps:
-      - name: Install Build Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            cmake \
-            ninja-build \
-            gcc \
-            g++ \
-            git
-
       - name: Clone LLVM project
         run: |
           git clone https://github.com/llvm/llvm-project.git
@@ -35,14 +28,12 @@ jobs:
       - name: Configure CMake
         working-directory: llvm-project
         run: |
-          cmake -S llvm -B build \
-            -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_DIR }} \
-            -DLLVM_ENABLE_PROJECTS:STRING=clang \
-            -DLLVM_ENABLE_RTTI:BOOL=ON \
-            -DCLANG_LINK_CLANG_DYLIB:BOOL=ON \
-            -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
+          cmake -S llvm -B build ^
+            -G Ninja ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_DIR }} ^
+            -DLLVM_ENABLE_PROJECTS:STRING=clang ^
+            -DLLVM_ENABLE_RTTI:BOOL=ON ^
             -DLLVM_TARGETS_TO_BUILD=host
 
       - name: Build Clang
@@ -57,13 +48,13 @@ jobs:
 
       - name: Compress Clang Installation
         run: |
-          tar -czvf clang-${CLANG_VERSION}-linux.tar.gz -C ${{ env.INSTALL_DIR }} .
+          tar -czvf clang-${{ env.CLANG_VERSION }}-windows.tar.gz -C ${{ env.INSTALL_DIR }} .
 
       - name: Upload Clang Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: clang-${{ env.CLANG_VERSION }}-linux
-          path: clang-${{ env.CLANG_VERSION }}-linux.tar.gz
+          name: clang-${{ env.CLANG_VERSION }}-windows
+          path: clang-${{ env.CLANG_VERSION }}-windows.tar.gz
 
       - name: Cleanup
         run: |
