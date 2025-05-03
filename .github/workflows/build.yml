@@ -8,7 +8,7 @@ on:
       - '**/*.hpp'
       - '**/*.cpp'
       - '**/*.cmake'
-      - .github/workflows/*.yml
+      #- .github/workflows/*.yml DISABLE for now
   pull_request:
     branches: ["main"]
     paths:
@@ -16,7 +16,7 @@ on:
       - '**/*.hpp'
       - '**/*.cpp'
       - '**/*.cmake'
-      - .github/workflows/*.yml
+      #- .github/workflows/*.yml DISABLE for now
 
 jobs:
   clang-format:
