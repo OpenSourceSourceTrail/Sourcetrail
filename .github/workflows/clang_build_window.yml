@@ -49,13 +49,13 @@ jobs:
 
       - name: Compress Clang Installation
         run: |
-          tar -czvf ${{ env.TAR_NAME }}.tar.gz -C ${{ env.INSTALL_DIR }} .
+          tar -czvf clang-${{ env.CLANG_VERSION }}-windows.tar.gz -C ${{ env.INSTALL_DIR }} .
 
       - name: Upload Clang Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.TAR_NAME }}
-          path: ${{ env.TAR_NAME }}.tar.gz
+          name: clang-${{ env.CLANG_VERSION }}-windows
+          path: clang-${{ env.CLANG_VERSION }}-windows.tar.gz
 
       - name: Cleanup
         run: |
