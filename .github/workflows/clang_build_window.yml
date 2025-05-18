@@ -11,7 +11,7 @@ on:
 env:
   CLANG_VERSION: ${{ github.event.inputs.clang_version || '19.1.7' }}
   INSTALL_DIR: ${{ github.workspace }}/clang-install
-  TAR_NAME: clang-${{ CLANG_VERSION }}-windows
+  TAR_NAME: clang-${{ env.CLANG_VERSION }}-windows
 
 jobs:
   build-clang:
