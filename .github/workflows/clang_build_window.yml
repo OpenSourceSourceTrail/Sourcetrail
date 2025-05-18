@@ -11,6 +11,7 @@ on:
 env:
   CLANG_VERSION: ${{ github.event.inputs.clang_version || '19.1.7' }}
   INSTALL_DIR: ${{ github.workspace }}/clang-install
+  TAR_NAME: clang-${{ CLANG_VERSION }}-windows
 
 jobs:
   build-clang:
@@ -48,13 +49,13 @@ jobs:
 
       - name: Compress Clang Installation
         run: |
-          tar -czvf clang-${CLANG_VERSION}-linux.tar.gz -C ${{ env.INSTALL_DIR }} .
+          tar -czvf ${{ env.TAR_NAME }}.tar.gz -C ${{ env.INSTALL_DIR }} .
 
       - name: Upload Clang Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: clang-${{ env.CLANG_VERSION }}-windows
-          path: clang-${{ env.CLANG_VERSION }}-windows.tar.gz
+          name: ${{ env.TAR_NAME }}
+          path: ${{ env.TAR_NAME }}.tar.gz
 
       - name: Cleanup
         run: |
