@@ -64,7 +64,8 @@ jobs:
             tag: msvc,
             cc: "cl",
             cxx: "cl",
-            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+            "with_cxx": "_build_cxx"
             }
           - {
               name: "Ubuntu Latest GCC",
@@ -184,7 +185,7 @@ jobs:
         run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
         shell: bash
 
-      - name: Download llvm build cache
+      - name: Download llvm build cache (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
         uses: actions/download-artifact@v4
         with:
@@ -193,9 +194,23 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: 13795569336 # TODO(Hussein): Need to be fixed
 
+      - name: Download llvm build cache (Windows)
+        if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
+        uses: actions/download-artifact@v4
+        with:
+          name: clang-19.1.7-windows
+          path: ${{github.workspace}}/external
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: 3147711025 # TODO(Hussein): Need to be fixed
+
       - name: Install llvm (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
         run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
+
+      - name: Install llvm (Windows)
+        if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
+        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-windows.tar.gz -C ${{github.workspace}}/external
+        shell: pwsh
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
@@ -204,10 +219,10 @@ jobs:
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         env:
-          CMAKE_PREFIX_PATH: ${{env.Qt5_DIR}}
+          CMAKE_PREFIX_PATH: ${{ env.Qt5_DIR }}
         run: |
           call "${{ matrix.config.environment_script }}"
-          cmake --preset="ci_${{ matrix.config.tag }}_release"
+          cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
         shell: cmd
 
       - name: Build (Ubuntu)
