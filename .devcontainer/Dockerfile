@@ -89,10 +89,33 @@ RUN wget -q https://download.qt.io/archive/qt/6.8/6.8.2/single/qt-everywhere-src
 
 WORKDIR /tmp/qt-everywhere-src-6.8.2/build
 
-RUN ../configure -prefix /usr/local/qt6.8.2 -opensource -confirm-license -nomake examples -nomake tests -submodules qtbase,qt5compat,qtsvg -no-opengl -openssl-linked && \
+RUN ../configure -prefix /usr/local/qt6.8.2 -opensource -confirm-license -nomake examples -nomake tests -submodules qtbase,qt5compat,qtsvg -no-opengl -openssl-linked -release && \
     cmake --build . --parallel && \
     cmake --install . && \
     rm -rf /tmp/qt-everywhere-src-6.8.2 /tmp/qt-everywhere-src-6.8.2.tar.xz
+
+# Install Qt Installer framework
+RUN apt-get update && \
+    apt-get install -y \
+    libdbus-1-3
+
+RUN wget -O /tmp/ifw-4.7.0.run https://download.qt.io/official_releases/qt-installer-framework/4.7.0/QtInstallerFramework-linux-x64-4.7.0.run && \
+    chmod +x /tmp/ifw-4.7.0.run && \
+    /tmp/ifw-4.7.0.run --accept-licenses --confirm-command install && \
+    cp -r /root/Qt/QtIFW-4.7.0/bin/* /usr/local/qt6.8.2/bin && \
+    rm /tmp/ifw-4.7.0.run && \
+    rm -rf /root/Qt
+
+# Install linuxdeploy
+RUN apt-get update && \
+    apt-get install -y \
+    fuse \ 
+    libfuse2
+
+RUN wget -q -P /tmp/ {https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20250213-2/linuxdeploy-x86_64.AppImage,https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage} && \
+    chmod +x /tmp/linuxdeploy*.AppImage && \
+    mv /tmp/linuxdeploy-x86_64.AppImage /usr/local/bin/linuxdeploy && \
+    mv /tmp/linuxdeploy-plugin-qt-x86_64.AppImage /usr/local/bin/linuxdeploy-plugin-qt
 
 # Add a non-root user in one step
 # For further details check https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
