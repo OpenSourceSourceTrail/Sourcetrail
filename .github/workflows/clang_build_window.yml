@@ -14,8 +14,9 @@ env:
   environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
 
 jobs:
-  build-clang:
+  build-clang-windows:
     runs-on: windows-latest
+    environment: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
     defaults:
       run:
         shell: cmd
@@ -37,7 +38,6 @@ jobs:
             -DLLVM_ENABLE_PROJECTS:STRING=clang ^
             -DLLVM_ENABLE_RTTI:BOOL=ON ^
             -DLLVM_TARGETS_TO_BUILD=host
-        shell: cmd
 
       - name: Build Clang
         working-directory: llvm-project/build
