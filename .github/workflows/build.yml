@@ -209,6 +209,7 @@ jobs:
           name: clang-19.1.7-windows
           path: ${{github.workspace}}/external
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          artifact-ids: 3147711025
 
       - name: Install llvm (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
