@@ -206,9 +206,10 @@ jobs:
         if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
         uses: actions/download-artifact@v4
         with:
+          name: clang-19.1.7-windows
           path: ${{github.workspace}}/external
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          artifact-ids: 3147711025
+          run-id: 15099292228 # TODO(Hussein): Need to be fixed
 
       - name: Install llvm (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
