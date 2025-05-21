@@ -64,6 +64,14 @@ jobs:
             tag: msvc,
             cc: "cl",
             cxx: "cl",
+            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+            }
+          - {
+            name: "Windows Latest MSVC  with cxx_build",
+            os: windows-latest,
+            tag: msvc,
+            cc: "cl",
+            cxx: "cl",
             environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
             "with_cxx": "_build_cxx"
             }
@@ -201,7 +209,6 @@ jobs:
           name: clang-19.1.7-windows
           path: ${{github.workspace}}/external
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 3147711025 # TODO(Hussein): Need to be fixed
 
       - name: Install llvm (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
