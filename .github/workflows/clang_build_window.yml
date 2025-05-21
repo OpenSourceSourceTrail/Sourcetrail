@@ -13,8 +13,9 @@ env:
   INSTALL_DIR: ${{ github.workspace }}/clang-install
 
 jobs:
-  build-clang:
+  build-clang-windows:
     runs-on: windows-latest
+    environment: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
     defaults:
       run:
         shell: cmd
