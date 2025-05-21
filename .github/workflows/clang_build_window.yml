@@ -11,6 +11,7 @@ on:
 env:
   CLANG_VERSION: ${{ github.event.inputs.clang_version || '19.1.7' }}
   INSTALL_DIR: ${{ github.workspace }}/clang-install
+  environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
 
 jobs:
   build-clang:
@@ -28,6 +29,7 @@ jobs:
       - name: Configure CMake
         working-directory: llvm-project
         run: |
+          call "${{ env.environment_script }}"
           cmake -S llvm -B build ^
             -G Ninja ^
             -DCMAKE_BUILD_TYPE=Release ^
@@ -35,6 +37,7 @@ jobs:
             -DLLVM_ENABLE_PROJECTS:STRING=clang ^
             -DLLVM_ENABLE_RTTI:BOOL=ON ^
             -DLLVM_TARGETS_TO_BUILD=host
+        shell: cmd
 
       - name: Build Clang
         working-directory: llvm-project/build
