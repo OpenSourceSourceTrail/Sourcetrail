@@ -488,8 +488,10 @@ void QtMainWindow::showStartScreen() {
   auto* pStartScreen = createWindow<qt::window::QtStartScreen>();
   pStartScreen->setupStartScreen();
 
-  connect(pStartScreen, &qt::window::QtStartScreen::openOpenProjectDialog, this, &QtMainWindow::openProject);
-  connect(pStartScreen, &qt::window::QtStartScreen::openNewProjectDialog, this, &QtMainWindow::newProject);
+  std::ignore = connect(pStartScreen, &qt::window::QtStartScreen::openOpenProjectDialog, this, &QtMainWindow::openProject);
+#if !defined(SOURCETRAIL_WASM)
+  std::ignore = connect(pStartScreen, &qt::window::QtStartScreen::openNewProjectDialog, this, &QtMainWindow::newProject);
+#endif
 }
 
 void QtMainWindow::hideStartScreen() {
@@ -701,7 +703,11 @@ void QtMainWindow::setupProjectMenu() {
   menuBar()->addMenu(menu);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
-  menu->addAction(tr("&New Project..."), QKeySequence::New, this, &QtMainWindow::newProject);
+  auto* newProjectAction = menu->addAction(tr("&New Project..."), QKeySequence::New, this, &QtMainWindow::newProject);
+#  if defined(SOURCETRAIL_WASM)
+  newProjectAction->setDisabled(true);
+  newProjectAction->setToolTip("New project is disabled for WASM");
+#  endif
   menu->addAction(tr("&Open Project..."), QKeySequence::Open, this, &QtMainWindow::openProject);
 #else
   menu->addAction(tr("&New Project..."), this, &QtMainWindow::newProject, QKeySequence::New);
@@ -714,7 +720,11 @@ void QtMainWindow::setupProjectMenu() {
 
   menu->addSeparator();
 
-  menu->addAction(tr("&Edit Project..."), this, &QtMainWindow::editProject);
+  auto* editProjectAction = menu->addAction(tr("&Edit Project..."), this, &QtMainWindow::editProject);
+#if defined(SOURCETRAIL_WASM)
+  editProjectAction->setDisabled(true);
+  editProjectAction->setToolTip("Edit project is disabled for WASM");
+#endif
   menu->addSeparator();
 
   menu->addAction(tr("Close Project"), this, &QtMainWindow::closeProject);

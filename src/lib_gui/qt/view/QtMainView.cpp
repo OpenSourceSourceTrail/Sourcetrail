@@ -3,6 +3,7 @@
 #include "QtMainWindow.h"
 #include "QtViewWidgetWrapper.h"
 #include "type/MessageRefreshUIState.h"
+#include "type/MessageStatus.h"
 #include "utilityApp.h"
 
 QtMainView::QtMainView(const ViewFactory* viewFactory, StorageAccess* storageAccess)
@@ -133,11 +134,19 @@ void QtMainView::clearBookmarksMenu() {
 }
 
 void QtMainView::handleMessage(MessageProjectEdit* /*message*/) {
+#if defined(SOURCETRAIL_WASM)
+  MessageStatus{L"Edit project is disabled for WASM", true}.dispatch();
+#else
   m_onQtThread([this]() { m_window->editProject(); });
+#endif
 }
 
-void QtMainView::handleMessage(MessageProjectNew* message) {
+void QtMainView::handleMessage([[maybe_unused]] MessageProjectNew* message) {
+#if defined(SOURCETRAIL_WASM)
+  MessageStatus{L"New project is disabled for WASM", true}.dispatch();
+#else
   m_onQtThread([this, cdbPath = message->cdbPath]() { m_window->newProjectFromCDB(cdbPath); });
+#endif
 }
 
 void QtMainView::handleMessage(MessageWindowChanged* /*message*/) {
