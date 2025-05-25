@@ -131,6 +131,8 @@ endif()
 # Project ------------------------------------------------------------------------------------------------------------------------
 set(PROJECT_NAME Sourcetrail)
 
+add_definitions(-DSOURCETRAIL_WASM=1)
+
 #RPATH
 if(UNIX AND NOT APPLE)
   set(CMAKE_SKIP_BUILD_RPATH FALSE)
