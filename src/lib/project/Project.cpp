@@ -51,6 +51,7 @@
 #include "utilityString.h"
 
 namespace {
+#if !defined(SOURCETRAIL_WASM)
 constexpr int DefaultIndexerThreadCount = 4;
 
 int getIndexerThreadCount() {
@@ -63,7 +64,7 @@ int getIndexerThreadCount() {
   }
   return indexerThreadCount;
 }
-
+#endif
 }    // namespace
 
 Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI) noexcept
@@ -108,7 +109,7 @@ void Project::setStateOutdated() {
   }
 }
 
-void Project::load(const std::shared_ptr<DialogView>& dialogView) {
+void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogView) {
   if(m_refreshStage != RefreshStageType::NONE) {
     MessageStatus(L"Cannot load another project while indexing.", true, false).dispatch();
     return;
@@ -131,6 +132,7 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
 
   {
     if(tempDbPath.exists()) {
+#if !defined(SOURCETRAIL_WASM)
       if(dbPath.exists()) {
         if(dialogView->confirm(L"Sourcetrail has been closed unexpectedly while indexing this project. "
                                L"You can either choose to keep "
@@ -154,6 +156,9 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
             "found");
         FileSystem::rename(tempDbPath, dbPath);
       }
+#else
+      MessageStatus{L"Sourcetrail has been closed unexpectedly while indexing this project.", true}.dispatch();
+#endif
     }
   }
 
@@ -238,10 +243,13 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
   }
 
   if(m_state != ProjectStateType::LOADED && m_hasGUI) {
-    MessageRefresh().dispatch();
+#if !defined(SOURCETRAIL_WASM)
+    MessageRefresh{}.dispatch();
+#endif
   }
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested) {
   if(m_refreshStage != RefreshStageType::NONE) {
     return;
@@ -497,7 +505,7 @@ void Project::discardTempStorage() {
 }
 
 bool Project::hasCxxSourceGroup() const {
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#  if BUILD_CXX_LANGUAGE_PACKAGE
   for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
     if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
       if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
@@ -505,10 +513,9 @@ bool Project::hasCxxSourceGroup() const {
       }
     }
   }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#  endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return false;
 }
-
 
 std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
                                                              std::shared_ptr<DialogView> dialogView,
@@ -728,3 +735,4 @@ bool Project::checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView>
   }
   return false;
 }
+#endif
