@@ -112,10 +112,12 @@ public slots:
   void showStartScreen();
   void hideStartScreen();
 
+#if !defined(SOURCETRAIL_WASM)
   void newProject();
   void newProjectFromCDB(const FilePath& filePath);
-  void openProject();
   void editProject();
+#endif
+  void openProject();
   void closeProject();
 
   void find();

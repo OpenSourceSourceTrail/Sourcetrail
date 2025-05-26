@@ -498,6 +498,7 @@ void QtMainWindow::hideStartScreen() {
   m_windowStack.clearWindows();
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void QtMainWindow::newProject() {
   auto* wizard = createWindow<QtProjectWizard>();
   wizard->newProject();
@@ -512,6 +513,16 @@ void QtMainWindow::newProjectFromCDB(const FilePath& filePath) {
   wizard->newProjectFromCDB(filePath);
 }
 
+void QtMainWindow::editProject() {
+  auto currentProject = Application::getInstance()->getCurrentProject();
+  if(currentProject) {
+    auto* wizard = createWindow<QtProjectWizard>();
+
+    wizard->editProject(currentProject->getProjectSettingsFilePath());
+  }
+}
+#endif
+
 void QtMainWindow::openProject() {
   QString fileName = QtFileDialog::getOpenFileName(
       this, tr("Open File"), FilePath(), QStringLiteral("Sourcetrail Project Files (*.srctrlprj)"));
@@ -519,15 +530,6 @@ void QtMainWindow::openProject() {
   if(!fileName.isEmpty()) {
     MessageLoadProject(FilePath(fileName.toStdWString())).dispatch();
     m_windowStack.clearWindows();
-  }
-}
-
-void QtMainWindow::editProject() {
-  auto currentProject = Application::getInstance()->getCurrentProject();
-  if(currentProject) {
-    auto* wizard = createWindow<QtProjectWizard>();
-
-    wizard->editProject(currentProject->getProjectSettingsFilePath());
   }
 }
 
@@ -703,7 +705,11 @@ void QtMainWindow::setupProjectMenu() {
   menuBar()->addMenu(menu);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
-  auto* newProjectAction = menu->addAction(tr("&New Project..."), QKeySequence::New, this, &QtMainWindow::newProject);
+  auto* newProjectAction = menu->addAction(tr("&New Project..."), QKeySequence::New, [this]() {
+#  if !defined(SOURCETRAIL_WASM)
+    newProject();
+#  endif
+  });
 #  if defined(SOURCETRAIL_WASM)
   newProjectAction->setDisabled(true);
   newProjectAction->setToolTip("New project is disabled for WASM");
@@ -720,7 +726,11 @@ void QtMainWindow::setupProjectMenu() {
 
   menu->addSeparator();
 
-  auto* editProjectAction = menu->addAction(tr("&Edit Project..."), this, &QtMainWindow::editProject);
+  auto* editProjectAction = menu->addAction(tr("&Edit Project..."), [this]() {
+#if !defined(SOURCETRAIL_WASM)
+    editProject();
+#endif
+  });
 #if defined(SOURCETRAIL_WASM)
   editProjectAction->setDisabled(true);
   editProjectAction->setToolTip("Edit project is disabled for WASM");
