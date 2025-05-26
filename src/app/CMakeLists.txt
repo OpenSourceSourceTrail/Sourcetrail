@@ -59,7 +59,9 @@ if(APPLE)
   target_link_libraries(Sourcetrail ${CORE_FOUNDATION})
 endif()
 
-add_dependencies(Sourcetrail Sourcetrail_indexer)
+if(NOT SOURCETRAIL_WASM)
+  add_dependencies(Sourcetrail Sourcetrail_indexer)
+endif()
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico)
   message(FATAL "\"sourcetrail.ico\" not found. You may run `git submodule`")
