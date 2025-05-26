@@ -129,6 +129,7 @@ add_sourcetrail_test(
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
 
+if(NOT SOURCETRAIL_WASM)
 add_sourcetrail_test(
   NAME
   CommandlineCommandConfigTestSuite
@@ -223,6 +224,7 @@ add_sourcetrail_test(
   "unittests.core."
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
+endif()
 
 add_sourcetrail_test(
   NAME

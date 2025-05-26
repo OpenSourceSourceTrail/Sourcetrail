@@ -7,7 +7,7 @@ project(
   DESCRIPTION "interactive source explorer"
   VERSION ${VERSION_STRING}
   HOMEPAGE_URL "opensourcesourcetrail.github.io"
-  LANGUAGES C CXX)
+  LANGUAGES CXX)
 #---------------------------------------------------------------------------------------------------------------------------------
 set(BUILD_CXX_LANGUAGE_PACKAGE
     OFF
@@ -53,14 +53,13 @@ set(SOURCETRAIL_USE_LIBCPP
 set(GCOV_VERSION
     "gcov-12"
     CACHE STRING "Version of gcov")
+
+set(SOURCETRAIL_WASM ON CACHE BOOL "")
 #---------------------------------------------------------------------------------------------------------------------------------
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 17)
 #---------------------------------------------------------------------------------------------------------------------------------
 include(cmake/add_files.cmake)
 include(cmake/version_setup.cmake)

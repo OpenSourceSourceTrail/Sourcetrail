@@ -39,7 +39,9 @@ target_link_libraries(
   PRIVATE Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::libGui::utility::utilityApp
-          Sourcetrail::core::utility::commandline::CommandLineParser)
+          # $<NOT:$<BOOL:OFF>>
+          $<$<NOT:$<BOOL:${SOURCETRAIL_WASM}>>:Sourcetrail::core::utility::commandline::CommandLineParser>
+          )
 
 target_include_directories(
   Sourcetrail
