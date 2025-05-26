@@ -33,6 +33,7 @@ public:
   void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress) override;
   void hideProgressDialog() override;
 
+#if !defined(SOURCETRAIL_WASM)
   void startIndexingDialog(Project* project,
                            const std::vector<RefreshMode>& enabledModes,
                            const RefreshMode initialMode,
@@ -56,6 +57,7 @@ public:
                                         ErrorCountInfo errorInfo,
                                         bool interrupted,
                                         bool shallow) override;
+#endif
 
   int confirm(const std::wstring& message, const std::vector<std::wstring>& options) override;
 

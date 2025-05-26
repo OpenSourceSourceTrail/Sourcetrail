@@ -97,6 +97,7 @@ void QtDialogView::hideProgressDialog() {
   setParentWindow(nullptr);
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void QtDialogView::startIndexingDialog(Project* project,
                                        const std::vector<RefreshMode>& enabledModes,
                                        const RefreshMode initialMode,
@@ -258,6 +259,7 @@ DatabasePolicy QtDialogView::finishedIndexingDialog(size_t indexedFileCount,
 
   return policy;
 }
+#endif
 
 int QtDialogView::confirm(const std::wstring& message, const std::vector<std::wstring>& options) {
   int result = -1;
