@@ -197,7 +197,9 @@ private:
 
   void updateTitle();
 
+  #if !defined(SOURCETRAIL_WASM)
   bool checkSharedMemory();
+  #endif
 
   const bool mHasGui;
   std::shared_ptr<lib::IFactory> mFactory;

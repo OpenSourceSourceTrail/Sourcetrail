@@ -18,14 +18,18 @@
 #include "IApplicationSettings.hpp"
 #include "IDECommunicationController.h"
 #include "impls/Factory.hpp"
-#include "ISharedMemoryGarbageCollector.hpp"
+#if !defined(SOURCETRAIL_WASM)
+#  include "ISharedMemoryGarbageCollector.hpp"
+#endif
 #include "ITaskManager.hpp"
 #include "logging.h"
 #include "MainView.h"
 #include "MessageQueue.h"
 #include "NetworkFactory.h"
 #include "ProjectSettings.h"
-#include "SharedMemory.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "SharedMemory.h"
+#endif
 #include "StorageCache.h"
 #include "TabId.h"
 #include "TaskScheduler.h"
@@ -112,11 +116,13 @@ void Application::createInstance(const Version& version,
     GraphViewStyle::setImpl(viewFactory->createGraphStyleImpl());
   }
 
+#if !defined(SOURCETRAIL_WASM)
   // TODO(Hussein): We should create this iff multi-process is used
   if(auto collector = factory->createSharedMemoryGarbageCollector(); collector) {
     lib::ISharedMemoryGarbageCollector::setInstance(collector);
     collector->run(Application::getUUID());
   }
+#endif
 
   scheduling::ITaskManager::setInstance(factory->createTaskManager());
   scheduling::ITaskManager::getInstanceRaw()->createScheduler(TabId::app());
@@ -204,10 +210,11 @@ Application::~Application() {
   if(mHasGui) {
     mMainView->saveLayout();
   }
-
+#if !defined(SOURCETRAIL_WASM)
   if(auto* collector = lib::ISharedMemoryGarbageCollector::getInstanceRaw(); collector) {
     collector->stop();
   }
+#endif
 }
 
 int Application::handleDialog(const std::wstring& message) {
@@ -482,6 +489,7 @@ void Application::updateTitle() {
   }
 }
 
+#if !defined(SOURCETRAIL_WASM)
 bool Application::checkSharedMemory() {
   const std::wstring error = utility::decodeFromUtf8(SharedMemory::checkSharedMemory(getUUID()));
   if(error.empty()) {
@@ -499,3 +507,4 @@ bool Application::checkSharedMemory() {
                   error));
   return false;
 }
+#endif

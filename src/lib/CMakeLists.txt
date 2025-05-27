@@ -163,45 +163,6 @@ add_files(
   data/graph/Node.h
   data/graph/Token.cpp
   data/graph/Token.h
-  data/indexer/interprocess/shared_types/SharedIndexerCommand.cpp
-  data/indexer/interprocess/shared_types/SharedIndexerCommand.h
-  data/indexer/interprocess/shared_types/SharedIntermediateStorage.cpp
-  data/indexer/interprocess/shared_types/SharedIntermediateStorage.h
-  data/indexer/interprocess/shared_types/SharedStorageTypes.h
-  data/indexer/interprocess/BaseInterprocessDataManager.cpp
-  data/indexer/interprocess/BaseInterprocessDataManager.h
-  data/indexer/interprocess/InterprocessIndexer.cpp
-  data/indexer/interprocess/InterprocessIndexer.h
-  data/indexer/interprocess/InterprocessIndexerCommandManager.cpp
-  data/indexer/interprocess/InterprocessIndexerCommandManager.h
-  data/indexer/interprocess/InterprocessIndexingStatusManager.cpp
-  data/indexer/interprocess/InterprocessIndexingStatusManager.h
-  data/indexer/interprocess/InterprocessIntermediateStorageManager.cpp
-  data/indexer/interprocess/InterprocessIntermediateStorageManager.h
-  data/indexer/CombinedIndexerCommandProvider.cpp
-  data/indexer/CombinedIndexerCommandProvider.h
-  data/indexer/Indexer.h
-  data/indexer/IndexerBase.cpp
-  data/indexer/IndexerBase.h
-  data/indexer/IndexerCommand.cpp
-  data/indexer/IndexerCommand.h
-  data/indexer/IndexerCommandCustom.cpp
-  data/indexer/IndexerCommandCustom.h
-  data/indexer/IndexerCommandProvider.cpp
-  data/indexer/IndexerCommandProvider.h
-  data/indexer/IndexerCommandType.cpp
-  data/indexer/IndexerCommandType.h
-  data/indexer/IndexerComposite.cpp
-  data/indexer/IndexerComposite.h
-  data/indexer/IndexerStateInfo.h
-  data/indexer/MemoryIndexerCommandProvider.cpp
-  data/indexer/MemoryIndexerCommandProvider.h
-  data/indexer/TaskBuildIndex.cpp
-  data/indexer/TaskBuildIndex.h
-  data/indexer/TaskExecuteCustomCommands.cpp
-  data/indexer/TaskExecuteCustomCommands.h
-  data/indexer/TaskFillIndexerCommandQueue.cpp
-  data/indexer/TaskFillIndexerCommandQueue.h
   data/location/LocationType.cpp
   data/location/LocationType.h
   data/location/SourceLocation.cpp
@@ -360,16 +321,60 @@ add_files(
   settings/ProjectSettings.cpp
   settings/ProjectSettings.h
   settings/Settings.cpp
-  settings/Settings.h
-  utility/interprocess/SharedMemory.cpp
-  utility/interprocess/SharedMemory.h
-  # Base Factory {
-  utility/interprocess/ISharedMemoryGarbageCollector.cpp
-  utility/interprocess/ISharedMemoryGarbageCollector.hpp
-  utility/interprocess/details/SharedMemoryGarbageCollector.cpp
-  utility/interprocess/details/SharedMemoryGarbageCollector.h
-  # }
-)
+  settings/Settings.h)
+
+if(NOT SOURCETRAIL_WASM)
+  add_files(
+    LIB
+    data/indexer/interprocess/shared_types/SharedIndexerCommand.cpp
+    data/indexer/interprocess/shared_types/SharedIndexerCommand.h
+    data/indexer/interprocess/shared_types/SharedIntermediateStorage.cpp
+    data/indexer/interprocess/shared_types/SharedIntermediateStorage.h
+    data/indexer/interprocess/shared_types/SharedStorageTypes.h
+    data/indexer/interprocess/BaseInterprocessDataManager.cpp
+    data/indexer/interprocess/BaseInterprocessDataManager.h
+    data/indexer/interprocess/InterprocessIndexer.cpp
+    data/indexer/interprocess/InterprocessIndexer.h
+    data/indexer/interprocess/InterprocessIndexerCommandManager.cpp
+    data/indexer/interprocess/InterprocessIndexerCommandManager.h
+    data/indexer/interprocess/InterprocessIndexingStatusManager.cpp
+    data/indexer/interprocess/InterprocessIndexingStatusManager.h
+    data/indexer/interprocess/InterprocessIntermediateStorageManager.cpp
+    data/indexer/interprocess/InterprocessIntermediateStorageManager.h
+    data/indexer/CombinedIndexerCommandProvider.cpp
+    data/indexer/CombinedIndexerCommandProvider.h
+    data/indexer/Indexer.h
+    data/indexer/IndexerBase.cpp
+    data/indexer/IndexerBase.h
+    data/indexer/IndexerCommand.cpp
+    data/indexer/IndexerCommand.h
+    data/indexer/IndexerCommandCustom.cpp
+    data/indexer/IndexerCommandCustom.h
+    data/indexer/IndexerCommandProvider.cpp
+    data/indexer/IndexerCommandProvider.h
+    data/indexer/IndexerCommandType.cpp
+    data/indexer/IndexerCommandType.h
+    data/indexer/IndexerComposite.cpp
+    data/indexer/IndexerComposite.h
+    data/indexer/IndexerStateInfo.h
+    data/indexer/MemoryIndexerCommandProvider.cpp
+    data/indexer/MemoryIndexerCommandProvider.h
+    data/indexer/TaskBuildIndex.cpp
+    data/indexer/TaskBuildIndex.h
+    data/indexer/TaskExecuteCustomCommands.cpp
+    data/indexer/TaskExecuteCustomCommands.h
+    data/indexer/TaskFillIndexerCommandQueue.cpp
+    data/indexer/TaskFillIndexerCommandQueue.h
+    utility/interprocess/SharedMemory.cpp
+    utility/interprocess/SharedMemory.h
+    # Base Factory {
+    utility/interprocess/ISharedMemoryGarbageCollector.cpp
+    utility/interprocess/ISharedMemoryGarbageCollector.hpp
+    utility/interprocess/details/SharedMemoryGarbageCollector.cpp
+    utility/interprocess/details/SharedMemoryGarbageCollector.h
+    # }
+  )
+endif()
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_files(

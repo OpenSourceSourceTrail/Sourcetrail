@@ -1,6 +1,8 @@
 #include "Factory.hpp"
 
+#if !defined(SOURCETRAIL_WASM)
 #include "details/SharedMemoryGarbageCollector.h"
+#endif
 #include "impls/TaskManager.hpp"
 #include "logging.h"
 #include "MessageQueue.h"
@@ -30,6 +32,7 @@ IMessageQueue::Ptr Factory::createMessageQueue() noexcept {
   return std::make_shared<details::MessageQueue>();
 }
 
+#if !defined(SOURCETRAIL_WASM)
 ISharedMemoryGarbageCollector::Ptr Factory::createSharedMemoryGarbageCollector() noexcept {
   SharedMemoryGarbageCollector::Ptr instance;
   try {
@@ -47,6 +50,7 @@ ISharedMemoryGarbageCollector::Ptr Factory::createSharedMemoryGarbageCollector()
 
   return instance;
 }
+#endif
 
 scheduling::ITaskManager::Ptr Factory::createTaskManager() noexcept {
   return std::make_shared<scheduling::impls::TaskManager>();
