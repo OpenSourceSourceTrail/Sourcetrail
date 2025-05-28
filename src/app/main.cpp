@@ -23,7 +23,9 @@
 #include "productVersion.h"
 #include "QtApplication.h"
 #include "QtCoreApplication.h"
+#if !defined(SOURCETRAIL_WASM)
 #include "QtNetworkFactory.h"
+#endif
 #include "QtViewFactory.h"
 #include "ResourcePaths.h"
 #include "ScopedFunctor.h"
@@ -41,6 +43,10 @@
 #  include "LanguagePackageCxx.h"
 #  include "SourceGroupFactoryModuleCxx.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+
+#if defined(SOURCETRAIL_WASM)
+class NetworkFactory;
+#endif
 
 namespace {
 
@@ -160,10 +166,14 @@ int runGui(int argc, char** argv, const Version& version, const Result& result) 
 #endif
 
   QtViewFactory viewFactory;
-  QtNetworkFactory networkFactory;
+  NetworkFactory *networkFactory = nullptr;
+#if !defined(SOURCETRAIL_WASM)
+  QtNetworkFactory qtNetworkFactory;
+  networkFactory = &qtNetworkFactory;
+#endif
 
   auto factory = std::make_shared<lib::Factory>();
-  Application::createInstance(version, factory, &viewFactory, &networkFactory);
+  Application::createInstance(version, factory, &viewFactory, networkFactory);
   [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());

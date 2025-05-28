@@ -26,8 +26,6 @@ add_files(
   component/controller/helper/DummyNode.h
   component/controller/helper/ListLayouter.cpp
   component/controller/helper/ListLayouter.h
-  component/controller/helper/NetworkProtocolHelper.cpp
-  component/controller/helper/NetworkProtocolHelper.h
   component/controller/helper/ScreenSearchInterfaces.h
   component/controller/helper/SnippetMerger.cpp
   component/controller/helper/SnippetMerger.h
@@ -47,8 +45,6 @@ add_files(
   component/controller/ErrorController.h
   component/controller/GraphController.cpp
   component/controller/GraphController.h
-  component/controller/IDECommunicationController.cpp
-  component/controller/IDECommunicationController.h
   component/controller/RefreshController.cpp
   component/controller/RefreshController.h
   component/controller/ScreenSearchController.cpp
@@ -119,8 +115,6 @@ add_files(
   component/ComponentFactory.h
   component/ComponentManager.cpp
   component/ComponentManager.h
-  component/NetworkFactory.cpp
-  component/NetworkFactory.h
   component/Tab.cpp
   component/Tab.h
   component/TabId.cpp
@@ -190,8 +184,6 @@ add_files(
   data/parser/ReferenceKind.h
   data/parser/SymbolKind.cpp
   data/parser/SymbolKind.h
-  data/parser/TaskParseWrapper.cpp
-  data/parser/TaskParseWrapper.h
   data/search/SearchIndex.cpp
   data/search/SearchIndex.h
   data/search/SearchMatch.cpp
@@ -255,14 +247,6 @@ add_files(
   data/NodeType.h
   data/NodeTypeSet.cpp
   data/NodeTypeSet.h
-  data/TaskCleanStorage.cpp
-  data/TaskCleanStorage.h
-  data/TaskFinishParsing.cpp
-  data/TaskFinishParsing.h
-  data/TaskInjectStorage.cpp
-  data/TaskInjectStorage.h
-  data/TaskMergeStorages.cpp
-  data/TaskMergeStorages.h
   project/Project.cpp
   project/Project.h
   project/IProject.cpp
@@ -326,6 +310,22 @@ add_files(
 if(NOT SOURCETRAIL_WASM)
   add_files(
     LIB
+    component/controller/IDECommunicationController.cpp
+    component/controller/IDECommunicationController.h
+    component/controller/helper/NetworkProtocolHelper.cpp
+    component/controller/helper/NetworkProtocolHelper.h
+    component/NetworkFactory.cpp
+    component/NetworkFactory.h
+    data/TaskCleanStorage.cpp
+    data/TaskCleanStorage.h
+    data/TaskFinishParsing.cpp
+    data/TaskFinishParsing.h
+    data/TaskInjectStorage.cpp
+    data/TaskInjectStorage.h
+    data/TaskMergeStorages.cpp
+    data/TaskMergeStorages.h
+    data/parser/TaskParseWrapper.cpp
+    data/parser/TaskParseWrapper.h
     data/indexer/interprocess/shared_types/SharedIndexerCommand.cpp
     data/indexer/interprocess/shared_types/SharedIndexerCommand.h
     data/indexer/interprocess/shared_types/SharedIntermediateStorage.cpp

@@ -124,14 +124,6 @@ add_files(
   qt/graphics/GraphFocusHandler.h
   qt/graphics/QtGraphicsView.cpp
   qt/graphics/QtGraphicsView.h
-  qt/network/QtIDECommunicationController.cpp
-  qt/network/QtIDECommunicationController.h
-  qt/network/QtNetworkFactory.cpp
-  qt/network/QtNetworkFactory.h
-  qt/network/QtRequest.cpp
-  qt/network/QtRequest.h
-  qt/network/QtTcpWrapper.cpp
-  qt/network/QtTcpWrapper.h
   qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
   qt/project_wizard/content/path/QtProjectWizardContentPath.h
   qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp
@@ -274,6 +266,19 @@ add_files(
   qt/QtApplication.h
   qt/QtCoreApplication.cpp
   qt/QtCoreApplication.h)
+
+if(NOT SOURCETRAIL_WASM)
+   add_files(
+     LIB_GUI
+     qt/network/QtNetworkFactory.cpp
+     qt/network/QtNetworkFactory.h
+     qt/network/QtIDECommunicationController.cpp
+     qt/network/QtIDECommunicationController.h
+     qt/network/QtRequest.cpp
+     qt/network/QtRequest.h
+     qt/network/QtTcpWrapper.cpp
+     qt/network/QtTcpWrapper.h)
+endif()
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_files(

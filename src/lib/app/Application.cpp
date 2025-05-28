@@ -25,7 +25,9 @@
 #include "logging.h"
 #include "MainView.h"
 #include "MessageQueue.h"
+#if !defined(SOURCETRAIL_WASM)
 #include "NetworkFactory.h"
+#endif
 #include "ProjectSettings.h"
 #if !defined(SOURCETRAIL_WASM)
 #  include "SharedMemory.h"
@@ -139,10 +141,12 @@ void Application::createInstance(const Version& version,
     sInstance->mMainView->setup();
   }
 
+#if !defined(SOURCETRAIL_WASM)
   if(nullptr != networkFactory) {
     sInstance->mIdeCommunicationController = networkFactory->createIDECommunicationController(sInstance->mStorageCache.get());
     sInstance->mIdeCommunicationController->startListening();
   }
+#endif
 
   sInstance->startMessagingAndScheduling();
 }
