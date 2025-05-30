@@ -24,7 +24,7 @@
 #include "QtApplication.h"
 #include "QtCoreApplication.h"
 #if !defined(SOURCETRAIL_WASM)
-#include "QtNetworkFactory.h"
+#  include "QtNetworkFactory.h"
 #endif
 #include "QtViewFactory.h"
 #include "ResourcePaths.h"
@@ -166,7 +166,7 @@ int runGui(int argc, char** argv, const Version& version, const Result& result) 
 #endif
 
   QtViewFactory viewFactory;
-  NetworkFactory *networkFactory = nullptr;
+  NetworkFactory* networkFactory = nullptr;
 #if !defined(SOURCETRAIL_WASM)
   QtNetworkFactory qtNetworkFactory;
   networkFactory = &qtNetworkFactory;

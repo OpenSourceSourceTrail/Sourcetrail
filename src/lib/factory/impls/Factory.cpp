@@ -1,7 +1,7 @@
 #include "Factory.hpp"
 
 #if !defined(SOURCETRAIL_WASM)
-#include "details/SharedMemoryGarbageCollector.h"
+#  include "details/SharedMemoryGarbageCollector.h"
 #endif
 #include "impls/TaskManager.hpp"
 #include "logging.h"

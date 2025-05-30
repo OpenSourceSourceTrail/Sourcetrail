@@ -26,7 +26,7 @@
 #include "MainView.h"
 #include "MessageQueue.h"
 #if !defined(SOURCETRAIL_WASM)
-#include "NetworkFactory.h"
+#  include "NetworkFactory.h"
 #endif
 #include "ProjectSettings.h"
 #if !defined(SOURCETRAIL_WASM)

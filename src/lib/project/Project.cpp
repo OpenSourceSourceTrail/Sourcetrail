@@ -17,7 +17,7 @@
 #include "../../scheduling/TaskReturnSuccessIf.h"
 #include "../../scheduling/TaskSetValue.h"
 #if !defined(SOURCETRAIL_WASM)
-#include "CombinedIndexerCommandProvider.h"
+#  include "CombinedIndexerCommandProvider.h"
 #endif
 #include "DialogView.h"
 #include "FilePath.h"
@@ -33,14 +33,14 @@
 #include "StorageProvider.h"
 #include "TabId.h"
 #if !defined(SOURCETRAIL_WASM)
-#include "TaskBuildIndex.h"
-#include "TaskCleanStorage.h"
-#include "TaskExecuteCustomCommands.h"
-#include "TaskFillIndexerCommandQueue.h"
-#include "TaskFinishParsing.h"
-#include "TaskInjectStorage.h"
-#include "TaskMergeStorages.h"
-#include "TaskParseWrapper.h"
+#  include "TaskBuildIndex.h"
+#  include "TaskCleanStorage.h"
+#  include "TaskExecuteCustomCommands.h"
+#  include "TaskFillIndexerCommandQueue.h"
+#  include "TaskFinishParsing.h"
+#  include "TaskInjectStorage.h"
+#  include "TaskMergeStorages.h"
+#  include "TaskParseWrapper.h"
 #endif
 #include "TextAccess.h"
 #include "type/error/MessageErrorCountClear.h"
