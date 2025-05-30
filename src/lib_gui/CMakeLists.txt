@@ -268,16 +268,16 @@ add_files(
   qt/QtCoreApplication.h)
 
 if(NOT SOURCETRAIL_WASM)
-   add_files(
-     LIB_GUI
-     qt/network/QtNetworkFactory.cpp
-     qt/network/QtNetworkFactory.h
-     qt/network/QtIDECommunicationController.cpp
-     qt/network/QtIDECommunicationController.h
-     qt/network/QtRequest.cpp
-     qt/network/QtRequest.h
-     qt/network/QtTcpWrapper.cpp
-     qt/network/QtTcpWrapper.h)
+  add_files(
+    LIB_GUI
+    qt/network/QtNetworkFactory.cpp
+    qt/network/QtNetworkFactory.h
+    qt/network/QtIDECommunicationController.cpp
+    qt/network/QtIDECommunicationController.h
+    qt/network/QtRequest.cpp
+    qt/network/QtRequest.h
+    qt/network/QtTcpWrapper.cpp
+    qt/network/QtTcpWrapper.h)
 endif()
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)

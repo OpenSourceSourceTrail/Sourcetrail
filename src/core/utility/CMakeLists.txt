@@ -1,7 +1,7 @@
 # ${CMAKE_SOURCE_DIR}/src/core/utility/CMakeLists.txt
 add_subdirectory(applicationArchitectureType)
 if(NOT SOURCETRAIL_WASM)
-add_subdirectory(commandline)
+  add_subdirectory(commandline)
 endif()
 add_subdirectory(configManager)
 add_subdirectory(file)

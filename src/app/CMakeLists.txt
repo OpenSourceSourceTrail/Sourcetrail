@@ -40,8 +40,7 @@ target_link_libraries(
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::libGui::utility::utilityApp
           # $<NOT:$<BOOL:OFF>>
-          $<$<NOT:$<BOOL:${SOURCETRAIL_WASM}>>:Sourcetrail::core::utility::commandline::CommandLineParser>
-          )
+          $<$<NOT:$<BOOL:${SOURCETRAIL_WASM}>>:Sourcetrail::core::utility::commandline::CommandLineParser>)
 
 target_include_directories(
   Sourcetrail
