@@ -371,11 +371,9 @@ void QtDialogView::handleMessage(MessageIndexingShowDialog* /*message*/) {
   m_onQtThread3([this]() { dialogVisibilityChanged(true); });
 }
 
-void QtDialogView::handleMessage(MessageErrorCountUpdate* message) {
-  ErrorCountInfo errorInfo = message->errorCount;
-
+void QtDialogView::handleMessage([[maybe_unused]] MessageErrorCountUpdate* message) {
 #if !defined(SOURCETRAIL_WASM)
-  m_onQtThread3([this, errorInfo]() { updateErrorCount(errorInfo.total, errorInfo.fatal); });
+  m_onQtThread3([this, errorInfo = message->errorCount]() { updateErrorCount(errorInfo.total, errorInfo.fatal); });
 #endif
 }
 
@@ -383,7 +381,7 @@ void QtDialogView::handleMessage(MessageWindowClosed* /*message*/) {
   m_resultReady = true;
 }
 
-void QtDialogView::updateErrorCount(size_t errorCount, size_t fatalCount) {
+void QtDialogView::updateErrorCount([[maybe_unused]] size_t errorCount, [[maybe_unused]] size_t fatalCount) {
 #if !defined(SOURCETRAIL_WASM)
   if(QtIndexingProgressDialog* progressWindow = dynamic_cast<QtIndexingProgressDialog*>(m_windowStack.getTopWindow())) {
     progressWindow->updateErrorCount(errorCount, fatalCount);

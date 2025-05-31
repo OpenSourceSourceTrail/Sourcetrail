@@ -8,31 +8,34 @@
 
 #include <range/v3/algorithm/any_of.hpp>
 
-#include "../../scheduling/TaskDecoratorRepeat.h"
-#include "../../scheduling/TaskFindKeyOnBlackboard.h"
-#include "../../scheduling/TaskGroupParallel.h"
-#include "../../scheduling/TaskGroupSelector.h"
-#include "../../scheduling/TaskGroupSequence.h"
-#include "../../scheduling/TaskLambda.h"
-#include "../../scheduling/TaskReturnSuccessIf.h"
-#include "../../scheduling/TaskSetValue.h"
-#if !defined(SOURCETRAIL_WASM)
-#  include "CombinedIndexerCommandProvider.h"
-#endif
 #include "DialogView.h"
 #include "FilePath.h"
-#include "FileSystem.h"
 #include "IApplicationSettings.hpp"
 #include "PersistentStorage.h"
 #include "ProjectSettings.h"
-#include "RefreshInfoGenerator.h"
-#include "SourceGroup.h"
-#include "SourceGroupFactory.h"
-#include "SourceGroupStatusType.h"
 #include "StorageCache.h"
-#include "StorageProvider.h"
-#include "TabId.h"
+#include "type/indexing/MessageIndexingFinished.h"
+#include "type/MessageStatus.h"
+#include "utilityApp.h"
+#include "logging.h"
+
 #if !defined(SOURCETRAIL_WASM)
+#  include "../../scheduling/TaskDecoratorRepeat.h"
+#  include "../../scheduling/TaskFindKeyOnBlackboard.h"
+#  include "../../scheduling/TaskGroupParallel.h"
+#  include "../../scheduling/TaskGroupSelector.h"
+#  include "../../scheduling/TaskGroupSequence.h"
+#  include "../../scheduling/TaskLambda.h"
+#  include "../../scheduling/TaskReturnSuccessIf.h"
+#  include "../../scheduling/TaskSetValue.h"
+#  include "CombinedIndexerCommandProvider.h"
+#  include "FileSystem.h"
+#  include "RefreshInfoGenerator.h"
+#  include "SourceGroup.h"
+#  include "SourceGroupFactory.h"
+#  include "SourceGroupStatusType.h"
+#  include "StorageProvider.h"
+#  include "TabId.h"
 #  include "TaskBuildIndex.h"
 #  include "TaskCleanStorage.h"
 #  include "TaskExecuteCustomCommands.h"
@@ -41,18 +44,15 @@
 #  include "TaskInjectStorage.h"
 #  include "TaskMergeStorages.h"
 #  include "TaskParseWrapper.h"
+#  include "TextAccess.h"
+#  include "type/error/MessageErrorCountClear.h"
+#  include "type/indexing/MessageIndexingShowDialog.h"
+#  include "type/indexing/MessageIndexingStarted.h"
+#  include "type/indexing/MessageIndexingStatus.h"
+#  include "type/MessageRefresh.h"
+#  include "utility.h"
+#  include "utilityString.h"
 #endif
-#include "TextAccess.h"
-#include "type/error/MessageErrorCountClear.h"
-#include "type/indexing/MessageIndexingFinished.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
-#include "type/indexing/MessageIndexingStarted.h"
-#include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageRefresh.h"
-#include "type/MessageStatus.h"
-#include "utility.h"
-#include "utilityApp.h"
-#include "utilityString.h"
 
 namespace {
 #if !defined(SOURCETRAIL_WASM)
@@ -135,8 +135,8 @@ void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogVie
   // clang-format on
 
   {
-    if(tempDbPath.exists()) {
 #if !defined(SOURCETRAIL_WASM)
+    if(tempDbPath.exists()) {
       if(dbPath.exists()) {
         if(dialogView->confirm(L"Sourcetrail has been closed unexpectedly while indexing this project. "
                                L"You can either choose to keep "
@@ -160,10 +160,10 @@ void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogVie
             "found");
         FileSystem::rename(tempDbPath, dbPath);
       }
-#else
-      MessageStatus{L"Sourcetrail has been closed unexpectedly while indexing this project.", true}.dispatch();
-#endif
     }
+#else
+    MessageStatus{L"Sourcetrail has been closed unexpectedly while indexing this project.", true}.dispatch();
+#endif
   }
 
   m_storage = std::make_shared<PersistentStorage>(dbPath, bookmarkDbPath);
@@ -201,7 +201,9 @@ void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogVie
     m_state = ProjectStateType::DB_CORRUPTED;
   }
 
+#if !defined(SOURCETRAIL_WASM)
   m_sourceGroups = SourceGroupFactory::getInstance()->createSourceGroups(m_settings->getAllSourceGroupSettings());
+#endif
 
   if(canLoad) {
     m_storage->setMode(SqliteIndexStorage::STORAGE_MODE_READ);
@@ -209,10 +211,13 @@ void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogVie
     m_storageCache->setSubject(m_storage);
 
     if(m_hasGUI) {
-      MessageIndexingFinished().dispatch();
+      MessageIndexingFinished{}.dispatch();
     }
-    MessageStatus(L"Finished Loading", false, false).dispatch();
+    MessageStatus{L"Finished Loading", false, false}.dispatch();
   } else {
+#if defined(SOURCETRAIL_WASM)
+    MessageStatus{fmt::format(L"Project could not be loaded. state is {}.", static_cast<int>(m_state)), true, false}.dispatch();
+#else
     switch(m_state) {
     case ProjectStateType::NEEDS_MIGRATION:
       MessageStatus(
@@ -244,13 +249,14 @@ void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogVie
     default:
       MessageStatus(L"Project could not be loaded.", false, false).dispatch();
     }
-  }
-
-  if(m_state != ProjectStateType::LOADED && m_hasGUI) {
-#if !defined(SOURCETRAIL_WASM)
-    MessageRefresh{}.dispatch();
 #endif
   }
+
+#if !defined(SOURCETRAIL_WASM)
+  if(m_state != ProjectStateType::LOADED && m_hasGUI) {
+    MessageRefresh{}.dispatch();
+  }
+#endif
 }
 
 #if !defined(SOURCETRAIL_WASM)

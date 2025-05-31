@@ -12,11 +12,12 @@
 #include <string>
 #include <vector>
 
-#include <TaskGroupSequence.h>
-
 #include "IProject.hpp"
+#if !defined(SOURCETRAIL_WASM)
+#include "TaskGroupSequence.h"
 #include "RefreshInfo.h"
 #include "SourceGroup.h"
+#endif
 
 class DialogView;
 class FilePath;
@@ -169,7 +170,9 @@ private:
   RefreshStageType m_refreshStage = RefreshStageType::NONE;
 
   std::shared_ptr<PersistentStorage> m_storage;
+#if !defined(SOURCETRAIL_WASM)
   std::vector<std::shared_ptr<SourceGroup>> m_sourceGroups;
+#endif
 
   std::string m_appUUID;
   bool m_hasGUI;

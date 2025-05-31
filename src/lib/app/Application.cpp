@@ -109,7 +109,7 @@ std::string Application::sUuid;
 void Application::createInstance(const Version& version,
                                  std::shared_ptr<lib::IFactory> factory,
                                  ViewFactory* viewFactory,
-                                 NetworkFactory* networkFactory) {
+                                 [[maybe_unused]] NetworkFactory* networkFactory) {
   const bool hasGui = (nullptr != viewFactory);
 
   Version::setApplicationVersion(version);

@@ -29,8 +29,10 @@
 #include "QtViewFactory.h"
 #include "ResourcePaths.h"
 #include "ScopedFunctor.h"
+#if !defined(SOURCETRAIL_WASM)
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
+#endif
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageStatus.h"
@@ -79,6 +81,7 @@ private:
 };
 
 void addLanguagePackages() {
+#if !defined(SOURCETRAIL_WASM)
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
@@ -88,6 +91,7 @@ void addLanguagePackages() {
 #if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#endif
 }
 
 void checkRunFromScript() {
