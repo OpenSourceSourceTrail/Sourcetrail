@@ -244,15 +244,15 @@ if(NOT SOURCETRAIL_WASM)
     LIB_GUI
     qt/QtCoreApplication.cpp
     qt/QtCoreApplication.h
-# window {
+    # window {
     qt/window/QtIndexingProgressDialog.cpp
     qt/window/QtIndexingProgressDialog.h
     qt/window/QtIndexingReportDialog.cpp
     qt/window/QtIndexingReportDialog.h
     qt/window/QtIndexingStartDialog.cpp
     qt/window/QtIndexingStartDialog.h
-# }
-# project_wizard {
+    # }
+    # project_wizard {
     qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
     qt/project_wizard/content/path/QtProjectWizardContentPath.h
     qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp
@@ -278,8 +278,8 @@ if(NOT SOURCETRAIL_WASM)
     qt/project_wizard/content/QtProjectWizardContentUnloadable.h
     qt/project_wizard/QtProjectWizard.cpp
     qt/project_wizard/QtProjectWizard.h
-# }
-# network {
+    # }
+    # network {
     qt/network/QtNetworkFactory.cpp
     qt/network/QtNetworkFactory.h
     qt/network/QtIDECommunicationController.cpp
@@ -288,8 +288,8 @@ if(NOT SOURCETRAIL_WASM)
     qt/network/QtRequest.h
     qt/network/QtTcpWrapper.cpp
     qt/network/QtTcpWrapper.h
-# }
-)
+    # }
+  )
 endif()
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)

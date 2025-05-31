@@ -11,11 +11,13 @@
 #include "StorageCache.h"
 #include "utilityApp.h"
 
+#if !defined(SOURCETRAIL_WASM)
 namespace {
 constexpr unsigned long long int operator""_kb(unsigned long long int size) noexcept {
   return size * 1024;
 }
 }    // namespace
+#endif
 
 namespace lib {
 

@@ -11,13 +11,13 @@
 #include "DialogView.h"
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "PersistentStorage.h"
 #include "ProjectSettings.h"
 #include "StorageCache.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageStatus.h"
 #include "utilityApp.h"
-#include "logging.h"
 
 #if !defined(SOURCETRAIL_WASM)
 #  include "../../scheduling/TaskDecoratorRepeat.h"

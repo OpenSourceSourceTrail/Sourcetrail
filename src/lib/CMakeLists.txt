@@ -258,7 +258,6 @@ add_files(
   project/SourceGroup.h
   project/SourceGroupCustomCommand.cpp
   project/SourceGroupCustomCommand.h
-
   settings/migration/SettingsMigration.cpp
   settings/migration/SettingsMigration.h
   settings/migration/SettingsMigrationDeleteKey.cpp
@@ -311,7 +310,6 @@ if(NOT SOURCETRAIL_WASM)
     project/SourceGroupFactoryModule.h
     project/SourceGroupFactoryModuleCustom.cpp
     project/SourceGroupFactoryModuleCustom.h
-
     component/controller/IDECommunicationController.cpp
     component/controller/IDECommunicationController.h
     component/controller/helper/NetworkProtocolHelper.cpp

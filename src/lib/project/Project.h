@@ -14,9 +14,9 @@
 
 #include "IProject.hpp"
 #if !defined(SOURCETRAIL_WASM)
-#include "TaskGroupSequence.h"
-#include "RefreshInfo.h"
-#include "SourceGroup.h"
+#  include "RefreshInfo.h"
+#  include "SourceGroup.h"
+#  include "TaskGroupSequence.h"
 #endif
 
 class DialogView;

@@ -30,8 +30,8 @@
 #include "ResourcePaths.h"
 #include "ScopedFunctor.h"
 #if !defined(SOURCETRAIL_WASM)
-#include "SourceGroupFactory.h"
-#include "SourceGroupFactoryModuleCustom.h"
+#  include "SourceGroupFactory.h"
+#  include "SourceGroupFactoryModuleCustom.h"
 #endif
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
@@ -84,13 +84,13 @@ void addLanguagePackages() {
 #if !defined(SOURCETRAIL_WASM)
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#  if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#  endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#  if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#  endif    // BUILD_CXX_LANGUAGE_PACKAGE
 #endif
 }
 
