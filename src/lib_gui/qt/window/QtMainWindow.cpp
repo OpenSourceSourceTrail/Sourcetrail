@@ -29,7 +29,9 @@
 #include "QtKeyboardShortcuts.h"
 #include "QtLicenseWindow.h"
 #include "QtPreferencesWindow.h"
-#include "QtProjectWizard.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "QtProjectWizard.h"
+#endif
 #include "QtStartScreen.hpp"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"

@@ -1,5 +1,4 @@
-#ifndef QT_DIALOG_VIEW_H
-#define QT_DIALOG_VIEW_H
+#pragma once
 
 #include "DialogView.h"
 #include "MessageListener.h"
@@ -89,12 +88,12 @@ private:
   QtThreadedLambdaFunctor m_onQtThread2;
   QtThreadedLambdaFunctor m_onQtThread3;
 
+#if !defined(SOURCETRAIL_WASM)
   std::map<RefreshMode, RefreshInfo> m_refreshInfos;
+#endif
   bool m_shallowIndexingEnabled;
 
   bool m_resultReady;
   bool m_uiBlocked = false;
   bool m_dialogsVisible = true;
 };
-
-#endif    // QT_DIALOG_VIEW_H

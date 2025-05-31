@@ -22,8 +22,8 @@
 #include "logging.h"
 #include "productVersion.h"
 #include "QtApplication.h"
-#include "QtCoreApplication.h"
 #if !defined(SOURCETRAIL_WASM)
+#  include "QtCoreApplication.h"
 #  include "QtNetworkFactory.h"
 #endif
 #include "QtViewFactory.h"

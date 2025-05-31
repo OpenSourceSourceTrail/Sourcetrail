@@ -11,9 +11,11 @@
 #include "../../../scheduling/TaskLambda.h"
 #include "Project.h"
 #include "QtIndexingDialog.h"
-#include "QtIndexingProgressDialog.h"
-#include "QtIndexingReportDialog.h"
-#include "QtIndexingStartDialog.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "QtIndexingProgressDialog.h"
+#  include "QtIndexingReportDialog.h"
+#  include "QtIndexingStartDialog.h"
+#endif
 #include "QtKnownProgressDialog.h"
 #include "QtMainWindow.h"
 #include "QtUnknownProgressDialog.h"
@@ -372,7 +374,9 @@ void QtDialogView::handleMessage(MessageIndexingShowDialog* /*message*/) {
 void QtDialogView::handleMessage(MessageErrorCountUpdate* message) {
   ErrorCountInfo errorInfo = message->errorCount;
 
+#if !defined(SOURCETRAIL_WASM)
   m_onQtThread3([this, errorInfo]() { updateErrorCount(errorInfo.total, errorInfo.fatal); });
+#endif
 }
 
 void QtDialogView::handleMessage(MessageWindowClosed* /*message*/) {
@@ -380,11 +384,13 @@ void QtDialogView::handleMessage(MessageWindowClosed* /*message*/) {
 }
 
 void QtDialogView::updateErrorCount(size_t errorCount, size_t fatalCount) {
+#if !defined(SOURCETRAIL_WASM)
   if(QtIndexingProgressDialog* progressWindow = dynamic_cast<QtIndexingProgressDialog*>(m_windowStack.getTopWindow())) {
     progressWindow->updateErrorCount(errorCount, fatalCount);
   } else if(QtIndexingReportDialog* reportWindow = dynamic_cast<QtIndexingReportDialog*>(m_windowStack.getTopWindow())) {
     reportWindow->updateErrorCount(errorCount, fatalCount);
   }
+#endif
 }
 
 template <typename DialogType, typename... ParamTypes>

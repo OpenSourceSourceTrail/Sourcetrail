@@ -51,7 +51,7 @@ void QtProjectWizardContentPathsSource::save() {
 
 bool QtProjectWizardContentPathsSource::check() {
   if(m_list->getPathsAsDisplayed().empty()) {
-    QMessageBox msgBox(m_window);
+    QMessageBox msgBox(mWindow);
     msgBox.setText(QStringLiteral("You didn't specify any 'Files & Directories to Index'."));
     msgBox.setInformativeText(
         QStringLiteral("Sourcetrail will not index any files for this Source Group. Please add "

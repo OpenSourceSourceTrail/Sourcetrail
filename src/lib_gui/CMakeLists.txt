@@ -124,39 +124,16 @@ add_files(
   qt/graphics/GraphFocusHandler.h
   qt/graphics/QtGraphicsView.cpp
   qt/graphics/QtGraphicsView.h
-  qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
-  qt/project_wizard/content/path/QtProjectWizardContentPath.h
-  qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp
-  qt/project_wizard/content/paths/QtProjectWizardContentPaths.h
-  qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.cpp
-  qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.h
-  qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.cpp
-  qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.h
+  # project_wizard {
+  qt/project_wizard/QtProjectWizardWindow.cpp
+  qt/project_wizard/QtProjectWizardWindow.h
   qt/project_wizard/content/QtProjectWizardContent.cpp
   qt/project_wizard/content/QtProjectWizardContent.h
-  qt/project_wizard/content/QtProjectWizardContentCustomCommand.cpp
-  qt/project_wizard/content/QtProjectWizardContentCustomCommand.h
-  qt/project_wizard/content/QtProjectWizardContentExtensions.cpp
-  qt/project_wizard/content/QtProjectWizardContentExtensions.h
   qt/project_wizard/content/QtProjectWizardContentGroup.cpp
   qt/project_wizard/content/QtProjectWizardContentGroup.h
   qt/project_wizard/content/QtProjectWizardContentPreferences.cpp
   qt/project_wizard/content/QtProjectWizardContentPreferences.h
-  qt/project_wizard/content/QtProjectWizardContentProjectData.cpp
-  qt/project_wizard/content/QtProjectWizardContentProjectData.h
-  qt/project_wizard/content/QtProjectWizardContentRequiredLabel.h
-  qt/project_wizard/content/QtProjectWizardContentSelect.cpp
-  qt/project_wizard/content/QtProjectWizardContentSelect.h
-  qt/project_wizard/content/QtProjectWizardContentSourceGroupData.cpp
-  qt/project_wizard/content/QtProjectWizardContentSourceGroupData.h
-  qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.cpp
-  qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.h
-  qt/project_wizard/content/QtProjectWizardContentUnloadable.cpp
-  qt/project_wizard/content/QtProjectWizardContentUnloadable.h
-  qt/project_wizard/QtProjectWizard.cpp
-  qt/project_wizard/QtProjectWizard.h
-  qt/project_wizard/QtProjectWizardWindow.cpp
-  qt/project_wizard/QtProjectWizardWindow.h
+  # }
   qt/utility/compatibilityQt.cpp
   qt/utility/compatibilityQt.h
   qt/utility/QtContextMenu.cpp
@@ -226,14 +203,11 @@ add_files(
   qt/window/QtBookmarkBrowser.h
   qt/window/QtBookmarkCreator.cpp
   qt/window/QtBookmarkCreator.h
+  # {
+  # TODO(Hussein): Refactor QtIndexingDialog to Base class.
   qt/window/QtIndexingDialog.cpp
   qt/window/QtIndexingDialog.h
-  qt/window/QtIndexingProgressDialog.cpp
-  qt/window/QtIndexingProgressDialog.h
-  qt/window/QtIndexingReportDialog.cpp
-  qt/window/QtIndexingReportDialog.h
-  qt/window/QtIndexingStartDialog.cpp
-  qt/window/QtIndexingStartDialog.h
+  # }
   qt/window/QtKeyboardShortcuts.cpp
   qt/window/QtKeyboardShortcuts.h
   qt/window/QtKnownProgressDialog.cpp
@@ -263,13 +237,49 @@ add_files(
   qt/window/QtWindowStack.cpp
   qt/window/QtWindowStack.h
   qt/QtApplication.cpp
-  qt/QtApplication.h
-  qt/QtCoreApplication.cpp
-  qt/QtCoreApplication.h)
+  qt/QtApplication.h)
 
 if(NOT SOURCETRAIL_WASM)
   add_files(
     LIB_GUI
+    qt/QtCoreApplication.cpp
+    qt/QtCoreApplication.h
+# window {
+    qt/window/QtIndexingProgressDialog.cpp
+    qt/window/QtIndexingProgressDialog.h
+    qt/window/QtIndexingReportDialog.cpp
+    qt/window/QtIndexingReportDialog.h
+    qt/window/QtIndexingStartDialog.cpp
+    qt/window/QtIndexingStartDialog.h
+# }
+# project_wizard {
+    qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
+    qt/project_wizard/content/path/QtProjectWizardContentPath.h
+    qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp
+    qt/project_wizard/content/paths/QtProjectWizardContentPaths.h
+    qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.cpp
+    qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.h
+    qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.cpp
+    qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.h
+    qt/project_wizard/content/QtProjectWizardContentCustomCommand.cpp
+    qt/project_wizard/content/QtProjectWizardContentCustomCommand.h
+    qt/project_wizard/content/QtProjectWizardContentExtensions.cpp
+    qt/project_wizard/content/QtProjectWizardContentExtensions.h
+    qt/project_wizard/content/QtProjectWizardContentProjectData.cpp
+    qt/project_wizard/content/QtProjectWizardContentProjectData.h
+    qt/project_wizard/content/QtProjectWizardContentRequiredLabel.h
+    qt/project_wizard/content/QtProjectWizardContentSelect.cpp
+    qt/project_wizard/content/QtProjectWizardContentSelect.h
+    qt/project_wizard/content/QtProjectWizardContentSourceGroupData.cpp
+    qt/project_wizard/content/QtProjectWizardContentSourceGroupData.h
+    qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.cpp
+    qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.h
+    qt/project_wizard/content/QtProjectWizardContentUnloadable.cpp
+    qt/project_wizard/content/QtProjectWizardContentUnloadable.h
+    qt/project_wizard/QtProjectWizard.cpp
+    qt/project_wizard/QtProjectWizard.h
+# }
+# network {
     qt/network/QtNetworkFactory.cpp
     qt/network/QtNetworkFactory.h
     qt/network/QtIDECommunicationController.cpp
@@ -277,7 +287,9 @@ if(NOT SOURCETRAIL_WASM)
     qt/network/QtRequest.cpp
     qt/network/QtRequest.h
     qt/network/QtTcpWrapper.cpp
-    qt/network/QtTcpWrapper.h)
+    qt/network/QtTcpWrapper.h
+# }
+)
 endif()
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)

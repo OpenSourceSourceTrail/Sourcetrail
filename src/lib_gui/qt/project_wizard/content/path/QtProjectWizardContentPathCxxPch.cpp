@@ -47,7 +47,7 @@ bool QtProjectWizardContentPathCxxPch::check() {
     const FilePath cdbPath = cdbSettings->getCompilationDatabasePathExpandedAndAbsolute();
     std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath);
     if(!cdb) {
-      QMessageBox msgBox(m_window);
+      QMessageBox msgBox(mWindow);
       msgBox.setText(QStringLiteral("Unable to open and read the provided compilation database file."));
       msgBox.exec();
       return false;
@@ -55,7 +55,7 @@ bool QtProjectWizardContentPathCxxPch::check() {
 
     if(utility::containsIncludePchFlags(cdb)) {
       if(m_settingsCxxPch->getPchInputFilePath().empty()) {
-        QMessageBox msgBox(m_window);
+        QMessageBox msgBox(mWindow);
         msgBox.setText(
             "The provided compilation database file uses precompiled headers. If you want "
             "to make use of "
@@ -72,7 +72,7 @@ bool QtProjectWizardContentPathCxxPch::check() {
       }
     } else {
       if(!m_settingsCxxPch->getPchInputFilePath().empty()) {
-        QMessageBox msgBox(m_window);
+        QMessageBox msgBox(mWindow);
         msgBox.setText(
             "The provided compilation database file does not use precompiled headers. The "
             "specified input file at "

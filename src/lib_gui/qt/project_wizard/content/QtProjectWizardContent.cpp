@@ -1,20 +1,20 @@
 #include "QtProjectWizardContent.h"
-// STL
+
 #include <thread>
-// Qt5
-#include <QFrame>
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QToolButton>
-// internal
+
 #include "QtTextEditDialog.h"
 #include "utility.h"
 #include "utilityString.h"
 
+
 QtProjectWizardContent::QtProjectWizardContent(QtProjectWizardWindow* window)
-    : QWidget(window)
-    , m_window(window)
-    , m_showFilesFunctor(std::bind(&QtProjectWizardContent::showFilesDialog, this, std::placeholders::_1)) {}
+    : QWidget{window}
+    , mWindow{window}
+    , mShowFilesFunctor{[this](auto&& PH1) { showFilesDialog(std::forward<decltype(PH1)>(PH1)); }} {}
 
 void QtProjectWizardContent::populate(QGridLayout* /*layout*/, int& /*row**/) {}
 
@@ -43,22 +43,22 @@ QString QtProjectWizardContent::getFileNamesDescription() const {
 }
 
 bool QtProjectWizardContent::isRequired() const {
-  return m_isRequired;
+  return mIsRequired;
 }
 
 void QtProjectWizardContent::setIsRequired(bool isRequired) {
-  m_isRequired = isRequired;
+  mIsRequired = isRequired;
 }
 
 QLabel* QtProjectWizardContent::createFormTitle(const QString& name) const {
-  QLabel* label = new QLabel(name);
+  auto* label = new QLabel{name};    // NOLINT
   label->setObjectName(QStringLiteral("titleLabel"));
   label->setWordWrap(true);
   return label;
 }
 
 QLabel* QtProjectWizardContent::createFormLabel(QString name) const {
-  if(m_isRequired) {
+  if(mIsRequired) {
     name += QStringLiteral("*");
   }
 
@@ -66,7 +66,7 @@ QLabel* QtProjectWizardContent::createFormLabel(QString name) const {
 }
 
 QLabel* QtProjectWizardContent::createFormSubLabel(const QString& name) const {
-  QLabel* label = new QLabel(name);
+  auto* label = new QLabel{name};    // NOLINT
   label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
   label->setObjectName(QStringLiteral("label"));
   label->setWordWrap(true);
@@ -74,7 +74,7 @@ QLabel* QtProjectWizardContent::createFormSubLabel(const QString& name) const {
 }
 
 QToolButton* QtProjectWizardContent::createSourceGroupButton(const QString& name, const QString& iconPath) const {
-  QToolButton* button = new QToolButton();
+  auto* button = new QToolButton;    // NOLINT
   button->setObjectName(QStringLiteral("sourceGroupButton"));
   button->setText(name);
   button->setIcon(QPixmap(iconPath));
@@ -88,26 +88,26 @@ QtHelpButton* QtProjectWizardContent::addHelpButton(const QString& helpTitle,
                                                     const QString& helpText,
                                                     QGridLayout* layout,
                                                     int row) const {
-  QtHelpButton* button = new QtHelpButton(QtHelpButtonInfo(helpTitle, helpText));
-  button->setMessageBoxParent(m_window);
+  auto* button = new QtHelpButton{QtHelpButtonInfo(helpTitle, helpText)};    // NOLINT
+  button->setMessageBoxParent(mWindow);
   layout->addWidget(button, row, QtProjectWizardWindow::HELP_COL, Qt::AlignTop);
   return button;
 }
 
 QPushButton* QtProjectWizardContent::addFilesButton(const QString& name, QGridLayout* layout, int row) const {
-  QPushButton* button = new QPushButton(name);
+  auto* button = new QPushButton{name};    // NOLINT
   button->setObjectName(QStringLiteral("windowButton"));
   button->setAttribute(Qt::WA_LayoutUsesWidgetRect);    // fixes layouting on Mac
-  if(layout) {
+  if(nullptr != layout) {
     layout->addWidget(button, row, QtProjectWizardWindow::BACK_COL, Qt::AlignRight | Qt::AlignTop);
   }
-  connect(button, &QPushButton::clicked, this, &QtProjectWizardContent::filesButtonClicked);
+  std::ignore = connect(button, &QPushButton::clicked, this, &QtProjectWizardContent::filesButtonClicked);
 
   return button;
 }
 
 QFrame* QtProjectWizardContent::addSeparator(QGridLayout* layout, int row) const {
-  QFrame* separator = new QFrame();
+  auto* separator = new QFrame;    // NOLINT
   separator->setFrameShape(QFrame::HLine);
 
   QPalette palette = separator->palette();
@@ -119,37 +119,38 @@ QFrame* QtProjectWizardContent::addSeparator(QGridLayout* layout, int row) const
 }
 
 void QtProjectWizardContent::filesButtonClicked() {
-  m_window->saveContent();
-  m_window->refreshContent();
+  mWindow->saveContent();
+  mWindow->refreshContent();
 
+  // TODO(Hussein): Remove detach
   std::thread([&]() {
     const std::vector<FilePath> filePaths = getFilePaths();
-    m_showFilesFunctor(filePaths);
+    mShowFilesFunctor(filePaths);
   }).detach();
 }
 
 void QtProjectWizardContent::showFilesDialog(const std::vector<FilePath>& filePaths) {
-  if(!m_filesDialog) {
-    m_filesDialog = new QtTextEditDialog(
-        getFileNamesTitle(), QString::number(filePaths.size()) + " " + getFileNamesDescription(), m_window);
-    m_filesDialog->setup();
+  if(nullptr == mFilesDialog) {
+    mFilesDialog = new QtTextEditDialog(
+        getFileNamesTitle(), QString::number(filePaths.size()) + " " + getFileNamesDescription(), mWindow);
+    mFilesDialog->setup();
 
-    m_filesDialog->setText(utility::join(utility::toWStrings(filePaths), L"\n"));
-    m_filesDialog->setCloseVisible(false);
-    m_filesDialog->setReadOnly(true);
+    mFilesDialog->setText(utility::join(utility::toWStrings(filePaths), L"\n"));
+    mFilesDialog->setCloseVisible(false);
+    mFilesDialog->setReadOnly(true);
 
-    connect(m_filesDialog, &QtTextEditDialog::finished, this, &QtProjectWizardContent::closedFilesDialog);
-    connect(m_filesDialog, &QtTextEditDialog::canceled, this, &QtProjectWizardContent::closedFilesDialog);
+    std::ignore = connect(mFilesDialog, &QtTextEditDialog::finished, this, &QtProjectWizardContent::closedFilesDialog);
+    std::ignore = connect(mFilesDialog, &QtTextEditDialog::canceled, this, &QtProjectWizardContent::closedFilesDialog);
   }
 
-  m_filesDialog->showWindow();
-  m_filesDialog->raise();
+  mFilesDialog->showWindow();
+  mFilesDialog->raise();
 }
 
 void QtProjectWizardContent::closedFilesDialog() {
-  m_filesDialog->hide();
-  m_filesDialog->deleteLater();
-  m_filesDialog = nullptr;
+  mFilesDialog->hide();
+  mFilesDialog->deleteLater();
+  mFilesDialog = nullptr;
 
   window()->raise();
 }

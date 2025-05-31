@@ -61,7 +61,7 @@ bool QtProjectWizardContentPathsHeaderSearchGlobal::check() {
   }
 
   if(compilerHeaderPaths.size()) {
-    QMessageBox msgBox(m_window);
+    QMessageBox msgBox(mWindow);
     msgBox.setText(QStringLiteral("Multiple Compiler Headers"));
     msgBox.setInformativeText(
         "Your Global Include Paths contain other paths that hold C/C++ compiler headers, "

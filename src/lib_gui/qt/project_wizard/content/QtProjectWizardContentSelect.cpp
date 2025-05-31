@@ -114,7 +114,7 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
       buttonGroup->setExclusive(true);
     }
 
-    m_window->setNextEnabled(false);
+    mWindow->setNextEnabled(false);
     m_title->setText("Source Group Types - " + m_languages->checkedButton()->text());
 
     m_description->setText(hasRecommended ? QStringLiteral("<b>* recommended</b>") : QLatin1String(""));
@@ -161,7 +161,7 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
 
       m_description->setText(m_sourceGroupTypeDescriptions[selectedType].c_str());
 
-      m_window->setNextEnabled(true);
+      mWindow->setNextEnabled(true);
     });
   }
 
@@ -225,7 +225,7 @@ bool QtProjectWizardContentSelect::check() {
   }
 
   if(!sourceGroupChosen) {
-    QMessageBox msgBox(m_window);
+    QMessageBox msgBox(mWindow);
     msgBox.setText(QStringLiteral("Please choose a method of creating a new Source Group."));
     msgBox.exec();
     return false;

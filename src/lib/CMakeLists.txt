@@ -365,9 +365,9 @@ if(NOT SOURCETRAIL_WASM)
     data/indexer/TaskExecuteCustomCommands.h
     data/indexer/TaskFillIndexerCommandQueue.cpp
     data/indexer/TaskFillIndexerCommandQueue.h
+    # interprocess {
     utility/interprocess/SharedMemory.cpp
     utility/interprocess/SharedMemory.h
-    # Base Factory {
     utility/interprocess/ISharedMemoryGarbageCollector.cpp
     utility/interprocess/ISharedMemoryGarbageCollector.hpp
     utility/interprocess/details/SharedMemoryGarbageCollector.cpp

@@ -4,14 +4,20 @@
 #include "DialogView.h"
 #include "language_packages.h"
 #include "QtProjectWizardContentGroup.h"
-#include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
-#include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
+#if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
+#  include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
+#endif
 #include "QtProjectWizardContentPreferences.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageScrollSpeedChange.h"
 #include "type/plugin/MessagePluginPortChange.h"
 #include "utilityApp.h"
+
+namespace {
+constexpr QSize PreferredSize{750, 500};
+}
 
 QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindow(parent) {
   // save old application settings so they can be compared later
@@ -25,8 +31,7 @@ QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindo
   m_appSettings.setScreenAutoScaling(appSettings->getScreenAutoScaling());
   m_appSettings.setScreenScaleFactor(appSettings->getScreenScaleFactor());
 
-
-  QtProjectWizardContentGroup* summary = new QtProjectWizardContentGroup(this);
+  auto* summary = new QtProjectWizardContentGroup(this);
   summary->addContent(new QtProjectWizardContentPreferences(this));
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
@@ -36,7 +41,7 @@ QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindo
   }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
-  setPreferredSize(QSize(750, 500));
+  setPreferredSize(PreferredSize);
   setContent(summary);
   setScrollAble(true);
 }
@@ -63,7 +68,7 @@ void QtPreferencesWindow::handleNext() {
   Application* app = Application::getInstance().get();
   IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
 
-  bool needsRestart = m_appSettings.getScreenAutoScaling() != appSettings->getScreenAutoScaling() ||
+  const bool needsRestart = m_appSettings.getScreenAutoScaling() != appSettings->getScreenAutoScaling() ||
       m_appSettings.getScreenScaleFactor() != appSettings->getScreenScaleFactor();
 
   if(needsRestart) {
@@ -76,8 +81,7 @@ void QtPreferencesWindow::handleNext() {
             L"'resetPreferences.sh' script located in your install directory.</p>");
   }
 
-
-  bool appSettingsChanged = !(m_appSettings == *appSettings);
+  const bool appSettingsChanged = !(m_appSettings == *appSettings);
 
   if(m_appSettings.getScrollSpeed() != appSettings->getScrollSpeed()) {
     MessageScrollSpeedChange(appSettings->getScrollSpeed()).dispatch();
@@ -91,8 +95,7 @@ void QtPreferencesWindow::handleNext() {
   app->loadSettings();
 
   if(appSettingsChanged) {
-    auto currentProject = Application::getInstance()->getCurrentProject();
-    if(currentProject) {
+    if(auto currentProject = Application::getInstance()->getCurrentProject()) {
       MessageLoadProject(currentProject->getProjectSettingsFilePath(), true).dispatch();
     }
   } else {
