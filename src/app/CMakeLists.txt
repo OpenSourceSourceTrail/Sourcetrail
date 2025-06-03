@@ -39,7 +39,8 @@ target_link_libraries(
   PRIVATE Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::libGui::utility::utilityApp
-          Sourcetrail::core::utility::commandline::CommandLineParser)
+          # $<NOT:$<BOOL:OFF>>
+          $<$<NOT:$<BOOL:${SOURCETRAIL_WASM}>>:Sourcetrail::core::utility::commandline::CommandLineParser>)
 
 target_include_directories(
   Sourcetrail
@@ -57,7 +58,9 @@ if(APPLE)
   target_link_libraries(Sourcetrail ${CORE_FOUNDATION})
 endif()
 
-add_dependencies(Sourcetrail Sourcetrail_indexer)
+if(NOT SOURCETRAIL_WASM)
+  add_dependencies(Sourcetrail Sourcetrail_indexer)
+endif()
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico)
   message(FATAL "\"sourcetrail.ico\" not found. You may run `git submodule`")

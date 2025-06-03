@@ -37,8 +37,8 @@ void QtProjectWizardContentPathCDB::populate(QGridLayout* layout, int& row) {
   m_picker->setPickDirectory(false);
   m_picker->setFileFilter(QStringLiteral("JSON Compilation Database (*.json)"));
 
-  connect(m_picker, &QtLocationPicker::locationPicked, [this]() { m_model->pickedPath(m_window); });
-  connect(m_picker, &QtLocationPicker::textChanged, [this](const QString& text) { m_model->onPickerTextChanged(m_window, text); });
+  connect(m_picker, &QtLocationPicker::locationPicked, [this]() { m_model->pickedPath(mWindow); });
+  connect(m_picker, &QtLocationPicker::textChanged, [this](const QString& text) { m_model->onPickerTextChanged(mWindow, text); });
 
   auto* description = new QLabel(
       "Sourcetrail will use all include paths and compiler flags from the Compilation Database "

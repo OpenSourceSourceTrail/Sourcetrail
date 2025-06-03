@@ -1,6 +1,8 @@
 #include "Factory.hpp"
 
-#include "details/SharedMemoryGarbageCollector.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "details/SharedMemoryGarbageCollector.h"
+#endif
 #include "impls/TaskManager.hpp"
 #include "logging.h"
 #include "MessageQueue.h"
@@ -9,11 +11,13 @@
 #include "StorageCache.h"
 #include "utilityApp.h"
 
+#if !defined(SOURCETRAIL_WASM)
 namespace {
 constexpr unsigned long long int operator""_kb(unsigned long long int size) noexcept {
   return size * 1024;
 }
 }    // namespace
+#endif
 
 namespace lib {
 
@@ -30,6 +34,7 @@ IMessageQueue::Ptr Factory::createMessageQueue() noexcept {
   return std::make_shared<details::MessageQueue>();
 }
 
+#if !defined(SOURCETRAIL_WASM)
 ISharedMemoryGarbageCollector::Ptr Factory::createSharedMemoryGarbageCollector() noexcept {
   SharedMemoryGarbageCollector::Ptr instance;
   try {
@@ -47,6 +52,7 @@ ISharedMemoryGarbageCollector::Ptr Factory::createSharedMemoryGarbageCollector()
 
   return instance;
 }
+#endif
 
 scheduling::ITaskManager::Ptr Factory::createTaskManager() noexcept {
   return std::make_shared<scheduling::impls::TaskManager>();

@@ -1,6 +1,8 @@
 #include "LanguagePackageManager.h"
 
-#include "IndexerComposite.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "IndexerComposite.h"
+#endif
 #include "LanguagePackage.h"
 
 LanguagePackageManager::Ptr LanguagePackageManager::getInstance() {
@@ -19,6 +21,9 @@ void LanguagePackageManager::addPackage(std::shared_ptr<LanguagePackage> package
 }
 
 std::shared_ptr<IndexerComposite> LanguagePackageManager::instantiateSupportedIndexers() {
+#if defined(SOURCETRAIL_WASM)
+  return nullptr;
+#else
   auto composite = std::make_shared<IndexerComposite>();
   for(const auto& package : m_packages) {
     for(const auto& indexer : package->instantiateSupportedIndexers()) {
@@ -26,6 +31,7 @@ std::shared_ptr<IndexerComposite> LanguagePackageManager::instantiateSupportedIn
     }
   }
   return composite;
+#endif
 }
 
 LanguagePackageManager::Ptr LanguagePackageManager::s_instance;

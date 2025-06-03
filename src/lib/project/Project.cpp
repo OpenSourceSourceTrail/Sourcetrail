@@ -8,49 +8,54 @@
 
 #include <range/v3/algorithm/any_of.hpp>
 
-#include "../../scheduling/TaskDecoratorRepeat.h"
-#include "../../scheduling/TaskFindKeyOnBlackboard.h"
-#include "../../scheduling/TaskGroupParallel.h"
-#include "../../scheduling/TaskGroupSelector.h"
-#include "../../scheduling/TaskGroupSequence.h"
-#include "../../scheduling/TaskLambda.h"
-#include "../../scheduling/TaskReturnSuccessIf.h"
-#include "../../scheduling/TaskSetValue.h"
-#include "CombinedIndexerCommandProvider.h"
 #include "DialogView.h"
 #include "FilePath.h"
-#include "FileSystem.h"
 #include "IApplicationSettings.hpp"
+#include "logging.h"
 #include "PersistentStorage.h"
 #include "ProjectSettings.h"
-#include "RefreshInfoGenerator.h"
-#include "SourceGroup.h"
-#include "SourceGroupFactory.h"
-#include "SourceGroupStatusType.h"
 #include "StorageCache.h"
-#include "StorageProvider.h"
-#include "TabId.h"
-#include "TaskBuildIndex.h"
-#include "TaskCleanStorage.h"
-#include "TaskExecuteCustomCommands.h"
-#include "TaskFillIndexerCommandQueue.h"
-#include "TaskFinishParsing.h"
-#include "TaskInjectStorage.h"
-#include "TaskMergeStorages.h"
-#include "TaskParseWrapper.h"
-#include "TextAccess.h"
-#include "type/error/MessageErrorCountClear.h"
 #include "type/indexing/MessageIndexingFinished.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
-#include "type/indexing/MessageIndexingStarted.h"
-#include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageRefresh.h"
 #include "type/MessageStatus.h"
-#include "utility.h"
 #include "utilityApp.h"
-#include "utilityString.h"
+
+#if !defined(SOURCETRAIL_WASM)
+#  include "../../scheduling/TaskDecoratorRepeat.h"
+#  include "../../scheduling/TaskFindKeyOnBlackboard.h"
+#  include "../../scheduling/TaskGroupParallel.h"
+#  include "../../scheduling/TaskGroupSelector.h"
+#  include "../../scheduling/TaskGroupSequence.h"
+#  include "../../scheduling/TaskLambda.h"
+#  include "../../scheduling/TaskReturnSuccessIf.h"
+#  include "../../scheduling/TaskSetValue.h"
+#  include "CombinedIndexerCommandProvider.h"
+#  include "FileSystem.h"
+#  include "RefreshInfoGenerator.h"
+#  include "SourceGroup.h"
+#  include "SourceGroupFactory.h"
+#  include "SourceGroupStatusType.h"
+#  include "StorageProvider.h"
+#  include "TabId.h"
+#  include "TaskBuildIndex.h"
+#  include "TaskCleanStorage.h"
+#  include "TaskExecuteCustomCommands.h"
+#  include "TaskFillIndexerCommandQueue.h"
+#  include "TaskFinishParsing.h"
+#  include "TaskInjectStorage.h"
+#  include "TaskMergeStorages.h"
+#  include "TaskParseWrapper.h"
+#  include "TextAccess.h"
+#  include "type/error/MessageErrorCountClear.h"
+#  include "type/indexing/MessageIndexingShowDialog.h"
+#  include "type/indexing/MessageIndexingStarted.h"
+#  include "type/indexing/MessageIndexingStatus.h"
+#  include "type/MessageRefresh.h"
+#  include "utility.h"
+#  include "utilityString.h"
+#endif
 
 namespace {
+#if !defined(SOURCETRAIL_WASM)
 constexpr int DefaultIndexerThreadCount = 4;
 
 int getIndexerThreadCount() {
@@ -63,7 +68,7 @@ int getIndexerThreadCount() {
   }
   return indexerThreadCount;
 }
-
+#endif
 }    // namespace
 
 Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI) noexcept
@@ -108,7 +113,7 @@ void Project::setStateOutdated() {
   }
 }
 
-void Project::load(const std::shared_ptr<DialogView>& dialogView) {
+void Project::load([[maybe_unused]] const std::shared_ptr<DialogView>& dialogView) {
   if(m_refreshStage != RefreshStageType::NONE) {
     MessageStatus(L"Cannot load another project while indexing.", true, false).dispatch();
     return;
@@ -130,6 +135,7 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
   // clang-format on
 
   {
+#if !defined(SOURCETRAIL_WASM)
     if(tempDbPath.exists()) {
       if(dbPath.exists()) {
         if(dialogView->confirm(L"Sourcetrail has been closed unexpectedly while indexing this project. "
@@ -155,6 +161,9 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
         FileSystem::rename(tempDbPath, dbPath);
       }
     }
+#else
+    MessageStatus{L"Sourcetrail has been closed unexpectedly while indexing this project.", true}.dispatch();
+#endif
   }
 
   m_storage = std::make_shared<PersistentStorage>(dbPath, bookmarkDbPath);
@@ -192,7 +201,9 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
     m_state = ProjectStateType::DB_CORRUPTED;
   }
 
+#if !defined(SOURCETRAIL_WASM)
   m_sourceGroups = SourceGroupFactory::getInstance()->createSourceGroups(m_settings->getAllSourceGroupSettings());
+#endif
 
   if(canLoad) {
     m_storage->setMode(SqliteIndexStorage::STORAGE_MODE_READ);
@@ -200,10 +211,13 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
     m_storageCache->setSubject(m_storage);
 
     if(m_hasGUI) {
-      MessageIndexingFinished().dispatch();
+      MessageIndexingFinished{}.dispatch();
     }
-    MessageStatus(L"Finished Loading", false, false).dispatch();
+    MessageStatus{L"Finished Loading", false, false}.dispatch();
   } else {
+#if defined(SOURCETRAIL_WASM)
+    MessageStatus{fmt::format(L"Project could not be loaded. state is {}.", static_cast<int>(m_state)), true, false}.dispatch();
+#else
     switch(m_state) {
     case ProjectStateType::NEEDS_MIGRATION:
       MessageStatus(
@@ -235,13 +249,17 @@ void Project::load(const std::shared_ptr<DialogView>& dialogView) {
     default:
       MessageStatus(L"Project could not be loaded.", false, false).dispatch();
     }
+#endif
   }
 
+#if !defined(SOURCETRAIL_WASM)
   if(m_state != ProjectStateType::LOADED && m_hasGUI) {
-    MessageRefresh().dispatch();
+    MessageRefresh{}.dispatch();
   }
+#endif
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refreshMode, bool shallowIndexingRequested) {
   if(m_refreshStage != RefreshStageType::NONE) {
     return;
@@ -497,7 +515,7 @@ void Project::discardTempStorage() {
 }
 
 bool Project::hasCxxSourceGroup() const {
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#  if BUILD_CXX_LANGUAGE_PACKAGE
   for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
     if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
       if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
@@ -505,10 +523,9 @@ bool Project::hasCxxSourceGroup() const {
       }
     }
   }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#  endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return false;
 }
-
 
 std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
                                                              std::shared_ptr<DialogView> dialogView,
@@ -728,3 +745,4 @@ bool Project::checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView>
   }
   return false;
 }
+#endif

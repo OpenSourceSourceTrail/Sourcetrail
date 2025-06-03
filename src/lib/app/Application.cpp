@@ -18,14 +18,20 @@
 #include "IApplicationSettings.hpp"
 #include "IDECommunicationController.h"
 #include "impls/Factory.hpp"
-#include "ISharedMemoryGarbageCollector.hpp"
+#if !defined(SOURCETRAIL_WASM)
+#  include "ISharedMemoryGarbageCollector.hpp"
+#endif
 #include "ITaskManager.hpp"
 #include "logging.h"
 #include "MainView.h"
 #include "MessageQueue.h"
-#include "NetworkFactory.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "NetworkFactory.h"
+#endif
 #include "ProjectSettings.h"
-#include "SharedMemory.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "SharedMemory.h"
+#endif
 #include "StorageCache.h"
 #include "TabId.h"
 #include "TaskScheduler.h"
@@ -103,7 +109,7 @@ std::string Application::sUuid;
 void Application::createInstance(const Version& version,
                                  std::shared_ptr<lib::IFactory> factory,
                                  ViewFactory* viewFactory,
-                                 NetworkFactory* networkFactory) {
+                                 [[maybe_unused]] NetworkFactory* networkFactory) {
   const bool hasGui = (nullptr != viewFactory);
 
   Version::setApplicationVersion(version);
@@ -112,11 +118,13 @@ void Application::createInstance(const Version& version,
     GraphViewStyle::setImpl(viewFactory->createGraphStyleImpl());
   }
 
+#if !defined(SOURCETRAIL_WASM)
   // TODO(Hussein): We should create this iff multi-process is used
   if(auto collector = factory->createSharedMemoryGarbageCollector(); collector) {
     lib::ISharedMemoryGarbageCollector::setInstance(collector);
     collector->run(Application::getUUID());
   }
+#endif
 
   scheduling::ITaskManager::setInstance(factory->createTaskManager());
   scheduling::ITaskManager::getInstanceRaw()->createScheduler(TabId::app());
@@ -133,10 +141,12 @@ void Application::createInstance(const Version& version,
     sInstance->mMainView->setup();
   }
 
+#if !defined(SOURCETRAIL_WASM)
   if(nullptr != networkFactory) {
     sInstance->mIdeCommunicationController = networkFactory->createIDECommunicationController(sInstance->mStorageCache.get());
     sInstance->mIdeCommunicationController->startListening();
   }
+#endif
 
   sInstance->startMessagingAndScheduling();
 }
@@ -204,10 +214,11 @@ Application::~Application() {
   if(mHasGui) {
     mMainView->saveLayout();
   }
-
+#if !defined(SOURCETRAIL_WASM)
   if(auto* collector = lib::ISharedMemoryGarbageCollector::getInstanceRaw(); collector) {
     collector->stop();
   }
+#endif
 }
 
 int Application::handleDialog(const std::wstring& message) {
@@ -283,7 +294,9 @@ void Application::handleMessage(MessageLoadProject* message) {
   if(mProject && mProject->getProjectSettingsFilePath() == projectSettingsFilePath) {
     if(message->settingsChanged && mHasGui) {
       mProject->setStateOutdated();
+#if !defined(SOURCETRAIL_WASM)
       refreshProject(RefreshMode::AllFiles, message->shallowIndexingRequested);
+#endif
     }
   } else {
     MessageStatus(L"Loading Project: " + projectSettingsFilePath.wstr(), false, true).dispatch();
@@ -332,14 +345,18 @@ void Application::handleMessage(MessageLoadProject* message) {
     }
 
     if(RefreshMode::None != message->refreshMode) {
+#if !defined(SOURCETRAIL_WASM)
       refreshProject(message->refreshMode, message->shallowIndexingRequested);
+#endif
     }
   }
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void Application::handleMessage(MessageRefresh* pMessage) {
   refreshProject(pMessage->all ? RefreshMode::AllFiles : RefreshMode::UpdatedFiles, false);
 }
+#endif
 
 void Application::handleMessage(MessageRefreshUI* pMessage) {
   if(mHasGui) {
@@ -402,6 +419,7 @@ void Application::loadWindow(bool showStartWindow) {
   }
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRequested) {
   if(mProject && checkSharedMemory()) {
     mProject->refresh(getDialogView(DialogView::UseCase::INDEXING), refreshMode, shallowIndexingRequested);
@@ -411,6 +429,7 @@ void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRe
     }
   }
 }
+#endif
 
 void Application::updateRecentProjects(const fs::path& projectSettingsFilePath) {
   if(mHasGui) {
@@ -474,6 +493,7 @@ void Application::updateTitle() {
   }
 }
 
+#if !defined(SOURCETRAIL_WASM)
 bool Application::checkSharedMemory() {
   const std::wstring error = utility::decodeFromUtf8(SharedMemory::checkSharedMemory(getUUID()));
   if(error.empty()) {
@@ -491,3 +511,4 @@ bool Application::checkSharedMemory() {
                   error));
   return false;
 }
+#endif

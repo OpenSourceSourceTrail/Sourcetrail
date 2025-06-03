@@ -61,7 +61,7 @@ bool QtProjectWizardContentPath::check() {
   }
 
   if(!error.isEmpty()) {
-    QMessageBox msgBox(m_window);
+    QMessageBox msgBox(mWindow);
     msgBox.setText(error);
     msgBox.exec();
     return false;

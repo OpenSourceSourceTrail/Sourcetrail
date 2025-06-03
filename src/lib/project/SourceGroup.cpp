@@ -3,14 +3,20 @@
 #include "../../scheduling/TaskLambda.h"
 #include "FilePath.h"
 #include "FilePathFilter.h"
-#include "MemoryIndexerCommandProvider.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "MemoryIndexerCommandProvider.h"
+#endif
 #include "ProjectSettings.h"
 #include "SourceGroupSettings.h"
 
 SourceGroup::~SourceGroup() = default;
 
 std::shared_ptr<IndexerCommandProvider> SourceGroup::getIndexerCommandProvider(const RefreshInfo& info) const {
+#if defined(SOURCETRAIL_WASM)
+  return nullptr;
+#else
   return std::make_shared<MemoryIndexerCommandProvider>(getIndexerCommands(info));
+#endif
 }
 
 std::shared_ptr<Task> SourceGroup::getPreIndexTask(std::shared_ptr<StorageProvider> /*storageProvider*/,

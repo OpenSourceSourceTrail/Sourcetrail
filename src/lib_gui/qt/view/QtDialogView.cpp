@@ -11,9 +11,11 @@
 #include "../../../scheduling/TaskLambda.h"
 #include "Project.h"
 #include "QtIndexingDialog.h"
-#include "QtIndexingProgressDialog.h"
-#include "QtIndexingReportDialog.h"
-#include "QtIndexingStartDialog.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "QtIndexingProgressDialog.h"
+#  include "QtIndexingReportDialog.h"
+#  include "QtIndexingStartDialog.h"
+#endif
 #include "QtKnownProgressDialog.h"
 #include "QtMainWindow.h"
 #include "QtUnknownProgressDialog.h"
@@ -97,6 +99,7 @@ void QtDialogView::hideProgressDialog() {
   setParentWindow(nullptr);
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void QtDialogView::startIndexingDialog(Project* project,
                                        const std::vector<RefreshMode>& enabledModes,
                                        const RefreshMode initialMode,
@@ -258,6 +261,7 @@ DatabasePolicy QtDialogView::finishedIndexingDialog(size_t indexedFileCount,
 
   return policy;
 }
+#endif
 
 int QtDialogView::confirm(const std::wstring& message, const std::vector<std::wstring>& options) {
   int result = -1;
@@ -367,22 +371,24 @@ void QtDialogView::handleMessage(MessageIndexingShowDialog* /*message*/) {
   m_onQtThread3([this]() { dialogVisibilityChanged(true); });
 }
 
-void QtDialogView::handleMessage(MessageErrorCountUpdate* message) {
-  ErrorCountInfo errorInfo = message->errorCount;
-
-  m_onQtThread3([this, errorInfo]() { updateErrorCount(errorInfo.total, errorInfo.fatal); });
+void QtDialogView::handleMessage([[maybe_unused]] MessageErrorCountUpdate* message) {
+#if !defined(SOURCETRAIL_WASM)
+  m_onQtThread3([this, errorInfo = message->errorCount]() { updateErrorCount(errorInfo.total, errorInfo.fatal); });
+#endif
 }
 
 void QtDialogView::handleMessage(MessageWindowClosed* /*message*/) {
   m_resultReady = true;
 }
 
-void QtDialogView::updateErrorCount(size_t errorCount, size_t fatalCount) {
+void QtDialogView::updateErrorCount([[maybe_unused]] size_t errorCount, [[maybe_unused]] size_t fatalCount) {
+#if !defined(SOURCETRAIL_WASM)
   if(QtIndexingProgressDialog* progressWindow = dynamic_cast<QtIndexingProgressDialog*>(m_windowStack.getTopWindow())) {
     progressWindow->updateErrorCount(errorCount, fatalCount);
   } else if(QtIndexingReportDialog* reportWindow = dynamic_cast<QtIndexingReportDialog*>(m_windowStack.getTopWindow())) {
     reportWindow->updateErrorCount(errorCount, fatalCount);
   }
+#endif
 }
 
 template <typename DialogType, typename... ParamTypes>

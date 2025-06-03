@@ -12,11 +12,12 @@
 #include <string>
 #include <vector>
 
-#include <TaskGroupSequence.h>
-
 #include "IProject.hpp"
-#include "RefreshInfo.h"
-#include "SourceGroup.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "RefreshInfo.h"
+#  include "SourceGroup.h"
+#  include "TaskGroupSequence.h"
+#endif
 
 class DialogView;
 class FilePath;
@@ -111,6 +112,7 @@ public:
    */
   void load(const std::shared_ptr<DialogView>& dialogView) override;
 
+#if !defined(SOURCETRAIL_WASM)
   /**
    * @brief Refresh the project
    *
@@ -135,12 +137,14 @@ public:
    * @param dialogView Dialog view
    */
   void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) override;
+#endif
 
 private:
   enum class ProjectStateType : std::uint8_t { NOT_LOADED, EMPTY, LOADED, OUTDATED, OUTVERSIONED, NEEDS_MIGRATION, DB_CORRUPTED };
 
   enum class RefreshStageType : std::uint8_t { REFRESHING, INDEXING, NONE };
 
+#if !defined(SOURCETRAIL_WASM)
   void swapToTempStorage(std::shared_ptr<DialogView> dialogView);
   bool swapToTempStorageFile(const FilePath& indexDbFilePath,
                              const FilePath& tempIndexDbFilePath,
@@ -157,6 +161,7 @@ private:
   bool checkIfNothingToRefresh(const RefreshInfo& info, std::shared_ptr<DialogView> dialogView);
 
   bool checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView> dialogView);
+#endif
 
   std::shared_ptr<ProjectSettings> m_settings;
   StorageCache* m_storageCache;
@@ -165,7 +170,9 @@ private:
   RefreshStageType m_refreshStage = RefreshStageType::NONE;
 
   std::shared_ptr<PersistentStorage> m_storage;
+#if !defined(SOURCETRAIL_WASM)
   std::vector<std::shared_ptr<SourceGroup>> m_sourceGroups;
+#endif
 
   std::string m_appUUID;
   bool m_hasGUI;

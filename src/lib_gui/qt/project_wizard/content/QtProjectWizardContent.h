@@ -1,7 +1,6 @@
 #pragma once
-// Qt5
 #include <QWidget>
-// internal
+
 #include "FilePath.h"
 #include "QtHelpButton.h"
 #include "QtProjectWizardWindow.h"
@@ -18,7 +17,7 @@ class QtProjectWizardContent : public QWidget {
   Q_OBJECT
 
 public:
-  QtProjectWizardContent(QtProjectWizardWindow* window);
+  explicit QtProjectWizardContent(QtProjectWizardWindow* window);
 
   virtual void populate(QGridLayout* layout, int& row);
   virtual void windowReady();
@@ -28,26 +27,26 @@ public:
   virtual void refresh();
   virtual bool check();
 
-  virtual std::vector<FilePath> getFilePaths() const;
-  virtual QString getFileNamesTitle() const;
-  virtual QString getFileNamesDescription() const;
+  [[nodiscard]] virtual std::vector<FilePath> getFilePaths() const;
+  [[nodiscard]] virtual QString getFileNamesTitle() const;
+  [[nodiscard]] virtual QString getFileNamesDescription() const;
 
-  bool isRequired() const;
+  [[nodiscard]] bool isRequired() const;
   void setIsRequired(bool isRequired);
 
 protected:
-  QLabel* createFormTitle(const QString& name) const;
-  QLabel* createFormLabel(QString name) const;
-  QLabel* createFormSubLabel(const QString& name) const;
-  QToolButton* createSourceGroupButton(const QString& name, const QString& iconPath) const;
+  [[nodiscard]] QLabel* createFormTitle(const QString& name) const;
+  [[nodiscard]] QLabel* createFormLabel(QString name) const;
+  [[nodiscard]] QLabel* createFormSubLabel(const QString& name) const;
+  [[nodiscard]] QToolButton* createSourceGroupButton(const QString& name, const QString& iconPath) const;
 
-  QtHelpButton* addHelpButton(const QString& helpTitle, const QString& helpText, QGridLayout* layout, int row) const;
-  QPushButton* addFilesButton(const QString& name, QGridLayout* layout, int row) const;
-  QFrame* addSeparator(QGridLayout* layout, int row) const;
+  [[nodiscard]] QtHelpButton* addHelpButton(const QString& helpTitle, const QString& helpText, QGridLayout* layout, int row) const;
+  [[nodiscard]] QPushButton* addFilesButton(const QString& name, QGridLayout* layout, int row) const;
+  [[nodiscard]] QFrame* addSeparator(QGridLayout* layout, int row) const;
 
-  QtProjectWizardWindow* m_window;
+  QtProjectWizardWindow* mWindow;
 
-  QtTextEditDialog* m_filesDialog = nullptr;
+  QtTextEditDialog* mFilesDialog = nullptr;
 
 protected slots:
   void filesButtonClicked();
@@ -56,7 +55,7 @@ protected slots:
 private:
   void showFilesDialog(const std::vector<FilePath>& filePaths);
 
-  QtThreadedFunctor<const std::vector<FilePath>&> m_showFilesFunctor;
+  QtThreadedFunctor<const std::vector<FilePath>&> mShowFilesFunctor;
 
-  bool m_isRequired = false;
+  bool mIsRequired = false;
 };

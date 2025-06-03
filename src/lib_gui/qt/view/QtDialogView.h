@@ -1,5 +1,4 @@
-#ifndef QT_DIALOG_VIEW_H
-#define QT_DIALOG_VIEW_H
+#pragma once
 
 #include "DialogView.h"
 #include "MessageListener.h"
@@ -33,6 +32,7 @@ public:
   void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress) override;
   void hideProgressDialog() override;
 
+#if !defined(SOURCETRAIL_WASM)
   void startIndexingDialog(Project* project,
                            const std::vector<RefreshMode>& enabledModes,
                            const RefreshMode initialMode,
@@ -56,6 +56,7 @@ public:
                                         ErrorCountInfo errorInfo,
                                         bool interrupted,
                                         bool shallow) override;
+#endif
 
   int confirm(const std::wstring& message, const std::vector<std::wstring>& options) override;
 
@@ -87,12 +88,12 @@ private:
   QtThreadedLambdaFunctor m_onQtThread2;
   QtThreadedLambdaFunctor m_onQtThread3;
 
+#if !defined(SOURCETRAIL_WASM)
   std::map<RefreshMode, RefreshInfo> m_refreshInfos;
+#endif
   bool m_shallowIndexingEnabled;
 
   bool m_resultReady;
   bool m_uiBlocked = false;
   bool m_dialogsVisible = true;
 };
-
-#endif    // QT_DIALOG_VIEW_H

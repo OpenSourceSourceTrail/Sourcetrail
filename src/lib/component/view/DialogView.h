@@ -3,9 +3,10 @@
 #include <functional>
 #include <string>
 #include <vector>
-
-#include "ErrorCountInfo.h"
-#include "RefreshInfo.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "ErrorCountInfo.h"
+#  include "RefreshInfo.h"
+#endif
 
 class Project;
 class StorageAccess;
@@ -32,6 +33,7 @@ public:
   virtual void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress);
   virtual void hideProgressDialog();
 
+#if !defined(SOURCETRAIL_WASM)
   virtual void startIndexingDialog(Project* project,
                                    const std::vector<RefreshMode>& enabledModes,
                                    const RefreshMode initialMode,
@@ -55,6 +57,7 @@ public:
                                                 ErrorCountInfo errorInfo,
                                                 bool interrupted,
                                                 bool shallow);
+#endif
 
   int confirm(const std::wstring& message);
   virtual int confirm(const std::wstring& message, const std::vector<std::wstring>& options);

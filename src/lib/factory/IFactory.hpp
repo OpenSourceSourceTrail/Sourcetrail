@@ -1,7 +1,9 @@
 #pragma once
 #include <memory>
 
-#include "ISharedMemoryGarbageCollector.hpp"
+#if !defined(SOURCETRAIL_WASM)
+#  include "ISharedMemoryGarbageCollector.hpp"
+#endif
 #include "ITaskManager.hpp"
 #include "MessageQueue.h"
 #include "ProjectSettings.h"
@@ -20,7 +22,9 @@ struct IFactory {
 
   virtual IMessageQueue::Ptr createMessageQueue() noexcept = 0;
 
+#if !defined(SOURCETRAIL_WASM)
   virtual ISharedMemoryGarbageCollector::Ptr createSharedMemoryGarbageCollector() noexcept = 0;
+#endif
 
   virtual scheduling::ITaskManager::Ptr createTaskManager() noexcept = 0;
 };

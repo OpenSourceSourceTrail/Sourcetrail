@@ -33,7 +33,9 @@ class Application final
     , public MessageListener<MessageCloseProject>
     , public MessageListener<MessageIndexingFinished>
     , public MessageListener<MessageLoadProject>
+#if !defined(SOURCETRAIL_WASM)
     , public MessageListener<MessageRefresh>
+#endif
     , public MessageListener<MessageRefreshUI>
     , public MessageListener<MessageSwitchColorScheme>
     , public MessageListener<MessageBookmarkUpdate> {
@@ -173,7 +175,9 @@ private:
    * @param message a message
    */
   void handleMessage(MessageLoadProject* message) override;
+#if !defined(SOURCETRAIL_WASM)
   void handleMessage(MessageRefresh* pMessage) override;
+#endif
   void handleMessage(MessageRefreshUI* pMessage) override;
   void handleMessage(MessageSwitchColorScheme* pMessage) override;
 
@@ -184,14 +188,18 @@ private:
 
   void loadWindow(bool showStartWindow);
 
+#if !defined(SOURCETRAIL_WASM)
   void refreshProject(RefreshMode refreshMode, bool shallowIndexingRequested);
+#endif
   void updateRecentProjects(const std::filesystem::path& projectSettingsFilePath);
 
   void logStorageStats() const;
 
   void updateTitle();
 
+#if !defined(SOURCETRAIL_WASM)
   bool checkSharedMemory();
+#endif
 
   const bool mHasGui;
   std::shared_ptr<lib::IFactory> mFactory;

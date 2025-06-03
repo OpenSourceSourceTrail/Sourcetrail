@@ -98,7 +98,7 @@ void QtProjectWizardContentPathsIndexedHeaders::save() {
 
 bool QtProjectWizardContentPathsIndexedHeaders::check() {
   if(m_list->getPathsAsDisplayed().empty()) {
-    QMessageBox msgBox(m_window);
+    QMessageBox msgBox(mWindow);
     msgBox.setText(QStringLiteral("You didn't specify any Header Files & Directories to Index."));
     msgBox.setInformativeText(QString::fromStdString("Sourcetrail will only index the source files listed in the " +
                                                      m_projectKindName + " file and none of the included header files."));
@@ -117,30 +117,30 @@ bool QtProjectWizardContentPathsIndexedHeaders::check() {
 void QtProjectWizardContentPathsIndexedHeaders::buttonClicked() {
   save();
 
-  if(!m_filesDialog) {
+  if(!mFilesDialog) {
     if(std::shared_ptr<SourceGroupSettingsCxxCdb> cdbSettings = std::dynamic_pointer_cast<SourceGroupSettingsCxxCdb>(m_settings)) {
       const FilePath cdbPath = cdbSettings->getCompilationDatabasePathExpandedAndAbsolute();
       if(!cdbPath.exists()) {
-        QMessageBox msgBox(m_window);
+        QMessageBox msgBox(mWindow);
         msgBox.setText(QStringLiteral("The provided Compilation Database path does not exist."));
         msgBox.setDetailedText(QString::fromStdWString(cdbPath.wstr()));
         msgBox.exec();
         return;
       }
 
-      m_filesDialog = new QtSelectPathsDialog("Select from Include Paths",
-                                              "The list contains all Include Paths found in the Compilation Database. Red paths "
-                                              "do not exist. Select the "
-                                              "paths containing the header files you want to index with Sourcetrail.",
-                                              m_window);
-      m_filesDialog->setup();
+      mFilesDialog = new QtSelectPathsDialog("Select from Include Paths",
+                                             "The list contains all Include Paths found in the Compilation Database. Red paths "
+                                             "do not exist. Select the "
+                                             "paths containing the header files you want to index with Sourcetrail.",
+                                             mWindow);
+      mFilesDialog->setup();
 
-      connect(m_filesDialog, &QtSelectPathsDialog::finished, this, &QtProjectWizardContentPathsIndexedHeaders::savedFilesDialog);
-      connect(m_filesDialog, &QtSelectPathsDialog::canceled, this, &QtProjectWizardContentPathsIndexedHeaders::closedFilesDialog);
+      connect(mFilesDialog, &QtSelectPathsDialog::finished, this, &QtProjectWizardContentPathsIndexedHeaders::savedFilesDialog);
+      connect(mFilesDialog, &QtSelectPathsDialog::canceled, this, &QtProjectWizardContentPathsIndexedHeaders::closedFilesDialog);
 
       const FilePath projectPath = cdbSettings->getProjectDirectoryPath();
 
-      dynamic_cast<QtSelectPathsDialog*>(m_filesDialog)
+      dynamic_cast<QtSelectPathsDialog*>(mFilesDialog)
           ->setPathsList(utility::convert<FilePath, FilePath>(
                              getIndexedPathsDerivedFromCDB(cdbSettings),
                              [&](const FilePath& path) { return utility::getAsRelativeIfShorter(path, projectPath); }),
@@ -149,13 +149,13 @@ void QtProjectWizardContentPathsIndexedHeaders::buttonClicked() {
     }
   }
 
-  if(m_filesDialog) {
-    m_filesDialog->showWindow();
-    m_filesDialog->raise();
+  if(mFilesDialog) {
+    mFilesDialog->showWindow();
+    mFilesDialog->raise();
   }
 }
 
 void QtProjectWizardContentPathsIndexedHeaders::savedFilesDialog() {
-  m_list->setPaths(dynamic_cast<QtSelectPathsDialog*>(m_filesDialog)->getPathsList());
+  m_list->setPaths(dynamic_cast<QtSelectPathsDialog*>(mFilesDialog)->getPathsList());
   closedFilesDialog();
 }

@@ -7,7 +7,7 @@ project(
   DESCRIPTION "interactive source explorer"
   VERSION ${VERSION_STRING}
   HOMEPAGE_URL "opensourcesourcetrail.github.io"
-  LANGUAGES C CXX)
+  LANGUAGES CXX)
 #---------------------------------------------------------------------------------------------------------------------------------
 set(BUILD_CXX_LANGUAGE_PACKAGE
     OFF
@@ -53,14 +53,15 @@ set(SOURCETRAIL_USE_LIBCPP
 set(GCOV_VERSION
     "gcov-12"
     CACHE STRING "Version of gcov")
+
+set(SOURCETRAIL_WASM
+    ON
+    CACHE BOOL "")
 #---------------------------------------------------------------------------------------------------------------------------------
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 17)
 #---------------------------------------------------------------------------------------------------------------------------------
 include(cmake/add_files.cmake)
 include(cmake/version_setup.cmake)
@@ -115,6 +116,10 @@ else()
   set(PLATFORM_INCLUDE "includesLinux.h")
 endif()
 
+if(SOURCETRAIL_WASM)
+  add_definitions(-DSOURCETRAIL_WASM=1)
+endif()
+
 set(BASH "")
 if(WIN32)
   execute_process(COMMAND CMD /c where bash OUTPUT_VARIABLE BASH)
@@ -151,11 +156,16 @@ set(Boost_USE_STATIC_LIBS
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(
   Boost 1.83
-  COMPONENTS date_time
-             filesystem
-             program_options
-             system
+  COMPONENTS date_time filesystem system
   REQUIRED)
+if(NOT SOURCETRAIL_WASM)
+  find_package(
+    Boost 1.83
+    COMPONENTS program_options
+    REQUIRED)
+else()
+
+endif()
 # Qt -----------------------------------------------------------------------------------------------------------------------------
 find_package(
   Qt6 6.8 REQUIRED
@@ -349,7 +359,9 @@ endif()
 
 set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
 # Indexer App --------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/indexer)
+if(NOT SOURCETRAIL_WASM)
+  add_subdirectory(src/indexer)
+endif()
 # App ----------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app)
 # Tests --------------------------------------------------------------------------------------------------------------------------
@@ -387,7 +399,11 @@ create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user"
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
-install(TARGETS Sourcetrail Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+if(SOURCETRAIL_WASM)
+  install(TARGETS Sourcetrail RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+else()
+  install(TARGETS Sourcetrail Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+endif()
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIME_DIR}/data/)
 

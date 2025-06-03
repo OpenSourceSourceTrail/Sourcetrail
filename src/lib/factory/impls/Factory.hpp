@@ -14,7 +14,9 @@ public:
 
   IMessageQueue::Ptr createMessageQueue() noexcept override;
 
+#if !defined(SOURCETRAIL_WASM)
   ISharedMemoryGarbageCollector::Ptr createSharedMemoryGarbageCollector() noexcept override;
+#endif
 
   scheduling::ITaskManager::Ptr createTaskManager() noexcept override;
 };

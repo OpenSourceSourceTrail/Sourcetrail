@@ -71,6 +71,7 @@ struct IProject {
    */
   virtual void load(const std::shared_ptr<DialogView>& dialogView) = 0;
 
+#if !defined(SOURCETRAIL_WASM)
   /**
    * @brief Refresh the project
    *
@@ -95,4 +96,5 @@ struct IProject {
    * @param dialogView Dialog view
    */
   virtual void buildIndex(RefreshInfo info, std::shared_ptr<DialogView> dialogView) = 0;
+#endif
 };

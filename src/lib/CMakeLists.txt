@@ -7,32 +7,27 @@ add_files(
   factory/impls/Factory.hpp
   factory/impls/Factory.cpp
   # }
+  app/Application.cpp
+  app/Application.h
+  app/LanguagePackage.h
+  app/LanguagePackageManager.cpp
+  app/LanguagePackageManager.h
   app/paths/AppPath.cpp
   app/paths/AppPath.h
   app/paths/ResourcePaths.cpp
   app/paths/ResourcePaths.h
   app/paths/UserPaths.cpp
   app/paths/UserPaths.h
-  app/Application.cpp
-  app/Application.h
-  app/LanguagePackage.h
-  app/LanguagePackageManager.cpp
-  app/LanguagePackageManager.h
-  component/controller/helper/ActivationListener.cpp
-  component/controller/helper/ActivationListener.h
-  component/controller/helper/BucketLayouter.cpp
-  component/controller/helper/BucketLayouter.h
-  component/controller/helper/DummyEdge.h
-  component/controller/helper/DummyNode.h
-  component/controller/helper/ListLayouter.cpp
-  component/controller/helper/ListLayouter.h
-  component/controller/helper/NetworkProtocolHelper.cpp
-  component/controller/helper/NetworkProtocolHelper.h
-  component/controller/helper/ScreenSearchInterfaces.h
-  component/controller/helper/SnippetMerger.cpp
-  component/controller/helper/SnippetMerger.h
-  component/controller/helper/TrailLayouter.cpp
-  component/controller/helper/TrailLayouter.h
+  component/Component.cpp
+  component/Component.h
+  component/ComponentFactory.cpp
+  component/ComponentFactory.h
+  component/ComponentManager.cpp
+  component/ComponentManager.h
+  component/Tab.cpp
+  component/Tab.h
+  component/TabId.cpp
+  component/TabId.h
   component/controller/ActivationController.cpp
   component/controller/ActivationController.h
   component/controller/BookmarkController.cpp
@@ -47,8 +42,6 @@ add_files(
   component/controller/ErrorController.h
   component/controller/GraphController.cpp
   component/controller/GraphController.h
-  component/controller/IDECommunicationController.cpp
-  component/controller/IDECommunicationController.h
   component/controller/RefreshController.cpp
   component/controller/RefreshController.h
   component/controller/ScreenSearchController.cpp
@@ -65,9 +58,19 @@ add_files(
   component/controller/TooltipController.h
   component/controller/UndoRedoController.cpp
   component/controller/UndoRedoController.h
-  component/view/helper/CodeScrollParams.h
-  component/view/helper/CodeSnippetParams.cpp
-  component/view/helper/CodeSnippetParams.h
+  component/controller/helper/ActivationListener.cpp
+  component/controller/helper/ActivationListener.h
+  component/controller/helper/BucketLayouter.cpp
+  component/controller/helper/BucketLayouter.h
+  component/controller/helper/DummyEdge.h
+  component/controller/helper/DummyNode.h
+  component/controller/helper/ListLayouter.cpp
+  component/controller/helper/ListLayouter.h
+  component/controller/helper/ScreenSearchInterfaces.h
+  component/controller/helper/SnippetMerger.cpp
+  component/controller/helper/SnippetMerger.h
+  component/controller/helper/TrailLayouter.cpp
+  component/controller/helper/TrailLayouter.h
   component/view/BookmarkButtonsView.cpp
   component/view/BookmarkButtonsView.h
   component/view/BookmarkView.cpp
@@ -113,18 +116,25 @@ add_files(
   component/view/ViewLayout.h
   component/view/ViewWidgetWrapper.cpp
   component/view/ViewWidgetWrapper.h
-  component/Component.cpp
-  component/Component.h
-  component/ComponentFactory.cpp
-  component/ComponentFactory.h
-  component/ComponentManager.cpp
-  component/ComponentManager.h
-  component/NetworkFactory.cpp
-  component/NetworkFactory.h
-  component/Tab.cpp
-  component/Tab.h
-  component/TabId.cpp
-  component/TabId.h
+  component/view/helper/CodeScrollParams.h
+  component/view/helper/CodeSnippetParams.cpp
+  component/view/helper/CodeSnippetParams.h
+  data/DefinitionKind.cpp
+  data/DefinitionKind.h
+  data/ErrorCountInfo.cpp
+  data/ErrorCountInfo.h
+  data/ErrorFilter.h
+  data/ErrorInfo.h
+  data/GroupType.cpp
+  data/GroupType.h
+  data/HierarchyCache.cpp
+  data/HierarchyCache.h
+  data/NodeKind.cpp
+  data/NodeKind.h
+  data/NodeType.cpp
+  data/NodeType.h
+  data/NodeTypeSet.cpp
+  data/NodeTypeSet.h
   data/bookmark/Bookmark.cpp
   data/bookmark/Bookmark.h
   data/bookmark/BookmarkCategory.cpp
@@ -137,6 +147,16 @@ add_files(
   data/fulltextsearch/FullTextSearchIndex.h
   data/fulltextsearch/SuffixArray.cpp
   data/fulltextsearch/SuffixArray.h
+  data/graph/Edge.cpp
+  data/graph/Edge.h
+  data/graph/ElementComponentKind.cpp
+  data/graph/ElementComponentKind.h
+  data/graph/Graph.cpp
+  data/graph/Graph.h
+  data/graph/Node.cpp
+  data/graph/Node.h
+  data/graph/Token.cpp
+  data/graph/Token.h
   data/graph/token_component/TokenComponent.cpp
   data/graph/token_component/TokenComponent.h
   data/graph/token_component/TokenComponentAbstraction.cpp
@@ -153,55 +173,6 @@ add_files(
   data/graph/token_component/TokenComponentIsAmbiguous.h
   data/graph/token_component/TokenComponentStatic.cpp
   data/graph/token_component/TokenComponentStatic.h
-  data/graph/Edge.cpp
-  data/graph/Edge.h
-  data/graph/ElementComponentKind.cpp
-  data/graph/ElementComponentKind.h
-  data/graph/Graph.cpp
-  data/graph/Graph.h
-  data/graph/Node.cpp
-  data/graph/Node.h
-  data/graph/Token.cpp
-  data/graph/Token.h
-  data/indexer/interprocess/shared_types/SharedIndexerCommand.cpp
-  data/indexer/interprocess/shared_types/SharedIndexerCommand.h
-  data/indexer/interprocess/shared_types/SharedIntermediateStorage.cpp
-  data/indexer/interprocess/shared_types/SharedIntermediateStorage.h
-  data/indexer/interprocess/shared_types/SharedStorageTypes.h
-  data/indexer/interprocess/BaseInterprocessDataManager.cpp
-  data/indexer/interprocess/BaseInterprocessDataManager.h
-  data/indexer/interprocess/InterprocessIndexer.cpp
-  data/indexer/interprocess/InterprocessIndexer.h
-  data/indexer/interprocess/InterprocessIndexerCommandManager.cpp
-  data/indexer/interprocess/InterprocessIndexerCommandManager.h
-  data/indexer/interprocess/InterprocessIndexingStatusManager.cpp
-  data/indexer/interprocess/InterprocessIndexingStatusManager.h
-  data/indexer/interprocess/InterprocessIntermediateStorageManager.cpp
-  data/indexer/interprocess/InterprocessIntermediateStorageManager.h
-  data/indexer/CombinedIndexerCommandProvider.cpp
-  data/indexer/CombinedIndexerCommandProvider.h
-  data/indexer/Indexer.h
-  data/indexer/IndexerBase.cpp
-  data/indexer/IndexerBase.h
-  data/indexer/IndexerCommand.cpp
-  data/indexer/IndexerCommand.h
-  data/indexer/IndexerCommandCustom.cpp
-  data/indexer/IndexerCommandCustom.h
-  data/indexer/IndexerCommandProvider.cpp
-  data/indexer/IndexerCommandProvider.h
-  data/indexer/IndexerCommandType.cpp
-  data/indexer/IndexerCommandType.h
-  data/indexer/IndexerComposite.cpp
-  data/indexer/IndexerComposite.h
-  data/indexer/IndexerStateInfo.h
-  data/indexer/MemoryIndexerCommandProvider.cpp
-  data/indexer/MemoryIndexerCommandProvider.h
-  data/indexer/TaskBuildIndex.cpp
-  data/indexer/TaskBuildIndex.h
-  data/indexer/TaskExecuteCustomCommands.cpp
-  data/indexer/TaskExecuteCustomCommands.h
-  data/indexer/TaskFillIndexerCommandQueue.cpp
-  data/indexer/TaskFillIndexerCommandQueue.h
   data/location/LocationType.cpp
   data/location/LocationType.h
   data/location/SourceLocation.cpp
@@ -229,12 +200,20 @@ add_files(
   data/parser/ReferenceKind.h
   data/parser/SymbolKind.cpp
   data/parser/SymbolKind.h
-  data/parser/TaskParseWrapper.cpp
-  data/parser/TaskParseWrapper.h
   data/search/SearchIndex.cpp
   data/search/SearchIndex.h
   data/search/SearchMatch.cpp
   data/search/SearchMatch.h
+  data/storage/PersistentStorage.cpp
+  data/storage/PersistentStorage.h
+  data/storage/Storage.cpp
+  data/storage/Storage.h
+  data/storage/StorageAccess.h
+  data/storage/StorageAccessProxy.cpp
+  data/storage/StorageAccessProxy.h
+  data/storage/StorageCache.cpp
+  data/storage/StorageCache.h
+  data/storage/StorageStats.h
   data/storage/migration/SqliteStorageMigration.cpp
   data/storage/migration/SqliteStorageMigration.h
   data/storage/migration/SqliteStorageMigrationLambda.cpp
@@ -248,8 +227,8 @@ add_files(
   data/storage/sqlite/SqliteIndexStorage.h
   data/storage/sqlite/SqliteStorage.cpp
   data/storage/sqlite/SqliteStorage.h
-  data/storage/type/StorageBookmarkCategory.h
   data/storage/type/StorageBookmark.h
+  data/storage/type/StorageBookmarkCategory.h
   data/storage/type/StorageBookmarkedEdge.h
   data/storage/type/StorageBookmarkedNode.h
   data/storage/type/StorageComponentAccess.h
@@ -262,63 +241,26 @@ add_files(
   data/storage/type/StorageOccurrence.h
   data/storage/type/StorageSourceLocation.h
   data/storage/type/StorageSymbol.h
-  data/storage/IntermediateStorage.cpp
-  data/storage/IntermediateStorage.h
-  data/storage/PersistentStorage.cpp
-  data/storage/PersistentStorage.h
-  data/storage/Storage.cpp
-  data/storage/Storage.h
-  data/storage/StorageAccess.h
-  data/storage/StorageAccessProxy.cpp
-  data/storage/StorageAccessProxy.h
-  data/storage/StorageCache.cpp
-  data/storage/StorageCache.h
-  data/storage/StorageProvider.cpp
-  data/storage/StorageProvider.h
-  data/storage/StorageStats.h
   data/tooltip/TooltipInfo.h
   data/tooltip/TooltipOrigin.h
-  data/DefinitionKind.cpp
-  data/DefinitionKind.h
-  data/ErrorCountInfo.cpp
-  data/ErrorCountInfo.h
-  data/ErrorFilter.h
-  data/ErrorInfo.h
-  data/GroupType.cpp
-  data/GroupType.h
-  data/HierarchyCache.cpp
-  data/HierarchyCache.h
-  data/NodeKind.cpp
-  data/NodeKind.h
-  data/NodeType.cpp
-  data/NodeType.h
-  data/NodeTypeSet.cpp
-  data/NodeTypeSet.h
-  data/TaskCleanStorage.cpp
-  data/TaskCleanStorage.h
-  data/TaskFinishParsing.cpp
-  data/TaskFinishParsing.h
-  data/TaskInjectStorage.cpp
-  data/TaskInjectStorage.h
-  data/TaskMergeStorages.cpp
-  data/TaskMergeStorages.h
-  project/Project.cpp
-  project/Project.h
   project/IProject.cpp
   project/IProject.hpp
-  project/RefreshInfo.h
-  project/RefreshInfoGenerator.h
-  project/RefreshInfoGenerator.cpp
-  project/SourceGroup.cpp
-  project/SourceGroup.h
-  project/SourceGroupCustomCommand.cpp
-  project/SourceGroupCustomCommand.h
-  project/SourceGroupFactory.cpp
-  project/SourceGroupFactory.h
-  project/SourceGroupFactoryModule.cpp
-  project/SourceGroupFactoryModule.h
-  project/SourceGroupFactoryModuleCustom.cpp
-  project/SourceGroupFactoryModuleCustom.h
+  project/Project.cpp
+  project/Project.h
+  settings/ApplicationSettingsPrefiller.cpp
+  settings/ApplicationSettingsPrefiller.h
+  settings/ColorScheme.cpp
+  settings/ColorScheme.h
+  settings/IApplicationSettings.cpp
+  settings/IApplicationSettings.hpp
+  settings/LanguageType.cpp
+  settings/LanguageType.h
+  settings/ProjectSettings.cpp
+  settings/ProjectSettings.h
+  settings/Settings.cpp
+  settings/Settings.h
+  settings/details/ApplicationSettings.cpp
+  settings/details/ApplicationSettings.h
   settings/migration/SettingsMigration.cpp
   settings/migration/SettingsMigration.h
   settings/migration/SettingsMigrationDeleteKey.cpp
@@ -328,6 +270,14 @@ add_files(
   settings/migration/SettingsMigrationMoveKey.cpp
   settings/migration/SettingsMigrationMoveKey.h
   settings/migration/SettingsMigrator.h
+  settings/source_group/SourceGroupSettings.cpp
+  settings/source_group/SourceGroupSettings.h
+  settings/source_group/SourceGroupSettingsBase.h
+  settings/source_group/SourceGroupSettingsWithComponents.h
+  settings/source_group/SourceGroupStatusType.cpp
+  settings/source_group/SourceGroupStatusType.h
+  settings/source_group/SourceGroupType.cpp
+  settings/source_group/SourceGroupType.h
   settings/source_group/component/SourceGroupSettingsWithCustomCommand.cpp
   settings/source_group/component/SourceGroupSettingsWithCustomCommand.h
   settings/source_group/component/SourceGroupSettingsWithExcludeFilters.cpp
@@ -339,45 +289,101 @@ add_files(
   settings/source_group/component/SourceGroupSettingsWithSourcePaths.h
   settings/source_group/type/SourceGroupSettingsUnloadable.cpp
   settings/source_group/type/SourceGroupSettingsUnloadable.h
-  settings/source_group/SourceGroupSettings.cpp
-  settings/source_group/SourceGroupSettings.h
-  settings/source_group/SourceGroupSettingsBase.h
-  settings/source_group/SourceGroupSettingsWithComponents.h
-  settings/source_group/SourceGroupStatusType.cpp
-  settings/source_group/SourceGroupStatusType.h
-  settings/source_group/SourceGroupType.cpp
-  settings/source_group/SourceGroupType.h
-  settings/details/ApplicationSettings.cpp
-  settings/details/ApplicationSettings.h
-  settings/IApplicationSettings.hpp
-  settings/IApplicationSettings.cpp
-  settings/ApplicationSettingsPrefiller.cpp
-  settings/ApplicationSettingsPrefiller.h
-  settings/ColorScheme.cpp
-  settings/ColorScheme.h
-  settings/LanguageType.cpp
-  settings/LanguageType.h
-  settings/ProjectSettings.cpp
-  settings/ProjectSettings.h
-  settings/Settings.cpp
-  settings/Settings.h
-  utility/interprocess/SharedMemory.cpp
-  utility/interprocess/SharedMemory.h
-  # Base Factory {
-  utility/interprocess/ISharedMemoryGarbageCollector.cpp
-  utility/interprocess/ISharedMemoryGarbageCollector.hpp
-  utility/interprocess/details/SharedMemoryGarbageCollector.cpp
-  utility/interprocess/details/SharedMemoryGarbageCollector.h
-  # }
 )
+
+if(NOT SOURCETRAIL_WASM)
+  add_files(
+    LIB
+    project/SourceGroupCustomCommand.cpp
+    project/SourceGroupCustomCommand.h
+    component/NetworkFactory.cpp
+    component/NetworkFactory.h
+    component/controller/IDECommunicationController.cpp
+    component/controller/IDECommunicationController.h
+    component/controller/helper/NetworkProtocolHelper.cpp
+    component/controller/helper/NetworkProtocolHelper.h
+    data/TaskCleanStorage.cpp
+    data/TaskCleanStorage.h
+    data/TaskFinishParsing.cpp
+    data/TaskFinishParsing.h
+    data/TaskInjectStorage.cpp
+    data/TaskInjectStorage.h
+    data/TaskMergeStorages.cpp
+    data/TaskMergeStorages.h
+    data/indexer/CombinedIndexerCommandProvider.cpp
+    data/indexer/CombinedIndexerCommandProvider.h
+    data/indexer/Indexer.h
+    data/indexer/IndexerBase.cpp
+    data/indexer/IndexerBase.h
+    data/indexer/IndexerCommand.cpp
+    data/indexer/IndexerCommand.h
+    data/indexer/IndexerCommandCustom.cpp
+    data/indexer/IndexerCommandCustom.h
+    data/indexer/IndexerCommandProvider.cpp
+    data/indexer/IndexerCommandProvider.h
+    data/indexer/IndexerCommandType.cpp
+    data/indexer/IndexerCommandType.h
+    data/indexer/IndexerComposite.cpp
+    data/indexer/IndexerComposite.h
+    data/indexer/IndexerStateInfo.h
+    data/indexer/MemoryIndexerCommandProvider.cpp
+    data/indexer/MemoryIndexerCommandProvider.h
+    data/indexer/TaskBuildIndex.cpp
+    data/indexer/TaskBuildIndex.h
+    data/indexer/TaskExecuteCustomCommands.cpp
+    data/indexer/TaskExecuteCustomCommands.h
+    data/indexer/TaskFillIndexerCommandQueue.cpp
+    data/indexer/TaskFillIndexerCommandQueue.h
+    data/indexer/interprocess/BaseInterprocessDataManager.cpp
+    data/indexer/interprocess/BaseInterprocessDataManager.h
+    data/indexer/interprocess/InterprocessIndexer.cpp
+    data/indexer/interprocess/InterprocessIndexer.h
+    data/indexer/interprocess/InterprocessIndexerCommandManager.cpp
+    data/indexer/interprocess/InterprocessIndexerCommandManager.h
+    data/indexer/interprocess/InterprocessIndexingStatusManager.cpp
+    data/indexer/interprocess/InterprocessIndexingStatusManager.h
+    data/indexer/interprocess/InterprocessIntermediateStorageManager.cpp
+    data/indexer/interprocess/InterprocessIntermediateStorageManager.h
+    data/indexer/interprocess/shared_types/SharedIndexerCommand.cpp
+    data/indexer/interprocess/shared_types/SharedIndexerCommand.h
+    data/indexer/interprocess/shared_types/SharedIntermediateStorage.cpp
+    data/indexer/interprocess/shared_types/SharedIntermediateStorage.h
+    data/indexer/interprocess/shared_types/SharedStorageTypes.h
+    data/parser/TaskParseWrapper.cpp
+    data/parser/TaskParseWrapper.h
+    data/storage/IntermediateStorage.cpp
+    data/storage/IntermediateStorage.h
+    data/storage/StorageProvider.cpp
+    data/storage/StorageProvider.h
+    project/RefreshInfo.h
+    project/RefreshInfoGenerator.cpp
+    project/RefreshInfoGenerator.h
+    project/SourceGroup.cpp
+    project/SourceGroup.h
+    project/SourceGroupFactory.cpp
+    project/SourceGroupFactory.h
+    project/SourceGroupFactoryModule.cpp
+    project/SourceGroupFactoryModule.h
+    project/SourceGroupFactoryModuleCustom.cpp
+    project/SourceGroupFactoryModuleCustom.h
+    # interprocess {
+    utility/interprocess/ISharedMemoryGarbageCollector.cpp
+    utility/interprocess/ISharedMemoryGarbageCollector.hpp
+    utility/interprocess/SharedMemory.cpp
+    utility/interprocess/SharedMemory.h
+    utility/interprocess/details/SharedMemoryGarbageCollector.cpp
+    utility/interprocess/details/SharedMemoryGarbageCollector.h
+    # }
+  )
+endif()
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_files(
     LIB
-    settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.cpp
-    settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.cpp
     settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h
+    settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.cpp
+    settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.cpp
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.cpp
@@ -393,5 +399,6 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     settings/source_group/type/SourceGroupSettingsCEmpty.h
     settings/source_group/type/SourceGroupSettingsCppEmpty.h
     settings/source_group/type/SourceGroupSettingsCustomCommand.h
-    settings/source_group/type/SourceGroupSettingsCxxCdb.h)
+    settings/source_group/type/SourceGroupSettingsCxxCdb.h
+  )
 endif()

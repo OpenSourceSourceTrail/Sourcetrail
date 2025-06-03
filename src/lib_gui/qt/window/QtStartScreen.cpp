@@ -170,8 +170,13 @@ void QtStartScreen::createVersionAndGithub(QHBoxLayout* layout) {
   vBoxLayout->addSpacing(BoxLayoutSpacing[1]);
   vBoxLayout->addStretch();
 
-  vBoxLayout->addWidget(createButton(
-      this, QStringLiteral("New Project"), QStringLiteral("projectButton"), [this]() { emit openNewProjectDialog(); }));
+  auto* newProjectButton = createButton(
+      this, QStringLiteral("New Project"), QStringLiteral("projectButton"), [this]() { emit openNewProjectDialog(); });
+#if defined(SOURCETRAIL_WASM)
+  newProjectButton->setToolTip("New project is disabled for WASM");
+  newProjectButton->setDisabled(true);
+#endif
+  vBoxLayout->addWidget(newProjectButton);
   vBoxLayout->addSpacing(BoxLayoutSpacing[2]);
   vBoxLayout->addWidget(createButton(
       this, QStringLiteral("Open Project"), QStringLiteral("projectButton"), [this]() { emit openOpenProjectDialog(); }));

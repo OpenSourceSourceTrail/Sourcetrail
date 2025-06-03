@@ -10,7 +10,9 @@
 #include "Application.h"
 #include "ApplicationSettings.h"
 #include "ApplicationSettingsPrefiller.h"
-#include "CommandLineParser.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "CommandLineParser.h"
+#endif
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
 #include "impls/Factory.hpp"
@@ -20,13 +22,17 @@
 #include "logging.h"
 #include "productVersion.h"
 #include "QtApplication.h"
-#include "QtCoreApplication.h"
-#include "QtNetworkFactory.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "QtCoreApplication.h"
+#  include "QtNetworkFactory.h"
+#endif
 #include "QtViewFactory.h"
 #include "ResourcePaths.h"
 #include "ScopedFunctor.h"
-#include "SourceGroupFactory.h"
-#include "SourceGroupFactoryModuleCustom.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "SourceGroupFactory.h"
+#  include "SourceGroupFactoryModuleCustom.h"
+#endif
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageStatus.h"
@@ -40,22 +46,52 @@
 #  include "SourceGroupFactoryModuleCxx.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
+#if defined(SOURCETRAIL_WASM)
+class NetworkFactory;
+#endif
+
 namespace {
-void signalHandler(int /*signum*/) {
-  std::cout << "interrupt indexing\n";
-  MessageIndexingInterrupted{}.dispatch();
-}
+
+struct Result final {
+  static Result make_error(std::wstring message) {
+    Result result;
+    result.mMessage = std::move(message);
+    return result;
+  }
+
+  explicit Result(std::filesystem::path projectPath) : mProjectFilePath{std::move(projectPath)} {}
+
+  operator bool() const {
+    return mMessage.empty();
+  }
+
+  std::filesystem::path operator*() const {
+    return mProjectFilePath;
+  }
+
+  [[nodiscard]] std::wstring getError() const {
+    return mMessage;
+  }
+
+private:
+  Result() = default;
+
+  std::filesystem::path mProjectFilePath;
+  std::wstring mMessage;
+};
 
 void addLanguagePackages() {
+#if !defined(SOURCETRAIL_WASM)
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#  if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#  endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#  if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#  endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#endif
 }
 
 void checkRunFromScript() {
@@ -65,6 +101,12 @@ void checkRunFromScript() {
     LOG_WARNING("Please run Sourcetrail via the Sourcetrail.sh script!");
   }
 #endif
+}
+
+#if !defined(SOURCETRAIL_WASM)
+void signalHandler(int /*signum*/) {
+  std::cout << "interrupt indexing\n";
+  MessageIndexingInterrupted{}.dispatch();
 }
 
 int runConsole(int argc, char** argv, const Version& version, commandline::CommandLineParser& commandLineParser) {
@@ -104,8 +146,9 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
 
   return QCoreApplication::exec();
 }
+#endif
 
-int runGui(int argc, char** argv, const Version& version, commandline::CommandLineParser& commandLineParser) {
+int runGui(int argc, char** argv, const Version& version, const Result& result) {
 #ifdef D_WINDOWS
   {
     HWND consoleWnd = GetConsoleWindow();
@@ -127,10 +170,14 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 #endif
 
   QtViewFactory viewFactory;
-  QtNetworkFactory networkFactory;
+  NetworkFactory* networkFactory = nullptr;
+#if !defined(SOURCETRAIL_WASM)
+  QtNetworkFactory qtNetworkFactory;
+  networkFactory = &qtNetworkFactory;
+#endif
 
   auto factory = std::make_shared<lib::Factory>();
-  Application::createInstance(version, factory, &viewFactory, &networkFactory);
+  Application::createInstance(version, factory, &viewFactory, networkFactory);
   [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());
@@ -143,10 +190,10 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   utility::loadFontsFromDirectory(ResourcePaths::getFontsDirectoryPath(), L".otf");
   utility::loadFontsFromDirectory(ResourcePaths::getFontsDirectoryPath(), L".ttf");
 
-  if(commandLineParser.hasError()) {
-    Application::getInstance()->handleDialog(commandLineParser.getError());
+  if(!result) {
+    Application::getInstance()->handleDialog(result.getError());
   } else {
-    MessageLoadProject{commandLineParser.getProjectFilePath(), false, RefreshMode::None}.dispatch();
+    MessageLoadProject{FilePath{*result}, false, RefreshMode::None}.dispatch();
   }
 
   return QApplication::exec();
@@ -174,6 +221,7 @@ int main(int argc, char* argv[]) {
   const Version version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
   QApplication::setApplicationVersion(version.toString().c_str());
 
+#if !defined(SOURCETRAIL_WASM)
   commandline::CommandLineParser commandLineParser(version.toString());
   std::vector<std::string> args;
   if(argc > 1) {
@@ -185,12 +233,18 @@ int main(int argc, char* argv[]) {
   if(commandLineParser.exitApplication()) {
     return EXIT_SUCCESS;
   }
+#endif
 
   setupPlatform(argc, argv);
 
   IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
+#if !defined(SOURCETRAIL_WASM)
+  auto result = (commandLineParser.hasError() ? Result::make_error(), Result{commandLineParser.getProjectFilePath()};
   if(commandLineParser.runWithoutGUI()) {
     return runConsole(argc, argv, version, commandLineParser);
   }
-  return runGui(argc, argv, version, commandLineParser);
+#else
+  Result result{""};
+#endif
+  return runGui(argc, argv, version, result);
 }

@@ -26,6 +26,7 @@ void DialogView::showProgressDialog(const std::wstring& /*title*/, const std::ws
 
 void DialogView::hideProgressDialog() {}
 
+#if !defined(SOURCETRAIL_WASM)
 void DialogView::startIndexingDialog(Project* /*project*/,
                                      const std::vector<RefreshMode>& /*enabledModes*/,
                                      const RefreshMode /*initialMode*/,
@@ -54,6 +55,7 @@ DatabasePolicy DialogView::finishedIndexingDialog(size_t /*indexedFileCount*/,
                                                   bool /*shallow*/) {
   return DATABASE_POLICY_KEEP;    // used in non-gui mode
 }
+#endif
 
 int DialogView::confirm(const std::wstring& message) {
   return confirm(message, std::vector<std::wstring>());

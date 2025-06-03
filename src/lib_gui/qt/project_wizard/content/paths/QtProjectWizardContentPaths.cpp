@@ -72,7 +72,7 @@ bool QtProjectWizardContentPaths::check() {
     }
 
     if(!missingPaths.isEmpty()) {
-      QMessageBox msgBox(m_window);
+      QMessageBox msgBox(mWindow);
       msgBox.setText(QString("Some provided paths do not exist at \"%1\". Do you want to "
                              "remove them before continuing?")
                          .arg(m_titleString));

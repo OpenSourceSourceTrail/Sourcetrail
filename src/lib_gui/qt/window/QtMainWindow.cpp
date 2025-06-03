@@ -29,7 +29,9 @@
 #include "QtKeyboardShortcuts.h"
 #include "QtLicenseWindow.h"
 #include "QtPreferencesWindow.h"
-#include "QtProjectWizard.h"
+#if !defined(SOURCETRAIL_WASM)
+#  include "QtProjectWizard.h"
+#endif
 #include "QtStartScreen.hpp"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
@@ -488,14 +490,17 @@ void QtMainWindow::showStartScreen() {
   auto* pStartScreen = createWindow<qt::window::QtStartScreen>();
   pStartScreen->setupStartScreen();
 
-  connect(pStartScreen, &qt::window::QtStartScreen::openOpenProjectDialog, this, &QtMainWindow::openProject);
-  connect(pStartScreen, &qt::window::QtStartScreen::openNewProjectDialog, this, &QtMainWindow::newProject);
+  std::ignore = connect(pStartScreen, &qt::window::QtStartScreen::openOpenProjectDialog, this, &QtMainWindow::openProject);
+#if !defined(SOURCETRAIL_WASM)
+  std::ignore = connect(pStartScreen, &qt::window::QtStartScreen::openNewProjectDialog, this, &QtMainWindow::newProject);
+#endif
 }
 
 void QtMainWindow::hideStartScreen() {
   m_windowStack.clearWindows();
 }
 
+#if !defined(SOURCETRAIL_WASM)
 void QtMainWindow::newProject() {
   auto* wizard = createWindow<QtProjectWizard>();
   wizard->newProject();
@@ -510,6 +515,16 @@ void QtMainWindow::newProjectFromCDB(const FilePath& filePath) {
   wizard->newProjectFromCDB(filePath);
 }
 
+void QtMainWindow::editProject() {
+  auto currentProject = Application::getInstance()->getCurrentProject();
+  if(currentProject) {
+    auto* wizard = createWindow<QtProjectWizard>();
+
+    wizard->editProject(currentProject->getProjectSettingsFilePath());
+  }
+}
+#endif
+
 void QtMainWindow::openProject() {
   QString fileName = QtFileDialog::getOpenFileName(
       this, tr("Open File"), FilePath(), QStringLiteral("Sourcetrail Project Files (*.srctrlprj)"));
@@ -517,15 +532,6 @@ void QtMainWindow::openProject() {
   if(!fileName.isEmpty()) {
     MessageLoadProject(FilePath(fileName.toStdWString())).dispatch();
     m_windowStack.clearWindows();
-  }
-}
-
-void QtMainWindow::editProject() {
-  auto currentProject = Application::getInstance()->getCurrentProject();
-  if(currentProject) {
-    auto* wizard = createWindow<QtProjectWizard>();
-
-    wizard->editProject(currentProject->getProjectSettingsFilePath());
   }
 }
 
@@ -701,7 +707,15 @@ void QtMainWindow::setupProjectMenu() {
   menuBar()->addMenu(menu);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
-  menu->addAction(tr("&New Project..."), QKeySequence::New, this, &QtMainWindow::newProject);
+  auto* newProjectAction = menu->addAction(tr("&New Project..."), QKeySequence::New, [this]() {
+#  if !defined(SOURCETRAIL_WASM)
+    newProject();
+#  endif
+  });
+#  if defined(SOURCETRAIL_WASM)
+  newProjectAction->setDisabled(true);
+  newProjectAction->setToolTip("New project is disabled for WASM");
+#  endif
   menu->addAction(tr("&Open Project..."), QKeySequence::Open, this, &QtMainWindow::openProject);
 #else
   menu->addAction(tr("&New Project..."), this, &QtMainWindow::newProject, QKeySequence::New);
@@ -714,7 +728,15 @@ void QtMainWindow::setupProjectMenu() {
 
   menu->addSeparator();
 
-  menu->addAction(tr("&Edit Project..."), this, &QtMainWindow::editProject);
+  auto* editProjectAction = menu->addAction(tr("&Edit Project..."), [this]() {
+#if !defined(SOURCETRAIL_WASM)
+    editProject();
+#endif
+  });
+#if defined(SOURCETRAIL_WASM)
+  editProjectAction->setDisabled(true);
+  editProjectAction->setToolTip("Edit project is disabled for WASM");
+#endif
   menu->addSeparator();
 
   menu->addAction(tr("Close Project"), this, &QtMainWindow::closeProject);

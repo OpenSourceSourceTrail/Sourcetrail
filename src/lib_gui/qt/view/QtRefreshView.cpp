@@ -22,11 +22,17 @@ QtRefreshView::QtRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout), 
   auto* refreshButton = new QtSearchBarButton{
       ResourcePaths::getGuiDirectoryPath().concatenate(L"refresh_view/images/refresh.png")};
   refreshButton->setObjectName(QStringLiteral("refresh_button"));
+// TODO(Hussein): refreshButton should be disabled at the startup
+#if defined(SOURCETRAIL_WASM)
+  refreshButton->setEnabled(false);
+  refreshButton->setToolTip(QStringLiteral("refresh is disabled for WASM"));
+#else
   refreshButton->setToolTip(QStringLiteral("refresh"));
   std::ignore = QObject::connect(refreshButton, &QPushButton::clicked, QCoreApplication::instance(), []() {
     MessageIndexingShowDialog().dispatch();
     MessageRefresh().dispatch();
   });
+#endif
 
   layout->addWidget(refreshButton);
   m_widget->setLayout(layout);
