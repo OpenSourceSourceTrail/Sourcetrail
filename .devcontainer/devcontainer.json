@@ -5,6 +5,9 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
+	"runArgs": [
+		"--privileged"
+	],
 	"mounts": [
 		"source=${localWorkspaceFolder},target=/home/sourcetrail/workspace,type=bind",
 		"source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,readonly"
