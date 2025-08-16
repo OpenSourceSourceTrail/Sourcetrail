@@ -104,4 +104,4 @@ USER sourcetrail
 
 # Install Python packages
 RUN python3 -m venv ~/env && \
-    ~/env/bin/pip install --no-cache-dir conan==2.5.0 cmakelint==1.4.3 gcovr==5.0 pygments==2.11 pymdown-extensions==9.3
+    ~/env/bin/pip install --no-cache-dir conan==2.5.0 cmakelint==1.4.3 gcovr==6.0 pygments==2.11 pymdown-extensions==9.3
