@@ -32,6 +32,7 @@ jobs:
 
       - name: Configure CMake
         working-directory: llvm-project
+        shell: cmd
         run: |
           cmake -S llvm -B build ^
             -G Ninja ^
