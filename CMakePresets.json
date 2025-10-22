@@ -157,12 +157,37 @@
                 "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_CXX_LANGUAGE_PACKAGE": "OFF",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/msvc/build/Release/generators/conan_toolchain.cmake",
                 "SR_IS_CI": "ON"
             },
             "inherits": [
                 "all-tests",
+                "ninja",
+                "window"
+            ]
+        },
+        {
+            "name": "ci_msvc_release_build_cxx",
+            "displayName": "CI VC++ Release with CXX",
+            "binaryDir": "${sourceDir}/build/",
+            "toolset": {
+                "value": "v143",
+                "strategy": "external"
+            },
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "CMAKE_POLICY_DEFAULT_CMP0091": "NEW",
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "CMAKE_TOOLCHAIN_FILE": ".conan/msvc/build/Release/generators/conan_toolchain.cmake",
+                "SR_IS_CI": "ON"
+            },
+            "inherits": [
+                "all-tests",
+                "build_cxx",
                 "ninja",
                 "window"
             ]
