@@ -218,10 +218,6 @@ jobs:
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
         run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
 
-      - name: Install llvm (Windows)
-        if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
-        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-windows.tar.gz -C ${{github.workspace}}/external
-
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
         run: cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
@@ -244,17 +240,10 @@ jobs:
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
-        continue-on-error: true
-        id: build_step
         run: |
           call "${{ matrix.config.environment_script }}"
-          cmake --build ${{github.workspace}}/build > ${{github.workspace}}/build/build.log 2>&1
-
-      - name: Check build status (Windows)
-        if: runner.os == 'Windows' && steps.build_step.outcome == 'failure'
-        run: |
-          type ${{github.workspace}}/build/build.log
-          exit /b 1
+          cmake --build ${{github.workspace}}/build > ${{github.workspace}}/build/build.log 2>&1 || (type ${{github.workspace}}/build/build.log && exit /b %errorlevel%)
+        shell: cmd
 
       - name: Upload build logs on failure
         if: failure()
