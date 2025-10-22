@@ -4,18 +4,18 @@ on:
   push:
     branches: ["main"]
     paths:
-      - '**/*.h'
-      - '**/*.hpp'
-      - '**/*.cpp'
-      - '**/*.cmake'
+      - "**/*.h"
+      - "**/*.hpp"
+      - "**/*.cpp"
+      - "**/*.cmake"
       - .github/workflows/*.yml
   pull_request:
     branches: ["main"]
     paths:
-      - '**/*.h'
-      - '**/*.hpp'
-      - '**/*.cpp'
-      - '**/*.cmake'
+      - "**/*.h"
+      - "**/*.hpp"
+      - "**/*.cpp"
+      - "**/*.cmake"
       - .github/workflows/*.yml
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full history to ensure base SHA is available
+          fetch-depth: 0 # Fetch full history to ensure base SHA is available
 
       - name: Install clang-format
         run: |
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Format CMake files
         id: cmake-format
@@ -59,12 +59,22 @@ jobs:
       matrix:
         config:
           - {
-            name: "Windows Latest MSVC",
-            os: windows-latest,
-            tag: msvc,
-            cc: "cl",
-            cxx: "cl",
-            environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+              name: "Windows Latest MSVC",
+              os: windows-latest,
+              tag: msvc,
+              cc: "cl",
+              cxx: "cl",
+              environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+              "with_cxx": "",
+            }
+          - {
+              name: "Windows Latest MSVC with cxx_build",
+              os: windows-latest,
+              tag: msvc,
+              cc: "cl",
+              cxx: "cl",
+              environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
+              "with_cxx": "_build_cxx",
             }
           - {
               name: "Ubuntu Latest GCC",
@@ -72,7 +82,7 @@ jobs:
               tag: gnu,
               cc: "gcc",
               cxx: "g++",
-              "with_cxx": ""
+              "with_cxx": "",
             }
           - {
               name: "Ubuntu Latest GCC with cxx_build",
@@ -80,7 +90,7 @@ jobs:
               tag: gnu,
               cc: "gcc",
               cxx: "g++",
-              "with_cxx": "_build_cxx"
+              "with_cxx": "_build_cxx",
             }
           - {
               name: "Ubuntu Latest CLang",
@@ -88,7 +98,7 @@ jobs:
               tag: "clang",
               cc: "clang",
               cxx: "clang++",
-              "with_cxx": ""
+              "with_cxx": "",
             }
           - {
               name: "Ubuntu Latest CLang cxx_build",
@@ -96,7 +106,7 @@ jobs:
               tag: "clang",
               cc: "clang",
               cxx: "clang++",
-              "with_cxx": "_build_cxx"
+              "with_cxx": "_build_cxx",
             }
 
     name: ${{ matrix.config.name }}
@@ -104,7 +114,7 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "true"
 
@@ -119,33 +129,33 @@ jobs:
         if: runner.os == 'Linux'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: '==3.2.*'
-          dir: '${{github.workspace}}/Qt/'
-          install-deps: 'true'
-          version: '6.8.2'
-          host: 'linux'
-          target: 'desktop'
-          arch: 'linux_gcc_64'
-          modules: 'qt5compat'
-          archives: 'icu qtbase qtdeclarative qtsvg'
-          cache: 'true'
-          cache-key-prefix: 'install-qt-action-linux'
+          aqtversion: "==3.2.*"
+          dir: "${{github.workspace}}/Qt/"
+          install-deps: "true"
+          version: "6.8.2"
+          host: "linux"
+          target: "desktop"
+          arch: "linux_gcc_64"
+          modules: "qt5compat"
+          archives: "icu qtbase qtdeclarative qtsvg"
+          cache: "true"
+          cache-key-prefix: "install-qt-action-linux"
 
       - name: Install Qt (Windows)
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: '==3.2.*'
-          dir: '${{github.workspace}}/Qt/'
-          install-deps: 'true'
-          version: '6.8.2'
-          host: 'windows'
-          target: 'desktop'
-          arch: 'win64_msvc2022_64'
-          modules: 'qt5compat'
-          archives: 'qtbase qtdeclarative qtsvg'
-          cache: 'true'
-          cache-key-prefix: 'install-qt-action-windows'
+          aqtversion: "==3.2.*"
+          dir: "${{github.workspace}}/Qt/"
+          install-deps: "true"
+          version: "6.8.2"
+          host: "windows"
+          target: "desktop"
+          arch: "win64_msvc2022_64"
+          modules: "qt5compat"
+          archives: "qtbase qtdeclarative qtsvg"
+          cache: "true"
+          cache-key-prefix: "install-qt-action-windows"
 
       - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'
@@ -184,14 +194,25 @@ jobs:
         run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
         shell: bash
 
-      - name: Download llvm build cache
+      - name: Download llvm build cache (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
-        uses: actions/download-artifact@v4
+        uses: robinraju/release-downloader@v1.12
         with:
-          name: clang-19.1.7-linux
-          path: ${{github.workspace}}/external
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 13795569336 # TODO(Hussein): Need to be fixed
+          tag: "2.0.0"
+          fileName: "clang-19.1.7-linux.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          out-file-path: ${{github.workspace}}/external
+          extract: true
+
+      - name: Download llvm build cache (Windows)
+        if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
+        uses: robinraju/release-downloader@v1.12
+        with:
+          tag: "2.0.0"
+          fileName: "clang-19.1.7-windows.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          out-file-path: ${{github.workspace}}/external
+          extract: true
 
       - name: Install llvm (Ubuntu)
         if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
@@ -207,7 +228,7 @@ jobs:
           CMAKE_PREFIX_PATH: ${{env.Qt5_DIR}}
         run: |
           call "${{ matrix.config.environment_script }}"
-          cmake --preset="ci_${{ matrix.config.tag }}_release"
+          cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
         shell: cmd
 
       - name: Build (Ubuntu)
@@ -242,7 +263,7 @@ jobs:
 
       - name: Test (Windows)
         if: runner.os == 'Windows'
-        run: ctest --test-dir ${{github.workspace}}/build ctest --exclude-regex "unittests\.core\.GenerateRandomString\.goodCase|unittests\.core\.CommandlineCommandIndexFix\.projectIsAbsent|unittests\.core\.CommandlineCommandIndexFix\.projectIsInvalidProj|unittests\.core\.CommandLineParserConfig\.projectFileMissingExtention|unittests\.core\.CommandLineParserConfig\.emptyProjectFile|unittests\.lib\.BookmarkControllerFix\.displayBookmarksFor2|unittests\.lib\.FileHandler\.goodCaseEmptyFile|unittests\.lib\.FileHandler\.emptyFileCanNotCreated|unittests\.lib\.FileHandler\.goodCaseFromBuffer|unittests\.lib\.FileHandler\.PassZeroToFromBuffer|unittests\.lib\.FileHandler\.goodCaseRandomData|unittests\.lib\.FileHandler\.PassZeroToRandomData|unittests\.lib_gui\.utilityAppTestSuite\.searchPath|QtSelfRefreshIconButtonTestSuite" --output-junit ${{github.workspace}}/build/report.xml
+        run: ctest --test-dir ${{github.workspace}}/build --exclude-regex "unittests\.core\.GenerateRandomString\.goodCase|unittests\.core\.CommandlineCommandIndexFix\.projectIsAbsent|unittests\.core\.CommandlineCommandIndexFix\.projectIsInvalidProj|unittests\.core\.CommandLineParserConfig\.projectFileMissingExtention|unittests\.core\.CommandLineParserConfig\.emptyProjectFile|unittests\.lib\.BookmarkControllerFix\.displayBookmarksFor2|unittests\.lib\.FileHandler\.goodCaseEmptyFile|unittests\.lib\.FileHandler\.emptyFileCanNotCreated|unittests\.lib\.FileHandler\.goodCaseFromBuffer|unittests\.lib\.FileHandler\.PassZeroToFromBuffer|unittests\.lib\.FileHandler\.goodCaseRandomData|unittests\.lib\.FileHandler\.PassZeroToRandomData|unittests\.lib_gui\.utilityAppTestSuite\.searchPath|QtSelfRefreshIconButtonTestSuite" --output-junit ${{github.workspace}}/build/report.xml
         shell: cmd
 
       - name: Upload ctest logs on failure
