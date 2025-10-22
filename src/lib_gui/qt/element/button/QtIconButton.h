@@ -13,8 +13,8 @@ public:
   void setColor(QColor color);
 
 protected:
-  void enterEvent(QEvent* event);
-  void leaveEvent(QEvent* event);
+  void enterEvent(QEnterEvent* event) override;
+  void leaveEvent(QEvent* event) override;
 
 private:
   void setIconFromPath(const FilePath& path);

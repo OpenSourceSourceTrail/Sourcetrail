@@ -28,9 +28,9 @@ signals:
   void hoveredOut(QPushButton*);
 
 protected:
-  void changeEvent(QEvent* event);
-  void enterEvent(QEvent* event);
-  void leaveEvent(QEvent* event);
+  void changeEvent(QEvent* event) override;
+  void enterEvent(QEnterEvent* event) override;
+  void leaveEvent(QEvent* event) override;
 
 private:
   void setState(const State& state);

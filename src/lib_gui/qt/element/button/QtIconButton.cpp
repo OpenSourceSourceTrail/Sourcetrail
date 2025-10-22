@@ -21,7 +21,7 @@ void QtIconButton::setColor(QColor color) {
   leaveEvent(nullptr);
 }
 
-void QtIconButton::enterEvent(QEvent* /*event*/) {
+void QtIconButton::enterEvent(QEnterEvent* /*event*/) {
   if(!m_hoveredIconPath.empty() && isEnabled()) {
     setIconFromPath(m_hoveredIconPath);
   }

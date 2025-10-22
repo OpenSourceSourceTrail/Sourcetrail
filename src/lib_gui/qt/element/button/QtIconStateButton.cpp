@@ -44,7 +44,7 @@ void QtIconStateButton::changeEvent(QEvent* event) {
   }
 }
 
-void QtIconStateButton::enterEvent(QEvent* event) {
+void QtIconStateButton::enterEvent(QEnterEvent* event) {
   if(!isEnabled()) {
     return;
   }
