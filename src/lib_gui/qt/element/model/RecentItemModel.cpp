@@ -4,8 +4,10 @@
 #include <QMessageBox>
 #include <QMimeData>
 
+#include "IApplicationSettings.hpp"
 #include "ProjectSettings.h"
 #include "type/MessageLoadProject.h"
+
 
 namespace {
 
