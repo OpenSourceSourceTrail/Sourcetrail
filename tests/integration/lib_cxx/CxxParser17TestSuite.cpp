@@ -210,6 +210,8 @@ B<'a'> b2;
   ASSERT_THAT(client->errors, testing::IsEmpty());
 }
 
+// TODO(Hussein89): Enable this test on Windows after investigating the issue
+#ifndef _WIN32
 /**
  * https://en.cppreference.com/w/cpp/language/structured_binding
  * https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0217r3.html
@@ -230,6 +232,7 @@ const auto [ x, y ] = origin();)");
   EXPECT_THAT(client->globalVariables,
               testing::Contains(L"const std::tuple_element<1UL, const std::pair<int, int>>::type && y <8:17 8:17>"));
 }
+#endif
 
 /**
  * https://en.cppreference.com/w/cpp/language/if

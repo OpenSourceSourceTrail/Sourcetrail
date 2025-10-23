@@ -1,14 +1,12 @@
 #pragma once
+#include <filesystem>
 #include <vector>
 
-#include <range/v3/to_container.hpp>
+#include <range/v3/range/conversion.hpp>
 #include <range/v3/view/transform.hpp>
 
 #include <QAbstractListModel>
 #include <QIcon>
-
-#include "FilePath.h"
-#include "IApplicationSettings.hpp"
 
 namespace qt::element::model {
 
