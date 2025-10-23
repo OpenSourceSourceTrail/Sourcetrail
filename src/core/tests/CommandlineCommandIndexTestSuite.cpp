@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 
 #include <gmock/gmock.h>
@@ -5,7 +6,6 @@
 
 #include "CommandlineCommandIndex.h"
 #include "CommandLineParser.h"
-#include "IApplicationSettings.hpp"
 #include "utilities/CollectOutStream.hpp"
 #include "utilities/FileHandler.hpp"
 
@@ -69,8 +69,9 @@ TEST_F(CommandlineCommandIndexFix, goodCaseArgs) {
 }
 
 TEST_F(CommandlineCommandIndexFix, projectIsAbsent) {
-  auto handler = FileHandler::createEmptyFile("/tmp/invalid");
-  std::vector<std::string> args = {"/tmp/invalid"};
+  const auto invalidPath = std::filesystem::temp_directory_path() / "invalid";
+  auto handler = FileHandler::createEmptyFile(invalidPath);
+  std::vector<std::string> args = {invalidPath.string()};
 
   auto ret = mConfig->parse(args);
 
@@ -81,8 +82,9 @@ TEST_F(CommandlineCommandIndexFix, projectIsAbsent) {
 }
 
 TEST_F(CommandlineCommandIndexFix, projectIsInvalidProj) {
-  auto handler = FileHandler::createEmptyFile("/tmp/invalid.srctrlprj");
-  std::vector<std::string> args = {"/tmp/invalid.srctrlprj"};
+  const auto invalidPath = std::filesystem::temp_directory_path() / "invalid.srctrlprj";
+  auto handler = FileHandler::createEmptyFile(invalidPath);
+  std::vector<std::string> args = {invalidPath.string()};
 
   auto ret = mConfig->parse(args);
 
