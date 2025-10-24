@@ -99,8 +99,8 @@ struct ProjectFix : Test {
     mStatus = std::unique_ptr<MockedMessageStatus>();
 
     mSettings = std::make_shared<StrictMock<MockedProjectSettings>>();
-    mStorageCache = std::make_unique<StrictMock<MockedStorageCache>>();
-    mProject = std::make_unique<Project>(mSettings, mStorageCache.get(), "", true);
+    mStorageCache = std::make_shared<StrictMock<MockedStorageCache>>();
+    mProject = std::make_unique<Project>(mSettings, mStorageCache, "", true);
 
     mDialogView = std::make_shared<StrictMock<MockedDialogView>>();
 
@@ -119,7 +119,7 @@ struct ProjectFix : Test {
   std::shared_ptr<scheduling::mocks::MockedTaskManager> mTaskManager;
   std::shared_ptr<StrictMock<MockedMessageQueue>> mMockedMessageQueue;
   std::shared_ptr<StrictMock<MockedProjectSettings>> mSettings;
-  std::unique_ptr<StrictMock<MockedStorageCache>> mStorageCache;
+  std::shared_ptr<StrictMock<MockedStorageCache>> mStorageCache;
   std::unique_ptr<Project> mProject;
   std::shared_ptr<StrictMock<MockedDialogView>> mDialogView;
   std::unique_ptr<MockedMessageStatus> mStatus;
@@ -401,7 +401,7 @@ protected:
   // std::shared_ptr<MockedFileSystem> mockFileSystem;
   std::shared_ptr<MockedDialogView> mockDialogView;
   std::shared_ptr<ProjectSettings> mockSettings;
-  StorageCache* mockStorageCache;
+  std::shared_ptr<StorageCache> mockStorageCache;
   std::string appUUID;
   bool hasGUI;
   std::unique_ptr<Project> project;
@@ -410,7 +410,7 @@ protected:
     // mockFileSystem = std::make_shared<MockFileSystem>();
     mockDialogView = std::make_shared<MockedDialogView>();
     mockSettings = std::make_shared<ProjectSettings>();
-    mockStorageCache = nullptr;
+    mockStorageCache = std::make_shared<StorageCache>();
     appUUID = "testUUID";
     hasGUI = true;
     project = std::make_unique<Project>(mockSettings, mockStorageCache, appUUID, hasGUI);

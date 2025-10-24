@@ -50,7 +50,10 @@ public:
    * @param storageCache Storage Cache
    * @param hasGUI The application started with GUI
    */
-  Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI) noexcept;
+  Project(std::shared_ptr<ProjectSettings> settings,
+          std::shared_ptr<StorageCache> storageCache,
+          std::string appUUID,
+          bool hasGUI) noexcept;
 
   /**
    * @name Disable copy and move operators
@@ -158,15 +161,12 @@ private:
 
   bool checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView> dialogView);
 
+  std::vector<std::shared_ptr<SourceGroup>> m_sourceGroups;
   std::shared_ptr<ProjectSettings> m_settings;
-  StorageCache* m_storageCache;
-
+  std::shared_ptr<StorageCache> m_storageCache;
+  std::shared_ptr<PersistentStorage> m_storage;
+  std::string m_appUUID;
   ProjectStateType m_state = ProjectStateType::NOT_LOADED;
   RefreshStageType m_refreshStage = RefreshStageType::NONE;
-
-  std::shared_ptr<PersistentStorage> m_storage;
-  std::vector<std::shared_ptr<SourceGroup>> m_sourceGroups;
-
-  std::string m_appUUID;
   bool m_hasGUI;
 };

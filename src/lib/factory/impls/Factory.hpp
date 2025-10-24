@@ -8,7 +8,7 @@ class Factory : public IFactory {
 public:
   ~Factory() override;
   std::shared_ptr<IProject> createProject(std::shared_ptr<ProjectSettings> settings,
-                                          StorageCache* storageCache,
+                                          std::shared_ptr<StorageCache> storageCache,
                                           std::string appUUID,
                                           bool hasGUI) noexcept override;
 
