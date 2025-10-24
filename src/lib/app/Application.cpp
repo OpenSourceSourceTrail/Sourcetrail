@@ -302,7 +302,7 @@ void Application::handleMessage(MessageLoadProject* message) {
       mStorageCache->setSubject(std::weak_ptr<StorageAccess>());
 
       mProject = mFactory->createProject(
-          std::make_shared<ProjectSettings>(projectSettingsFilePath), mStorageCache.get(), getUUID(), hasGUI());
+          std::make_shared<ProjectSettings>(projectSettingsFilePath), mStorageCache, getUUID(), hasGUI());
 
       if(mProject) {
         mProject->load(getDialogView(DialogView::UseCase::GENERAL));

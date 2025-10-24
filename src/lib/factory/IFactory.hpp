@@ -14,7 +14,7 @@ namespace lib {
 struct IFactory {
   virtual ~IFactory();
   virtual std::shared_ptr<IProject> createProject(std::shared_ptr<ProjectSettings> settings,
-                                                  StorageCache* storageCache,
+                                                  std::shared_ptr<StorageCache> storageCache,
                                                   std::string appUUID,
                                                   bool hasGUI) noexcept = 0;
 

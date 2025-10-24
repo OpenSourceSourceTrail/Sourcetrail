@@ -20,10 +20,10 @@ namespace lib {
 Factory::~Factory() = default;
 
 std::shared_ptr<IProject> Factory::createProject(std::shared_ptr<ProjectSettings> settings,
-                                                 StorageCache* storageCache,
+                                                 std::shared_ptr<StorageCache> storageCache,
                                                  std::string appUUID,
                                                  bool hasGUI) noexcept {
-  return std::make_shared<Project>(std::move(settings), storageCache, std::move(appUUID), hasGUI);
+  return std::make_shared<Project>(std::move(settings), std::move(storageCache), std::move(appUUID), hasGUI);
 }
 
 IMessageQueue::Ptr Factory::createMessageQueue() noexcept {

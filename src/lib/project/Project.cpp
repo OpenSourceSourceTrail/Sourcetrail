@@ -66,8 +66,11 @@ int getIndexerThreadCount() {
 
 }    // namespace
 
-Project::Project(std::shared_ptr<ProjectSettings> settings, StorageCache* storageCache, std::string appUUID, bool hasGUI) noexcept
-    : m_settings(std::move(settings)), m_storageCache(storageCache), m_appUUID(std::move(appUUID)), m_hasGUI(hasGUI) {}
+Project::Project(std::shared_ptr<ProjectSettings> settings,
+                 std::shared_ptr<StorageCache> storageCache,
+                 std::string appUUID,
+                 bool hasGUI) noexcept
+    : m_settings(std::move(settings)), m_storageCache(std::move(storageCache)), m_appUUID(std::move(appUUID)), m_hasGUI(hasGUI) {}
 
 Project::~Project() noexcept = default;
 
@@ -508,7 +511,6 @@ bool Project::hasCxxSourceGroup() const {
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return false;
 }
-
 
 std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
                                                              std::shared_ptr<DialogView> dialogView,
