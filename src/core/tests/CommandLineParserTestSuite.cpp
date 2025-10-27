@@ -140,8 +140,8 @@ TEST(CommandLineParserConfig, projectFileOptionNotExists) {
 
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, projectFileMissingExtention) {
-  constexpr auto EmptyProjectPath = "/tmp/empty.proj";
-  std::vector<std::string> args{"--project-file", EmptyProjectPath};
+  const auto EmptyProjectPath = std::filesystem::temp_directory_path() / "empty.proj";
+  std::vector<std::string> args{"--project-file", EmptyProjectPath.string()};
   auto fileHandler = FileHandler::createEmptyFile(args.back());
 
   commandline::CommandLineParser parser({});
@@ -159,8 +159,8 @@ TEST(CommandLineParserConfig, projectFileMissingExtention) {
 
 // NOLINTNEXTLINE
 TEST(CommandLineParserConfig, emptyProjectFile) {
-  constexpr auto EmptyProjectPath = "/tmp/empty.srctrlprj";
-  std::vector<std::string> args{"--project-file", EmptyProjectPath};
+  const auto EmptyProjectPath = std::filesystem::temp_directory_path() / "empty.srctrlprj";
+  std::vector<std::string> args{"--project-file", EmptyProjectPath.string()};
   auto fileHandler = FileHandler::createEmptyFile(args.back());
 
   commandline::CommandLineParser parser({});
