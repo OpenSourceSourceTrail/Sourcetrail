@@ -1,11 +1,14 @@
 // STL
 #include <csignal>
 #include <cstdlib>
+#include <filesystem>
 #include <iostream>
 
+#include <fmt/core.h>
 #include <fmt/format.h>
 
 #include <spdlog/sinks/sink.h>
+#include <system_error>
 
 #include "Application.h"
 #include "ApplicationSettings.h"
@@ -41,8 +44,8 @@
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 namespace {
-void signalHandler(int /*signum*/) {
-  std::cout << "interrupt indexing\n";
+void signalHandler(int signum) {
+  fmt::println("Interrupt signal received. {}", signum);
   MessageIndexingInterrupted{}.dispatch();
 }
 
@@ -51,17 +54,16 @@ void addLanguagePackages() {
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 }
 
 void checkRunFromScript() {
 #ifndef D_WINDOWS
-  const auto expectedShareDirectory = FilePath(QCoreApplication::applicationDirPath().toStdWString() + L"/../share");
-  if(qEnvironmentVariableIsEmpty("SOURCETRAIL_VIA_SCRIPT") && !expectedShareDirectory.exists()) {
+  std::error_code errorCode;
+  const auto expectedShareDirectory = std::filesystem::path{QCoreApplication::applicationDirPath().toStdString()}.parent_path() /
+      "share";
+  if(qEnvironmentVariableIsEmpty("SOURCETRAIL_VIA_SCRIPT") && !std::filesystem::exists(expectedShareDirectory, errorCode)) {
     LOG_WARNING("Please run Sourcetrail via the Sourcetrail.sh script!");
   }
 #endif
