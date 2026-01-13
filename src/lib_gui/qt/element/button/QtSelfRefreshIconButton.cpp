@@ -32,7 +32,6 @@ void QtSelfRefreshIconButton::setText(const QString& text) {
 
 void QtSelfRefreshIconButton::setIconPath(const FilePath& iconPath) {
   if(iconPath != m_iconPath) {
-    qDebug() << "iconPath";
     m_iconPath = iconPath;
     refresh();
   }
