@@ -296,7 +296,15 @@ QCheckBox* QtErrorView::createFilterCheckbox(const QString& name, bool checked, 
   QCheckBox* checkbox = new QCheckBox(name);
   checkbox->setChecked(checked);
 
-  connect(checkbox, &QCheckBox::checkStateChanged, this, &QtErrorView::errorFilterChanged);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+  std::ignore = connect(checkbox,
+                        &QCheckBox::checkStateChanged,
+#else
+  std::ignore = connect(checkbox,
+                        &QCheckBox::stateChanged,
+#endif
+                        this,
+                        &QtErrorView::errorFilterChanged);
 
   layout->addWidget(checkbox);
   layout->addSpacing(25);
