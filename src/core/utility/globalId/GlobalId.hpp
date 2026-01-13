@@ -40,14 +40,14 @@ private:
   size_t mValue = 0;
 };
 
-[[nodiscard]] inline constexpr bool operator==(Id other, GlobalId id) noexcept {
+[[nodiscard]] constexpr bool operator==(Id other, GlobalId id) noexcept {
   return id == other;
 }
 
-[[nodiscard]] inline constexpr bool operator<(Id other, GlobalId id) noexcept {
+[[nodiscard]] constexpr bool operator<(Id other, GlobalId id) noexcept {
   return id.value() < other;
 }
 
-inline constexpr GlobalId operator"" _gi(unsigned long long int index) noexcept {
+constexpr GlobalId operator""_gi(unsigned long long int index) noexcept {
   return GlobalId{index};
 }
