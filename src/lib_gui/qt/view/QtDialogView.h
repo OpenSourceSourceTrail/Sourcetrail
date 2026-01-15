@@ -78,8 +78,8 @@ private:
   template <typename DialogType, typename... ParamTypes>
   DialogType* createWindow(ParamTypes... params);
 
-  QtMainWindow* m_mainWindow;
-  QtWindow* m_parentWindow;
+  QtMainWindow* m_mainWindow = nullptr;
+  QtWindow* m_parentWindow= nullptr;
 
   QtWindowStack m_windowStack;
 
