@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include <QDebug>
 #include <QResizeEvent>
 
 #include "utilityQt.h"
