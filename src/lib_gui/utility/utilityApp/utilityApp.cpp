@@ -203,8 +203,17 @@ int getIdealThreadCount() {
   return std::max(1, threadCount);
 }
 
-std::string getAppArchTypeString() {
-  return "64";
+std::string getAppArchTypeString(ApplicationArchitectureType archType) {
+  switch(archType) {
+  case ApplicationArchitectureType::X86_32:
+    return "32";
+  case ApplicationArchitectureType::X86_64:
+    return "64";
+  case ApplicationArchitectureType::ARM:
+    return "ARM";
+  default:
+    return "Unknown";
+  }
 }
 
 }    // namespace utility

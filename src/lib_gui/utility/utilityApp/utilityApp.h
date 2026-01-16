@@ -2,6 +2,8 @@
 #include <filesystem>
 #include <string>
 
+#include <boost/predef.h>
+
 #include "ApplicationArchitectureType.h"
 #include "FilePath.h"
 #include "OsType.h"
@@ -30,26 +32,29 @@ void killRunningProcesses();
 int getIdealThreadCount();
 
 constexpr OsType getOsType() {
-#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#if defined(BOOST_OS_WINDOWS)
   return OsType::Windows;
-#elif defined(__APPLE__)
+#elif defined(BOOST_OS_MACOS)
   return OsType::Mac;
-#elif defined(__linux) || defined(__linux__) || defined(linux)
+#elif defined(BOOST_OS_LINUX)
   return OsType::Linux;
 #else
-  return OsType::Unkown;
+  return OsType::Unknown;
 #endif
 }
 
 constexpr ApplicationArchitectureType getApplicationArchitectureType() {
-#if defined(__x86_64) || defined(__x86_64__) || defined(__amd64) || defined(_M_X64) || defined(WIN64)
+#if defined(BOOST_ARCH_X86_64)
   return ApplicationArchitectureType::X86_64;
-#else
+#elif defined(BOOST_ARCH_X86_32)
   return ApplicationArchitectureType::X86_32;
-#endif
+#elif defined(BOOST_ARCH_ARM)
+  return ApplicationArchitectureType::ARM;
+#else
   return ApplicationArchitectureType::Unknown;
+#endif
 }
 
-std::string getAppArchTypeString();
+std::string getAppArchTypeString(ApplicationArchitectureType archType = getApplicationArchitectureType());
 
 }    // namespace utility
