@@ -8,7 +8,7 @@
 #include "utilityApp.h"
 #include "utilityCxxHeaderDetection.h"
 
-CxxVs15HeaderPathDetector::CxxVs15HeaderPathDetector() : PathDetector("Visual Studio 2017") {}
+CxxVs15HeaderPathDetector::CxxVs15HeaderPathDetector() : PathDetector{"Visual Studio 2015"} {}
 
 std::vector<FilePath> CxxVs15HeaderPathDetector::doGetPaths() const {
   std::vector<FilePath> headerSearchPaths;
