@@ -9,6 +9,7 @@
 #  include "CxxHeaderPathDetector.h"
 #  include "CxxVs10To14HeaderPathDetector.h"
 #  include "CxxVs15HeaderPathDetector.h"
+#  include "CxxVs17HeaderPathDetector.hpp"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
@@ -19,6 +20,7 @@ std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
   }
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
+  combinedDetector->addDetector(std::make_shared<CxxVs17HeaderPathDetector>());
   combinedDetector->addDetector(std::make_shared<CxxVs15HeaderPathDetector>());
 
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
