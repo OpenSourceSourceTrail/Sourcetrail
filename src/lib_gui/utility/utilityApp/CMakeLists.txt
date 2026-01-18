@@ -10,6 +10,7 @@ add_sourcetrail_library(
   Sourcetrail::core::utility::ApplicationArchitectureType
   Sourcetrail::core::utility::file::FilePath
   Sourcetrail::core::utility::OsType
+  Boost::boost
   PRIVATE_DEPS
   Qt6::Core
   Boost::filesystem
