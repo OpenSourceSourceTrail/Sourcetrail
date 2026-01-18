@@ -1,6 +1,38 @@
 ### Changelog
 
-#### WIP
+#### 2.1.0
+
+* feat: Update bin to support clang 20 headers
+* fix: update ApplicationArchitectureType enum to include ARM and change underlying type to uint8_t; improve condition check in Project.cpp
+* feat: enhance indexing by converting Windows-style compiler flags to Unix-style and skipping RC files
+* fix: improve error logging for file opening in TextAccess and update CMakeLists.txt dependencies
+* feat: implement conversion of Windows-style compiler flags to Unix-style and add corresponding test suite
+* fix: update dependencies in conanfile.txt to latest versions
+* feat: add CxxVs17HeaderPathDetector test suite for header path detection
+* feat: add CxxVs17HeaderPathDetector to header path detection
+* fix: correct Visual Studio version in CxxVs15HeaderPathDetector constructor
+* feat: add CxxVs17HeaderPathDetector for detecting Visual Studio 2017+ header paths
+* feat: enhance getAppArchTypeString to support multiple architecture types
+* fix: remove debug output for iconPath in QtSelfRefreshIconButton
+* fix: initialize member pointers in QtDialogView to nullptr
+* fix: simplify to_underlying function template by removing unnecessary enable_if
+* fix: remove unnecessary inline specifier from operator overloads and user-defined literal in GlobalId
+* fix: enhance signal handling and update filesystem checks in main.cpp
+* fix: update preprocessor directives for platform-specific warnings in LowMemoryStringMap
+* fix: remove debug output for iconPath in QtSelfRefreshIconButton
+* fix: update QCheckBox connection for compatibility with Qt 6.7.0 and later
+* refactor: change StorageCache parameter from pointer to shared_ptr in project-related classes
+* src: Disable structuredBindings test for win
+* Fix missing include
+* src: replace to_container includes with range/conversion in multiple files
+* fix Windows llvm installation and build checks
+* ci: Update build workflows for improved Clang installation and caching
+* Fix link to Sourcetrail releases in README
+* ci: Build clang for windows x64
+* ci: Create a github action to build clang for windows
+* ci: Update appimage pipeline to qt6.8 & clang19
+
+#### 2.0.0
 
 * Migrate the Project from Qt5.15 to Qt6.8 (#47)
 * Docker: migrate from clang 15 to 19 (#55)
