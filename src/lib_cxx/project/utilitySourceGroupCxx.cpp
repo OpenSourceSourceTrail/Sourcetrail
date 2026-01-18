@@ -1,8 +1,13 @@
 #include "utilitySourceGroupCxx.h"
 
-#include <ranges>
+#include <algorithm>
+#include <iterator>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <clang/Tooling/JSONCompilationDatabase.h>
+#include <unordered_map>
 
 #include "CanonicalFilePathCache.h"
 #include "CxxCompilationDatabaseSingle.h"
@@ -20,6 +25,13 @@
 #include "StorageProvider.h"
 #include "TaskLambda.h"
 #include "utility.h"
+#include "utilityString.h"
+
+namespace {
+bool contains(const std::wstring& text, const std::wstring& value) {
+  return text.find(value) != std::wstring::npos;
+}
+}    // namespace
 
 namespace utility {
 std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOptions* settings,
@@ -131,6 +143,81 @@ std::vector<std::wstring> getWithRemoveIncludePchFlag(const std::vector<std::wst
   std::vector<std::wstring> ret = args;
   removeIncludePchFlag(ret);
   return ret;
+}
+
+bool convertWindowsStyleFlagsToUnixStyleFlags(std::vector<std::wstring>& args) {
+  static const std::unordered_map<std::wstring, std::wstring> windowsToUnix = {
+      {L"/std", L"-std"},
+      {L"/GR", L"-frtti"},
+      {L"/GR-", L"-fno-rtti"},
+      {L"/I", L"-I"},
+      {L"/D", L"-D"},
+      {L"/EHsc", L"-fexceptions"},
+      {L"/EHsc-", L"-fno-exceptions"},
+      {L"-external:I", L"-isystem"},
+      {L"-std:", L"-std="},
+  };
+  static constexpr std::array ValidUnix = {L"-std=", L"-D", L"-I", L"-isystem"};
+
+  if(args.empty()) {
+    return false;
+  }
+
+  std::vector<std::wstring> output;
+  output.reserve(args.size());
+
+  auto itr = args.cbegin();
+  if(contains(args.front(), L"cl.exe")) {
+    output.push_back(*itr);
+    std::advance(itr, 1);
+  }
+
+  for(; itr != args.cend(); std::advance(itr, 1)) {
+    const auto& value = *itr;
+    if(value.size() < 2) {
+      continue;
+    }
+
+    if('-' == value[0]) {
+      if(std::ranges::any_of(ValidUnix, [&value](const auto& item) { return contains(value, item); })) {
+        output.push_back(*itr);
+        continue;
+      } else {
+        std::wstring key = L"-external:I";
+        std::wstring unixValue = L"-isystem";
+
+        if(contains(value, key)) {
+          output.push_back(fmt::format(L"{}{}", unixValue, value.substr(key.size())));
+          continue;
+        }
+
+        key = L"-std:";
+        unixValue = L"-std=";
+
+        if(contains(value, key)) {
+          output.push_back(fmt::format(L"{}{}", unixValue, value.substr(key.size())));
+          continue;
+        }
+
+        if(contains(value, L"-c") && itr + 1 != args.cend()) {
+          output.emplace_back(L"-c");
+          output.emplace_back(*(itr + 1));
+        }
+      }
+    }
+
+    if('/' == value[0]) {
+      for(const auto& key : windowsToUnix) {
+        if(contains(value, key.first)) {
+          output.push_back(fmt::format(L"{}{}", key.second, value.substr(key.first.size())));
+          continue;
+        }
+      }
+    }
+  }
+
+  args = std::move(output);
+  return true;
 }
 
 void removeIncludePchFlag(std::vector<std::wstring>& args) {
