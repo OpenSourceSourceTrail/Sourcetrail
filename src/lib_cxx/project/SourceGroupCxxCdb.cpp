@@ -90,9 +90,24 @@ std::shared_ptr<IndexerCommandProvider> SourceGroupCxxCdb::getIndexerCommandProv
       }
     }
 
-    if(info.filesToIndex.find(sourcePath) != info.filesToIndex.end() && sourceFilePaths.find(sourcePath) != sourceFilePaths.end()) {
+    if(info.filesToIndex.contains(sourcePath) && sourceFilePaths.contains(sourcePath)) {
       std::vector<std::wstring> cdbFlags = utility::convert<std::string, std::wstring>(
-          command.CommandLine, [](const std::string& s) { return utility::decodeFromUtf8(s); });
+          command.CommandLine, [](const std::string& str) { return utility::decodeFromUtf8(str); });
+      if(cdbFlags.empty()) {
+        continue;
+      }
+
+      // Convert windows flags to unix style for clang on windows
+      if(std::filesystem::path{cdbFlags.front()}.filename() == L"cl.exe") {
+        if(!utility::convertWindowsStyleFlagsToUnixStyleFlags(cdbFlags)) {
+          fmt::print(L"RC file detected, skipping indexing. {}", cdbFlags.front());
+          continue;
+        }
+      } else if(std::filesystem::path{cdbFlags.front()}.filename() == L"rc.exe") {
+        fmt::print(L"RC file detected, skipping indexing. {}", cdbFlags.front());
+        // Remove RC files from indexing
+        continue;
+      }
 
       utility::removeIncludePchFlag(cdbFlags);
 
