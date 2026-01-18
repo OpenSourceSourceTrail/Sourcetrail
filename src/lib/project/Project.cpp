@@ -306,7 +306,7 @@ void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refres
     break;
   }
 
-  if(question.size() && m_hasGUI) {
+  if(!question.empty() && m_hasGUI) {
     if(dialogView->confirm(question, {L"Reindex", L"Cancel"}) == 1) {
       return;
     }
