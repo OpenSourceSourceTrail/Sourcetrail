@@ -248,8 +248,8 @@ add_files(
   qt/window/QtKnownProgressDialog.h
   qt/window/QtLicenseWindow.cpp
   qt/window/QtLicenseWindow.h
-  qt/window/QtMainWindow.cpp
-  qt/window/QtMainWindow.h
+  qt/window/MainWindow/QtMainWindow.cpp
+  qt/window/MainWindow/QtMainWindow.h
   qt/window/QtPathListDialog.cpp
   qt/window/QtPathListDialog.h
   qt/window/QtPreferencesWindow.cpp
