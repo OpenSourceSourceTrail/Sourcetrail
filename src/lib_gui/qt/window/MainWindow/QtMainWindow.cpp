@@ -19,10 +19,12 @@
 #include "Application.h"
 #include "Bookmark.h"
 #include "CompositeView.h"
+#include "FilePath.h"
 #include "FileSystem.h"
 #include "globalStrings.h"
 #include "IApplicationSettings.hpp"
 #include "logging.h"
+#include "MouseReleaseFilter.hpp"
 #include "QtAbout.h"
 #include "QtContextMenu.h"
 #include "QtFileDialog.h"
@@ -31,6 +33,7 @@
 #include "QtPreferencesWindow.h"
 #include "QtProjectWizard.h"
 #include "QtStartScreen.hpp"
+#include "QtViewToggle.hpp"
 #include "QtViewWidgetWrapper.h"
 #include "ResourcePaths.h"
 #include "TabbedView.h"
@@ -64,50 +67,6 @@
 #include "utilityString.h"
 #include "View.h"
 
-QtViewToggle::QtViewToggle(View* view, QWidget* parent) : QWidget(parent), m_view(view) {}
-
-void QtViewToggle::clear() {
-  m_view = nullptr;
-}
-
-void QtViewToggle::toggledByAction() {
-  if(m_view != nullptr) {
-    if(auto* window = dynamic_cast<QtMainWindow*>(parent()); window != nullptr) {
-      window->toggleView(m_view, true);
-    }
-  }
-}
-
-void QtViewToggle::toggledByUI() {
-  if(m_view != nullptr) {
-    if(auto* window = dynamic_cast<QtMainWindow*>(parent()); window != nullptr) {
-      window->toggleView(m_view, false);
-    }
-  }
-}
-
-
-MouseReleaseFilter::MouseReleaseFilter(QObject* parent) : QObject(parent) {
-  m_backButton = static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getControlsMouseBackButton());
-  m_forwardButton = static_cast<std::size_t>(IApplicationSettings::getInstanceRaw()->getControlsMouseForwardButton());
-}
-
-bool MouseReleaseFilter::eventFilter(QObject* obj, QEvent* event) {
-  if(event->type() == QEvent::MouseButtonRelease) {
-    if(const auto* mouseEvent = dynamic_cast<QMouseEvent*>(event); mouseEvent != nullptr) {
-      if(mouseEvent->button() == m_backButton) {
-        MessageHistoryUndo().dispatch();
-        return true;
-      } else if(mouseEvent->button() == m_forwardButton) {
-        MessageHistoryRedo().dispatch();
-        return true;
-      }
-    }
-  }
-
-  return QObject::eventFilter(obj, event);
-}
-
 
 QtMainWindow::QtMainWindow() : m_windowStack(this) {
   setObjectName(QStringLiteral("QtMainWindow"));
@@ -118,11 +77,11 @@ QtMainWindow::QtMainWindow() : m_windowStack(this) {
   setWindowFlags(Qt::Widget);
 
   if(auto* app = dynamic_cast<QApplication*>(QCoreApplication::instance()); app != nullptr) {
-    app->installEventFilter(new MouseReleaseFilter(this));
+    app->installEventFilter(new MouseReleaseFilter{this});
 
     refreshStyle();
 
-    if(utility::getOsType() != OsType::Mac) {
+    if constexpr(utility::getOsType() != OsType::Mac) {
       // can only be done once, because resetting the style on the QCoreApplication causes crash
       app->setStyleSheet(utility::getStyleSheet(ResourcePaths::getGuiDirectoryPath().concatenate(L"main/scrollbar.css")).c_str());
     }

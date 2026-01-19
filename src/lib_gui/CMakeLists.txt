@@ -248,8 +248,14 @@ add_files(
   qt/window/QtKnownProgressDialog.h
   qt/window/QtLicenseWindow.cpp
   qt/window/QtLicenseWindow.h
+  # {
+  qt/window/MainWindow/MouseReleaseFilter.cpp
+  qt/window/MainWindow/MouseReleaseFilter.hpp
   qt/window/MainWindow/QtMainWindow.cpp
   qt/window/MainWindow/QtMainWindow.h
+  qt/window/MainWindow/QtViewToggle.cpp
+  qt/window/MainWindow/QtViewToggle.hpp
+  # }
   qt/window/QtPathListDialog.cpp
   qt/window/QtPathListDialog.h
   qt/window/QtPreferencesWindow.cpp

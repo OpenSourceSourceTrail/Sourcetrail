@@ -1,54 +1,29 @@
 #pragma once
 #include <memory>
-#include <utility>
 #include <vector>
 
 #include <QMainWindow>
 
-#include "FilePath.h"
+#include <qtclasshelpermacros.h>
+
 #include "QtWindowStack.h"
+
 
 class Bookmark;
 class MessageBase;
 class QDockWidget;
 class View;
+class QtViewToggle;
+class FilePath;
 
-class QtViewToggle : public QWidget {
-  Q_OBJECT
-
-public:
-  explicit QtViewToggle(View* view, QWidget* parent = nullptr);
-  void clear();
-
-public slots:
-  void toggledByAction();
-  void toggledByUI();
-
-private:
-  View* m_view;
-};
-
-
-class MouseReleaseFilter : public QObject {
-  Q_OBJECT
-
-public:
-  explicit MouseReleaseFilter(QObject* parent);
-
-protected:
-  bool eventFilter(QObject* obj, QEvent* event) override;
-
-private:
-  size_t m_backButton;
-  size_t m_forwardButton;
-};
-
-
-class QtMainWindow : public QMainWindow {
+class QtMainWindow final : public QMainWindow {
   Q_OBJECT
 
 public:
   QtMainWindow();
+
+  Q_DISABLE_COPY_MOVE(QtMainWindow)
+
   ~QtMainWindow() override;
 
   void addView(View* view);
@@ -156,11 +131,11 @@ private slots:
   void activateBookmarkAction();
 
 private:
-  struct DockWidget {
-    QDockWidget* widget;
-    View* view;
-    QAction* action;
-    QtViewToggle* toggle;
+  struct DockWidget final {
+    QDockWidget* widget = nullptr;
+    View* view = nullptr;
+    QAction* action = nullptr;
+    QtViewToggle* toggle = nullptr;
   };
 
   void setupEditMenu();
@@ -179,8 +154,8 @@ private:
 
   std::vector<DockWidget> m_dockWidgets;
 
-  QMenu* m_viewMenu;
-  QAction* m_viewSeparator;
+  QMenu* m_viewMenu = nullptr;
+  QAction* m_viewSeparator = nullptr;
 
   QMenu* m_historyMenu = nullptr;
   std::vector<std::shared_ptr<MessageBase>> m_history;
@@ -188,9 +163,9 @@ private:
   QMenu* m_bookmarksMenu = nullptr;
   std::vector<std::shared_ptr<Bookmark>> m_bookmarks;
 
-  QMenu* m_recentProjectsMenu;
+  QMenu* m_recentProjectsMenu = nullptr;
 
-  QAction* m_showTitleBarsAction;
+  QAction* m_showTitleBarsAction = nullptr;
 
   bool m_showDockWidgetTitleBars = true;
 
