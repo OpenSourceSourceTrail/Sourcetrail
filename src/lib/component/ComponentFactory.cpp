@@ -1,6 +1,9 @@
 #include "ComponentFactory.h"
 
 #include <memory>
+#include <tuple>
+
+#include <qobject.h>
 
 #include "ActivationController.h"
 #include "BookmarkController.h"
@@ -148,5 +151,9 @@ std::shared_ptr<Component> ComponentFactory::createChatComponent(ViewLayout* vie
   std::shared_ptr<ChatView> view = m_viewFactory->createChatView(viewLayout);
   std::shared_ptr<ChatController> controller = std::make_shared<ChatController>();
 
+  std::ignore = QObject::connect(view.get(), &ChatView::messageSendRequested, controller.get(), &ChatController::sendMessage);
+  std::ignore = QObject::connect(controller.get(), &ChatController::messageToAdd, view.get(), &ChatView::addMessage);
+  std::ignore = QObject::connect(controller.get(), &ChatController::inputStateChanged, view.get(), &ChatView::setInputEnabled);
+  std::ignore = QObject::connect(controller.get(), &ChatController::clearInputRequested, view.get(), &ChatView::clearInput);
   return std::make_shared<Component>(view, controller);
 }

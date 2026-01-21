@@ -1,9 +1,11 @@
 #pragma once
 #include <QFrame>
-#include <QtCore>
 #include <QWidget>
 
+#include <qobject.h>
+
 #include "ChatView.hpp"
+
 
 class QVBoxLayout;
 class QLineEdit;
@@ -20,10 +22,14 @@ public:
 
   void addMessage(const QString& text, Role role) override;
 
+  void setInputEnabled(bool enabled) override;
+
+  void clearInput() override;
+
+  void clearChat() override;
+
 private:
   void sendMessage();
-
-  void clearChat();
 
   void setupUI();
 
@@ -31,8 +37,7 @@ private:
 
   QWidget* createInputArea();
 
-  [[nodiscard]] QString generateResponse(const QString& query) const;
-
+  // TODO(Hussein): Port to resource file
   void applyStyles();
 
   QWidget* m_widget{nullptr};

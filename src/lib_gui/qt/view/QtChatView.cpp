@@ -9,10 +9,10 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "ChatController.hpp"
 #include "MessageBubble.hpp"
 #include "QtViewWidgetWrapper.h"
 
@@ -31,9 +31,16 @@ void QtChatView::sendMessage() {
   if(text.isEmpty()) {
     return;
   }
-  m_inputField->clear();
 
-  getController<ChatController>()->sendMessage(text);
+  emit messageSendRequested(text);
+}
+
+void QtChatView::setInputEnabled(bool enabled) {
+  m_inputField->setEnabled(enabled);
+}
+
+void QtChatView::clearInput() {
+  m_inputField->clear();
 }
 
 void QtChatView::clearChat() {
@@ -175,22 +182,6 @@ void QtChatView::addMessage(const QString& text, Role role) {
       scrollArea->verticalScrollBar()->setValue(scrollArea->verticalScrollBar()->maximum());
     }
   });
-}
-
-QString QtChatView::generateResponse(const QString& query) const {
-  // Simple mock responses using C++20 features
-  static const std::vector<std::pair<QString, QString>> responses = {
-      {"hello", "Hello! How can I assist you with your code today?"},
-      {"help", "I can help you with code explanations, debugging, refactoring, and answering programming questions."},
-      {"explain", "Sure! Please share the code you'd like me to explain."},
-      {"default", "I'm here to help! Could you provide more details about what you need?"}};
-
-  auto lower = query.toLower();
-
-  // C++20 ranges to find matching response
-  auto it = std::ranges::find_if(responses, [&lower](const auto& pair) { return lower.contains(pair.first); });
-
-  return it != responses.end() ? it->second : responses.back().second;
 }
 
 void QtChatView::applyStyles() {
