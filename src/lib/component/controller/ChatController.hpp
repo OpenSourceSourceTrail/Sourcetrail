@@ -4,28 +4,24 @@
 #include <QObject>
 #include <QString>
 
+#include <qobject.h>
+#include <qtmetamacros.h>
+
 #include "Controller.h"
 
-/*
-class LlmInterface : public QObject {
-public:
-  virtual ~LlmInterface() = default;
-  virtual void sendMessage(const QString& message) noexcept = 0;
-public slots:
-  void onResponseReceived(const QString& response) noexcept;
-};
-*/
-
-class ChatController : public Controller {
+class ChatController
+    : public QObject
+    , public Controller {
+  Q_OBJECT
 public:
   explicit ChatController() noexcept;
 
   ~ChatController() noexcept override;
 
   void clear() override {}
-  // public slots:
-  void onSendMessage(const QString& message);
-  void onResponseReceived(const QString& message);
 
-private:
+  void sendMessage(const QString& message);
+
+public slots:
+  void onResponseReceived(const QString& message);
 };

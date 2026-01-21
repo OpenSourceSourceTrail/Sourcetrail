@@ -248,6 +248,10 @@ target_link_libraries(
 
 #configure language package defines
 configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")
+
+set_target_properties(
+  Sourcetrail_lib
+  PROPERTIES AUTOMOC ON)
 # Lib gui_utility ----------------------------------------------------------------------------------------------------------------
 add_library(Sourcetrail_lib_gui_utility)
 add_library(Sourcetrail::lib_gui::utility ALIAS Sourcetrail_lib_gui_utility)

@@ -12,9 +12,8 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include <qobject.h>
-#include <qwidget.h>
-
+#include "ChatController.hpp"
+#include "MessageBubble.hpp"
 #include "QtViewWidgetWrapper.h"
 
 
@@ -29,17 +28,12 @@ QtChatView::~QtChatView() = default;
 
 void QtChatView::sendMessage() {
   QString text = m_inputField->text().trimmed();
-  if(text.isEmpty())
+  if(text.isEmpty()) {
     return;
-
-  addMessage(text, MessageBubble::Role::User);
+  }
   m_inputField->clear();
 
-  // Simulate assistant response
-  QTimer::singleShot(500, m_widget, [this, text]() {
-    QString response = generateResponse(text);
-    addMessage(response, MessageBubble::Role::Assistant);
-  });
+  getController<ChatController>()->sendMessage(text);
 }
 
 void QtChatView::clearChat() {
@@ -54,7 +48,8 @@ void QtChatView::clearChat() {
 }
 
 void QtChatView::setupUI() {
-  auto* mainLayout = new QVBoxLayout(m_widget);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  auto* mainLayout = new QVBoxLayout{m_widget};
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
 
@@ -63,12 +58,15 @@ void QtChatView::setupUI() {
   mainLayout->addWidget(header);
 
   // Chat area
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   auto* scrollArea = new QScrollArea(m_widget);
   scrollArea->setWidgetResizable(true);
   scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   scrollArea->setFrameShape(QFrame::NoFrame);
 
-  auto* chatWidget = new QWidget();
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  auto* chatWidget = new QWidget;
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   m_chatLayout = new QVBoxLayout(chatWidget);
   m_chatLayout->setContentsMargins(12, 12, 12, 12);
   m_chatLayout->setSpacing(12);
@@ -126,28 +124,28 @@ QWidget* QtChatView::createHeader() {
 }
 
 QWidget* QtChatView::createInputArea() {
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   auto* inputWidget = new QFrame(m_widget);
-  auto* layout = new QVBoxLayout(inputWidget);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  auto* layout = new QHBoxLayout(inputWidget);
   layout->setContentsMargins(12, 8, 12, 12);
   layout->setSpacing(8);
 
   // Input field
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   m_inputField = new QLineEdit(inputWidget);
   m_inputField->setPlaceholderText("Ask Copilot a question...");
   m_inputField->setMinimumHeight(36);
   std::ignore = QObject::connect(m_inputField, &QLineEdit::returnPressed, m_widget, [this]() { sendMessage(); });
 
   // Button row
-  auto* btnLayout = new QHBoxLayout();
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
   auto* sendBtn = new QPushButton("Send", inputWidget);
   sendBtn->setMinimumWidth(80);
   std::ignore = QObject::connect(sendBtn, &QPushButton::clicked, m_widget, [this]() { sendMessage(); });
 
-  btnLayout->addStretch();
-  btnLayout->addWidget(sendBtn);
-
   layout->addWidget(m_inputField);
-  layout->addLayout(btnLayout);
+  layout->addWidget(sendBtn);
 
   inputWidget->setStyleSheet(R"(
             QFrame {
@@ -159,7 +157,7 @@ QWidget* QtChatView::createInputArea() {
   return inputWidget;
 }
 
-void QtChatView::addMessage(const QString& text, MessageBubble::Role role) {
+void QtChatView::addMessage(const QString& text, Role role) {
   // Remove stretch before adding new message
   if(m_chatLayout->count() > 0) {
     auto* item = m_chatLayout->takeAt(m_chatLayout->count() - 1);

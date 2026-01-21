@@ -1,6 +1,10 @@
 #pragma once
+#include <QString>
+
 #include "view.h"
 #include "ViewLayout.h"
+
+enum class Role : uint8_t { User, Assistant };
 
 class ChatView : public View {
 public:
@@ -9,7 +13,5 @@ public:
 
   [[nodiscard]] std::string getName() const override;
 
-  // virtual void sendMessage(const std::string& message) = 0;
-
-  // virtual void clearChat() = 0;
+  virtual void addMessage(const QString& text, Role role) = 0;
 };
