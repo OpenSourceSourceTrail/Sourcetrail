@@ -30,6 +30,7 @@ public:
   std::shared_ptr<Component> createTabsComponent(ViewLayout* viewLayout, ScreenSearchSender* screenSearchSender);
   std::shared_ptr<Component> createTooltipComponent(ViewLayout* viewLayout);
   std::shared_ptr<Component> createUndoRedoComponent(ViewLayout* viewLayout);
+  std::shared_ptr<Component> createChatComponent(ViewLayout* viewLayout);
 
 private:
   const ViewFactory* m_viewFactory;

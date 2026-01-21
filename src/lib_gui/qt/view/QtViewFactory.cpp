@@ -3,6 +3,7 @@
 #include "GraphViewStyle.h"
 #include "QtBookmarkButtonsView.h"
 #include "QtBookmarkView.h"
+#include "QtChatView.hpp"
 #include "QtCodeView.h"
 #include "QtCompositeView.h"
 #include "QtCustomTrailView.h"
@@ -105,4 +106,8 @@ std::shared_ptr<DialogView> QtViewFactory::createDialogView(ViewLayout* viewLayo
 
 std::shared_ptr<GraphViewStyleImpl> QtViewFactory::createGraphStyleImpl() const {
   return std::make_shared<QtGraphViewStyleImpl>();
+}
+
+std::shared_ptr<ChatView> QtViewFactory::createChatView(ViewLayout* viewLayout) const {
+  return View::createAndAddToLayout<QtChatView>(viewLayout);
 }

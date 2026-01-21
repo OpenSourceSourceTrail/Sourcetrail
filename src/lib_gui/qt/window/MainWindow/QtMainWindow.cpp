@@ -140,11 +140,11 @@ void QtMainWindow::addView(View* view) {
   addDockWidget(Qt::TopDockWidgetArea, dock);
 
   auto* toggle = new QtViewToggle(view, this);    // NOLINT(cppcoreguidelines-owning-memory)
-  connect(dock, &QDockWidget::visibilityChanged, toggle, &QtViewToggle::toggledByUI);
+  std::ignore = connect(dock, &QDockWidget::visibilityChanged, toggle, &QtViewToggle::toggledByUI);
 
   auto* action = new QAction(name + " Window", this);    // NOLINT(cppcoreguidelines-owning-memory)
   action->setCheckable(true);
-  connect(action, &QAction::triggered, toggle, &QtViewToggle::toggledByAction);
+  std::ignore = connect(action, &QAction::triggered, toggle, &QtViewToggle::toggledByAction);
   m_viewMenu->insertAction(m_viewSeparator, action);
 
   DockWidget dockWidget{};

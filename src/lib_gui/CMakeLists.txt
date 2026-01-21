@@ -249,6 +249,12 @@ add_files(
   qt/window/QtLicenseWindow.cpp
   qt/window/QtLicenseWindow.h
   # {
+  qt/view/QtChatView.cpp
+  qt/view/QtChatView.hpp
+  qt/view/MessageBubble.cpp
+  qt/view/MessageBubble.hpp
+  # }
+  # {
   qt/window/MainWindow/MouseReleaseFilter.cpp
   qt/window/MainWindow/MouseReleaseFilter.hpp
   qt/window/MainWindow/QtMainWindow.cpp

@@ -1,6 +1,10 @@
 #pragma once
 // internal
+#include <memory>
+
+#include "ChatView.hpp"
 #include "ViewFactory.h"
+
 
 class QtViewFactory final : public ViewFactory {
 public:
@@ -35,4 +39,6 @@ public:
                                                StorageAccess* storageAccess) const override;
 
   std::shared_ptr<GraphViewStyleImpl> createGraphStyleImpl() const override;
+
+  std::shared_ptr<ChatView> createChatView(ViewLayout* viewLayout) const;
 };

@@ -24,6 +24,7 @@ class TabsView;
 class TooltipView;
 class UndoRedoView;
 class ViewLayout;
+class ChatView;
 
 class ViewFactory {
 public:
@@ -56,4 +57,6 @@ public:
                                                        StorageAccess* storageAccess) const = 0;
 
   virtual std::shared_ptr<GraphViewStyleImpl> createGraphStyleImpl() const = 0;
+
+  virtual std::shared_ptr<ChatView> createChatView(ViewLayout* viewLayout) const = 0;
 };

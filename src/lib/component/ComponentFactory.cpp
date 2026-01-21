@@ -5,6 +5,7 @@
 #include "ActivationController.h"
 #include "BookmarkController.h"
 #include "BookmarkView.h"
+#include "ChatController.hpp"
 #include "CodeController.h"
 #include "CodeView.h"
 #include "Component.h"
@@ -30,7 +31,9 @@
 #include "TooltipView.h"
 #include "UndoRedoController.h"
 #include "UndoRedoView.h"
+#include "view/ChatView.hpp"
 #include "ViewFactory.h"
+
 
 ComponentFactory::ComponentFactory(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : m_viewFactory(viewFactory), m_storageAccess(storageAccess) {}
@@ -137,6 +140,13 @@ std::shared_ptr<Component> ComponentFactory::createTooltipComponent(ViewLayout* 
 std::shared_ptr<Component> ComponentFactory::createUndoRedoComponent(ViewLayout* viewLayout) {
   std::shared_ptr<UndoRedoView> view = m_viewFactory->createUndoRedoView(viewLayout);
   std::shared_ptr<UndoRedoController> controller = std::make_shared<UndoRedoController>(m_storageAccess);
+
+  return std::make_shared<Component>(view, controller);
+}
+
+std::shared_ptr<Component> ComponentFactory::createChatComponent(ViewLayout* viewLayout) {
+  std::shared_ptr<ChatView> view = m_viewFactory->createChatView(viewLayout);
+  std::shared_ptr<ChatController> controller = std::make_shared<ChatController>();
 
   return std::make_shared<Component>(view, controller);
 }
