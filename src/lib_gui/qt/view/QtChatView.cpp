@@ -25,14 +25,24 @@ QtChatView::QtChatView(ViewLayout* viewLayout) noexcept : ChatView{viewLayout}, 
 
 QtChatView::~QtChatView() = default;
 
-
-void QtChatView::sendMessage() {
-  QString text = m_inputField->text().trimmed();
-  if(text.isEmpty()) {
-    return;
+void QtChatView::addMessage(const QString& text, Role role) {
+  // Remove stretch before adding new message
+  if(m_chatLayout->count() > 0) {
+    auto* item = m_chatLayout->takeAt(m_chatLayout->count() - 1);
+    delete item;
   }
 
-  emit messageSendRequested(text);
+  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
+  auto* bubble = new MessageBubble(text, role, m_widget);
+  m_chatLayout->addWidget(bubble);
+  m_chatLayout->addStretch();
+
+  // Scroll to bottom
+  QTimer::singleShot(50, m_widget, [this]() {
+    if(auto* scrollArea = qobject_cast<QScrollArea*>(m_chatLayout->parentWidget()->parentWidget())) {
+      scrollArea->verticalScrollBar()->setValue(scrollArea->verticalScrollBar()->maximum());
+    }
+  });
 }
 
 void QtChatView::setInputEnabled(bool enabled) {
@@ -52,6 +62,21 @@ void QtChatView::clearChat() {
     delete item;
   }
   m_chatLayout->addStretch();
+}
+
+void QtChatView::displayError(const QString& error) {
+  auto* bubble = new MessageBubble(error, Role::Error, m_widget);
+  m_chatLayout->addWidget(bubble);
+  m_chatLayout->addStretch();
+}
+
+void QtChatView::sendMessage() {
+  QString text = m_inputField->text().trimmed();
+  if(text.isEmpty()) {
+    return;
+  }
+
+  emit messageSendRequested(text);
 }
 
 void QtChatView::setupUI() {
@@ -162,26 +187,6 @@ QWidget* QtChatView::createInputArea() {
         )");
 
   return inputWidget;
-}
-
-void QtChatView::addMessage(const QString& text, Role role) {
-  // Remove stretch before adding new message
-  if(m_chatLayout->count() > 0) {
-    auto* item = m_chatLayout->takeAt(m_chatLayout->count() - 1);
-    delete item;
-  }
-
-  // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-  auto* bubble = new MessageBubble(text, role, m_widget);
-  m_chatLayout->addWidget(bubble);
-  m_chatLayout->addStretch();
-
-  // Scroll to bottom
-  QTimer::singleShot(50, m_widget, [this]() {
-    if(auto* scrollArea = qobject_cast<QScrollArea*>(m_chatLayout->parentWidget()->parentWidget())) {
-      scrollArea->verticalScrollBar()->setValue(scrollArea->verticalScrollBar()->maximum());
-    }
-  });
 }
 
 void QtChatView::applyStyles() {

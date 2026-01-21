@@ -6,7 +6,7 @@
 #include "ViewLayout.h"
 
 
-enum class Role : uint8_t { User, Assistant };
+enum class Role : uint8_t { User, Assistant, Error };
 
 class ChatView
     : public QObject
@@ -29,4 +29,6 @@ public slots:
   virtual void clearInput() = 0;
 
   virtual void clearChat() = 0;
+
+  virtual void displayError(const QString& error) = 0;
 };

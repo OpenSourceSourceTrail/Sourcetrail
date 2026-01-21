@@ -28,6 +28,8 @@ public:
 
   void clearChat() override;
 
+  void displayError(const QString& error) override;
+
 private:
   void sendMessage();
 
