@@ -3,9 +3,9 @@
 #include "utilityApp.h"
 
 TEST(utilityAppTestSuite, searchPath) {
-#ifdef D_WINDOWS
-  const std::filesystem::path exec = "";
-  const std::filesystem::path full_exec = "";
+#ifdef _WIN32
+  const std::filesystem::path exec = "cmd.exe";
+  const std::filesystem::path full_exec = "C:/Windows/system32/cmd.exe";
 #else
   const std::filesystem::path exec = "bash";
   const std::filesystem::path full_exec = "/usr/bin/bash";
@@ -14,7 +14,7 @@ TEST(utilityAppTestSuite, searchPath) {
 }
 
 TEST(utilityAppTestSuite, emptyPath) {
-#ifdef D_WINDOWS
+#ifdef _WIN32
   const std::filesystem::path exec = "";
   const std::filesystem::path full_exec = "";
 #else
@@ -25,9 +25,11 @@ TEST(utilityAppTestSuite, emptyPath) {
 }
 
 TEST(utilityAppTestSuite, getOsType) {
-#if defined(D_WINDOWS)
+#if defined(_WIN32)
   EXPECT_EQ(utility::getOsType(), OsType::Windows);
-#elif defined(D_LINUX)
+#elif defined(__APPLE__)
+  EXPECT_EQ(utility::getOsType(), OsType::MacOS);
+#elif defined(__linux__)
   EXPECT_EQ(utility::getOsType(), OsType::Linux);
 #endif
 }

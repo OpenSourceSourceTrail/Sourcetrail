@@ -11,7 +11,7 @@ using namespace ::testing;
 // NOLINTNEXTLINE
 TEST(FileHandler, goodCaseEmptyFile) {
   std::error_code errorCode;
-  constexpr auto TemptyFilePath = "/tmp/emptyFile0";
+  const auto TemptyFilePath = std::filesystem::temp_directory_path() / "emptyFile0";
   {
     auto fileHandler = FileHandler::createEmptyFile(TemptyFilePath);
     ASSERT_TRUE(fileHandler);
@@ -19,7 +19,7 @@ TEST(FileHandler, goodCaseEmptyFile) {
     ASSERT_TRUE(fs::exists(TemptyFilePath, errorCode));
     EXPECT_EQ(0, fs::file_size(TemptyFilePath, errorCode));
     EXPECT_EQ(0, fileHandler->fileSize());
-    EXPECT_THAT(fileHandler->filePath().string(), StrEq(TemptyFilePath));
+    EXPECT_THAT(fileHandler->filePath().string(), StrEq(TemptyFilePath.string()));
   }
   EXPECT_FALSE(fs::exists(TemptyFilePath, errorCode));
 }
@@ -27,9 +27,11 @@ TEST(FileHandler, goodCaseEmptyFile) {
 // NOLINTNEXTLINE
 TEST(FileHandler, emptyFileExists) {
   std::error_code errorCode;
-  constexpr auto TemptyFilePath = "/tmp/emptyFile1";
+  const auto TemptyFilePath = std::filesystem::temp_directory_path() / "emptyFile1";
   if(fs::exists(TemptyFilePath, errorCode)) {
-    fs::remove(TemptyFilePath, errorCode);
+    if(!fs::remove(TemptyFilePath, errorCode)) {
+      std::cerr << "Can not remove temporary file: " << TemptyFilePath;
+    }
   }
 
   std::ofstream oStream(TemptyFilePath);
@@ -39,7 +41,9 @@ TEST(FileHandler, emptyFileExists) {
   ASSERT_FALSE(fileHandler);
 
   if(fs::exists(TemptyFilePath, errorCode)) {
-    fs::remove(TemptyFilePath, errorCode);
+    if(!fs::remove(TemptyFilePath, errorCode)) {
+      std::cerr << "Can not remove temporary file: " << TemptyFilePath;
+    }
   }
 }
 
@@ -57,7 +61,7 @@ TEST(FileHandler, emptyFileCanNotCreated) {
 // NOLINTNEXTLINE
 TEST(FileHandler, goodCaseFromBuffer) {
   constexpr auto BufferSize = 32U;
-  constexpr auto FilePath = "/tmp/fromDataFile0";
+  const auto FilePath = std::filesystem::temp_directory_path() / "fromDataFile0";
   std::error_code errorCode;
   {
     const std::vector<char> buffer(BufferSize, 0);
@@ -71,7 +75,7 @@ TEST(FileHandler, goodCaseFromBuffer) {
 
 // NOLINTNEXTLINE
 TEST(FileHandler, PassZeroToFromBuffer) {
-  constexpr auto FilePath = "/tmp/fromDataFile0";
+  const auto FilePath = std::filesystem::temp_directory_path() / "fromDataFile0";
   std::error_code errorCode;
   {
     const std::vector<char> buffer;
@@ -85,7 +89,7 @@ TEST(FileHandler, PassZeroToFromBuffer) {
 
 // NOLINTNEXTLINE
 TEST(FileHandler, goodCaseRandomData) {
-  constexpr auto RandomFilePath = "/tmp/randomDataFile0";
+  const auto RandomFilePath = std::filesystem::temp_directory_path() / "randomDataFile0";
   constexpr auto RandomFileSize = 512U;
   std::error_code errorCode;
   {
@@ -99,7 +103,7 @@ TEST(FileHandler, goodCaseRandomData) {
 
 // NOLINTNEXTLINE
 TEST(FileHandler, PassZeroToRandomData) {
-  constexpr auto RandomFilePath = "/tmp/randomDataFile1";
+  const auto RandomFilePath = std::filesystem::temp_directory_path() / "randomDataFile1";
   constexpr auto RandomFileSize = 0U;
   std::error_code errorCode;
   {
