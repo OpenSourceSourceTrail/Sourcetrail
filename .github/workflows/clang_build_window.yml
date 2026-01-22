@@ -10,53 +10,62 @@ on:
 
 env:
   CLANG_VERSION: ${{ github.event.inputs.clang_version || '19.1.7' }}
-  INSTALL_DIR: ${{ github.workspace }}/clang-install
+  INSTALL_DIR: ${{ github.workspace }}\clang-install
 
 jobs:
   build-clang-windows:
     runs-on: windows-latest
-    environment: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
-    defaults:
-      run:
-        shell: cmd
     steps:
+      - name: Setup MSVC Environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Install Ninja
+        run: |
+          choco install ninja -y
+          ninja --version
+
       - name: Clone LLVM project
         run: |
-          git clone https://github.com/llvm/llvm-project.git
-          cd llvm-project
-          git checkout tags/llvmorg-${{ env.CLANG_VERSION }}
+          git clone --depth 1 --branch llvmorg-${{ env.CLANG_VERSION }} https://github.com/llvm/llvm-project.git
 
       - name: Configure CMake
         working-directory: llvm-project
+        shell: cmd
         run: |
           cmake -S llvm -B build ^
             -G Ninja ^
             -DCMAKE_BUILD_TYPE=Release ^
             -DCMAKE_INSTALL_PREFIX=${{ env.INSTALL_DIR }} ^
-            -DLLVM_ENABLE_PROJECTS:STRING=clang ^
-            -DLLVM_ENABLE_RTTI:BOOL=ON ^
-            -DLLVM_TARGETS_TO_BUILD=host
+            -DLLVM_ENABLE_PROJECTS=clang ^
+            -DLLVM_ENABLE_RTTI=ON ^
+            -DLLVM_TARGETS_TO_BUILD=X86 ^
+            -DLLVM_INCLUDE_TESTS=OFF ^
+            -DLLVM_INCLUDE_EXAMPLES=OFF ^
+            -DLLVM_INCLUDE_BENCHMARKS=OFF
 
       - name: Build Clang
         working-directory: llvm-project/build
-        run: |
-          ninja
+        run: ninja clang
 
       - name: Install Clang
         working-directory: llvm-project/build
-        run: |
-          ninja install
+        run: ninja install
 
       - name: Compress Clang Installation
+        shell: pwsh
         run: |
-          tar -czvf clang-${{ env.CLANG_VERSION }}-windows.tar.gz -C ${{ env.INSTALL_DIR }} .
+          Compress-Archive -Path "${{ env.INSTALL_DIR }}\*" -DestinationPath "clang-${{ env.CLANG_VERSION }}-windows.zip"
 
       - name: Upload Clang Artifact
         uses: actions/upload-artifact@v4
         with:
           name: clang-${{ env.CLANG_VERSION }}-windows
-          path: clang-${{ env.CLANG_VERSION }}-windows.tar.gz
+          path: clang-${{ env.CLANG_VERSION }}-windows.zip
+          retention-days: 7
 
       - name: Cleanup
+        shell: pwsh
         run: |
-          rm -rf llvm-project
+          Remove-Item -Recurse -Force llvm-project -ErrorAction SilentlyContinue
