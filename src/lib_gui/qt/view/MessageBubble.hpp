@@ -1,15 +1,15 @@
 #pragma once
 #include <QFrame>
 
-#include "ChatView.hpp"
+#include "ChatMessage.hpp"
 
 class MessageBubble : public QFrame {
   Q_OBJECT
 public:
-  MessageBubble(const QString& text, Role role, QWidget* parent = nullptr);
+  MessageBubble(const QString& text, MessageRole role, QWidget* parent = nullptr);
 
 private:
   void setupUI(const QString& text);
 
-  Role m_role;
+  MessageRole mRole;
 };

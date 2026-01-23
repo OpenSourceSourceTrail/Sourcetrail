@@ -1,10 +1,10 @@
 #include "MessageBubble.hpp"
 
-#include <qboxlayout.h>
-#include <qlabel.h>
+#include <QBoxLayout>
+#include <QLabel>
 
 
-MessageBubble::MessageBubble(const QString& text, Role role, QWidget* parent) : QFrame(parent), m_role(role) {
+MessageBubble::MessageBubble(const QString& text, MessageRole role, QWidget* parent) : QFrame(parent), mRole(role) {
   setupUI(text);
 }
 

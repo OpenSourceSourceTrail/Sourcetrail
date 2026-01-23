@@ -186,6 +186,8 @@ add_files(
   qt/utility/QtThreadedFunctor.h
   qt/utility/utilityQt.cpp
   qt/utility/utilityQt.h
+  qt/view/MessageBubbleWidget.cpp
+  qt/view/MessageBubbleWidget.hpp
   qt/view/QtBookmarkButtonsView.cpp
   qt/view/QtBookmarkButtonsView.h
   qt/view/QtBookmarkView.cpp
