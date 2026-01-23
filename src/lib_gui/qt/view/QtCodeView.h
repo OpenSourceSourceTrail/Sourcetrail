@@ -1,6 +1,4 @@
-#ifndef QT_CODE_VIEW_H
-#define QT_CODE_VIEW_H
-
+#pragma once
 #include "CodeView.h"
 #include "QtThreadedFunctor.h"
 
@@ -8,7 +6,8 @@ class QtCodeNavigator;
 
 class QtCodeView : public CodeView {
 public:
-  QtCodeView(ViewLayout* viewLayout);
+  QtCodeView(ViewLayout* viewLayout) noexcept;
+  Q_DISABLE_COPY_MOVE(QtCodeView)
   ~QtCodeView() override;
 
   // View implementation
@@ -58,5 +57,3 @@ private:
 
   bool m_hasFocus = false;
 };
-
-#endif    // QT_CODE_VIEW_H

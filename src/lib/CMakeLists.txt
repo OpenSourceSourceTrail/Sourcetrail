@@ -24,6 +24,7 @@ add_files(
   component/ComponentFactory.h
   component/ComponentManager.cpp
   component/ComponentManager.h
+  # Controller {
   component/controller/ActivationController.cpp
   component/controller/ActivationController.h
   component/controller/BookmarkController.cpp
@@ -73,12 +74,14 @@ add_files(
   component/controller/UndoRedoController.h
   component/controller/ChatController.cpp
   component/controller/ChatController.hpp
+  # }
   component/NetworkFactory.cpp
   component/NetworkFactory.h
   component/Tab.cpp
   component/Tab.h
   component/TabId.cpp
   component/TabId.h
+  # View {
   component/view/BookmarkButtonsView.cpp
   component/view/BookmarkButtonsView.h
   component/view/BookmarkView.cpp
@@ -129,9 +132,11 @@ add_files(
   component/view/ViewLayout.h
   component/view/ViewWidgetWrapper.cpp
   component/view/ViewWidgetWrapper.h
+  # }
   data/ChatMessage.hpp
   data/ChatModel.cpp
   data/ChatModel.hpp
+
   data/bookmark/Bookmark.cpp
   data/bookmark/Bookmark.h
   data/bookmark/BookmarkCategory.cpp
@@ -140,6 +145,7 @@ add_files(
   data/bookmark/EdgeBookmark.h
   data/bookmark/NodeBookmark.cpp
   data/bookmark/NodeBookmark.h
+  # }
   data/fulltextsearch/FullTextSearchIndex.cpp
   data/fulltextsearch/FullTextSearchIndex.h
   data/fulltextsearch/SuffixArray.cpp
