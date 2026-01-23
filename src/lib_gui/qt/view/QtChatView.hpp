@@ -33,6 +33,8 @@ public:
   Q_DISABLE_COPY_MOVE(QtChatView)
   ~QtChatView() override;
 
+  void createWidgetWrapper() override;
+
   // ChatView interface - pure presentation updates
   void setInputEnabled(bool enabled) override;
   void clearInput() override;
@@ -60,7 +62,7 @@ private:
   void handleSubmit();
 
   std::shared_ptr<ChatModel> mModel;
-  std::unique_ptr<QWidget> mWidget;
+  QWidget* mWidget{nullptr};
 
   // Non-owning pointers to widgets owned by Qt parent-child
   QVBoxLayout* mChatLayout{nullptr};

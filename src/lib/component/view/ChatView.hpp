@@ -16,8 +16,6 @@ public:
 
   [[nodiscard]] std::string getName() const override;
 
-  void createWidgetWrapper() override;
-
   void refreshView() override;
 
 signals:

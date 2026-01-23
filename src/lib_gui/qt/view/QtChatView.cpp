@@ -19,14 +19,17 @@
 
 
 QtChatView::QtChatView(ViewLayout* viewLayout, std::shared_ptr<ChatModel> model)
-    : ChatView{viewLayout}, mModel{std::move(model)}, mWidget{std::make_unique<QWidget>()} {
-  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(mWidget.get()));
+    : ChatView{viewLayout}, mModel{std::move(model)}, mWidget{new QWidget} {
   setupUI();
   setupConnections();
   loadStyleSheet();
 }
 
 QtChatView::~QtChatView() = default;
+
+void QtChatView::createWidgetWrapper() {
+  setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(mWidget));
+}
 
 void QtChatView::setInputEnabled(bool enabled) {
   if(mInputField) {
@@ -47,7 +50,7 @@ void QtChatView::focusInput() {
 }
 
 void QtChatView::setupUI() {
-  auto* mainLayout = new QVBoxLayout{mWidget.get()};
+  auto* mainLayout = new QVBoxLayout{mWidget};
   mainLayout->setContentsMargins(0, 0, 0, 0);
   mainLayout->setSpacing(0);
 
@@ -182,7 +185,7 @@ void QtChatView::loadStyleSheet() {
 }
 
 QWidget* QtChatView::createHeader() {
-  auto* header = new QFrame{mWidget.get()};
+  auto* header = new QFrame{mWidget};
   header->setObjectName("header");
 
   auto* layout = new QHBoxLayout{header};
@@ -208,7 +211,7 @@ QWidget* QtChatView::createHeader() {
 }
 
 QWidget* QtChatView::createChatArea() {
-  mScrollArea = new QScrollArea{mWidget.get()};
+  mScrollArea = new QScrollArea{mWidget};
   mScrollArea->setWidgetResizable(true);
   mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   mScrollArea->setFrameShape(QFrame::NoFrame);
@@ -225,7 +228,7 @@ QWidget* QtChatView::createChatArea() {
 }
 
 QWidget* QtChatView::createInputArea() {
-  auto* inputWidget = new QFrame{mWidget.get()};
+  auto* inputWidget = new QFrame{mWidget};
   inputWidget->setObjectName("inputArea");
 
   auto* layout = new QHBoxLayout{inputWidget};
