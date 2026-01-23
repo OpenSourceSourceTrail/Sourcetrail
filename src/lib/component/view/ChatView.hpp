@@ -5,30 +5,29 @@
 #include "view.h"
 #include "ViewLayout.h"
 
-
-enum class Role : uint8_t { User, Assistant, Error };
-
 class ChatView
     : public QObject
     , public View {
   Q_OBJECT
 public:
   explicit ChatView(ViewLayout* viewLayout) noexcept;
+  Q_DISABLE_COPY_MOVE(ChatView)
   ~ChatView() override;
 
   [[nodiscard]] std::string getName() const override;
 
+  void createWidgetWrapper() override;
+
+  void refreshView() override;
+
 signals:
-  void messageSendRequested(const QString& text);
+  void messageSubmitted(const QString& text);
+  void clearRequested();
 
 public slots:
-  virtual void addMessage(const QString& text, Role role) = 0;
-
   virtual void setInputEnabled(bool enabled) = 0;
 
   virtual void clearInput() = 0;
 
-  virtual void clearChat() = 0;
-
-  virtual void displayError(const QString& error) = 0;
+  virtual void focusInput() = 0;
 };
