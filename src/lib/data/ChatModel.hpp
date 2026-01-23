@@ -4,6 +4,7 @@
 #include <QAbstractListModel>
 
 #include <nonstd/expected.hpp>
+#include <qtclasshelpermacros.h>
 
 #include "ChatMessage.hpp"
 
@@ -22,13 +23,8 @@ public:
   enum class Roles : int { ContentRole = Qt::UserRole + 1, RoleRole, TimestampRole };
 
   explicit ChatModel(QObject* parent = nullptr);
-  ~ChatModel() override = default;
-
-  // Disable copy, enable move
-  ChatModel(const ChatModel&) = delete;
-  ChatModel& operator=(const ChatModel&) = delete;
-  ChatModel(ChatModel&&) noexcept = default;
-  ChatModel& operator=(ChatModel&&) noexcept = default;
+  Q_DISABLE_COPY_MOVE(ChatModel)
+  ~ChatModel() override;
 
   // QAbstractItemModel interface
   [[nodiscard]] int rowCount(const QModelIndex& parent = QModelIndex{}) const override;

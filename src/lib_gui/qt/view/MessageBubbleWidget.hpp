@@ -34,5 +34,5 @@ private:
   [[nodiscard]] static QString roleToStyleClass(MessageRole role) noexcept;
 
   QLabel* mContentLabel{nullptr};       // Owned by Qt parent-child
-  QLabel* m_timestampLabel{nullptr};    // Owned by Qt parent-child
+  QLabel* mTimestampLabel{nullptr};    // Owned by Qt parent-child
 };

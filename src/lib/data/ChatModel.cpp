@@ -4,6 +4,8 @@ ChatModel::ChatModel(QObject* parent) : QAbstractListModel{parent} {
   m_messages.reserve(100);    // Reasonable default capacity
 }
 
+ChatModel::~ChatModel() = default;
+
 int ChatModel::rowCount([[maybe_unused]] const QModelIndex& parent) const {
   return static_cast<int>(m_messages.size());
 }

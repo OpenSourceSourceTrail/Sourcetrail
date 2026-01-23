@@ -297,7 +297,6 @@ void QtChatView::handleSubmit() {
   if(text.isEmpty()) {
     return;
   }
-  qDebug() << "User submitted message:" << text;
 
   // Forward to controller - view has no business logic
   emit ChatView::messageSubmitted(text);

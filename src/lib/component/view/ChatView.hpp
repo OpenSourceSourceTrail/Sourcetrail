@@ -2,7 +2,7 @@
 #include <QObject>
 #include <QString>
 
-#include "view.h"
+#include "View.h"
 #include "ViewLayout.h"
 
 class ChatView
