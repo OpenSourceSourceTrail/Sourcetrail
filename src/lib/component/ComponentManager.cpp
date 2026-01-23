@@ -100,6 +100,9 @@ void ComponentManager::setupMain(ViewLayout* viewLayout, Id appId) {
 
   auto customTrailComponent = m_componentFactory.createCustomTrailComponent(viewLayout);
   m_components.push_back(customTrailComponent);
+
+  auto chatComponent = m_componentFactory.createChatComponent(tabbedView.get());
+  m_components.push_back(chatComponent);
 }
 
 void ComponentManager::setupTab(ViewLayout* viewLayout, Id tabId, ScreenSearchSender* screenSearchSender) {

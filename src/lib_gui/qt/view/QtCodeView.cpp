@@ -9,9 +9,9 @@
 #include "ResourcePaths.h"
 #include "utilityQt.h"
 
-QtCodeView::QtCodeView(ViewLayout* viewLayout) : CodeView(viewLayout), m_widget{new QtCodeNavigator} {
-  std::ignore = QObject::connect(m_widget, &QtCodeNavigator::focusIn, m_widget, [this]() { setNavigationFocus(true); });
-  std::ignore = QObject::connect(m_widget, &QtCodeNavigator::focusOut, m_widget, [this]() { setNavigationFocus(false); });
+QtCodeView::QtCodeView(ViewLayout* viewLayout) noexcept : CodeView(viewLayout), m_widget{new QtCodeNavigator} {
+  QObject::connect(m_widget, &QtCodeNavigator::focusIn, m_widget, [this]() { setNavigationFocus(true); });
+  QObject::connect(m_widget, &QtCodeNavigator::focusOut, m_widget, [this]() { setNavigationFocus(false); });
 }
 
 QtCodeView::~QtCodeView() = default;
@@ -21,8 +21,8 @@ void QtCodeView::createWidgetWrapper() {
 }
 
 void QtCodeView::refreshView() {
-  if(getController()) {
-    m_widget->setSchedulerId(getController()->getTabId());
+  if(auto* controller = getController(); nullptr != controller) {
+    m_widget->setSchedulerId(controller->getTabId());
   }
 
   m_onQtThread([this]() {

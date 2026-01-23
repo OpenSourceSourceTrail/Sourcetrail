@@ -18,6 +18,27 @@ add_files(
   app/LanguagePackage.h
   app/LanguagePackageManager.cpp
   app/LanguagePackageManager.h
+  component/Component.cpp
+  component/Component.h
+  component/ComponentFactory.cpp
+  component/ComponentFactory.h
+  component/ComponentManager.cpp
+  component/ComponentManager.h
+  # Controller {
+  component/controller/ActivationController.cpp
+  component/controller/ActivationController.h
+  component/controller/BookmarkController.cpp
+  component/controller/BookmarkController.h
+  component/controller/CodeController.cpp
+  component/controller/CodeController.h
+  component/controller/Controller.cpp
+  component/controller/Controller.h
+  component/controller/CustomTrailController.cpp
+  component/controller/CustomTrailController.h
+  component/controller/ErrorController.cpp
+  component/controller/ErrorController.h
+  component/controller/GraphController.cpp
+  component/controller/GraphController.h
   component/controller/helper/ActivationListener.cpp
   component/controller/helper/ActivationListener.h
   component/controller/helper/BucketLayouter.cpp
@@ -33,20 +54,6 @@ add_files(
   component/controller/helper/SnippetMerger.h
   component/controller/helper/TrailLayouter.cpp
   component/controller/helper/TrailLayouter.h
-  component/controller/ActivationController.cpp
-  component/controller/ActivationController.h
-  component/controller/BookmarkController.cpp
-  component/controller/BookmarkController.h
-  component/controller/CodeController.cpp
-  component/controller/CodeController.h
-  component/controller/Controller.cpp
-  component/controller/Controller.h
-  component/controller/CustomTrailController.cpp
-  component/controller/CustomTrailController.h
-  component/controller/ErrorController.cpp
-  component/controller/ErrorController.h
-  component/controller/GraphController.cpp
-  component/controller/GraphController.h
   component/controller/IDECommunicationController.cpp
   component/controller/IDECommunicationController.h
   component/controller/RefreshController.cpp
@@ -65,13 +72,22 @@ add_files(
   component/controller/TooltipController.h
   component/controller/UndoRedoController.cpp
   component/controller/UndoRedoController.h
-  component/view/helper/CodeScrollParams.h
-  component/view/helper/CodeSnippetParams.cpp
-  component/view/helper/CodeSnippetParams.h
+  component/controller/ChatController.cpp
+  component/controller/ChatController.hpp
+  # }
+  component/NetworkFactory.cpp
+  component/NetworkFactory.h
+  component/Tab.cpp
+  component/Tab.h
+  component/TabId.cpp
+  component/TabId.h
+  # View {
   component/view/BookmarkButtonsView.cpp
   component/view/BookmarkButtonsView.h
   component/view/BookmarkView.cpp
   component/view/BookmarkView.h
+  component/view/ChatView.cpp
+  component/view/ChatView.hpp
   component/view/CodeView.cpp
   component/view/CodeView.h
   component/view/CompositeView.cpp
@@ -86,6 +102,9 @@ add_files(
   component/view/GraphViewStyle.cpp
   component/view/GraphViewStyle.h
   component/view/GraphViewStyleImpl.h
+  component/view/helper/CodeScrollParams.h
+  component/view/helper/CodeSnippetParams.cpp
+  component/view/helper/CodeSnippetParams.h
   component/view/MainView.cpp
   component/view/MainView.h
   component/view/RefreshView.cpp
@@ -113,18 +132,11 @@ add_files(
   component/view/ViewLayout.h
   component/view/ViewWidgetWrapper.cpp
   component/view/ViewWidgetWrapper.h
-  component/Component.cpp
-  component/Component.h
-  component/ComponentFactory.cpp
-  component/ComponentFactory.h
-  component/ComponentManager.cpp
-  component/ComponentManager.h
-  component/NetworkFactory.cpp
-  component/NetworkFactory.h
-  component/Tab.cpp
-  component/Tab.h
-  component/TabId.cpp
-  component/TabId.h
+  # }
+  data/ChatMessage.hpp
+  data/ChatModel.cpp
+  data/ChatModel.hpp
+
   data/bookmark/Bookmark.cpp
   data/bookmark/Bookmark.h
   data/bookmark/BookmarkCategory.cpp
@@ -133,6 +145,7 @@ add_files(
   data/bookmark/EdgeBookmark.h
   data/bookmark/NodeBookmark.cpp
   data/bookmark/NodeBookmark.h
+  # }
   data/fulltextsearch/FullTextSearchIndex.cpp
   data/fulltextsearch/FullTextSearchIndex.h
   data/fulltextsearch/SuffixArray.cpp

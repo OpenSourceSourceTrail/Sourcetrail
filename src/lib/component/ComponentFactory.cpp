@@ -1,10 +1,13 @@
 #include "ComponentFactory.h"
 
 #include <memory>
+#include <tuple>
 
 #include "ActivationController.h"
 #include "BookmarkController.h"
 #include "BookmarkView.h"
+#include "ChatController.hpp"
+#include "ChatModel.hpp"
 #include "CodeController.h"
 #include "CodeView.h"
 #include "Component.h"
@@ -14,6 +17,7 @@
 #include "ErrorView.h"
 #include "GraphController.h"
 #include "GraphView.h"
+#include "ILLMService.hpp"
 #include "RefreshController.h"
 #include "RefreshView.h"
 #include "ScreenSearchController.h"
@@ -30,7 +34,9 @@
 #include "TooltipView.h"
 #include "UndoRedoController.h"
 #include "UndoRedoView.h"
+#include "view/ChatView.hpp"
 #include "ViewFactory.h"
+
 
 ComponentFactory::ComponentFactory(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : m_viewFactory(viewFactory), m_storageAccess(storageAccess) {}
@@ -139,4 +145,14 @@ std::shared_ptr<Component> ComponentFactory::createUndoRedoComponent(ViewLayout*
   std::shared_ptr<UndoRedoController> controller = std::make_shared<UndoRedoController>(m_storageAccess);
 
   return std::make_shared<Component>(view, controller);
+}
+
+std::shared_ptr<Component> ComponentFactory::createChatComponent(ViewLayout* viewLayout) {
+  auto model = std::make_shared<ChatModel>();
+  std::shared_ptr<ILLMService> llmService;
+  std::shared_ptr<ChatView> view = m_viewFactory->createChatView(viewLayout, model);
+  auto controller = std::make_shared<ChatController>(model, llmService);
+  controller->attachView(view.get());
+
+  return std::make_shared<Component>(std::move(view), std::move(controller));
 }

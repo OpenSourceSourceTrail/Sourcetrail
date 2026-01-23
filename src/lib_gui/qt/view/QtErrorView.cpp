@@ -1,5 +1,7 @@
 #include "QtErrorView.h"
 
+#include <tuple>
+
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QFrame>
@@ -25,6 +27,7 @@
 #include "type/MessageProjectEdit.h"
 #include "utilityQt.h"
 
+
 QIcon QtErrorView::s_errorIcon;
 
 QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_controllerProxy(this, TabId::app()) {
@@ -36,13 +39,13 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
 
   QWidget* widget = QtViewWidgetWrapper::getWidgetOfView(this);
 
-  QBoxLayout* layout = new QVBoxLayout();
+  QBoxLayout* layout = new QVBoxLayout;
   layout->setContentsMargins(0, 0, 0, 0);
   layout->setSpacing(0);
   widget->setLayout(layout);
 
-  m_table = new QtTable(widget);
-  m_model = new QStandardItemModel(widget);
+  m_table = new QtTable{widget};               // NOLINT(cppcoreguidelines-owning-memory)
+  m_model = new QStandardItemModel{widget};    // NOLINT(cppcoreguidelines-owning-memory)
   m_table->setSortingEnabled(true);
   m_table->setModel(m_model);
 
@@ -77,7 +80,7 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
   layout->addWidget(m_table);
 
   // Setup Checkboxes
-  auto* checkboxes = new QHBoxLayout;
+  auto* checkboxes = new QHBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   checkboxes->setContentsMargins(10, 3, 0, 3);
   checkboxes->setSpacing(0);
 
@@ -89,6 +92,7 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
     m_showNonIndexedErrors = createFilterCheckbox(
         QStringLiteral("Errors in non-indexed files"), m_errorFilter.unindexedError, checkboxes);
 
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_helpButton = new QtHelpButton(createErrorHelpButtonInfo());
     m_helpButton->setObjectName(QStringLiteral("help_button"));
     checkboxes->addWidget(m_helpButton);
@@ -97,12 +101,14 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
   checkboxes->addStretch();
 
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_allLabel = new QLabel(QLatin1String(""));
     checkboxes->addWidget(m_allLabel);
     m_allLabel->hide();
 
     checkboxes->addSpacing(5);
 
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_allButton = new QPushButton(QLatin1String(""));
     m_allButton->setObjectName(QStringLiteral("screen_button"));
     std::ignore = connect(m_allButton, &QPushButton::clicked, [this]() {
@@ -112,6 +118,7 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
     checkboxes->addWidget(m_allButton);
     m_allButton->hide();
 
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_errorLabel = new QLabel(QLatin1String(""));
     checkboxes->addWidget(m_errorLabel);
   }
@@ -119,12 +126,13 @@ QtErrorView::QtErrorView(ViewLayout* pViewLayout) : ErrorView(pViewLayout), m_co
   checkboxes->addSpacing(10);
 
   {
+    // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
     m_editButton = new QtSelfRefreshIconButton(QStringLiteral("Edit Project"),
                                                ResourcePaths::getGuiDirectoryPath().concatenate(L"code_view/images/edit.png"),
                                                "window/button");
     m_editButton->setObjectName(QStringLiteral("screen_button"));
     m_editButton->setToolTip(QStringLiteral("edit project"));
-    connect(m_editButton, &QPushButton::clicked, []() { MessageProjectEdit().dispatch(); });
+    std::ignore = connect(m_editButton, &QPushButton::clicked, []() { MessageProjectEdit().dispatch(); });
 
     checkboxes->addWidget(m_editButton);
   }

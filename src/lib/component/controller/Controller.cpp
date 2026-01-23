@@ -1,17 +1,16 @@
 #include "Controller.h"
 
-Controller::Controller() : m_component(nullptr) {}
+#include "GlobalId.hpp"
 
-Controller::~Controller() {}
+
+Controller::Controller() = default;
+
+Controller::~Controller() = default;
 
 void Controller::setComponent(Component* component) {
-  m_component = component;
+  mComponent = component;
 }
 
 Id Controller::getTabId() const {
-  if(m_component) {
-    return m_component->getTabId();
-  }
-
-  return 0;
+  return nullptr != mComponent ? mComponent->getTabId() : 0;
 }

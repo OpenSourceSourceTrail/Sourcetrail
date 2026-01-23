@@ -1,6 +1,10 @@
 #pragma once
+#include <concepts>
 
 #include "Component.h"
+
+template <typename T>
+concept IsView = std::is_base_of_v<View, T>;
 
 class Controller {
 public:
@@ -15,18 +19,16 @@ public:
 
 protected:
   template <typename ViewType>
-  ViewType* getView() const;
+  ViewType* getView() const
+    requires IsView<ViewType>;
 
 private:
-  Component* m_component;
+  Component* mComponent = nullptr;
 };
 
-
 template <typename ViewType>
-ViewType* Controller::getView() const {
-  if(m_component != nullptr) {
-    return m_component->getView<ViewType>();
-  }
-
-  return nullptr;
+ViewType* Controller::getView() const
+  requires IsView<ViewType>
+{
+  return nullptr != mComponent ? mComponent->getView<ViewType>() : nullptr;
 }

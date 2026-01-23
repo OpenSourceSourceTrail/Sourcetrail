@@ -4,6 +4,8 @@
 #include "QtViewWidgetWrapper.h"
 #include "type/MessageRefreshUIState.h"
 #include "utilityApp.h"
+#include "View.h"
+
 
 QtMainView::QtMainView(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : MainView(viewFactory, storageAccess), m_window{new QtMainWindow} {
