@@ -1,7 +1,6 @@
 #pragma once
-// STL
 #include <memory>
-// internal
+
 #include "CompositeView.h"
 #include "DialogView.h"
 
@@ -25,6 +24,7 @@ class TooltipView;
 class UndoRedoView;
 class ViewLayout;
 class ChatView;
+class ChatModel;
 
 class ViewFactory {
 public:
@@ -58,5 +58,5 @@ public:
 
   virtual std::shared_ptr<GraphViewStyleImpl> createGraphStyleImpl() const = 0;
 
-  virtual std::shared_ptr<ChatView> createChatView(ViewLayout* viewLayout) const = 0;
+  virtual std::shared_ptr<ChatView> createChatView(ViewLayout* viewLayout, std::shared_ptr<ChatModel> model) const = 0;
 };

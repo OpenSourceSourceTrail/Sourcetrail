@@ -108,6 +108,6 @@ std::shared_ptr<GraphViewStyleImpl> QtViewFactory::createGraphStyleImpl() const 
   return std::make_shared<QtGraphViewStyleImpl>();
 }
 
-std::shared_ptr<ChatView> QtViewFactory::createChatView(ViewLayout* viewLayout) const {
-  return View::createAndAddToLayout<QtChatView>(viewLayout);
+std::shared_ptr<ChatView> QtViewFactory::createChatView(ViewLayout* viewLayout, std::shared_ptr<ChatModel> model) const {
+  return View::createAndAddToLayout<QtChatView>(viewLayout, std::move(model));
 }

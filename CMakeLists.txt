@@ -190,6 +190,7 @@ add_subdirectory(src/external)
 add_subdirectory(src/lib)
 add_subdirectory(src/lib_gui)
 #---------------------------------------------------------------------------------------------------------------------------------
+add_subdirectory(src/llm)
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
 add_subdirectory(src/messaging)
@@ -239,6 +240,7 @@ target_link_libraries(
           Sourcetrail::core::utility::file::FileSystem
           Sourcetrail::core::utility::file::utilityFile
           Sourcetrail::core::utility::file::FileManager
+          ILLMService
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
           Boost::program_options
