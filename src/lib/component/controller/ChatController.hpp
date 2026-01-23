@@ -2,30 +2,42 @@
 #include <QObject>
 #include <QString>
 
-// TODO(Hussein): Remove it
-#include "ChatView.hpp"
 #include "Controller.h"
+
+class ChatView;
+class ChatModel;
+class ILLMService;
 
 class ChatController
     : public QObject
     , public Controller {
   Q_OBJECT
 public:
-  explicit ChatController() noexcept;
+  explicit ChatController(std::shared_ptr<ChatModel> model,
+                          std::shared_ptr<ILLMService> llmService,
+                          QObject* parent = nullptr) noexcept;
   Q_DISABLE_COPY_MOVE(ChatController)
   ~ChatController() noexcept override;
 
+  void attachView(ChatView* view);
   void clear() override {}
 
-  void sendMessage(const QString& message);
+public slots:
+  void handleUserMessage(const QString& content);
+  void handleClearRequest();
 
 signals:
-  void messageToAdd(const QString& message, Role role);
-  void inputStateChanged(bool enabled);
-  void clearInputRequested();
+  void processingStarted();
+  void processingCompleted();
   void errorOccurred(const QString& error);
 
-public slots:
-  void onResponseReceived(const QString& message);
-  void onErrorOccurred(const QString& error);
+private slots:
+  void onLLMResponseReceived(const QString& response);
+  void onLLMError(const QString& error);
+
+private:
+  std::shared_ptr<ChatModel> mModel;
+  std::shared_ptr<ILLMService> mLlmService;
+  ChatView* mView{nullptr};    // Non-owning
+  bool mIsProcessing{false};
 };
