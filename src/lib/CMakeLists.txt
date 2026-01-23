@@ -130,6 +130,8 @@ add_files(
   component/view/ViewWidgetWrapper.cpp
   component/view/ViewWidgetWrapper.h
   data/ChatMessage.hpp
+  data/ChatModel.cpp
+  data/ChatModel.hpp
   data/bookmark/Bookmark.cpp
   data/bookmark/Bookmark.h
   data/bookmark/BookmarkCategory.cpp
