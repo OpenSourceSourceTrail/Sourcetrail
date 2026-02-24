@@ -8,8 +8,7 @@
 
 #include "ChatView.hpp"
 
-class QVBoxLayout;
-class QScrollArea;
+class QListView;
 class QLineEdit;
 class ChatModel;
 class ChatMessage;
@@ -65,7 +64,6 @@ private:
   QWidget* mWidget{nullptr};
 
   // Non-owning pointers to widgets owned by Qt parent-child
-  QVBoxLayout* mChatLayout{nullptr};
-  QScrollArea* mScrollArea{nullptr};
+  QListView* mChatListView{nullptr};
   QLineEdit* mInputField{nullptr};
 };

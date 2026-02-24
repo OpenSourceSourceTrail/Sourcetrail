@@ -5,16 +5,16 @@
 #include <QFrame>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListView>
 #include <QPushButton>
-#include <QScrollArea>
 #include <QScrollBar>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <qlogging.h>
 
 #include "ChatModel.hpp"
 #include "ChatView.hpp"
-#include "MessageBubbleWidget.hpp"
+#include "MessageBubbleDelegate.hpp"
 #include "QtViewWidgetWrapper.h"
 
 
@@ -32,19 +32,19 @@ void QtChatView::createWidgetWrapper() {
 }
 
 void QtChatView::setInputEnabled(bool enabled) {
-  if(mInputField) {
+  if(mInputField != nullptr) {
     mInputField->setEnabled(enabled);
   }
 }
 
 void QtChatView::clearInput() {
-  if(mInputField) {
+  if(mInputField != nullptr) {
     mInputField->clear();
   }
 }
 
 void QtChatView::focusInput() {
-  if(mInputField) {
+  if(mInputField != nullptr) {
     mInputField->setFocus();
   }
 }
@@ -60,9 +60,9 @@ void QtChatView::setupUI() {
 }
 
 void QtChatView::setupConnections() {
-  // Model -> View data binding
-  connect(mModel.get(), &ChatModel::messageAdded, this, &QtChatView::onMessageAdded);
-  connect(mModel.get(), &ChatModel::messagesCleared, this, &QtChatView::onMessagesCleared);
+  // Connect model signals for scroll behavior
+  [[maybe_unused]] auto conn1 = connect(mModel.get(), &ChatModel::messageAdded, this, &QtChatView::onMessageAdded);
+  [[maybe_unused]] auto conn2 = connect(mModel.get(), &ChatModel::messagesCleared, this, &QtChatView::onMessagesCleared);
 }
 
 void QtChatView::loadStyleSheet() {
@@ -201,7 +201,7 @@ QWidget* QtChatView::createHeader() {
   auto* clearBtn = new QPushButton{"Clear", header};
   clearBtn->setObjectName("clearButton");
 
-  connect(clearBtn, &QPushButton::clicked, this, &ChatView::clearRequested);
+  [[maybe_unused]] auto clearConn = connect(clearBtn, &QPushButton::clicked, this, &ChatView::clearRequested);
 
   layout->addWidget(titleLabel);
   layout->addStretch();
@@ -211,20 +211,17 @@ QWidget* QtChatView::createHeader() {
 }
 
 QWidget* QtChatView::createChatArea() {
-  mScrollArea = new QScrollArea{mWidget};
-  mScrollArea->setWidgetResizable(true);
-  mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-  mScrollArea->setFrameShape(QFrame::NoFrame);
+  mChatListView = new QListView{mWidget};
+  mChatListView->setModel(mModel.get());
+  mChatListView->setItemDelegate(new MessageBubbleDelegate{mChatListView});
+  mChatListView->setObjectName("chatListView");
+  mChatListView->setFrameShape(QFrame::NoFrame);
+  mChatListView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  mChatListView->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+  mChatListView->setSpacing(12);
+  mChatListView->setUniformItemSizes(false);
 
-  auto* chatWidget = new QWidget;
-  mChatLayout = new QVBoxLayout{chatWidget};
-  mChatLayout->setContentsMargins(12, 12, 12, 12);
-  mChatLayout->setSpacing(12);
-  mChatLayout->addStretch();
-
-  mScrollArea->setWidget(chatWidget);
-
-  return mScrollArea;
+  return mChatListView;
 }
 
 QWidget* QtChatView::createInputArea() {
@@ -239,12 +236,12 @@ QWidget* QtChatView::createInputArea() {
   mInputField->setPlaceholderText("Ask Copilot a question...");
   mInputField->setMinimumHeight(36);
 
-  connect(mInputField, &QLineEdit::returnPressed, this, &QtChatView::handleSubmit);
+  [[maybe_unused]] auto inputConn = connect(mInputField, &QLineEdit::returnPressed, this, &QtChatView::handleSubmit);
 
   auto* sendBtn = new QPushButton{"Send", inputWidget};
   sendBtn->setObjectName("sendButton");
 
-  connect(sendBtn, &QPushButton::clicked, this, &QtChatView::handleSubmit);
+  [[maybe_unused]] auto sendConn = connect(sendBtn, &QPushButton::clicked, this, &QtChatView::handleSubmit);
 
   layout->addWidget(mInputField);
   layout->addWidget(sendBtn);
@@ -252,35 +249,25 @@ QWidget* QtChatView::createInputArea() {
   return inputWidget;
 }
 
-void QtChatView::onMessageAdded(const ChatMessage& message) {
-  // Remove stretch before adding new message
-  if(mChatLayout->count() > 0) {
-    auto* lastItem = mChatLayout->takeAt(mChatLayout->count() - 1);
-    delete lastItem;
+void QtChatView::onMessageAdded([[maybe_unused]] const ChatMessage& message) {
+  // Scroll to bottom when new message is added
+  if(mChatListView != nullptr) {
+    const int lastRow = mModel->rowCount() - 1;
+    if(lastRow >= 0) {
+      mChatListView->scrollTo(mModel->index(lastRow), QAbstractItemView::EnsureVisible);
+    }
   }
-
-  // Add message bubble (owned by Qt parent-child)
-  auto* bubble = new MessageBubbleWidget{message, mChatLayout->parentWidget()};
-  mChatLayout->addWidget(bubble);
-  mChatLayout->addStretch();
-
-  scrollToBottom();
 }
 
 void QtChatView::onMessagesCleared() {
-  // Clear all widgets except stretch
-  while(mChatLayout->count() > 0) {
-    auto* item = mChatLayout->takeAt(0);
-    if(auto* widget = item->widget()) {
-      widget->deleteLater();
-    }
-    delete item;
+  // QListView automatically refreshes when model is cleared
+  if(mChatListView != nullptr) {
+    mChatListView->scrollToTop();
   }
-  mChatLayout->addStretch();
 }
 
 void QtChatView::scrollToBottom() {
-  if(!mScrollArea) {
+  if(mChatListView == nullptr) {
     return;
   }
 
@@ -288,8 +275,9 @@ void QtChatView::scrollToBottom() {
   QMetaObject::invokeMethod(
       this,
       [this]() {
-        if(auto* scrollBar = mScrollArea->verticalScrollBar()) {
-          scrollBar->setValue(scrollBar->maximum());
+        const int lastRow = mModel->rowCount() - 1;
+        if(lastRow >= 0) {
+          mChatListView->scrollTo(mModel->index(lastRow), QAbstractItemView::EnsureVisible);
         }
       },
       Qt::QueuedConnection);
