@@ -37,7 +37,7 @@ QHash<int, QByteArray> ChatModel::roleNames() const {
 
 nonstd::expected<void, ChatError> ChatModel::addMessage(ChatMessage message) {
   if(message.content().trimmed().isEmpty()) {
-    return nonstd::unexpected{ChatError::EmptyMessage};
+    return nonstd::unexpected<ChatError>{ChatError::EmptyMessage};
   }
 
   const int newRow = static_cast<int>(m_messages.size());
