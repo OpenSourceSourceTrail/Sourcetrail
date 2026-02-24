@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 
 #include "BookmarkButtonsView.h"
+#include "ChatModel.hpp"
 #include "CodeView.h"
 #include "CompositeView.h"
 #include "Controller.h"
@@ -62,7 +63,7 @@ void ComponentManager::setupMain(ViewLayout* viewLayout, Id appId) {
 
   auto screenSearchComponent = m_componentFactory.createScreenSearchComponent(viewLayout);
   auto* screenSearchController = screenSearchComponent->getController<ScreenSearchController>();
-  if(screenSearchController) {
+  if(nullptr != screenSearchController) {
     screenSearchController->addResponder(graphView.get());
     screenSearchController->addResponder(codeView.get());
   }
@@ -101,8 +102,9 @@ void ComponentManager::setupMain(ViewLayout* viewLayout, Id appId) {
   auto customTrailComponent = m_componentFactory.createCustomTrailComponent(viewLayout);
   m_components.push_back(customTrailComponent);
 
-  auto chatComponent = m_componentFactory.createChatComponent(tabbedView.get());
-  m_components.push_back(chatComponent);
+  auto model = std::make_shared<ChatModel>();
+  std::shared_ptr<sourcetrail::lib_llm::services::LlmCoordinator> llmService;
+  m_components.push_back(m_componentFactory.createChatComponent(viewLayout, model, llmService));
 }
 
 void ComponentManager::setupTab(ViewLayout* viewLayout, Id tabId, ScreenSearchSender* screenSearchSender) {
