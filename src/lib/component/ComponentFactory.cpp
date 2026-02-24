@@ -18,6 +18,7 @@
 #include "GraphController.h"
 #include "GraphView.h"
 #include "ILLMService.hpp"
+#include "LlmCoordinator.hpp"
 #include "RefreshController.h"
 #include "RefreshView.h"
 #include "ScreenSearchController.h"
@@ -147,11 +148,12 @@ std::shared_ptr<Component> ComponentFactory::createUndoRedoComponent(ViewLayout*
   return std::make_shared<Component>(view, controller);
 }
 
-std::shared_ptr<Component> ComponentFactory::createChatComponent(ViewLayout* viewLayout) {
-  auto model = std::make_shared<ChatModel>();
-  std::shared_ptr<ILLMService> llmService;
+std::shared_ptr<Component> ComponentFactory::createChatComponent(
+    ViewLayout* viewLayout,
+    std::shared_ptr<ChatModel> model,
+    std::shared_ptr<sourcetrail::lib_llm::services::LlmCoordinator> coordinator) {
   std::shared_ptr<ChatView> view = m_viewFactory->createChatView(viewLayout, model);
-  auto controller = std::make_shared<ChatController>(model, llmService);
+  auto controller = std::make_shared<ChatController>(std::move(model), std::move(coordinator));
   controller->attachView(view.get());
 
   return std::make_shared<Component>(std::move(view), std::move(controller));

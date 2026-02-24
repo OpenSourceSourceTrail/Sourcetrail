@@ -8,6 +8,11 @@ class Component;
 class ViewFactory;
 class ViewLayout;
 class ScreenSearchSender;
+class ChatModel;
+
+namespace sourcetrail::lib_llm::services {
+class LlmCoordinator;
+}
 
 class ComponentFactory {
 public:
@@ -30,7 +35,9 @@ public:
   std::shared_ptr<Component> createTabsComponent(ViewLayout* viewLayout, ScreenSearchSender* screenSearchSender);
   std::shared_ptr<Component> createTooltipComponent(ViewLayout* viewLayout);
   std::shared_ptr<Component> createUndoRedoComponent(ViewLayout* viewLayout);
-  std::shared_ptr<Component> createChatComponent(ViewLayout* viewLayout);
+  std::shared_ptr<Component> createChatComponent(ViewLayout* viewLayout,
+                                                 std::shared_ptr<ChatModel> model,
+                                                 std::shared_ptr<sourcetrail::lib_llm::services::LlmCoordinator> coordinator);
 
 private:
   const ViewFactory* m_viewFactory;
