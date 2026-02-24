@@ -1,7 +1,6 @@
 #pragma once
-#include <vector>
-
 #include <QAbstractListModel>
+#include <QStandardItemModel>
 
 #include <nonstd/expected.hpp>
 #include <qtclasshelpermacros.h>
@@ -20,7 +19,7 @@ class ChatModel final : public QAbstractListModel {
   Q_OBJECT
 
 public:
-  enum class Roles : int { ContentRole = Qt::UserRole + 1, RoleRole, TimestampRole };
+  enum class Roles : std::uint16_t { ContentRole = Qt::UserRole + 1, RoleRole, TimestampRole };
 
   explicit ChatModel(QObject* parent = nullptr);
   Q_DISABLE_COPY_MOVE(ChatModel)
@@ -32,14 +31,14 @@ public:
   [[nodiscard]] QHash<int, QByteArray> roleNames() const override;
 
   // Business operations
-  [[nodiscard]] nonstd::expected<void, ChatError> addMessage(ChatMessage message);
+  [[nodiscard]] nonstd::expected<void, ChatError> addMessage(const ChatMessage& message);
   void clear();
 
   [[nodiscard]] bool isEmpty() const noexcept {
-    return m_messages.empty();
+    return m_messages.rowCount() == 0;
   }
   [[nodiscard]] std::size_t messageCount() const noexcept {
-    return m_messages.size();
+    return static_cast<std::size_t>(m_messages.rowCount());
   }
 
 signals:
@@ -47,7 +46,7 @@ signals:
   void messagesCleared();
 
 private:
-  std::vector<ChatMessage> m_messages;
+  QStandardItemModel m_messages;
 };
 
 Q_DECLARE_METATYPE(MessageRole)
