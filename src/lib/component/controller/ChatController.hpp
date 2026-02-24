@@ -1,12 +1,17 @@
 #pragma once
+#include <atomic>
+
 #include <QObject>
 #include <QString>
 
 #include "Controller.h"
+#include "LlmCoordinator.hpp"
 
 class ChatView;
 class ChatModel;
-class ILLMService;
+namespace sourcetrail::lib_llm::services {
+class LlmCoordinator;
+}
 
 class ChatController
     : public QObject
@@ -14,7 +19,7 @@ class ChatController
   Q_OBJECT
 public:
   explicit ChatController(std::shared_ptr<ChatModel> model,
-                          std::shared_ptr<ILLMService> llmService,
+                          std::shared_ptr<sourcetrail::lib_llm::services::LlmCoordinator> llmService,
                           QObject* parent = nullptr) noexcept;
   Q_DISABLE_COPY_MOVE(ChatController)
   ~ChatController() noexcept override;
@@ -37,7 +42,8 @@ private slots:
 
 private:
   std::shared_ptr<ChatModel> mModel;
-  std::shared_ptr<ILLMService> mLlmService;
+  std::shared_ptr<sourcetrail::lib_llm::services::LlmCoordinator> mCoordinator;
+  QFuture<nonstd::expected<sourcetrail::lib_llm::Message, sourcetrail::lib_llm::LlmError>> mCurrentRequest;
   ChatView* mView{nullptr};    // Non-owning
-  bool mIsProcessing{false};
+  std::atomic_bool mIsProcessing{false};
 };

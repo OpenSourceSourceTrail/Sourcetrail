@@ -3,11 +3,15 @@
 #include "ChatMessage.hpp"
 #include "ChatModel.hpp"
 #include "ChatView.hpp"
-#include "ILLMService.hpp"
+#include "LlmCoordinator.hpp"
+#include "LlmTypes.hpp"
+#include "logging.h"
 
 
-ChatController::ChatController(std::shared_ptr<ChatModel> model, std::shared_ptr<ILLMService> llmService, QObject* parent) noexcept
-    : QObject{parent}, mModel{std::move(model)}, mLlmService{std::move(llmService)} {}
+ChatController::ChatController(std::shared_ptr<ChatModel> model,
+                               std::shared_ptr<sourcetrail::lib_llm::services::LlmCoordinator> coordinator,
+                               QObject* parent) noexcept
+    : QObject{parent}, mModel{std::move(model)}, mCoordinator{std::move(coordinator)} {}
 
 ChatController::~ChatController() noexcept = default;
 
@@ -21,7 +25,7 @@ void ChatController::attachView(ChatView* view) {
 }
 
 void ChatController::handleUserMessage(const QString& content) {
-  if(mIsProcessing) {
+  if(mIsProcessing.exchange(true)) {
     return;    // Prevent concurrent requests
   }
 
@@ -45,8 +49,18 @@ void ChatController::handleUserMessage(const QString& content) {
   emit processingStarted();
 
   // Send to LLM service (async)
-  if(mLlmService && mLlmService->isAvailable()) {
-    mLlmService->sendMessage(content);
+  if(mCoordinator) {
+    mCoordinator
+        ->sendUserMessage(sourcetrail::lib_llm::UserMessage{
+            .prompt = content,
+        })
+        .then([this](nonstd::expected<sourcetrail::lib_llm::Message, sourcetrail::lib_llm::LlmError> response) {
+          if(response) {
+            onLLMResponseReceived(response->content);
+          } else {
+            onLLMError(response.error().message);
+          }
+        });
   } else {
     onLLMError("LLM service unavailable");
   }
@@ -54,8 +68,8 @@ void ChatController::handleUserMessage(const QString& content) {
 
 void ChatController::handleClearRequest() {
   if(mIsProcessing) {
-    if(mLlmService) {
-      mLlmService->cancelRequest();
+    if(mCoordinator && mCurrentRequest.isRunning()) {
+      mCurrentRequest.cancel();
     }
     mIsProcessing = false;
   }
@@ -84,7 +98,9 @@ void ChatController::onLLMResponseReceived(const QString& response) {
 void ChatController::onLLMError(const QString& error) {
   mIsProcessing = false;
 
-  mModel->addMessage(ChatMessage{QString{"Error: %1"}.arg(error), MessageRole::Error});
+  if(auto result = mModel->addMessage(ChatMessage{QString{"Error: %1"}.arg(error), MessageRole::Error}); !result) {
+    LOG_ERROR("Failed to add error message to model: {}", error.toStdString());
+  }
 
   if(nullptr != mView) {
     mView->setInputEnabled(true);
