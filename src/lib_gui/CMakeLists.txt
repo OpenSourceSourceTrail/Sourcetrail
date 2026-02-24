@@ -255,6 +255,8 @@ add_files(
   qt/view/QtChatView.hpp
   qt/view/MessageBubble.cpp
   qt/view/MessageBubble.hpp
+  qt/view/MessageBubbleDelegate.cpp
+  qt/view/MessageBubbleDelegate.hpp
   # }
   # {
   qt/window/MainWindow/MouseReleaseFilter.cpp
