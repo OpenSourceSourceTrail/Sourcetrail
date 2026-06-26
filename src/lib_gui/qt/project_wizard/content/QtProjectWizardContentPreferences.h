@@ -1,10 +1,7 @@
 #pragma once
-
 #include <QComboBox>
 
-#include "CombinedPathDetector.h"
 #include "QtLocationPicker.h"
-#include "QtPathListBox.h"
 #include "QtProjectWizardContent.h"
 
 class QCheckBox;
@@ -69,7 +66,6 @@ private:
 
   QComboBox* m_fontSize;
   QComboBox* m_tabWidth;
-  QComboBox* m_textEncoding;
 
   QComboBox* m_colorSchemes;
   std::vector<FilePath> m_colorSchemePaths;

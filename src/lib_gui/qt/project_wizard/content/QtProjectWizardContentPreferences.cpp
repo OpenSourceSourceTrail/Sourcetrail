@@ -8,7 +8,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include <QTextCodec>
 #include <QTimer>
 
 #include <spdlog/sinks/basic_file_sink.h>
@@ -16,12 +15,9 @@
 
 #include "FileSystem.h"
 #include "IApplicationSettings.hpp"
-#include "logging.h"
 #include "ResourcePaths.h"
 #include "type/MessageSwitchColorScheme.h"
-#include "utility.h"
 #include "utilityApp.h"
-#include "utilityPathDetection.h"
 #include "utilityQt.h"
 
 QtProjectWizardContentPreferences::QtProjectWizardContentPreferences(QtProjectWizardWindow* window)
@@ -73,11 +69,6 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
   // tab width
   m_tabWidth = addComboBox(QStringLiteral("Tab Width"), 1, 16, QLatin1String(""), layout, row);
 
-  // text encoding
-  m_textEncoding = addComboBox(QStringLiteral("Text Encoding"), QLatin1String(""), layout, row);
-  for(int mib : QTextCodec::availableMibs()) {
-    m_textEncoding->addItem(QTextCodec::codecForMib(mib)->name());
-  }
 
   // color scheme
   m_colorSchemes = addComboBox(QStringLiteral("Color Scheme"), QLatin1String(""), layout, row);
@@ -299,8 +290,6 @@ void QtProjectWizardContentPreferences::load() {
   m_fontSize->setCurrentIndex(appSettings->getFontSize() - appSettings->getFontSizeMin());
   m_tabWidth->setCurrentIndex(appSettings->getCodeTabWidth() - 1);
 
-  m_textEncoding->setCurrentText(QString::fromStdString(appSettings->getTextEncoding()));
-
   FilePath colorSchemePath = FilePath{appSettings->getColorSchemePath().wstring()};
   for(size_t i = 0; i < m_colorSchemePaths.size(); i++) {
     if(colorSchemePath == m_colorSchemePaths[i]) {
@@ -351,8 +340,6 @@ void QtProjectWizardContentPreferences::save() {
 
   appSettings->setFontSize(m_fontSize->currentIndex() + appSettings->getFontSizeMin());
   appSettings->setCodeTabWidth(m_tabWidth->currentIndex() + 1);
-
-  appSettings->setTextEncoding(m_textEncoding->currentText().toStdString());
 
   appSettings->setColorSchemeName(
       m_colorSchemePaths[static_cast<std::size_t>(m_colorSchemes->currentIndex())].withoutExtension().fileName());
