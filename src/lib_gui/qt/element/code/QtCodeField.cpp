@@ -1,9 +1,10 @@
 #include "QtCodeField.h"
 
+#include <boost/locale/encoding.hpp>
+
 #include <QAction>
 #include <QPainter>
 #include <QTextBlock>
-#include <QTextCodec>
 #include <QWindow>
 
 #include "ColorScheme.h"
@@ -694,17 +695,18 @@ void QtCodeField::createLineLengthCache() {
 
 void QtCodeField::createMultibyteCharacterLocationCache(const QString& code) {
   m_multibyteCharacterLocations.clear();
-  QTextCodec* codec = QTextCodec::codecForName(IApplicationSettings::getInstanceRaw()->getTextEncoding().c_str());
+  const std::string encoding = IApplicationSettings::getInstanceRaw()->getTextEncoding();
 
   for(const QString& line : code.split(QStringLiteral("\n"))) {
     std::vector<std::pair<int, int>> columnsToOffsets;
     for(int i = 0; i < line.size(); i++) {
       if(line[i].unicode() > 127) {
-        int ss = static_cast<int>(codec->fromUnicode(line[i]).size());
-        columnsToOffsets.push_back(std::make_pair(i, ss));
+        const std::string utf8Char = QString(line[i]).toStdString();
+        const int byteSize = static_cast<int>(boost::locale::conv::from_utf(utf8Char, encoding).size());
+        columnsToOffsets.emplace_back(i, byteSize);
       }
     }
-    m_multibyteCharacterLocations.push_back(columnsToOffsets);
+    m_multibyteCharacterLocations.push_back(std::move(columnsToOffsets));
   }
 }
 
