@@ -1,5 +1,4 @@
-#ifndef QT_FILE_DIALOG_H
-#define QT_FILE_DIALOG_H
+#pragma once
 #include <QStringList>
 
 class FilePath;
@@ -19,5 +18,3 @@ private:
   static QString getDir(QString dir);
   static void saveFilePickerLocation(const FilePath& path);
 };
-
-#endif    // QT_FILE_DIALOG_H
