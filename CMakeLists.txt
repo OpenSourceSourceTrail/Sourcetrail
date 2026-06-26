@@ -153,6 +153,7 @@ find_package(
   Boost 1.83
   COMPONENTS date_time
              filesystem
+             locale
              program_options
              system
   REQUIRED)
@@ -162,8 +163,7 @@ find_package(
   COMPONENTS Widgets
              PrintSupport
              Network
-             Svg
-             Core5Compat)
+             Svg)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(cmake/copy_qt_binaries.cmake)
@@ -308,7 +308,7 @@ target_link_libraries(
           Sourcetrail::lib_gui::utility
           Sourcetrail::libGui::utility::utilityApp
           Sourcetrail::messaging
-          Qt6::Core5Compat
+          Boost::locale
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
 
 # command for versioning script

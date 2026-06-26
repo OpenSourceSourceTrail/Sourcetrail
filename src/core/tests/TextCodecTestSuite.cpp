@@ -50,7 +50,7 @@ TEST_F(TextCodecTest, IsValidMethod) {
 }
 
 // Test decode method
-TEST_F(TextCodecTest, DISABLED_DecodeMethod) {
+TEST_F(TextCodecTest, DecodeMethod) {
   // Test decoding UTF-8 string
   {
     TextCodec codec("UTF-8");
@@ -78,7 +78,7 @@ TEST_F(TextCodecTest, DISABLED_DecodeMethod) {
 }
 
 // Test encode method
-TEST_F(TextCodecTest, DISABLED_EncodeMethod) {
+TEST_F(TextCodecTest, EncodeMethod) {
   // Test encoding wide string to UTF-8
   {
     TextCodec codec("UTF-8");
