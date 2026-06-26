@@ -1,7 +1,5 @@
-#ifndef QT_HIGHLIGHTER_H
-#define QT_HIGHLIGHTER_H
-
-#include <QRegExp>
+#pragma once
+#include <QRegularExpression>
 #include <QTextCharFormat>
 
 class QTextBlock;
@@ -32,10 +30,10 @@ public:
 private:
   struct HighlightingRule {
     HighlightingRule();
-    HighlightingRule(HighlightType type, const QRegExp& regExp, bool priority, bool multiLine = false);
+    HighlightingRule(HighlightType type, const QRegularExpression& regExp, bool priority, bool multiLine = false);
 
     HighlightType type = HighlightType::TEXT;
-    QRegExp pattern;
+    QRegularExpression pattern;
     bool priority = false;
     bool multiLine = false;
   };
@@ -70,5 +68,3 @@ private:
   std::vector<std::tuple<HighlightType, int, int>> m_multiLineRanges;
   std::vector<bool> m_highlightedLines;
 };
-
-#endif    // QT_HIGHLIGHTER_H

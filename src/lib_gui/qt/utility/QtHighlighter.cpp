@@ -109,14 +109,14 @@ void QtHighlighter::loadHighlightingRules() {
       QJsonArray patterns = ruleObj.value(QStringLiteral("patterns")).toArray();
       for(QJsonValueRef pattern : patterns) {
         if(pattern.isString()) {
-          rules.push_back(HighlightingRule(type, QRegExp(pattern.toString()), priority));
+          rules.push_back(HighlightingRule(type, QRegularExpression(pattern.toString()), priority));
         }
       }
 
       QJsonObject range = ruleObj.value(QStringLiteral("range")).toObject();
       if(!range.empty()) {
-        rules.push_back(HighlightingRule(type, QRegExp(range.value("start").toString()), priority, true));
-        rules.push_back(HighlightingRule(type, QRegExp(range.value("end").toString()), priority, true));
+        rules.push_back(HighlightingRule(type, QRegularExpression(range.value("start").toString()), priority, true));
+        rules.push_back(HighlightingRule(type, QRegularExpression(range.value("end").toString()), priority, true));
       }
     }
 
@@ -320,7 +320,7 @@ std::vector<std::tuple<QtHighlighter::HighlightType, int, int>> QtHighlighter::c
 
   while(true) {
     while(true) {
-      cursorStart = document()->find(startRule->pattern.pattern(), cursorStart);
+      cursorStart = document()->find(startRule->pattern, cursorStart);
       if(cursorStart.isNull()) {
         break;
       }
@@ -336,7 +336,7 @@ std::vector<std::tuple<QtHighlighter::HighlightType, int, int>> QtHighlighter::c
       break;
     }
 
-    cursorEnd = document()->find(endRule->pattern.pattern(), cursorStart);
+    cursorEnd = document()->find(endRule->pattern, cursorStart);
     if(cursorEnd.isNull()) {
       break;
     }
@@ -351,7 +351,7 @@ std::vector<std::tuple<QtHighlighter::HighlightType, int, int>> QtHighlighter::c
 
 QtHighlighter::HighlightingRule::HighlightingRule() {}
 
-QtHighlighter::HighlightingRule::HighlightingRule(HighlightType type_, const QRegExp& regExp, bool priority_, bool multiLine_)
+QtHighlighter::HighlightingRule::HighlightingRule(HighlightType type_, const QRegularExpression& regExp, bool priority_, bool multiLine_)
     : type(type_), pattern(regExp), priority(priority_), multiLine(multiLine_) {}
 
 bool QtHighlighter::isInRange(int pos, const std::vector<std::tuple<HighlightType, int, int>>& ranges) const {
@@ -368,21 +368,19 @@ std::vector<std::tuple<QtHighlighter::HighlightType, int, int>> QtHighlighter::g
                                                                                                 const HighlightingRule& rule) const {
   const int pos = block.position();
   const QString text = block.text();
-  QRegExp expression(rule.pattern);
-  int index = expression.indexIn(text);
 
   std::vector<std::tuple<HighlightType, int, int>> ranges;
 
-  while(index >= 0) {
-    const int length = expression.matchedLength();
-    if(expression.capturedTexts().size() > 1) {
-      const QString cap = expression.capturedTexts()[1];
-      const int start = static_cast<int>(text.indexOf(cap, index));
-      ranges.push_back(std::make_tuple(rule.type, pos + start, pos + start + cap.length()));
+  QRegularExpressionMatchIterator it = rule.pattern.globalMatch(text);
+  while(it.hasNext()) {
+    QRegularExpressionMatch match = it.next();
+    if(match.lastCapturedIndex() > 0) {
+      const QString cap = match.captured(1);
+      const int start = static_cast<int>(text.indexOf(cap, match.capturedStart()));
+      ranges.emplace_back(rule.type, pos + start, pos + start + cap.length());
     } else {
-      ranges.push_back(std::make_tuple(rule.type, pos + index, pos + index + length));
+      ranges.emplace_back(rule.type, pos + match.capturedStart(), pos + match.capturedStart() + match.capturedLength());
     }
-    index = expression.indexIn(block.text(), index + length);
   }
 
   return ranges;
@@ -397,18 +395,17 @@ void QtHighlighter::formatBlockForRule(const QTextBlock& block,
 
   const QTextCharFormat& format = s_charFormats.find(rule.type)->second;
 
-  QRegExp expression(rule.pattern);
-  int pos = block.position();
-  int index = expression.indexIn(block.text());
+  const int pos = block.position();
+  QRegularExpressionMatchIterator it = rule.pattern.globalMatch(block.text());
 
-  while(index >= 0) {
-    int length = expression.matchedLength();
+  while(it.hasNext()) {
+    QRegularExpressionMatch match = it.next();
+    const int index = match.capturedStart();
+    const int length = match.capturedLength();
 
     if(!isInRange(pos + index, *ranges)) {
       applyFormat(pos + index, pos + index + length, format);
     }
-
-    index = expression.indexIn(block.text(), index + length);
   }
 }
 
