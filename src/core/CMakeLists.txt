@@ -16,6 +16,7 @@ target_link_libraries(Sourcetrail_core INTERFACE Boost::date_time Boost::system 
 target_link_libraries(
   Sourcetrail_core
   INTERFACE range-v3::range-v3
+            Sourcetrail::core::utility::math
             Sourcetrail::core::utility::file::FilePath # TODO(Hussein): It must be moved to private
             Sourcetrail::core::utility::file::FileInfo # TODO(Hussein): It must be moved to private
             Sourcetrail::core::utility::TimeStamp # TODO(Hussein): It must be moved to private

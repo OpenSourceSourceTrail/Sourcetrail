@@ -1,5 +1,6 @@
 # ${CMAKE_SOURCE_DIR}/src/core/utility/CMakeLists.txt
 add_subdirectory(applicationArchitectureType)
+add_subdirectory(math)
 add_subdirectory(commandline)
 add_subdirectory(configManager)
 add_subdirectory(file)
