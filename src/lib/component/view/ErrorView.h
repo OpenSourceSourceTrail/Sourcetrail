@@ -24,4 +24,6 @@ public:
   [[nodiscard]] virtual ErrorFilter getErrorFilter() const = 0;
 
   virtual void setErrorFilter(const ErrorFilter& filter) = 0;
+
+  virtual void showErrorHelpMessage() = 0;
 };

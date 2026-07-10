@@ -17,6 +17,7 @@
 #include "ErrorController.h"
 #include "ErrorFilter.h"
 #include "QtHelpButton.h"
+#include "QtHelpButtonInfo.h"
 #include "QtSelfRefreshIconButton.h"
 #include "QtTable.h"
 #include "QtViewWidgetWrapper.h"
@@ -326,4 +327,8 @@ bool QtErrorView::isShownError(const ErrorInfo& error) {
     return true;
   }
   return false;
+}
+
+void QtErrorView::showErrorHelpMessage() {
+  m_onQtThread([this]() { createErrorHelpButtonInfo().displayMessage(nullptr); });
 }

@@ -39,6 +39,8 @@ public:
   [[nodiscard]] ErrorFilter getErrorFilter() const override;
   void setErrorFilter(const ErrorFilter& filter) override;
 
+  void showErrorHelpMessage() override;
+
 private slots:
   void errorFilterChanged(int i = 0);
 

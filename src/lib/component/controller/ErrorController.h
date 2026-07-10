@@ -4,7 +4,6 @@
 // internal
 #include "ActivationListener.h"
 #include "MessageListener.h"
-#include "QtThreadedFunctor.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"
 #include "type/error/MessageErrorsAll.h"
@@ -71,6 +70,5 @@ private:
   std::map<Id, bool> m_tabShowsErrors;
   std::map<Id, FilePath> m_tabActiveFilePath;
 
-  QtThreadedLambdaFunctor m_onQtThread;
   bool m_newErrorsAdded = false;
 };
