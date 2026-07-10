@@ -39,7 +39,8 @@ target_link_libraries(
   PRIVATE Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::core::utility::utilityApp
-          Sourcetrail::core::utility::commandline::CommandLineParser)
+          Sourcetrail::core::utility::commandline::CommandLineParser
+          Sourcetrail::proto::convert)
 
 target_include_directories(
   Sourcetrail

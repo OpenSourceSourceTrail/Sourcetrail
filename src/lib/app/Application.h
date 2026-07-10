@@ -127,6 +127,10 @@ public:
     return mHasGui;
   }
 
+  [[nodiscard]] StorageCache* getStorageCache() const noexcept {
+    return mStorageCache.get();
+  }
+
   /**
    * @brief Handles a dialog with a message.
    * @param message The message to display in the dialog.

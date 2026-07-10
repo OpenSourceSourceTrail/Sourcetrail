@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package sourcetrail;
+
+import "sourcetrail_common.proto";
+
+// Boundary B: engine (server) <-> indexer worker (client)
+service IndexerWorkerService {
+  // Worker pulls next command; empty response = no more commands
+  rpc PullCommand(PullCommandRequest) returns (PullCommandResponse);
+
+  // Worker pushes result storage after indexing a file
+  rpc PushIntermediateStorage(PushIntermediateStorageRequest) returns (PushIntermediateStorageResponse);
+
+  // Worker reports status events (start/finish file, crash, done)
+  rpc ReportStatus(StatusReport) returns (StatusReportResponse);
+
+  // Worker subscribes to interrupt signal (server-streaming)
+  rpc WatchInterrupt(WatchInterruptRequest) returns (stream InterruptEvent);
+}
+
+message PullCommandRequest {
+  uint64 process_id = 1;
+}
+
+message PullCommandResponse {
+  bool command_found = 1;
+  IndexerCommand command = 2;
+}
+
+message PushIntermediateStorageRequest {
+  uint64 process_id = 1;
+  IntermediateStorage storage = 2;
+}
+
+message PushIntermediateStorageResponse {}
+
+message StatusReport {
+  uint64 process_id = 1;
+
+  enum EventType {
+    START_FILE = 0;
+    FINISH_FILE = 1;
+    PROCESS_DONE = 2;
+  }
+  EventType event = 2;
+  string file_path = 3; // only set for START_FILE (UTF-8 encoded wstring)
+}
+
+message StatusReportResponse {}
+
+message WatchInterruptRequest {
+  uint64 process_id = 1;
+}
+
+message InterruptEvent {
+  bool interrupted = 1;
+}

@@ -34,6 +34,7 @@ target_link_libraries(
   PRIVATE $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Sourcetrail::core
           Sourcetrail::lib
+          Sourcetrail::proto::convert
           Sourcetrail::messaging
           Sourcetrail::core::utility::logging)
 

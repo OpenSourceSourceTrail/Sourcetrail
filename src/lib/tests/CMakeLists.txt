@@ -65,6 +65,10 @@ foreach(test_name IN LISTS test_lib_names)
   target_compile_definitions(${test_name} PUBLIC ST_TESTING=1)
 endforeach()
 
+foreach(test_name IN LISTS test_lib_names)
+  target_link_libraries(${test_name} PRIVATE Sourcetrail::proto::convert)
+endforeach()
+
 target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::core::utility::ScopedFunctor)
 
 target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::core::utility::SingleValueCache)

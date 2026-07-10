@@ -182,6 +182,10 @@ target_sources(
   data/indexer/interprocess/InterprocessIndexingStatusManager.h
   data/indexer/interprocess/InterprocessIntermediateStorageManager.cpp
   data/indexer/interprocess/InterprocessIntermediateStorageManager.h
+  data/indexer/grpc/GrpcIndexer.cpp
+  data/indexer/grpc/GrpcIndexer.h
+  data/indexer/grpc/IndexerWorkerServiceImpl.cpp
+  data/indexer/grpc/IndexerWorkerServiceImpl.h
   data/indexer/CombinedIndexerCommandProvider.cpp
   data/indexer/CombinedIndexerCommandProvider.h
   data/indexer/Indexer.h
@@ -420,9 +424,15 @@ target_include_directories(
          ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/
          ${CMAKE_BINARY_DIR}/src/lib)
 
+target_include_directories(
+  Sourcetrail_lib
+  PUBLIC "${CMAKE_SOURCE_DIR}/src/proto")
+
 target_link_libraries(
   Sourcetrail_lib
   PUBLIC Sourcetrail::messaging
+         Sourcetrail::proto::api
+         gRPC::grpc++
          Sourcetrail::core::utility::ConfigManager
          Sourcetrail::core::utility::LowMemoryStringMap
          Sourcetrail::core::utility::Status

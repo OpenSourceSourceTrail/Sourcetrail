@@ -7,6 +7,7 @@ target_link_libraries(
   Sourcetrail_cli
   PRIVATE Sourcetrail::core
           Sourcetrail::lib
+          Sourcetrail::proto::convert
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::messaging
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>

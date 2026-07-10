@@ -1,14 +1,14 @@
 #include <cstdlib>
-#include <iterator>
 #include <stdexcept>
+#include <string>
 
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
 #include "ApplicationSettings.h"
 #include "AppPath.h"
+#include "GrpcIndexer.h"
 #include "IApplicationSettings.hpp"
-#include "InterprocessIndexer.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
 #include "logging.h"
@@ -16,7 +16,7 @@
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
 #  include "LanguagePackageCxx.h"
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#endif
 
 #ifdef _WIN32
 #  include <Windows.h>
@@ -35,56 +35,35 @@ void setupLogging(const std::string& logFilePath, spdlog::level::level_enum leve
 void suppressCrashMessage() {
 #ifdef _WIN32
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
-#endif    // _WIN32
+#endif
 }
 }    // namespace
 
+// argv: <processId> --engine-endpoint <endpoint> <appPath> <userDataPath> [logFilePath]
 int main(int argc, char* argv[]) {
+  if(argc < 6) {
+    LOG_ERROR("Usage: Sourcetrail_indexer <processId> --engine-endpoint <endpoint> <appPath> <userDataPath> [logFilePath]");
+    return EXIT_FAILURE;
+  }
+
   int processId = -1;
-  std::string instanceUuid;
-  std::string appPath;
-  std::string userDataPath;
-  std::string logFilePath;
-
-  if(argc >= 2) {
-    try {
-      processId = std::stoi(argv[1]);
-    } catch(const std::invalid_argument& e) {
-      LOG_ERROR("Invalid argument for processId: " + std::string(e.what()));
-      return EXIT_FAILURE;
-    } catch(const std::out_of_range& e) {
-      LOG_ERROR("Argument out of range for processId: " + std::string(e.what()));
-      return EXIT_FAILURE;
-    }
-  } else {
-    LOG_ERROR("Process ID is not provided");
+  try {
+    processId = std::stoi(argv[1]);
+  } catch(const std::exception& e) {
+    LOG_ERROR("Invalid processId: " + std::string(e.what()));
     return EXIT_FAILURE;
   }
 
-  if(argc >= 3) {
-    instanceUuid = argv[2];
-  } else {
-    LOG_ERROR("Instance UUID is not provided");
+  const std::string endpointFlag = argv[2];
+  if(endpointFlag != "--engine-endpoint") {
+    LOG_ERROR("Expected --engine-endpoint flag, got: " + endpointFlag);
     return EXIT_FAILURE;
   }
 
-  if(argc >= 4) {
-    appPath = argv[3];
-  } else {
-    LOG_ERROR("App path is not provided");
-    return EXIT_FAILURE;
-  }
-
-  if(argc >= 5) {
-    userDataPath = argv[4];
-  } else {
-    LOG_ERROR("User data path is not provided");
-    return EXIT_FAILURE;
-  }
-
-  if(argc >= 6) {
-    logFilePath = argv[5];
-  }
+  const std::string engineEndpoint = argv[3];
+  const std::string appPath = argv[4];
+  const std::string userDataPath = argv[5];
+  const std::string logFilePath = (argc >= 7) ? argv[6] : "";
 
   AppPath::setSharedDataDirectoryPath(FilePath(appPath));
   UserPaths::setUserDataDirectoryPath(FilePath(userDataPath));
@@ -99,7 +78,7 @@ int main(int argc, char* argv[]) {
   }
 
   if(appSettings->getVerboseIndexerLoggingEnabled() && !logFilePath.empty()) {
-    setupLogging(std::string(logFilePath), spdlog::level::level_enum(appSettings->getLoggingLevel()));
+    setupLogging(logFilePath, spdlog::level::level_enum(appSettings->getLoggingLevel()));
   } else {
     for(auto& sink : spdlog::default_logger_raw()->sinks()) {
       sink->set_level(spdlog::level::off);
@@ -108,20 +87,20 @@ int main(int argc, char* argv[]) {
 
   LOG_INFO(L"sharedDataPath: " + AppPath::getSharedDataDirectoryPath().wstr());
   LOG_INFO(L"userDataPath: " + UserPaths::getUserDataDirectoryPath().wstr());
-
+  LOG_INFO("engineEndpoint: " + engineEndpoint);
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#endif
 
   try {
-    InterprocessIndexer indexer(instanceUuid, Id(processId));
+    GrpcIndexer indexer(engineEndpoint, static_cast<Id>(processId));
     indexer.work();
-  } catch(std::runtime_error& error) {
+  } catch(const std::runtime_error& error) {
     LOG_ERROR(error.what());
     return EXIT_FAILURE;
   } catch(...) {
-    LOG_ERROR("Unknown error");
+    LOG_ERROR("Unknown error in indexer");
     return EXIT_FAILURE;
   }
 

@@ -139,6 +139,8 @@ endif()
 # Settings -----------------------------------------------------------------------------------------------------------------------
 find_package(expected-lite REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SQLite3 CONFIG REQUIRED)
@@ -186,6 +188,7 @@ endif()
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
 add_subdirectory(src/external)
+add_subdirectory(src/proto)
 add_subdirectory(src/lib)
 add_subdirectory(src/lib_gui)
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -203,6 +206,8 @@ add_subdirectory(src/indexer)
 add_subdirectory(src/app)
 # CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------
 add_subdirectory(src/cli)
+# Engine daemon (Qt-free) ---------------------------------------------------------------------------------------------------------
+add_subdirectory(src/engine)
 # Tests --------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
@@ -238,7 +243,7 @@ create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user"
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
-install(TARGETS Sourcetrail Sourcetrail_indexer Sourcetrail_cli RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+install(TARGETS Sourcetrail Sourcetrail_indexer Sourcetrail_cli Sourcetrail_engine RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIME_DIR}/data/)
 

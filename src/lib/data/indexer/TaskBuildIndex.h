@@ -1,9 +1,12 @@
 #pragma once
+#include <memory>
+#include <mutex>
 #include <thread>
+#include <vector>
 
-#include "InterprocessIndexerCommandManager.h"
-#include "InterprocessIndexingStatusManager.h"
-#include "InterprocessIntermediateStorageManager.h"
+#include <grpcpp/server.h>
+
+#include "IndexerWorkerServiceImpl.h"
 #include "MessageListener.h"
 #include "Task.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
@@ -33,7 +36,6 @@ protected:
 
   void runIndexerProcess(int processId, const std::wstring& logFilePath);
   void runIndexerThread(int processId);
-  bool fetchIntermediateStorages(const std::shared_ptr<Blackboard>& blackboard);
   void updateIndexingDialog(const std::shared_ptr<Blackboard>& blackboard, const std::vector<FilePath>& sourcePaths);
 
   static const std::wstring sProcessName;
@@ -44,15 +46,18 @@ protected:
   const std::string mAppUUID;
   bool mMultiProcessIndexing;
 
-  InterprocessIndexingStatusManager mInterprocessIndexingStatusManager;
+  std::unique_ptr<IndexerWorkerServiceImpl> mIndexerWorkerService;
+  std::unique_ptr<grpc::Server> mGrpcServer;
+  int mEnginePort{0};
+
   bool mIndexerCommandQueueStopped = false;
   size_t mProcessCount;
   bool mInterrupted = false;
   size_t mIndexingFileCount = 0;
+  size_t mLastReportedIndexedCount = 0;
 
   // store as plain pointers to avoid deallocation issues when closing app during indexing
   std::vector<std::unique_ptr<std::thread>> mProcessThreads;
-  std::vector<std::shared_ptr<InterprocessIntermediateStorageManager>> mInterprocessIntermediateStorageManagers;
 
   size_t mRunningThreadCount = 0;
   std::mutex mRunningThreadCountMutex;
