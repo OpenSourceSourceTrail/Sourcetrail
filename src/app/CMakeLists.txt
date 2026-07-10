@@ -38,7 +38,7 @@ target_link_libraries(
          Qt6::Network
   PRIVATE Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::ScopedFunctor
-          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::core::utility::utilityApp
           Sourcetrail::core::utility::commandline::CommandLineParser)
 
 target_include_directories(

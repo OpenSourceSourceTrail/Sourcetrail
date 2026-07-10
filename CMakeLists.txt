@@ -193,7 +193,7 @@ add_subdirectory(src/lib_gui)
 add_subdirectory(src/core)
 add_subdirectory(src/scheduling)
 add_subdirectory(src/messaging)
-add_subdirectory(src/lib_gui/utility/utilityApp)
+add_subdirectory(src/core/utility/utilityApp)
 # Lib Cxx ------------------------------------------------------------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_subdirectory(src/lib_cxx)
@@ -206,8 +206,7 @@ target_include_directories(
   Sourcetrail_lib
   PUBLIC ${LIB_INCLUDE_PATHS}
          ${LIB_GUI_INCLUDE_PATHS}
-         ${CMAKE_SOURCE_DIR}/src/lib_gui/utility/
-         ${CMAKE_SOURCE_DIR}/src/lib_gui/utility/path_detector/
+         ${CMAKE_SOURCE_DIR}/src/lib/utility/path_detector/
          ${CMAKE_BINARY_DIR}/src/lib)
 
 target_link_libraries(
@@ -235,7 +234,7 @@ target_link_libraries(
           Sourcetrail::core::utility::TextCodec
           Sourcetrail::core::utility::utilityUuid
           Sourcetrail::lib_gui
-          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::core::utility::utilityApp
           Sourcetrail::core::utility::file::FileSystem
           Sourcetrail::core::utility::file::utilityFile
           Sourcetrail::core::utility::file::FileManager
@@ -248,28 +247,44 @@ target_link_libraries(
 
 #configure language package defines
 configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")
-# Lib gui_utility ----------------------------------------------------------------------------------------------------------------
-add_library(Sourcetrail_lib_gui_utility)
-add_library(Sourcetrail::lib_gui::utility ALIAS Sourcetrail_lib_gui_utility)
+# Path detection utility (non-GUI, previously Lib gui_utility) -----------------------------------------------------------------
+add_library(Sourcetrail_lib_path_detection)
+add_library(Sourcetrail::lib::utility::PathDetection ALIAS Sourcetrail_lib_path_detection)
 
 target_sources(
-  Sourcetrail_lib_gui_utility
-  PRIVATE src/lib_gui/utility/utilityPathDetection.cpp src/lib_gui/utility/path_detector/CombinedPathDetector.cpp
-          src/lib_gui/utility/path_detector/PathDetector.cpp)
+  Sourcetrail_lib_path_detection
+  PRIVATE src/lib/utility/path_detector/utilityPathDetection.cpp
+          src/lib/utility/path_detector/CombinedPathDetector.cpp
+          src/lib/utility/path_detector/PathDetector.cpp)
 
-target_include_directories(Sourcetrail_lib_gui_utility PUBLIC src/lib_gui/utility/ src/lib_gui/utility/path_detector/
-                                                              src/lib_gui/utility/path_detector/cxx_header/)
+if(BUILD_CXX_LANGUAGE_PACKAGE)
+  target_sources(
+    Sourcetrail_lib_path_detection
+    PRIVATE src/lib/utility/path_detector/cxx_header/CxxFrameworkPathDetector.cpp
+            src/lib/utility/path_detector/cxx_header/CxxHeaderPathDetector.cpp
+            src/lib/utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.cpp
+            src/lib/utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.cpp
+            src/lib/utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.cpp
+            src/lib/utility/path_detector/cxx_header/utilityCxxHeaderDetection.cpp)
+endif()
+
+target_include_directories(
+  Sourcetrail_lib_path_detection
+  PUBLIC src/lib/utility/path_detector/ src/lib/utility/path_detector/cxx_header/
+  PRIVATE ${CMAKE_BINARY_DIR}/src/lib)
 
 target_link_libraries(
-  Sourcetrail_lib_gui_utility
+  Sourcetrail_lib_path_detection
   PUBLIC Sourcetrail::core::utility::ApplicationArchitectureType Sourcetrail::core::utility::OsType
   PRIVATE Boost::system
           Qt6::Core
           Sourcetrail::core
-          Sourcetrail::lib
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::core::utility::logging
-          Sourcetrail::libGui::utility::utilityApp)
+          Sourcetrail::core::utility::utility
+          Sourcetrail::core::utility::file::FileSystem
+          Sourcetrail::core::utility::utilityString
+          Sourcetrail::core::utility::utilityApp)
 
 # Lib Gui ------------------------------------------------------------------------------------------------------------------------
 # target for running versionnumber script
@@ -291,7 +306,7 @@ target_link_libraries(
          Sourcetrail::core::utility::Migrator
          Sourcetrail::core::utility::file::FilePathFilter
          Sourcetrail::core::utility::file::FileSystem
-         Sourcetrail::libGui::utility::utilityApp
+         Sourcetrail::core::utility::utilityApp
   PRIVATE Sourcetrail::core
           Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::OrderedCache
@@ -305,8 +320,8 @@ target_link_libraries(
           Sourcetrail::core::utility::file::utilityFile
           Sourcetrail::core::utility::file::FilePath
           Sourcetrail::core::utility::file::FileManager
-          Sourcetrail::lib_gui::utility
-          Sourcetrail::libGui::utility::utilityApp
+          Sourcetrail::lib::utility::PathDetection
+          Sourcetrail::core::utility::utilityApp
           Sourcetrail::messaging
           Boost::locale
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)

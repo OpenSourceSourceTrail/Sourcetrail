@@ -1,7 +1,7 @@
-# ${CMAKE_SOURCE_DIR}/src/lib_gui/utility/utilityApp/CMakeLists.txt
+# ${CMAKE_SOURCE_DIR}/src/core/utility/utilityApp/CMakeLists.txt
 add_sourcetrail_library(
   NAME
-  libGui::utility::utilityApp
+  core::utility::utilityApp
   SOURCES
   utilityApp.cpp
   PUBLIC_HEADERS
@@ -12,7 +12,6 @@ add_sourcetrail_library(
   Sourcetrail::core::utility::OsType
   Boost::boost
   PRIVATE_DEPS
-  Qt6::Core
   Boost::filesystem
   Sourcetrail::core::utility::logging
   Sourcetrail::core::utility::ScopedFunctor

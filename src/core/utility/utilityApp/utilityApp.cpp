@@ -12,7 +12,7 @@
 #include <boost/process/search_path.hpp>
 #include <boost/process/start_dir.hpp>
 
-#include <QThread>
+#include <thread>
 
 #include "logging.h"
 #include "ScopedFunctor.h"
@@ -196,7 +196,7 @@ void killRunningProcesses() {
 }
 
 int getIdealThreadCount() {
-  int threadCount = QThread::idealThreadCount();
+  int threadCount = static_cast<int>(std::thread::hardware_concurrency());
   if constexpr(getOsType() == OsType::Windows) {
     threadCount -= 1;
   }

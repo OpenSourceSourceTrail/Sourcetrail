@@ -17,7 +17,7 @@ add_sourcetrail_test(
   SOURCES
   utilityAppTestSuite.cpp
   DEPS
-  Sourcetrail::libGui::utility::utilityApp
+  Sourcetrail::core::utility::utilityApp
   TEST_PREFIX
   "unittests.lib_gui."
   WORKING_DIRECTORY

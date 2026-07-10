@@ -1,6 +1,7 @@
 # ${CMAKE_SOURCE_DIR}/src/lib_gui/CMakeLists.txt
 add_files(
   LIB_GUI
+  utility/globalStrings.h
   platform_includes/includesLinux.h
   platform_includes/includesMac.h
   platform_includes/includesWindows.h
@@ -306,16 +307,5 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     qt/project_wizard/content/QtProjectWizardContentFlags.h
     qt/project_wizard/content/QtProjectWizardContentVS.cpp
     qt/project_wizard/content/QtProjectWizardContentVS.h
-    utility/path_detector/cxx_header/CxxFrameworkPathDetector.cpp
-    utility/path_detector/cxx_header/CxxFrameworkPathDetector.h
-    utility/path_detector/cxx_header/CxxHeaderPathDetector.cpp
-    utility/path_detector/cxx_header/CxxHeaderPathDetector.h
-    utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.cpp
-    utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.h
-    utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.cpp
-    utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.h
-    utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.cpp
-    utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.hpp
-    utility/path_detector/cxx_header/utilityCxxHeaderDetection.cpp
-    utility/path_detector/cxx_header/utilityCxxHeaderDetection.h)
+)
 endif()
