@@ -1,7 +1,5 @@
 #include "BucketLayouter.h"
 
-#include <QVector4D>
-
 #include "DummyEdge.h"
 #include "GraphViewStyle.h"
 
@@ -30,16 +28,16 @@ bool Bucket::hasNode(std::shared_ptr<DummyNode> node) const {
 void Bucket::addNode(std::shared_ptr<DummyNode> node) {
   m_nodes.insert(node);
 
-  m_width = (node->size.x() > static_cast<float>(m_width) ? static_cast<int>(node->size.x()) : m_width);
-  m_height += GraphViewStyle::toGridSize(static_cast<int>(node->size.y())) + GraphViewStyle::s_gridCellPadding;
+  m_width = (node->size.x > static_cast<float>(m_width) ? static_cast<int>(node->size.x) : m_width);
+  m_height += GraphViewStyle::toGridSize(static_cast<int>(node->size.y)) + GraphViewStyle::s_gridCellPadding;
 }
 
 const DummyNode::BundledNodesSet& Bucket::getNodes() const {
   return m_nodes;
 }
 
-void Bucket::preLayout(QVector2D viewSize, bool addVerticalSplit, bool forceVerticalSplit) {
-  int cols = (viewSize.y() > 0.0f ? static_cast<int>(static_cast<float>(m_height) / viewSize.y()) : 0) + 1;
+void Bucket::preLayout(Vec2f viewSize, bool addVerticalSplit, bool forceVerticalSplit) {
+  int cols = (viewSize.y > 0.0f ? static_cast<int>(static_cast<float>(m_height) / viewSize.y) : 0) + 1;
 
   int x = 0;
   int y = 0;
@@ -74,14 +72,14 @@ void Bucket::preLayout(QVector2D viewSize, bool addVerticalSplit, bool forceVert
       }
     }
 
-    node->position.setX(static_cast<float>(x));
-    node->position.setY(static_cast<float>(y));
+    node->position.x = static_cast<float>(x);
+    node->position.y = static_cast<float>(y);
 
     nodesInCol.back().push_back(node.get());
 
-    y += GraphViewStyle::toGridSize(static_cast<int>(node->size.y())) + GraphViewStyle::s_gridCellPadding;
+    y += GraphViewStyle::toGridSize(static_cast<int>(node->size.y)) + GraphViewStyle::s_gridCellPadding;
 
-    width = std::max(width, static_cast<int>(node->size.x()));
+    width = std::max(width, static_cast<int>(node->size.x));
     m_height = std::max(m_height, y);
   }
 
@@ -93,8 +91,8 @@ void Bucket::preLayout(QVector2D viewSize, bool addVerticalSplit, bool forceVert
 
   for(size_t idx = 0; idx < nodesInCol.size(); idx++) {
     for(DummyNode* node : nodesInCol[idx]) {
-      node->columnSize.setX(static_cast<float>(colWidths[idx]));
-      node->columnSize.setY(static_cast<float>(colHeights[idx]));
+      node->columnSize.x = static_cast<float>(colWidths[idx]);
+      node->columnSize.y = static_cast<float>(colHeights[idx]);
     }
   }
 
@@ -127,42 +125,42 @@ void Bucket::preLayout(QVector2D viewSize, bool addVerticalSplit, bool forceVert
       if(hasOffset) {
         above = false;
       } else if(nodesInCol[idx].size() == 1) {
-        offset -= static_cast<int>((node->size.y() + static_cast<float>(GraphViewStyle::s_gridCellPadding)) / 2);
-      } else if(node->position.y() < static_cast<float>(mid) && node->position.y() + node->size.y() > static_cast<float>(mid)) {
-        if(static_cast<float>(mid) - node->position.y() < (node->position.y() + node->size.y()) - static_cast<float>(mid)) {
-          offset = static_cast<int>(static_cast<float>(mid) - node->position.y() +
+        offset -= static_cast<int>((node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding)) / 2);
+      } else if(node->position.y < static_cast<float>(mid) && node->position.y + node->size.y > static_cast<float>(mid)) {
+        if(static_cast<float>(mid) - node->position.y < (node->position.y + node->size.y) - static_cast<float>(mid)) {
+          offset = static_cast<int>(static_cast<float>(mid) - node->position.y +
                                     static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2);
           above = false;
         } else {
-          offset = static_cast<int>(static_cast<float>(mid) - (node->position.y() + node->size.y()) -
+          offset = static_cast<int>(static_cast<float>(mid) - (node->position.y + node->size.y) -
                                     static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2);
         }
         hasOffset = true;
-      } else if(node->position.y() + node->size.y() < static_cast<float>(mid) &&
+      } else if(node->position.y + node->size.y < static_cast<float>(mid) &&
                 static_cast<float>(mid) <
-                    node->position.y() + node->size.y() + static_cast<float>(GraphViewStyle::s_gridCellPadding)) {
+                    node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding)) {
         offset = static_cast<int>(static_cast<float>(mid) -
-                                  (node->position.y() + node->size.y() + static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2));
+                                  (node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2));
         hasOffset = true;
       }
 
       if(above) {
         aboveNodes.push_back(node);
-        aboveNodesMaxWidth = std::max(aboveNodesMaxWidth, static_cast<int>(node->size.x()));
+        aboveNodesMaxWidth = std::max(aboveNodesMaxWidth, static_cast<int>(node->size.x));
       } else {
         belowNodes.push_back(node);
-        belowNodesMaxWidth = std::max(belowNodesMaxWidth, static_cast<int>(node->size.x()));
+        belowNodesMaxWidth = std::max(belowNodesMaxWidth, static_cast<int>(node->size.x));
       }
     }
 
     offset += (m_height - colHeights[idx]) / 2;
     for(DummyNode* node : aboveNodes) {
-      node->position.setY(node->position.y() + static_cast<float>(offset - nodeOffset));
-      node->columnSize.setX(static_cast<float>(aboveNodesMaxWidth));
+      node->position.y += static_cast<float>(offset - nodeOffset);
+      node->columnSize.x = static_cast<float>(aboveNodesMaxWidth);
     }
     for(DummyNode* node : belowNodes) {
-      node->position.setY(node->position.y() + static_cast<float>(offset + nodeOffset));
-      node->columnSize.setX(static_cast<float>(belowNodesMaxWidth));
+      node->position.y += static_cast<float>(offset + nodeOffset);
+      node->columnSize.x = static_cast<float>(belowNodesMaxWidth);
     }
   }
 }
@@ -172,7 +170,8 @@ void Bucket::layout(int x, int y, int width, int height) {
     return;
   }
 
-  QVector2D offset{static_cast<float>(x + (width - m_width) / 2), static_cast<float>(y + (height - m_height) / 2)};
+  Vec2f offset{.x = static_cast<float>(x + (width - m_width) / 2),
+               .y = static_cast<float>(y + (height - m_height) / 2)};
   offset = GraphViewStyle::alignOnRaster((*m_nodes.begin())->position + offset) - (*m_nodes.begin())->position;
 
   for(const std::shared_ptr<DummyNode>& node : m_nodes) {
@@ -201,7 +200,7 @@ int Bucket::getMiddleGapX() const {
 }
 
 
-BucketLayouter::BucketLayouter(QVector2D viewSize) : m_viewSize(viewSize), m_i1(0), m_j1(0), m_i2(0), m_j2(0) {
+BucketLayouter::BucketLayouter(Vec2f viewSize) : m_viewSize(viewSize), m_i1(0), m_j1(0), m_i2(0), m_j2(0) {
   m_buckets[0][0] = Bucket(0, 0);
 }
 
@@ -329,8 +328,8 @@ void BucketLayouter::layoutBuckets(bool addVerticalSplit) {
 
   int verticalOffset = 0;
   if(m_activeParentNode) {
-    QVector4D rect = m_activeParentNode->getActiveSubNodeRect();
-    verticalOffset = static_cast<int>((rect.y() + rect.w() - m_activeParentNode->size.y()) / 2);
+    LayoutRect rect = m_activeParentNode->getActiveSubNodeRect();
+    verticalOffset = static_cast<int>((rect.top + rect.bottom - m_activeParentNode->size.y) / 2);
   }
 
   // Calculate x offsets in the middle column to align all columns in each bucket at the column

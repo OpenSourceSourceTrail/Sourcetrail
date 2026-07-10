@@ -126,7 +126,7 @@ private:
 
   void layoutNesting();
   void extendEqualFunctionNames(const std::vector<std::shared_ptr<DummyNode>>& nodes) const;
-  QVector4D layoutNestingRecursive(DummyNode* node, int relayoutAccessMaxWidth = -1) const;
+  LayoutRect layoutNestingRecursive(DummyNode* node, int relayoutAccessMaxWidth = -1) const;
   void addExpandToggleNode(DummyNode* node) const;
   void layoutToGrid(DummyNode* node) const;
 

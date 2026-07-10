@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include <QVector4D>
-
 TrailLayouter::TrailLayouter(LayoutDirection dir) : m_direction(dir), m_rootNode(nullptr) {}
 
 void TrailLayouter::layoutGraph(std::vector<std::shared_ptr<DummyNode>>& dummyNodes,
@@ -352,8 +350,8 @@ void TrailLayouter::layout() {
     int y = -heightsPerCol[i] / 2;
 
     for(TrailNode* node : nodes) {
-      node->pos = horizontalLayout() ? QVector2D{static_cast<float>(x), static_cast<float>(y)} :
-                                       QVector2D{static_cast<float>(y), static_cast<float>(x)};
+      node->pos = horizontalLayout() ? Vec2f{static_cast<float>(x), static_cast<float>(y)} :
+                                       Vec2f{static_cast<float>(y), static_cast<float>(x)};
       y += static_cast<int>(node->size[static_cast<int>(yIdx)] + 30.0f);
 
       if(!node->id) {
@@ -492,7 +490,10 @@ void TrailLayouter::retrievePositions(const std::map<Id, Id>& topLevelAncestorId
         bool forward = edge->target->id == topLevelAncestorIds.find(dummyEdge->targetId)->second;
         for(size_t i = 0; i < edge->virtualNodes.size(); i++) {
           TrailNode* node = edge->virtualNodes[forward ? i : edge->virtualNodes.size() - 1 - i];
-          dummyEdge->path.push_back({node->pos.x(), node->pos.y(), node->pos.x() + node->size.x(), node->pos.y() + node->size.y()});
+          dummyEdge->path.push_back({.left  = node->pos.x,
+                                      .top   = node->pos.y,
+                                      .right = node->pos.x + node->size.x,
+                                      .bottom= node->pos.y + node->size.y});
         }
       }
     }

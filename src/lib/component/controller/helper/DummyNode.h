@@ -2,8 +2,8 @@
 
 #include <cmath>
 
-#include <QVector2D>
-#include <QVector4D>
+#include "LayoutRect.h"
+#include "Vec2f.h"
 
 #include "AccessKind.h"
 #include "GlobalId.hpp"
@@ -155,16 +155,16 @@ public:
     return false;
   }
 
-  QVector4D getActiveSubNodeRect(QVector2D pos = {}) const {
+  LayoutRect getActiveSubNodeRect(Vec2f pos = {}) const {
     pos += position;
 
     if(active) {
-      return {pos.x(), pos.y(), pos.x() + size.x(), pos.y() + size.y()};
+      return {.left = pos.x, .top = pos.y, .right = pos.x + size.x, .bottom = pos.y + size.y};
     }
 
     for(const std::shared_ptr<DummyNode>& node : subNodes) {
-      QVector4D rect = node->getActiveSubNodeRect(pos);
-      if(rect.w() > 0) {
+      LayoutRect rect = node->getActiveSubNodeRect(pos);
+      if(rect.isValid()) {
         return rect;
       }
     }
@@ -358,8 +358,8 @@ public:
 
   Type type;
 
-  QVector2D position;
-  QVector2D size;
+  Vec2f position;
+  Vec2f size;
 
   bool visible;
   bool hidden;
@@ -390,7 +390,7 @@ public:
   Id bundleId;
 
   // Layout
-  QVector2D columnSize;
+  Vec2f columnSize;
 
   // BundleNode
   BundledNodesSet bundledNodes;

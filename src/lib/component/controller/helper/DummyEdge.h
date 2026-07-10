@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QVector4D>
+#include "LayoutRect.h"
 
 // internal
 #include "Edge.h"
@@ -56,7 +56,7 @@ struct DummyEdge {
   bool hidden = false;
   bool active = false;
 
-  std::vector<QVector4D> path;
+  std::vector<LayoutRect> path;
 
   bool layoutHorizontal = true;
 

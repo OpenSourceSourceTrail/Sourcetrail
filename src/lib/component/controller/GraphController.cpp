@@ -2,8 +2,6 @@
 
 #include <set>
 
-#include <QVector2D>
-
 #include "AccessKind.h"
 #include "Application.h"
 #include "BucketLayouter.h"
@@ -1520,7 +1518,7 @@ void GraphController::extendEqualFunctionNames(const std::vector<std::shared_ptr
   }
 }
 
-QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAccessMaxWidth) const {
+LayoutRect GraphController::layoutNestingRecursive(DummyNode* node, int relayoutAccessMaxWidth) const {
   if(!node->visible) {
     return {};
   }
@@ -1575,17 +1573,17 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
       if(!subNode->visible) {
         continue;
       } else if(subNode->isQualifierNode()) {
-        subNode->position.setY(static_cast<float>(margins.top) + margins.charHeight / 2.0f);
+        subNode->position.y = static_cast<float>(margins.top) + margins.charHeight / 2.0f;
         width += 5;
         continue;
       }
 
-      QVector4D rect = layoutNestingRecursive(subNode.get());
+      LayoutRect rect = layoutNestingRecursive(subNode.get());
 
       if(subNode->isExpandToggleNode()) {
-        width += static_cast<int>(static_cast<float>(margins.spacingX) + subNode->size.x());
-      } else if(subNode->isAccessNode() && rect.z() > static_cast<float>(maxAccessWidth)) {
-        maxAccessWidth = static_cast<int>(rect.z());
+        width += static_cast<int>(static_cast<float>(margins.spacingX) + subNode->size.x);
+      } else if(subNode->isAccessNode() && rect.right > static_cast<float>(maxAccessWidth)) {
+        maxAccessWidth = static_cast<int>(rect.right);
         maxWidthAccessNode = subNode;
       }
     }
@@ -1601,16 +1599,16 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
 
   if(node->subNodes.size()) {
     if(node->isGroupNode()) {
-      QVector2D viewSize = getView()->getViewSize();
+      Vec2f viewSize = getView()->getViewSize();
 
       switch(node->groupLayout) {
       case GroupLayout::LIST:
-        viewSize.setX(viewSize.x() - 150);    // prevent horizontal scroll
+        viewSize.x -= 150;    // prevent horizontal scroll
         ListLayouter::layoutMultiColumn(viewSize, &node->subNodes);
         break;
 
       case GroupLayout::SKEWED:
-        ListLayouter::layoutSkewed(&node->subNodes, margins.spacingX, margins.spacingY, static_cast<int>(viewSize.x() * 1.5f));
+        ListLayouter::layoutSkewed(&node->subNodes, margins.spacingX, margins.spacingY, static_cast<int>(viewSize.x * 1.5f));
         break;
 
       case GroupLayout::BUCKET:
@@ -1635,17 +1633,17 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
     }
   }
 
-  QVector2D size = ListLayouter::offsetNodes(
+  Vec2f size = ListLayouter::offsetNodes(
       node->subNodes,
       static_cast<int>(static_cast<float>(margins.top) + margins.charHeight + static_cast<float>(margins.spacingA)),
       margins.left);
 
-  width = std::max(static_cast<int>(size.x()), width);
-  height = static_cast<int>(size.y());
+  width = std::max(static_cast<int>(size.x), width);
+  height = static_cast<int>(size.y);
 
-  node->size.setX(static_cast<float>(margins.left + width + margins.right));
-  node->size.setY(static_cast<float>(margins.top) + margins.charHeight + static_cast<float>(margins.spacingA) +
-                  static_cast<float>(height) + static_cast<float>(margins.bottom));
+  node->size.x = static_cast<float>(margins.left + width + margins.right);
+  node->size.y = static_cast<float>(margins.top) + margins.charHeight + static_cast<float>(margins.spacingA) +
+                 static_cast<float>(height) + static_cast<float>(margins.bottom);
 
   for(const std::shared_ptr<DummyNode>& subNode : node->subNodes) {
     if(!subNode->visible) {
@@ -1653,10 +1651,10 @@ QVector4D GraphController::layoutNestingRecursive(DummyNode* node, int relayoutA
     }
 
     if(subNode->isAccessNode()) {
-      subNode->size.setX(static_cast<float>(width));
+      subNode->size.x = static_cast<float>(width);
     } else if(subNode->isExpandToggleNode()) {
-      subNode->position.setX(static_cast<float>(margins.left) + static_cast<float>(width) - subNode->size.x());
-      subNode->position.setY(6);
+      subNode->position.x = static_cast<float>(margins.left) + static_cast<float>(width) - subNode->size.x;
+      subNode->position.y = 6;
     }
   }
 
@@ -1703,11 +1701,11 @@ void GraphController::layoutToGrid(DummyNode* node) const {
 
   // Increase size of nodes with visible children to cover full grid cells
 
-  size_t width = static_cast<size_t>(GraphViewStyle::toGridSize(static_cast<int>(node->size.x())));
-  size_t height = static_cast<size_t>(GraphViewStyle::toGridSize(static_cast<int>(node->size.y())));
+  size_t width = static_cast<size_t>(GraphViewStyle::toGridSize(static_cast<int>(node->size.x)));
+  size_t height = static_cast<size_t>(GraphViewStyle::toGridSize(static_cast<int>(node->size.y)));
 
-  size_t incX = static_cast<size_t>(static_cast<float>(width) - node->size.x());
-  size_t incY = static_cast<size_t>(static_cast<float>(height) - node->size.y());
+  size_t incX = static_cast<size_t>(static_cast<float>(width) - node->size.x);
+  size_t incY = static_cast<size_t>(static_cast<float>(height) - node->size.y);
 
   DummyNode* lastAccessNode = nullptr;
   DummyNode* expandToggleNode = nullptr;
@@ -1718,7 +1716,7 @@ void GraphController::layoutToGrid(DummyNode* node) const {
     }
 
     if(subNode->isAccessNode()) {
-      subNode->size.setX(subNode->size.x() + static_cast<float>(incX));
+      subNode->size.x += static_cast<float>(incX);
       lastAccessNode = subNode.get();
     } else if(subNode->isExpandToggleNode()) {
       expandToggleNode = subNode.get();
@@ -1726,14 +1724,14 @@ void GraphController::layoutToGrid(DummyNode* node) const {
   }
 
   if(lastAccessNode) {
-    lastAccessNode->size.setY(lastAccessNode->size.y() + static_cast<float>(incY));
+    lastAccessNode->size.y += static_cast<float>(incY);
 
     if(expandToggleNode) {
-      expandToggleNode->position.setX(expandToggleNode->position.x() + static_cast<float>(incX));
+      expandToggleNode->position.x += static_cast<float>(incX);
     }
 
-    node->size.setX(static_cast<float>(width));
-    node->size.setY(static_cast<float>(height));
+    node->size.x = static_cast<float>(width);
+    node->size.y = static_cast<float>(height);
   }
 }
 
@@ -1884,10 +1882,10 @@ void GraphController::forEachDummyEdge(std::function<void(DummyEdge*)> func) {
 
 void GraphController::createLegendGraph() {
   Id id = ~Id(0) >> 1;
-  std::map<Id, QVector2D> nodePositions;
+  std::map<Id, Vec2f> nodePositions;
   const auto& pGraph = std::make_shared<Graph>();
 
-  auto addText = [this](const std::wstring& text, int fontSizeDiff, QVector2D position) {
+  auto addText = [this](const std::wstring& text, int fontSizeDiff, Vec2f position) {
     std::shared_ptr<DummyNode> node = std::make_shared<DummyNode>(DummyNode::DUMMY_TEXT);
     node->name = text;
     node->visible = true;
@@ -1898,7 +1896,7 @@ void GraphController::createLegendGraph() {
   };
 
   auto addNode = [&id, &pGraph, &nodePositions](
-                     NodeKind kind, const std::wstring& name, QVector2D position, DefinitionKind defKind = DEFINITION_EXPLICIT) {
+                     NodeKind kind, const std::wstring& name, Vec2f position, DefinitionKind defKind = DEFINITION_EXPLICIT) {
     nodePositions.emplace(++id, position);
     return pGraph->createNode(id, NodeType(kind), NameHierarchy(name, NAME_DELIMITER_UNKNOWN), defKind);
   };

@@ -3,7 +3,7 @@
 #include <map>
 #include <memory>
 
-#include <QVector2D>
+#include "Vec2f.h"
 
 // internal
 #include "AccessKind.h"
@@ -16,7 +16,7 @@ class GraphViewStyleImpl;
 
 class GraphViewStyle {
 public:
-  static QVector2D alignOnRaster(QVector2D position);
+  static Vec2f alignOnRaster(Vec2f position);
 
   struct NodeMargins {
     NodeMargins();
@@ -64,10 +64,10 @@ public:
     size_t fontSize;
     bool fontBold;
 
-    QVector2D textOffset;
+    Vec2f textOffset;
 
     FilePath iconPath;
-    QVector2D iconOffset;
+    Vec2f iconOffset;
     size_t iconSize;
 
     bool hasHatching;
@@ -88,8 +88,8 @@ public:
     int cornerRadius;
     int verticalOffset;
 
-    QVector2D originOffset;
-    QVector2D targetOffset;
+    Vec2f originOffset;
+    Vec2f targetOffset;
 
     bool dashed;
   };

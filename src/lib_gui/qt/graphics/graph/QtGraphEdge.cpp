@@ -124,8 +124,8 @@ void QtGraphEdge::updateLine() {
       item->setParentItem(nullptr);
     }
 
-    style.originOffset.setY(0);
-    style.targetOffset.setY(0);
+    style.originOffset.y = 0;
+    style.targetOffset.y = 0;
 
     for(const QVector4D& rect : m_path) {
       QtLineItemBezier* bezier = new QtLineItemBezier(this);
@@ -187,7 +187,7 @@ void QtGraphEdge::updateLine() {
 
       if(ownerNonGroupParent == targetNonGroupParent ||
          (type == Edge::EDGE_OVERRIDE &&
-          targetParentRect.z() + style.targetOffset.x() + style.originOffset.x() > ownerParentRect.x())) {
+          targetParentRect.z() + style.targetOffset.x + style.originOffset.x > ownerParentRect.x())) {
         child->setOnFront(true);
       } else {
         child->setOnFront(false);
@@ -323,7 +323,7 @@ void QtGraphEdge::coFocusIn() {
         info.count = static_cast<int>(m_weight);
         info.countText = "edge";
       }
-      info.offset = {10, 20};
+      info.offset = {.x = 10.0f, .y = 20.0f};
 
       if(type == Edge::EDGE_INHERITANCE && getData()) {
         TokenComponentInheritanceChain* componentInheritance = getData()->getComponent<TokenComponentInheritanceChain>();

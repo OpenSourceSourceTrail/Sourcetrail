@@ -69,14 +69,14 @@ QPolygon QtLineItemBase::getPath() const {
   const QVector4D& tR = m_targetRect;
   const QVector4D& tPR = m_targetParentRect;
 
-  const QVector2D& oOff = m_style.originOffset;
-  const QVector2D& tOff = m_style.targetOffset;
+  const Vec2f& oOff = m_style.originOffset;
+  const Vec2f& tOff = m_style.targetOffset;
 
   QVector2D oP[4];
-  getPivotPoints(oP, oR, oPR, static_cast<int>(oOff.y()), false);
+  getPivotPoints(oP, oR, oPR, static_cast<int>(oOff.y), false);
 
   QVector2D tP[4];
-  getPivotPoints(tP, tR, tPR, static_cast<int>(tOff.y()), true);
+  getPivotPoints(tP, tR, tPR, static_cast<int>(tOff.y), true);
 
   int io = -1;
   int it = -1;
@@ -117,10 +117,10 @@ QPolygon QtLineItemBase::getPath() const {
 
   // start/end and offsetted start/end points
   QVector2D o[4];
-  getPivotPoints(o, oR, oR, static_cast<int>(oOff.y()), false);
+  getPivotPoints(o, oR, oR, static_cast<int>(oOff.y), false);
 
   QVector2D t[4];
-  getPivotPoints(t, tR, tR, static_cast<int>(tOff.y()), true);
+  getPivotPoints(t, tR, tR, static_cast<int>(tOff.y), true);
 
   QPoint a(static_cast<int>(t[it].x()), static_cast<int>(t[it].y()));
   QPoint d(static_cast<int>(o[io].x()), static_cast<int>(o[io].y()));
@@ -130,31 +130,31 @@ QPolygon QtLineItemBase::getPath() const {
 
   switch(it) {
   case 0:
-    b.setY(static_cast<int>(static_cast<float>(b.y()) - tOff.x()));
+    b.setY(static_cast<int>(static_cast<float>(b.y()) - tOff.x));
     break;
   case 1:
-    b.setX(static_cast<int>(static_cast<float>(b.x()) + tOff.x()));
+    b.setX(static_cast<int>(static_cast<float>(b.x()) + tOff.x));
     break;
   case 2:
-    b.setY(static_cast<int>(static_cast<float>(b.y()) + tOff.x()));
+    b.setY(static_cast<int>(static_cast<float>(b.y()) + tOff.x));
     break;
   case 3:
-    b.setX(static_cast<int>(static_cast<float>(b.x()) - tOff.x()));
+    b.setX(static_cast<int>(static_cast<float>(b.x()) - tOff.x));
     break;
   }
 
   switch(io) {
   case 0:
-    c.setY(static_cast<int>(static_cast<float>(c.y()) - oOff.x()));
+    c.setY(static_cast<int>(static_cast<float>(c.y()) - oOff.x));
     break;
   case 1:
-    c.setX(static_cast<int>(static_cast<float>(c.x()) + oOff.x()));
+    c.setX(static_cast<int>(static_cast<float>(c.x()) + oOff.x));
     break;
   case 2:
-    c.setY(static_cast<int>(static_cast<float>(c.y()) + oOff.x()));
+    c.setY(static_cast<int>(static_cast<float>(c.y()) + oOff.x));
     break;
   case 3:
-    c.setX(static_cast<int>(static_cast<float>(c.x()) - oOff.x()));
+    c.setX(static_cast<int>(static_cast<float>(c.x()) - oOff.x));
     break;
   }
 
@@ -184,16 +184,16 @@ QPolygon QtLineItemBase::getPath() const {
 
         switch(it) {
         case 0:
-          b.setY(static_cast<int>(static_cast<float>(b.y()) - tOff.x()));
+          b.setY(static_cast<int>(static_cast<float>(b.y()) - tOff.x));
           break;
         case 1:
-          b.setX(static_cast<int>(static_cast<float>(b.x()) + tOff.x()));
+          b.setX(static_cast<int>(static_cast<float>(b.x()) + tOff.x));
           break;
         case 2:
-          b.setY(static_cast<int>(static_cast<float>(b.y()) + tOff.x()));
+          b.setY(static_cast<int>(static_cast<float>(b.y()) + tOff.x));
           break;
         case 3:
-          b.setX(static_cast<int>(static_cast<float>(b.x()) - tOff.x()));
+          b.setX(static_cast<int>(static_cast<float>(b.x()) - tOff.x));
           break;
         }
       } else {
@@ -204,16 +204,16 @@ QPolygon QtLineItemBase::getPath() const {
 
         switch(io) {
         case 0:
-          c.setY(static_cast<int>(static_cast<float>(c.y()) - oOff.x()));
+          c.setY(static_cast<int>(static_cast<float>(c.y()) - oOff.x));
           break;
         case 1:
-          c.setX(static_cast<int>(static_cast<float>(c.x()) + oOff.x()));
+          c.setX(static_cast<int>(static_cast<float>(c.x()) + oOff.x));
           break;
         case 2:
-          c.setY(static_cast<int>(static_cast<float>(c.y()) + oOff.x()));
+          c.setY(static_cast<int>(static_cast<float>(c.y()) + oOff.x));
           break;
         case 3:
-          c.setX(static_cast<int>(static_cast<float>(c.x()) - oOff.x()));
+          c.setX(static_cast<int>(static_cast<float>(c.x()) - oOff.x));
           break;
         }
       }

@@ -367,10 +367,13 @@ void QtGraphNode::addSubNode(QtGraphNode* node) {
 }
 
 void QtGraphNode::moved(const QVector2D& oldPosition) {
-  setPosition(GraphViewStyle::alignOnRaster(getPosition()));
+  const QVector2D cur = getPosition();
+  const Vec2f aligned = GraphViewStyle::alignOnRaster({cur.x(), cur.y()});
+  setPosition(QVector2D{aligned.x, aligned.y});
 
   if(isDataNode() || isGroupNode() || isBundleNode()) {
-    MessageGraphNodeMove(getTokenId(), getPosition() - oldPosition).dispatch();
+    const QVector2D d = getPosition() - oldPosition;
+    MessageGraphNodeMove(getTokenId(), Vec2f{.x = d.x(), .y = d.y()}).dispatch();
   }
 }
 
@@ -546,7 +549,7 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style) {
     m_icon = new QGraphicsPixmapItem(utility::colorizePixmap(pixmap.pixmap(), style.color.icon.c_str()), this);
     m_icon->setTransformationMode(Qt::SmoothTransformation);
     m_icon->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    m_icon->setPos(style.iconOffset.x(), style.iconOffset.y());
+    m_icon->setPos(style.iconOffset.x, style.iconOffset.y);
   }
 
   QFont font(style.fontName.c_str());
@@ -557,24 +560,24 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style) {
 
   m_text->setFont(font);
   m_text->setBrush(QBrush(style.color.text.c_str()));
-  m_text->setPos(static_cast<qreal>(style.iconOffset.x() + static_cast<float>(style.iconSize) + style.textOffset.x()),
-                 static_cast<qreal>(style.textOffset.y()));
+  m_text->setPos(static_cast<qreal>(style.iconOffset.x + static_cast<float>(style.iconSize) + style.textOffset.x),
+                 static_cast<qreal>(style.textOffset.y));
 
   if(m_matchLength) {
     GraphViewStyle::NodeColor color = GraphViewStyle::getScreenMatchColor(m_isActiveMatch);
 
     m_matchText->setFont(font);
     m_matchText->setBrush(QBrush(color.text.c_str()));
-    m_matchText->setPos(static_cast<qreal>(style.iconOffset.x() + static_cast<float>(style.iconSize) + style.textOffset.x()),
-                        static_cast<qreal>(style.textOffset.y()));
+    m_matchText->setPos(static_cast<qreal>(style.iconOffset.x + static_cast<float>(style.iconSize) + style.textOffset.x),
+                        static_cast<qreal>(style.textOffset.y));
 
     const float charWidth = static_cast<float>(
                                 QFontMetrics(font).boundingRect(QStringLiteral("QtGraphNode::QtGraphNode::QtGraphNode")).width()) /
         37.0f;
     const float charHeight = static_cast<float>(QFontMetrics(font).height());
-    m_matchRect->setRect(static_cast<qreal>(style.iconOffset.x() + static_cast<float>(style.iconSize) + style.textOffset.x() +
+    m_matchRect->setRect(static_cast<qreal>(style.iconOffset.x + static_cast<float>(style.iconSize) + style.textOffset.x +
                                             static_cast<float>(m_matchPos) * charWidth),
-                         static_cast<qreal>(style.textOffset.y()),
+                         static_cast<qreal>(style.textOffset.y),
                          static_cast<qreal>(static_cast<float>(m_matchLength) * charWidth),
                          static_cast<qreal>(charHeight));
     m_matchRect->setPen(QPen(color.border.c_str()));

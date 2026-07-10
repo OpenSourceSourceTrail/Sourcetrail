@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <QVector2D>
+#include "Vec2f.h"
 
 #include "GlobalId.hpp"
 #include "GroupType.h"
@@ -45,7 +45,7 @@ public:
 
   virtual void resizeView() = 0;
 
-  [[nodiscard]] virtual QVector2D getViewSize() const = 0;
+  [[nodiscard]] virtual Vec2f getViewSize() const = 0;
   [[nodiscard]] virtual GroupType getGrouping() const = 0;
 
   virtual void scrollToValues(int xValue, int yValue) = 0;

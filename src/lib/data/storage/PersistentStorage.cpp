@@ -2,8 +2,6 @@
 
 #include <queue>
 
-#include <QVector2D>
-
 #include "AccessKind.h"
 #include "ElementComponentKind.h"
 #include "FileInfo.h"
@@ -1727,9 +1725,9 @@ TooltipInfo PersistentStorage::getTooltipInfoForTokenIds(const std::vector<Id>& 
   info.snippets.push_back(getTooltipSnippetForNode(node));
 
   if(origin == TOOLTIP_ORIGIN_CODE) {
-    info.offset = {20, 30};
+    info.offset = {.x = 20.0f, .y = 30.0f};
   } else if(origin == TOOLTIP_ORIGIN_GRAPH) {
-    info.offset = {50, 20};
+    info.offset = {.x = 50.0f, .y = 20.0f};
   }
 
   return info;
@@ -1963,7 +1961,7 @@ TooltipInfo PersistentStorage::getTooltipInfoForSourceLocationIdsAndLocalSymbolI
     info.snippets.push_back(snippet);
   }
 
-  info.offset = {0, 15};
+  info.offset = {.x = 0.0f, .y = 15.0f};
 
   return info;
 }

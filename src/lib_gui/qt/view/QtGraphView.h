@@ -6,6 +6,7 @@
 #include <QPointF>
 #include <QVector2D>
 // internal
+#include "Vec2f.h"
 #include "GlobalId.hpp"
 #include "Graph.h"
 #include "GraphFocusHandler.h"
@@ -59,7 +60,7 @@ public:
 
   void resizeView() override;
 
-  QVector2D getViewSize() const override;
+  Vec2f getViewSize() const override;
   GroupType getGrouping() const override;
 
   void scrollToValues(int xValue, int yValue) override;

@@ -325,8 +325,8 @@ void QtGraphView::rebuildGraph(std::shared_ptr<Graph> graph,
 
     // move graph to center
     QPointF center = itemsBoundingRect(m_nodes).center();
-    const QVector2D o = GraphViewStyle::alignOnRaster({static_cast<float>(center.x()), static_cast<float>(center.y())});
-    QPointF offset = QPointF(o.x(), o.y());
+    const Vec2f o = GraphViewStyle::alignOnRaster({static_cast<float>(center.x()), static_cast<float>(center.y())});
+    QPointF offset = QPointF(o.x, o.y);
     m_sceneRectOffset = offset - center;
 
     for(QtGraphNode* node : m_nodes) {
@@ -443,7 +443,7 @@ void QtGraphView::resizeView() {
   m_onQtThread([this]() { doResize(); });
 }
 
-QVector2D QtGraphView::getViewSize() const {
+Vec2f QtGraphView::getViewSize() const {
   QtGraphicsView* view = getView();
 
   const float zoomFactor = view->getZoomFactor();
@@ -867,9 +867,9 @@ QtGraphNode* QtGraphView::createNodeRecursive(
     return nullptr;
   }
 
-  newNode->setPosition(node->position);
-  newNode->setSize(node->size);
-  newNode->setColumnSize(node->columnSize);
+  newNode->setPosition(QVector2D{node->position.x, node->position.y});
+  newNode->setSize(QVector2D{node->size.x, node->size.y});
+  newNode->setColumnSize(QVector2D{node->columnSize.x, node->columnSize.y});
   newNode->setIsActive(node->active);
   newNode->setMultipleActive(multipleActive);
 
@@ -927,7 +927,11 @@ QtGraphEdge* QtGraphView::createEdge(QGraphicsView* view,
                                           edge->getDirection());
 
     if(trailMode != Graph::TRAIL_NONE) {
-      std::vector<QVector4D> path = edge->path;
+      std::vector<QVector4D> path;
+      path.reserve(edge->path.size());
+      for(const LayoutRect& r : edge->path) {
+        path.emplace_back(r.left, r.top, r.right, r.bottom);
+      }
       for(size_t i = 0; i < path.size(); i++) {
         path[i].setX(static_cast<float>(static_cast<qreal>(path[i].x()) - pathOffset.x()));
         path[i].setZ(static_cast<float>(static_cast<qreal>(path[i].z()) - pathOffset.x()));

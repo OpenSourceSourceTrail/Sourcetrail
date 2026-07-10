@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <QVector2D>
+#include "Vec2f.h"
 
 #include "GlobalId.hpp"
 
@@ -26,7 +26,7 @@ struct TooltipInfo {
 
   std::vector<TooltipSnippet> snippets;
 
-  QVector2D offset;
+  Vec2f offset;
 };
 
 #endif    // TOOLTIP_INFO_H
