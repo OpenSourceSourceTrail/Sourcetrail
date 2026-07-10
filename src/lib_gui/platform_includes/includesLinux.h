@@ -22,15 +22,13 @@ inline void setupPlatform(int /*argc*/, [[maybe_unused]] char* argv[]) {
   qputenv("QT_AUTO_SCREEN_SCALE_FACTOR_SOURCETRAIL", qgetenv("QT_AUTO_SCREEN_SCALE_FACTOR"));
   qputenv("QT_SCALE_FACTOR_SOURCETRAIL", qgetenv("QT_SCALE_FACTOR"));
 
-  const int autoScaling = appSettings.getScreenAutoScaling();
-  if(autoScaling != -1) {
+  if(const int autoScaling = appSettings.getScreenAutoScaling();  autoScaling != -1) {
     QByteArray bytes;
     bytes.setNum(autoScaling);
     qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", bytes);
   }
 
-  const float scaleFactor = appSettings.getScreenScaleFactor();
-  if(scaleFactor > 0.0F) {
+  if(const float scaleFactor = appSettings.getScreenScaleFactor();  scaleFactor > 0.0F) {
     QByteArray bytes;
     bytes.setNum(scaleFactor);
     qputenv("QT_SCALE_FACTOR", bytes);

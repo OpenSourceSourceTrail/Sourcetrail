@@ -173,7 +173,7 @@ int main(int argc, char* argv[]) {
 #  endif
 #endif
 
-  const Version version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+  const Version version{VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH};
   QApplication::setApplicationVersion(version.toString().c_str());
 
   commandline::CommandLineParser commandLineParser(version.toString());
