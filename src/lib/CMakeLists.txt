@@ -432,6 +432,7 @@ target_link_libraries(
   Sourcetrail_lib
   PUBLIC Sourcetrail::messaging
          Sourcetrail::proto::api
+         Sourcetrail::proto::convert
          gRPC::grpc++
          Sourcetrail::core::utility::ConfigManager
          Sourcetrail::core::utility::LowMemoryStringMap

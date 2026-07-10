@@ -42,10 +42,17 @@ add_library(Sourcetrail::proto::convert ALIAS Sourcetrail_proto_convert)
 
 target_include_directories(Sourcetrail_proto_convert PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
+# proto_convert needs lib headers to compile but must NOT create a CMake link
+# dep on Sourcetrail_lib (that would cause a cycle: lib→convert→lib).
+# Reading INTERFACE_INCLUDE_DIRECTORIES via generator expression gives us the
+# include paths at generation time without registering a link dependency.
+target_include_directories(
+  Sourcetrail_proto_convert
+  PRIVATE "$<TARGET_PROPERTY:Sourcetrail_lib,INTERFACE_INCLUDE_DIRECTORIES>"
+          "$<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:$<TARGET_PROPERTY:Sourcetrail_lib_cxx,INTERFACE_INCLUDE_DIRECTORIES>>")
+
 target_link_libraries(
   Sourcetrail_proto_convert
   PUBLIC Sourcetrail_proto_api
-  PRIVATE Sourcetrail_lib
-          Sourcetrail::core::utility::logging
-          Sourcetrail::core::utility::utilityString
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
+  PRIVATE Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::utilityString)
