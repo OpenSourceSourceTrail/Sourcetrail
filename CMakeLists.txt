@@ -367,6 +367,8 @@ set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h PROPERTY SK
 add_subdirectory(src/indexer)
 # App ----------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app)
+# CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------
+add_subdirectory(src/cli)
 # Tests --------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
@@ -402,7 +404,7 @@ create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user"
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
-install(TARGETS Sourcetrail Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+install(TARGETS Sourcetrail Sourcetrail_indexer Sourcetrail_cli RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIME_DIR}/data/)
 
