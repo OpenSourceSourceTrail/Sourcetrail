@@ -2,7 +2,7 @@
 
 #include <fmt/xchar.h>
 
-#include <QVector2D>
+#include "Vec2f.h"
 
 // internal
 #include "GlobalId.hpp"
@@ -11,7 +11,7 @@
 
 class MessageGraphNodeMove final : public Message<MessageGraphNodeMove> {
 public:
-  MessageGraphNodeMove(Id tokenId_, const QVector2D& delta_) : tokenId(tokenId_), delta(delta_) {
+  MessageGraphNodeMove(Id tokenId_, const Vec2f& delta_) : tokenId(tokenId_), delta(delta_) {
     setSchedulerId(TabId::currentTab());
   }
 
@@ -20,9 +20,9 @@ public:
   }
 
   void print(std::wostream& ostream) const override {
-    ostream << tokenId << L" " << fmt::format(L"[{}, {}]", delta.x(), delta.x());
+    ostream << tokenId << L" " << fmt::format(L"[{}, {}]", delta.x, delta.y);
   }
 
   const Id tokenId;
-  const QVector2D delta;
+  const Vec2f delta;
 };

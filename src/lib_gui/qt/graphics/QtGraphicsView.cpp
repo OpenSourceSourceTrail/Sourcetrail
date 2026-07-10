@@ -725,6 +725,6 @@ void QtGraphicsView::updateTransform() {
 
 void QtGraphicsView::handleMessage(MessageSaveAsImage* pMessage) {
   if((pMessage->getSchedulerId() == getSchedulerId()) && !m_imageCached.isNull()) {
-    m_imageCached.save(pMessage->path);
+    m_imageCached.save(QString::fromStdWString(pMessage->path));
   }
 }

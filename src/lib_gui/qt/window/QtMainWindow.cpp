@@ -597,7 +597,7 @@ void QtMainWindow::saveAsImage() {
   if(filePath.isNull()) {
     return;
   }
-  MessageSaveAsImage m(filePath);
+  MessageSaveAsImage m(filePath.toStdWString());
   m.setSchedulerId(TabId::currentTab());
   m.dispatch();
 }
