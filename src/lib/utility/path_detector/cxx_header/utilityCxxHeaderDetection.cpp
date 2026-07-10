@@ -1,7 +1,8 @@
 #include "utilityCxxHeaderDetection.h"
 
-#include <QSettings>
-#include <QSysInfo>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #include "FileSystem.h"
 #include "utilityApp.h"
@@ -74,20 +75,32 @@ std::vector<FilePath> getWindowsSdkHeaderSearchPaths(ApplicationArchitectureType
   return headerSearchPaths;
 }
 
-FilePath getWindowsSdkRootPathUsingRegistry(ApplicationArchitectureType architectureType, const std::string& sdkVersion) {
-  QString key = QStringLiteral("HKEY_LOCAL_MACHINE\\SOFTWARE\\");
+FilePath getWindowsSdkRootPathUsingRegistry([[maybe_unused]] ApplicationArchitectureType architectureType,
+                                            [[maybe_unused]] const std::string& sdkVersion) {
+#ifdef _WIN32
+  std::string subKey = "SOFTWARE\\";
   if(architectureType == ApplicationArchitectureType::X86_32) {
-    key += QStringLiteral("Wow6432Node\\");
+    subKey += "Wow6432Node\\";
   }
-  key += QStringLiteral("Microsoft\\Microsoft SDKs\\Windows\\") + sdkVersion.c_str();
+  subKey += "Microsoft\\Microsoft SDKs\\Windows\\" + sdkVersion;
 
-  QSettings expressKey(key, QSettings::NativeFormat);    // NativeFormat means from Registry on Windows.
-  QString value = expressKey.value(QStringLiteral("InstallationFolder")).toString();
+  char installationFolder[MAX_PATH] = {};
+  DWORD installationFolderSize = sizeof(installationFolder);
+  const LSTATUS status = RegGetValueA(HKEY_LOCAL_MACHINE,
+                                      subKey.c_str(),
+                                      "InstallationFolder",
+                                      RRF_RT_REG_SZ,
+                                      nullptr,
+                                      installationFolder,
+                                      &installationFolderSize);
 
-  FilePath path(value.toStdWString());
-  if(path.exists()) {
-    return path;
+  if(status == ERROR_SUCCESS) {
+    FilePath path(utility::decodeFromUtf8(installationFolder));
+    if(path.exists()) {
+      return path;
+    }
   }
+#endif
 
   return FilePath();
 }

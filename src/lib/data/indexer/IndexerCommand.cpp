@@ -1,13 +1,12 @@
 #include "IndexerCommand.h"
 
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <boost/json/object.hpp>
+#include <boost/json/serialize.hpp>
 
 #include "utilityString.h"
 
-std::wstring IndexerCommand::serialize(std::shared_ptr<const IndexerCommand> indexerCommand, bool compact) {
-  QJsonDocument jsonDocument(indexerCommand->doSerialize());
-  return QString::fromUtf8(jsonDocument.toJson(compact ? QJsonDocument::Compact : QJsonDocument::Indented)).toStdWString();
+std::wstring IndexerCommand::serialize(std::shared_ptr<const IndexerCommand> indexerCommand, bool /*compact*/) {
+  return utility::decodeFromUtf8(boost::json::serialize(indexerCommand->doSerialize()));
 }
 
 IndexerCommand::IndexerCommand(const FilePath& sourceFilePath) : m_sourceFilePath(sourceFilePath) {}
@@ -20,11 +19,11 @@ const FilePath& IndexerCommand::getSourceFilePath() const {
   return m_sourceFilePath;
 }
 
-QJsonObject IndexerCommand::doSerialize() const {
-  QJsonObject jsonObject;
+boost::json::object IndexerCommand::doSerialize() const {
+  boost::json::object jsonObject;
 
-  { jsonObject["type"] = QString::fromStdString(indexerCommandTypeToString(getIndexerCommandType())); }
-  { jsonObject["source_file_path"] = QString::fromStdWString(m_sourceFilePath.wstr()); }
+  jsonObject["type"] = indexerCommandTypeToString(getIndexerCommandType());
+  jsonObject["source_file_path"] = utility::encodeToUtf8(m_sourceFilePath.wstr());
 
   return jsonObject;
 }

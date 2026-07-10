@@ -1,7 +1,7 @@
 #include "IndexerCommandCxx.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
+#include <boost/json/array.hpp>
+#include <boost/json/object.hpp>
 
 #include <clang/Tooling/CompilationDatabase.h>
 #include <clang/Tooling/JSONCompilationDatabase.h>
@@ -150,37 +150,37 @@ const FilePath& IndexerCommandCxx::getWorkingDirectory() const {
   return mWorkingDirectory;
 }
 
-QJsonObject IndexerCommandCxx::doSerialize() const {
-  QJsonObject jsonObject = IndexerCommand::doSerialize();
+boost::json::object IndexerCommandCxx::doSerialize() const {
+  boost::json::object jsonObject = IndexerCommand::doSerialize();
 
   {
-    QJsonArray indexedPathsArray;
+    boost::json::array indexedPathsArray;
     for(const FilePath& indexedPath : mIndexedPaths) {
-      indexedPathsArray.append(QString::fromStdWString(indexedPath.wstr()));
+      indexedPathsArray.emplace_back(utility::encodeToUtf8(indexedPath.wstr()));
     }
-    jsonObject["indexed_paths"] = indexedPathsArray;
+    jsonObject["indexed_paths"] = std::move(indexedPathsArray);
   }
   {
-    QJsonArray excludeFiltersArray;
+    boost::json::array excludeFiltersArray;
     for(const FilePathFilter& excludeFilter : mExcludeFilters) {
-      excludeFiltersArray.append(QString::fromStdWString(excludeFilter.wstr()));
+      excludeFiltersArray.emplace_back(utility::encodeToUtf8(excludeFilter.wstr()));
     }
-    jsonObject["exclude_filters"] = excludeFiltersArray;
+    jsonObject["exclude_filters"] = std::move(excludeFiltersArray);
   }
   {
-    QJsonArray includeFiltersArray;
+    boost::json::array includeFiltersArray;
     for(const FilePathFilter& includeFilter : mIncludeFilters) {
-      includeFiltersArray.append(QString::fromStdWString(includeFilter.wstr()));
+      includeFiltersArray.emplace_back(utility::encodeToUtf8(includeFilter.wstr()));
     }
-    jsonObject["include_filters"] = includeFiltersArray;
+    jsonObject["include_filters"] = std::move(includeFiltersArray);
   }
-  { jsonObject["working_directory"] = QString::fromStdWString(getWorkingDirectory().wstr()); }
+  jsonObject["working_directory"] = utility::encodeToUtf8(getWorkingDirectory().wstr());
   {
-    QJsonArray compilerFlagsArray;
+    boost::json::array compilerFlagsArray;
     for(const std::wstring& compilerFlag : mCompilerFlags) {
-      compilerFlagsArray.append(QString::fromStdWString(compilerFlag));
+      compilerFlagsArray.emplace_back(utility::encodeToUtf8(compilerFlag));
     }
-    jsonObject["compiler_flags"] = compilerFlagsArray;
+    jsonObject["compiler_flags"] = std::move(compilerFlagsArray);
   }
 
   return jsonObject;

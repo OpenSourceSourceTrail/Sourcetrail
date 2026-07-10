@@ -38,7 +38,7 @@ public:
   [[nodiscard]] const FilePath& getWorkingDirectory() const;
 
 protected:
-  [[nodiscard]] QJsonObject doSerialize() const override;
+  [[nodiscard]] boost::json::object doSerialize() const override;
 
 private:
   std::set<FilePath> mIndexedPaths;

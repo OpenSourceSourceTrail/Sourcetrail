@@ -8,7 +8,9 @@
 #include "FilePathFilter.h"
 #include "IndexerCommandType.h"
 
-class QJsonObject;
+namespace boost::json {
+class object;
+}    // namespace boost::json
 
 class IndexerCommand {
 public:
@@ -24,7 +26,7 @@ public:
   const FilePath& getSourceFilePath() const;
 
 protected:
-  virtual QJsonObject doSerialize() const;
+  virtual boost::json::object doSerialize() const;
 
 private:
   FilePath m_sourceFilePath;

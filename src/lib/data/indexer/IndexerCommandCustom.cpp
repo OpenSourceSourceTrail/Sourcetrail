@@ -1,7 +1,7 @@
 #include "IndexerCommandCustom.h"
 
-#include <QJsonArray>
-#include <QJsonObject>
+#include <boost/json/array.hpp>
+#include <boost/json/object.hpp>
 
 #include "utilityString.h"
 
@@ -76,18 +76,18 @@ bool IndexerCommandCustom::getRunInParallel() const {
   return m_runInParallel;
 }
 
-QJsonObject IndexerCommandCustom::doSerialize() const {
-  QJsonObject jsonObject = IndexerCommand::doSerialize();
+boost::json::object IndexerCommandCustom::doSerialize() const {
+  boost::json::object jsonObject = IndexerCommand::doSerialize();
 
-  { jsonObject["command"] = QString::fromStdWString(m_command); }
+  jsonObject["command"] = utility::encodeToUtf8(m_command);
   {
-    QJsonArray argumentsArray;
+    boost::json::array argumentsArray;
     for(const std::wstring& argument : m_arguments) {
-      argumentsArray.append(QString::fromStdWString(argument));
+      argumentsArray.emplace_back(utility::encodeToUtf8(argument));
     }
-    jsonObject["arguments"] = argumentsArray;
+    jsonObject["arguments"] = std::move(argumentsArray);
   }
-  { jsonObject["run_in_parallel"] = m_runInParallel; }
+  jsonObject["run_in_parallel"] = m_runInParallel;
 
   return jsonObject;
 }

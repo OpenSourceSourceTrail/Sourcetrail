@@ -38,7 +38,7 @@ public:
   bool getRunInParallel() const;
 
 protected:
-  QJsonObject doSerialize() const override;
+  boost::json::object doSerialize() const override;
 
 private:
   std::wstring replaceVariables(std::wstring s) const;

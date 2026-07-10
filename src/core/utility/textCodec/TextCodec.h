@@ -1,9 +1,5 @@
 #pragma once
-#include <memory>
 #include <string>
-
-class QStringDecoder;
-class QStringEncoder;
 
 class TextCodec final {
 public:
@@ -18,6 +14,5 @@ public:
 
 private:
   const std::string mName;
-  mutable std::shared_ptr<QStringDecoder> mDecoder;
-  mutable std::shared_ptr<QStringEncoder> mEncoder;
+  const bool mValid;
 };

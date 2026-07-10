@@ -7,4 +7,4 @@ add_sourcetrail_library(
   PUBLIC_HEADERS
   TextCodec.h
   PRIVATE_DEPS
-  Qt6::Core)
+  Boost::locale)

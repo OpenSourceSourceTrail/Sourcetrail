@@ -2,13 +2,15 @@
 
 #include <string>
 
-#include <QSettings>
-#include <QSysInfo>
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 #include "FilePath.h"
 #include "logging.h"
 #include "utility.h"
 #include "utilityCxxHeaderDetection.h"
+#include "utilityString.h"
 
 namespace {
 constexpr int VisualStudio2010 = 10;
@@ -77,22 +79,28 @@ std::vector<FilePath> CxxVs10To14HeaderPathDetector::doGetPaths() const {
 }
 
 FilePath CxxVs10To14HeaderPathDetector::getVsInstallPathUsingRegistry() const {
-  QString key = "HKEY_LOCAL_MACHINE\\SOFTWARE\\";
+#ifdef _WIN32
+  std::string subKey = "SOFTWARE\\";
   if(m_architecture == ApplicationArchitectureType::X86_32) {
-    key += "Wow6432Node\\";
+    subKey += "Wow6432Node\\";
   }
-  key += "Microsoft\\";
-  key += (m_isExpress ? QStringLiteral("VCExpress") : QStringLiteral("VisualStudio"));
-  key += "\\" + QString::number(m_version) + ".0";
+  subKey += "Microsoft\\";
+  subKey += (m_isExpress ? "VCExpress" : "VisualStudio");
+  subKey += "\\" + std::to_string(m_version) + ".0";
 
-  const QSettings expressKey(key, QSettings::NativeFormat);    // NativeFormat means from Registry on Windows.
-  const QString value = expressKey.value("InstallDir").toString() + "../../";
+  char installDir[MAX_PATH] = {};
+  DWORD installDirSize = sizeof(installDir);
+  const LSTATUS status = RegGetValueA(
+      HKEY_LOCAL_MACHINE, subKey.c_str(), "InstallDir", RRF_RT_REG_SZ, nullptr, installDir, &installDirSize);
 
-  FilePath path(value.toStdWString());
-  if(path.exists()) {
-    LOG_INFO(L"Found working registry key for VS install path: " + key.toStdWString());
-    return path;
+  if(status == ERROR_SUCCESS) {
+    FilePath path(utility::decodeFromUtf8(std::string(installDir) + "../../"));
+    if(path.exists()) {
+      LOG_INFO(L"Found working registry key for VS install path: " + utility::decodeFromUtf8("HKEY_LOCAL_MACHINE\\" + subKey));
+      return path;
+    }
   }
+#endif
 
   return {};
 }

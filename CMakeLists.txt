@@ -233,13 +233,13 @@ target_link_libraries(
           Sourcetrail::core::utility::TextAccess
           Sourcetrail::core::utility::TextCodec
           Sourcetrail::core::utility::utilityUuid
-          Sourcetrail::lib_gui
           Sourcetrail::core::utility::utilityApp
           Sourcetrail::core::utility::file::FileSystem
           Sourcetrail::core::utility::file::utilityFile
           Sourcetrail::core::utility::file::FileManager
           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
           Boost::filesystem
+          Boost::json
           Boost::program_options
           Boost::system
           SQLite::SQLite3
@@ -277,14 +277,14 @@ target_link_libraries(
   Sourcetrail_lib_path_detection
   PUBLIC Sourcetrail::core::utility::ApplicationArchitectureType Sourcetrail::core::utility::OsType
   PRIVATE Boost::system
-          Qt6::Core
           Sourcetrail::core
           Sourcetrail::core::utility::ScopedFunctor
           Sourcetrail::core::utility::logging
           Sourcetrail::core::utility::utility
           Sourcetrail::core::utility::file::FileSystem
           Sourcetrail::core::utility::utilityString
-          Sourcetrail::core::utility::utilityApp)
+          Sourcetrail::core::utility::utilityApp
+          $<$<PLATFORM_ID:Windows>:Advapi32>)
 
 # Lib Gui ------------------------------------------------------------------------------------------------------------------------
 # target for running versionnumber script
