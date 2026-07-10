@@ -1,20 +1,22 @@
 #ifndef TASK_FILL_INDEXER_COMMAND_QUEUE_H
 #define TASK_FILL_INDEXER_COMMAND_QUEUE_H
 
+#include <memory>
 #include <queue>
 
 #include "../../../scheduling/Task.h"
-#include "InterprocessIndexerCommandManager.h"
+#include "FilePath.h"
 #include "MessageListener.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 
 class IndexerCommandProvider;
+class IndexerWorkerServiceImpl;
 
 class TaskFillIndexerCommandsQueue
     : public Task
     , public MessageListener<MessageIndexingInterrupted> {
 public:
-  TaskFillIndexerCommandsQueue(const std::string& appUUID,
+  TaskFillIndexerCommandsQueue(std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
                                std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
                                size_t maximumQueueSize);
 
@@ -30,8 +32,8 @@ protected:
   bool fillCommandQueue();
 
 private:
+  std::shared_ptr<IndexerWorkerServiceImpl> m_indexerWorkerService;
   std::unique_ptr<IndexerCommandProvider> m_indexerCommandProvider;
-  InterprocessIndexerCommandManager m_indexerCommandManager;
 
   const size_t m_maximumQueueSize;
 

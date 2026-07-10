@@ -1,16 +1,18 @@
 #include "TaskFillIndexerCommandQueue.h"
 
 #include "../../../scheduling/Blackboard.h"
+#include "Convert.h"
 #include "FileSystem.h"
 #include "IndexerCommandProvider.h"
+#include "IndexerWorkerServiceImpl.h"
 #include "logging.h"
 #include "utilityFile.h"
 
-TaskFillIndexerCommandsQueue::TaskFillIndexerCommandsQueue(const std::string& appUUID,
+TaskFillIndexerCommandsQueue::TaskFillIndexerCommandsQueue(std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
                                                            std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
                                                            size_t maximumQueueSize)
-    : m_indexerCommandProvider(std::move(indexerCommandProvider))
-    , m_indexerCommandManager(appUUID, 0, true)
+    : m_indexerWorkerService(std::move(indexerWorkerService))
+    , m_indexerCommandProvider(std::move(indexerCommandProvider))
     , m_maximumQueueSize(maximumQueueSize) {}
 
 void TaskFillIndexerCommandsQueue::doEnter(std::shared_ptr<Blackboard> blackboard) {
@@ -60,38 +62,42 @@ void TaskFillIndexerCommandsQueue::handleMessage(MessageIndexingInterrupted* /*m
   std::lock_guard<std::mutex> lock(m_commandsMutex);
 
   LOG_INFO("Discarding remaining " +
-           std::to_string(m_indexerCommandProvider->size() + m_indexerCommandManager.indexerCommandCount()) +
+           std::to_string(m_indexerCommandProvider->size() + m_indexerWorkerService->pendingCommandCount()) +
            " indexer commands.");
 
   std::queue<FilePath> empty;
   std::swap(m_filePathQueue, empty);
 
   m_indexerCommandProvider->clear();
-  m_indexerCommandManager.clearIndexerCommands();
 
-  LOG_INFO("Remaining: " + std::to_string(m_indexerCommandProvider->size() + m_indexerCommandManager.indexerCommandCount()) + ".");
+  LOG_INFO("Remaining: " + std::to_string(m_indexerCommandProvider->size() + m_indexerWorkerService->pendingCommandCount()) + ".");
 }
 
 bool TaskFillIndexerCommandsQueue::fillCommandQueue() {
-  size_t refillAmount = m_maximumQueueSize - m_indexerCommandManager.indexerCommandCount();
-  if(!refillAmount) {
+  const size_t pending = m_indexerWorkerService->pendingCommandCount();
+  if(pending >= m_maximumQueueSize) {
     return false;
   }
+  const size_t refillAmount = m_maximumQueueSize - pending;
 
   std::lock_guard<std::mutex> lock(m_commandsMutex);
-  std::vector<std::shared_ptr<IndexerCommand>> commands;
+  std::vector<sourcetrail::IndexerCommand> commands;
 
   while(!m_indexerCommandProvider->empty() && commands.size() < refillAmount) {
+    std::shared_ptr<IndexerCommand> command;
     if(!m_filePathQueue.empty()) {
-      commands.push_back(m_indexerCommandProvider->consumeCommandForSourceFilePath(m_filePathQueue.front()));
+      command = m_indexerCommandProvider->consumeCommandForSourceFilePath(m_filePathQueue.front());
       m_filePathQueue.pop();
     } else {
-      commands.push_back(m_indexerCommandProvider->consumeCommand());
+      command = m_indexerCommandProvider->consumeCommand();
+    }
+    if(command) {
+      commands.push_back(proto::convert::toProto(command.get()));
     }
   }
 
-  if(commands.size()) {
-    m_indexerCommandManager.pushIndexerCommands(commands);
+  if(!commands.empty()) {
+    m_indexerWorkerService->fillCommands(std::move(commands));
     return true;
   }
 

@@ -22,6 +22,7 @@ constexpr auto DelayTimeBeforeStartWorkInMs = 200;
 }    // namespace
 
 TaskBuildIndex::TaskBuildIndex(size_t processCount,
+                               std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
                                std::shared_ptr<StorageProvider> storageProvider,
                                std::shared_ptr<DialogView> dialogView,
                                std::string appUUID,
@@ -30,16 +31,15 @@ TaskBuildIndex::TaskBuildIndex(size_t processCount,
     , mDialogView(std::move(dialogView))
     , mAppUUID(std::move(appUUID))
     , mMultiProcessIndexing(multiProcessIndexing)
+    , mIndexerWorkerService(std::move(indexerWorkerService))
     , mProcessCount(processCount) {}
 
 void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
-  mIndexingFileCount = 0;
   mLastReportedIndexedCount = 0;
   updateIndexingDialog(blackboard, std::vector<FilePath>());
 
-  // Start gRPC server for worker boundary
-  mIndexerWorkerService = std::make_unique<IndexerWorkerServiceImpl>(mStorageProvider);
-
+  // Start gRPC server for worker boundary. The service instance is shared with
+  // TaskFillIndexerCommandsQueue, which feeds its command queue.
   grpc::ServerBuilder builder;
   builder.AddListeningPort("localhost:0", grpc::InsecureServerCredentials(), &mEnginePort);
   builder.RegisterService(mIndexerWorkerService.get());
@@ -228,10 +228,10 @@ void TaskBuildIndex::updateIndexingDialog(const std::shared_ptr<Blackboard>& bla
   blackboard->get("source_file_count", sourceFileCount);
   blackboard->get("indexed_source_file_count", indexedSourceFileCount);
 
-  mIndexingFileCount += sourcePaths.size();
+  const size_t startedFileCount = mIndexerWorkerService ? mIndexerWorkerService->getStartedFileCount() : 0;
 
   mDialogView->updateIndexingDialog(
-      mIndexingFileCount, static_cast<size_t>(indexedSourceFileCount), static_cast<size_t>(sourceFileCount), sourcePaths);
+      startedFileCount, static_cast<size_t>(indexedSourceFileCount), static_cast<size_t>(sourceFileCount), sourcePaths);
 
   const size_t progress = (sourceFileCount > 0) ? static_cast<size_t>(indexedSourceFileCount * 100 / sourceFileCount) : 0;
   MessageIndexingStatus{true, progress}.dispatch();

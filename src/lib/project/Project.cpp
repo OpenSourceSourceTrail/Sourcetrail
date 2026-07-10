@@ -33,6 +33,7 @@
 #include "TaskBuildIndex.h"
 #include "TaskCleanStorage.h"
 #include "TaskExecuteCustomCommands.h"
+#include "IndexerWorkerServiceImpl.h"
 #include "TaskFillIndexerCommandQueue.h"
 #include "TaskFinishParsing.h"
 #include "TaskInjectStorage.h"
@@ -557,6 +558,8 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
 
     // TODO(Hussein): Create Tasks using factory pattern
     auto storageProvider = std::make_shared<StorageProvider>();
+    // Shared gRPC worker service: TaskBuildIndex hosts it, TaskFillIndexerCommandsQueue feeds it
+    auto indexerWorkerService = std::make_shared<IndexerWorkerServiceImpl>(storageProvider);
     // add tasks for setting some variables on the blackboard that are used during indexing
     taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("indexer_threads_started", false));
     taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("indexer_threads_stopped", false));
@@ -582,7 +585,8 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
 
     // add task for refilling the indexer command queue
     // TODO(Hussein): Create Tasks using factory pattern
-    taskParallelIndexing->addTask(std::make_shared<TaskFillIndexerCommandsQueue>(m_appUUID, std::move(indexerCommandProvider), 20));
+    taskParallelIndexing->addTask(
+        std::make_shared<TaskFillIndexerCommandsQueue>(indexerWorkerService, std::move(indexerCommandProvider), 20));
 
     // add task for indexing
     const bool multiProcess = IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && hasCxxSourceGroup();
@@ -592,7 +596,8 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
         std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
             ->addChildTask(std::make_shared<TaskReturnSuccessIf<bool>>(
                 "indexer_command_queue_started", TaskReturnSuccessIf<bool>::CONDITION_EQUALS, false)),
-        std::make_shared<TaskBuildIndex>(adjustedIndexerThreadCount, storageProvider, dialogView, m_appUUID, multiProcess)));
+        std::make_shared<TaskBuildIndex>(
+            adjustedIndexerThreadCount, indexerWorkerService, storageProvider, dialogView, m_appUUID, multiProcess)));
 
     // add task for merging the intermediate storages
     taskParallelIndexing->addTask(std::make_shared<TaskGroupSequence>()->addChildTasks(

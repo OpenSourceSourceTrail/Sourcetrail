@@ -22,16 +22,17 @@ void GrpcIndexer::work() {
 
   auto pIndexer = LanguagePackageManager::getInstance()->instantiateSupportedIndexers();
 
-  // Watch interrupt in a background thread
+  // Watch interrupt in a background thread. The context is hoisted out so the
+  // main loop can cancel the (otherwise blocking) server-streaming RPC on normal
+  // completion; without this the watcher thread would block forever in Read().
   bool interruptReceived = false;
-  bool watcherRunning = true;
+  grpc::ClientContext watchCtx;
 
   std::thread watcherThread([&]() {
-    grpc::ClientContext ctx;
     sourcetrail::WatchInterruptRequest req;
     req.set_process_id(static_cast<uint64_t>(mProcessId));
 
-    auto stream = stub->WatchInterrupt(&ctx, req);
+    auto stream = stub->WatchInterrupt(&watchCtx, req);
     sourcetrail::InterruptEvent event;
     while(stream->Read(&event)) {
       if(event.interrupted()) {
@@ -43,11 +44,10 @@ void GrpcIndexer::work() {
         break;
       }
     }
-    watcherRunning = false;
   });
 
   const ScopedFunctor watcherStopper([&]() {
-    watcherRunning = false;
+    watchCtx.TryCancel();
     watcherThread.join();
   });
 

@@ -17,7 +17,11 @@ void IndexerWorkerServiceImpl::fillCommands(std::vector<sourcetrail::IndexerComm
   for(auto& cmd : commands) {
     mCommandQueue.push_back(std::move(cmd));
   }
-  mActiveWorkers = 0;
+}
+
+size_t IndexerWorkerServiceImpl::pendingCommandCount() {
+  const std::lock_guard<std::mutex> lock(mCommandMutex);
+  return mCommandQueue.size();
 }
 
 void IndexerWorkerServiceImpl::setInterrupted(bool interrupted) {
@@ -26,8 +30,10 @@ void IndexerWorkerServiceImpl::setInterrupted(bool interrupted) {
 }
 
 std::vector<FilePath> IndexerWorkerServiceImpl::drainAndGetCrashedFiles() {
-  std::unique_lock<std::mutex> lock(mStatusMutex);
-  mStatusCv.wait(lock, [this] { return mActiveWorkers <= 0; });
+  // Called from TaskBuildIndex::doExit *after* all worker threads/processes are joined,
+  // so no further gRPC calls can mutate state here. Any source file still recorded as
+  // "in progress" means its worker died without reporting FINISH/DONE -> crashed.
+  const std::lock_guard<std::mutex> lock(mStatusMutex);
 
   std::vector<FilePath> crashed = std::move(mCrashedFiles);
   for(auto& [processId, file] : mCurrentFileByProcess) {
@@ -42,6 +48,10 @@ size_t IndexerWorkerServiceImpl::getIndexedFileCount() const {
   return mIndexedFileCount.load();
 }
 
+size_t IndexerWorkerServiceImpl::getStartedFileCount() const {
+  return mStartedFileCount.load();
+}
+
 std::vector<FilePath> IndexerWorkerServiceImpl::getCurrentlyIndexedSourceFilePaths() {
   const std::lock_guard<std::mutex> lock(mStatusMutex);
   std::vector<FilePath> paths;
@@ -54,7 +64,7 @@ std::vector<FilePath> IndexerWorkerServiceImpl::getCurrentlyIndexedSourceFilePat
 }
 
 grpc::Status IndexerWorkerServiceImpl::PullCommand(grpc::ServerContext* /*ctx*/,
-                                                   const sourcetrail::PullCommandRequest* req,
+                                                   const sourcetrail::PullCommandRequest* /*req*/,
                                                    sourcetrail::PullCommandResponse* resp) {
   const std::lock_guard<std::mutex> lock(mCommandMutex);
 
@@ -66,13 +76,6 @@ grpc::Status IndexerWorkerServiceImpl::PullCommand(grpc::ServerContext* /*ctx*/,
   *resp->mutable_command() = std::move(mCommandQueue.front());
   mCommandQueue.pop_front();
   resp->set_command_found(true);
-
-  if(req->process_id() != 0) {
-    const std::lock_guard<std::mutex> statusLock(mStatusMutex);
-    if(mCurrentFileByProcess.find(req->process_id()) == mCurrentFileByProcess.end()) {
-      mActiveWorkers++;
-    }
-  }
 
   return grpc::Status::OK;
 }
@@ -102,6 +105,7 @@ grpc::Status IndexerWorkerServiceImpl::ReportStatus(grpc::ServerContext* /*ctx*/
       mCrashedFiles.emplace_back(utility::decodeFromUtf8(prev));
     }
     mCurrentFileByProcess[pid] = req->file_path();
+    mStartedFileCount++;
     LOG_INFO(fmt::format("IndexerWorkerService: process {} started indexing {}", pid, req->file_path()));
     break;
   }
@@ -112,13 +116,9 @@ grpc::Status IndexerWorkerServiceImpl::ReportStatus(grpc::ServerContext* /*ctx*/
     break;
   }
   case sourcetrail::StatusReport::PROCESS_DONE: {
-    {
-      const std::lock_guard<std::mutex> lock(mStatusMutex);
-      mCurrentFileByProcess.erase(pid);
-      mActiveWorkers--;
-      LOG_INFO(fmt::format("IndexerWorkerService: process {} done, {} workers remaining", pid, mActiveWorkers));
-    }
-    mStatusCv.notify_all();
+    const std::lock_guard<std::mutex> lock(mStatusMutex);
+    mCurrentFileByProcess.erase(pid);
+    LOG_INFO(fmt::format("IndexerWorkerService: process {} done", pid));
     break;
   }
   default:

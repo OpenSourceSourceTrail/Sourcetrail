@@ -20,6 +20,7 @@ class TaskBuildIndex
     , public MessageListener<MessageIndexingInterrupted> {
 public:
   TaskBuildIndex(size_t processCount,
+                 std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
                  std::shared_ptr<StorageProvider> storageProvider,
                  std::shared_ptr<DialogView> dialogView,
                  std::string appUUID,
@@ -46,14 +47,13 @@ protected:
   const std::string mAppUUID;
   bool mMultiProcessIndexing;
 
-  std::unique_ptr<IndexerWorkerServiceImpl> mIndexerWorkerService;
+  std::shared_ptr<IndexerWorkerServiceImpl> mIndexerWorkerService;
   std::unique_ptr<grpc::Server> mGrpcServer;
   int mEnginePort{0};
 
   bool mIndexerCommandQueueStopped = false;
   size_t mProcessCount;
   bool mInterrupted = false;
-  size_t mIndexingFileCount = 0;
   size_t mLastReportedIndexedCount = 0;
 
   // store as plain pointers to avoid deallocation issues when closing app during indexing
