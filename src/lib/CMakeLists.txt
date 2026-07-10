@@ -1,6 +1,10 @@
 # ${CMAKE_SOURCE_DIR}/src/lib/CMakeLists.txt
-add_files(
-  LIB
+add_library(Sourcetrail_lib)
+add_library(Sourcetrail::lib ALIAS Sourcetrail_lib)
+
+target_sources(
+  Sourcetrail_lib
+  PRIVATE
   # Base Factory {
   factory/IFactory.hpp
   factory/IFactory.cpp
@@ -372,8 +376,9 @@ add_files(
 )
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_files(
-    LIB
+  target_sources(
+    Sourcetrail_lib
+    PRIVATE
     settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.cpp
     settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h
     settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.cpp
@@ -395,3 +400,102 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     settings/source_group/type/SourceGroupSettingsCustomCommand.h
     settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 endif()
+
+get_target_property(_lib_sources Sourcetrail_lib SOURCES)
+foreach(_src ${_lib_sources})
+  if(NOT IS_ABSOLUTE "${_src}")
+    set(_src "${CMAKE_CURRENT_SOURCE_DIR}/${_src}")
+  endif()
+  cmake_path(IS_PREFIX CMAKE_CURRENT_SOURCE_DIR "${_src}" NORMALIZE _under_src)
+  if(_under_src)
+    get_filename_component(_dir "${_src}" DIRECTORY)
+    list(APPEND _lib_include_dirs "${_dir}")
+  endif()
+endforeach()
+list(REMOVE_DUPLICATES _lib_include_dirs)
+
+target_include_directories(
+  Sourcetrail_lib
+  PUBLIC ${_lib_include_dirs}
+         ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/
+         ${CMAKE_BINARY_DIR}/src/lib)
+
+target_link_libraries(
+  Sourcetrail_lib
+  PUBLIC Sourcetrail::messaging
+         Sourcetrail::core::utility::ConfigManager
+         Sourcetrail::core::utility::LowMemoryStringMap
+         Sourcetrail::core::utility::Status
+         Sourcetrail::core::utility::Tree
+         Sourcetrail::core::utility::utility
+         Sourcetrail::core::utility::Migration
+         Sourcetrail::core::utility::Migrator
+         Sourcetrail::core::utility::file::FilePath
+         Sourcetrail::core::utility::file::FilePathFilter
+         Sourcetrail::core::utility::toUnderlying
+         Sourcetrail::scheduling
+         CppSQLite::CppSQLite3
+         nonstd::expected-lite
+  PRIVATE Sourcetrail::core
+          Sourcetrail::core::utility::ConfigManager
+          Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::core::utility::Status
+          Sourcetrail::core::utility::TextAccess
+          Sourcetrail::core::utility::TextCodec
+          Sourcetrail::core::utility::utilityUuid
+          Sourcetrail::core::utility::utilityApp
+          Sourcetrail::core::utility::file::FileSystem
+          Sourcetrail::core::utility::file::utilityFile
+          Sourcetrail::core::utility::file::FileManager
+          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
+          Boost::filesystem
+          Boost::json
+          Boost::program_options
+          Boost::system
+          SQLite::SQLite3
+          $<$<PLATFORM_ID:Windows>:bcrypt>)
+
+configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in"
+               "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")
+
+# Path detection utility (non-GUI)
+add_library(Sourcetrail_lib_path_detection)
+add_library(Sourcetrail::lib::utility::PathDetection ALIAS Sourcetrail_lib_path_detection)
+
+target_sources(
+  Sourcetrail_lib_path_detection
+  PRIVATE utility/path_detector/utilityPathDetection.cpp
+          utility/path_detector/CombinedPathDetector.cpp
+          utility/path_detector/PathDetector.cpp)
+
+if(BUILD_CXX_LANGUAGE_PACKAGE)
+  target_sources(
+    Sourcetrail_lib_path_detection
+    PRIVATE utility/path_detector/cxx_header/CxxFrameworkPathDetector.cpp
+            utility/path_detector/cxx_header/CxxHeaderPathDetector.cpp
+            utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.cpp
+            utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.cpp
+            utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.cpp
+            utility/path_detector/cxx_header/utilityCxxHeaderDetection.cpp)
+endif()
+
+target_include_directories(
+  Sourcetrail_lib_path_detection
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/
+         ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/cxx_header/
+  PRIVATE ${CMAKE_BINARY_DIR}/src/lib)
+
+target_link_libraries(
+  Sourcetrail_lib_path_detection
+  PUBLIC Sourcetrail::core::utility::ApplicationArchitectureType
+         Sourcetrail::core::utility::OsType
+  PRIVATE Boost::system
+          Sourcetrail::core
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::utility
+          Sourcetrail::core::utility::file::FileSystem
+          Sourcetrail::core::utility::utilityString
+          Sourcetrail::core::utility::utilityApp
+          $<$<PLATFORM_ID:Windows>:Advapi32>)

@@ -66,13 +66,9 @@ target_include_directories(
 
 target_include_directories(
   Sourcetrail_lib_cxx
-  PRIVATE ${LIB_CXX_INCLUDE_PATHS}
-          ${LIB_UTILITY_INCLUDE_PATHS}
-          ${LIB_INCLUDE_PATHS}
-          ${CMAKE_BINARY_DIR}/src/lib)
+  PRIVATE ${CMAKE_BINARY_DIR}/src/lib)
 
-target_include_directories(Sourcetrail_lib_cxx SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS}
-                                                              ${EXTERNAL_INCLUDE_PATHS})
+target_include_directories(Sourcetrail_lib_cxx SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 
 if(LLVM_LINK_LLVM_DYLIB)
   set(REQ_LLVM_LIBS LLVM)

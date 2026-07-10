@@ -78,3 +78,4 @@ CMakeLists.txt.user*
 compile_commands.json
 .conan/
 CMakeUserPresets.json
+*.pyc

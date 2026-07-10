@@ -17,9 +17,9 @@ target_link_libraries(
 
 target_include_directories(
   Sourcetrail_cli
-  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${LIB_INCLUDE_PATHS}" "${CMAKE_BINARY_DIR}/src/lib" "${CMAKE_BINARY_DIR}/src/lib_gui")
-
-target_include_directories(Sourcetrail_cli SYSTEM PRIVATE "${EXTERNAL_INCLUDE_PATHS}")
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
+          "${CMAKE_BINARY_DIR}/src/lib"
+          "${CMAKE_BINARY_DIR}/src/lib_gui")
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)

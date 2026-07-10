@@ -42,12 +42,7 @@ if(APPLE)
   target_link_libraries(Sourcetrail_indexer PRIVATE ${CORE_FOUNDATION})
 endif()
 
-set_property(
-  TARGET Sourcetrail_indexer
-  PROPERTY INCLUDE_DIRECTORIES
-           "${APP_INCLUDE_PATHS}"
-           "${LIB_INCLUDE_PATHS}"
-           "${LIB_UTILITY_INCLUDE_PATHS}"
-           "${LIB_GUI_INCLUDE_PATHS}"
-           "${CMAKE_BINARY_DIR}/src/lib_gui"
-           "${CMAKE_BINARY_DIR}/src/lib")
+target_include_directories(
+  Sourcetrail_indexer
+  PRIVATE "${CMAKE_BINARY_DIR}/src/lib"
+          "${CMAKE_BINARY_DIR}/src/lib_gui")

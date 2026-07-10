@@ -43,13 +43,9 @@ target_link_libraries(
 
 target_include_directories(
   Sourcetrail
-  PRIVATE "${APP_INCLUDE_PATHS}"
-          "${LIB_INCLUDE_PATHS}"
-          "${LIB_GUI_INCLUDE_PATHS}"
-          "${CMAKE_BINARY_DIR}/src/lib_gui"
+  PRIVATE "${CMAKE_BINARY_DIR}/src/lib_gui"
           "${CMAKE_BINARY_DIR}/src/lib")
 
-target_include_directories(Sourcetrail SYSTEM PRIVATE "${EXTERNAL_INCLUDE_PATHS}")
 set_target_properties(Sourcetrail PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
 # add platform specific libraries
 if(APPLE)

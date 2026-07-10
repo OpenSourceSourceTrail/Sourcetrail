@@ -1,6 +1,14 @@
 # ${CMAKE_SOURCE_DIR}/src/lib_gui/CMakeLists.txt
-add_files(
-  LIB_GUI
+add_custom_target(versionnumber ALL)
+
+add_library(Sourcetrail_lib_gui
+  ${CMAKE_SOURCE_DIR}/bin/resources.qrc
+  ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h)
+add_library(Sourcetrail::lib_gui ALIAS Sourcetrail_lib_gui)
+
+target_sources(
+  Sourcetrail_lib_gui
+  PRIVATE
   utility/globalStrings.h
   platform_includes/includesLinux.h
   platform_includes/includesMac.h
@@ -277,8 +285,9 @@ add_files(
   qt/QtCoreApplication.h)
 
 if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_files(
-    LIB_GUI
+  target_sources(
+    Sourcetrail_lib_gui
+    PRIVATE
     qt/project_wizard/content/path/ProjectWizardModel.hpp
     qt/project_wizard/content/path/ProjectWizardModel.cpp
     qt/project_wizard/content/path/QtProjectWizardContentPathCDB.cpp
@@ -309,3 +318,82 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
     qt/project_wizard/content/QtProjectWizardContentVS.h
 )
 endif()
+
+target_link_libraries(
+  Sourcetrail_lib_gui
+  PUBLIC Sourcetrail::lib
+         Qt6::Widgets
+         Qt6::Network
+         Qt6::Svg
+         Sourcetrail::core::utility::SingleValueCache
+         Sourcetrail::core::utility::LowMemoryStringMap
+         Sourcetrail::core::utility::Migrator
+         Sourcetrail::core::utility::file::FilePathFilter
+         Sourcetrail::core::utility::file::FileSystem
+         Sourcetrail::core::utility::utilityApp
+  PRIVATE Sourcetrail::core
+          Sourcetrail::core::utility::logging
+          Sourcetrail::core::utility::OrderedCache
+          Sourcetrail::core::utility::ScopedFunctor
+          Sourcetrail::core::utility::Status
+          Sourcetrail::core::utility::TextAccess
+          Sourcetrail::core::utility::TextCodec
+          Sourcetrail::core::utility::toUnderlying
+          Sourcetrail::core::utility::utility
+          Sourcetrail::core::utility::utilityUuid
+          Sourcetrail::core::utility::file::utilityFile
+          Sourcetrail::core::utility::file::FilePath
+          Sourcetrail::core::utility::file::FileManager
+          Sourcetrail::lib::utility::PathDetection
+          Sourcetrail::core::utility::utilityApp
+          Sourcetrail::messaging
+          Boost::locale
+          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
+
+add_custom_command(
+  TARGET versionnumber
+  PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -DBINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/version.cmake
+  BYPRODUCTS ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h DEPENDS Sourcetrail_lib_gui
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMENT "check/update version number")
+
+add_dependencies(Sourcetrail_lib_gui versionnumber)
+
+get_target_property(_lib_gui_sources Sourcetrail_lib_gui SOURCES)
+foreach(_src ${_lib_gui_sources})
+  if(NOT IS_ABSOLUTE "${_src}")
+    set(_src "${CMAKE_CURRENT_SOURCE_DIR}/${_src}")
+  endif()
+  cmake_path(IS_PREFIX CMAKE_CURRENT_SOURCE_DIR "${_src}" NORMALIZE _under_src)
+  if(_under_src)
+    get_filename_component(_dir "${_src}" DIRECTORY)
+    list(APPEND _lib_gui_include_dirs "${_dir}")
+  endif()
+endforeach()
+list(REMOVE_DUPLICATES _lib_gui_include_dirs)
+
+target_include_directories(
+  Sourcetrail_lib_gui
+  PUBLIC ${_lib_gui_include_dirs}
+         ${CMAKE_BINARY_DIR}/src/lib_gui
+         ${CMAKE_BINARY_DIR}/src/lib)
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/platform_includes/includes.h.in"
+               "${CMAKE_BINARY_DIR}/src/lib_gui/includes.h")
+
+configure_file("${CMAKE_SOURCE_DIR}/cmake/productVersion.h.in"
+               "${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h")
+
+set_target_properties(
+  Sourcetrail_lib_gui
+  PROPERTIES AUTOMOC ON
+             AUTORCC ON
+             INCLUDE_CURRENT_DIR ON)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  set_source_files_properties(${CMAKE_BINARY_DIR}/Sourcetrail_lib_gui_autogen/mocs_compilation.cpp
+                              PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
+endif()
+
+set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
