@@ -8,19 +8,15 @@
 
 #include <range/v3/algorithm/any_of.hpp>
 
-#include "../../scheduling/TaskDecoratorRepeat.h"
-#include "../../scheduling/TaskFindKeyOnBlackboard.h"
-#include "../../scheduling/TaskflowGroupParallel.h"
-#include "../../scheduling/TaskGroupSelector.h"
+#include "../../scheduling/Task.h"
 #include "../../scheduling/TaskGroupSequence.h"
-#include "../../scheduling/TaskLambda.h"
-#include "../../scheduling/TaskReturnSuccessIf.h"
-#include "../../scheduling/TaskSetValue.h"
-#include "CombinedIndexerCommandProvider.h"
+#include "DefaultTaskFactory.h"
 #include "DialogView.h"
 #include "FilePath.h"
 #include "FileSystem.h"
 #include "IApplicationSettings.hpp"
+#include "IndexTaskBuilder.h"
+#include "ITaskFactory.h"
 #include "PersistentStorage.h"
 #include "ProjectSettings.h"
 #include "RefreshInfoGenerator.h"
@@ -28,21 +24,10 @@
 #include "SourceGroupFactory.h"
 #include "SourceGroupStatusType.h"
 #include "StorageCache.h"
-#include "StorageProvider.h"
 #include "TabId.h"
-#include "TaskBuildIndex.h"
-#include "TaskCleanStorage.h"
-#include "TaskExecuteCustomCommands.h"
-#include "IndexerWorkerServiceImpl.h"
-#include "TaskFillIndexerCommandQueue.h"
-#include "TaskFinishParsing.h"
-#include "TaskInjectStorage.h"
-#include "TaskMergeStorages.h"
-#include "TaskParseWrapper.h"
 #include "TextAccess.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/indexing/MessageIndexingFinished.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/indexing/MessageIndexingStarted.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageRefresh.h"
@@ -51,27 +36,24 @@
 #include "utilityApp.h"
 #include "utilityString.h"
 
-namespace {
-constexpr int DefaultIndexerThreadCount = 4;
-
-int getIndexerThreadCount() {
-  int indexerThreadCount = IApplicationSettings::getInstanceRaw()->getIndexerThreadCount();
-  if(indexerThreadCount <= 0) {
-    indexerThreadCount = utility::getIdealThreadCount();
-    if(indexerThreadCount <= 0) {
-      indexerThreadCount = DefaultIndexerThreadCount;    // setting to some fallback value
-    }
-  }
-  return indexerThreadCount;
-}
-
-}    // namespace
-
 Project::Project(std::shared_ptr<ProjectSettings> settings,
                  std::shared_ptr<StorageCache> storageCache,
                  std::string appUUID,
-                 bool hasGUI) noexcept
-    : m_settings(std::move(settings)), m_storageCache(std::move(storageCache)), m_appUUID(std::move(appUUID)), m_hasGUI(hasGUI) {}
+                 bool hasGUI,
+                 std::shared_ptr<ITaskFactory> taskFactory) noexcept
+    : m_settings(std::move(settings)), m_storageCache(std::move(storageCache)), m_appUUID(std::move(appUUID)), m_hasGUI(hasGUI) {
+  IndexTaskBuilder::Callbacks callbacks;
+  callbacks.onKeepDatabase = [this](std::shared_ptr<DialogView> dialogView) { swapToTempStorage(std::move(dialogView)); };
+  callbacks.onDiscardDatabase = [this]() { discardTempStorage(); };
+  callbacks.onIndexingFinished = [this]() {
+    m_refreshStage = RefreshStageType::NONE;
+    MessageIndexingFinished().dispatch();
+  };
+  callbacks.hasCxxSourceGroup = [this]() { return hasCxxSourceGroup(); };
+
+  m_indexTaskBuilder = std::make_unique<IndexTaskBuilder>(
+      taskFactory ? std::move(taskFactory) : std::make_shared<DefaultTaskFactory>(), m_appUUID, std::move(callbacks));
+}
 
 Project::~Project() noexcept = default;
 
@@ -517,171 +499,12 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
                                                              std::shared_ptr<DialogView> dialogView,
                                                              std::shared_ptr<PersistentStorage> tempStorage,
                                                              size_t& sourceFileCount) {
-  auto taskSequential = std::make_shared<TaskGroupSequence>();
-
-  // Add task to clear the storage in case of refresh all
-  if(RefreshMode::AllFiles != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
-    taskSequential->addTask(
-        // TODO(Hussein): Create Tasks using factory pattern
-        std::make_shared<TaskCleanStorage>(tempStorage,
-                                           dialogView,
-                                           utility::toVector(utility::concat(info.filesToClear, info.nonIndexedFilesToClear)),
-                                           info.mode == RefreshMode::UpdatedAndIncompleteFiles));
-  }
-
-  // TODO(Hussein): Create Tasks using factory pattern
-  auto indexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
-  auto customIndexerCommandProvider = std::make_unique<CombinedIndexerCommandProvider>();
-  for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-    if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus()) {
-      if(SOURCE_GROUP_CUSTOM_COMMAND == sourceGroup->getType()) {
-        customIndexerCommandProvider->addProvider(sourceGroup->getIndexerCommandProvider(info));
-      } else {
-        indexerCommandProvider->addProvider(sourceGroup->getIndexerCommandProvider(info));
-      }
-    }
-  }
-
-  sourceFileCount = indexerCommandProvider->size() + customIndexerCommandProvider->size();
-
-  // TODO(Hussein): Create Tasks using factory pattern
-  taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("shallow_indexing", info.shallow));
-  taskSequential->addTask(std::make_shared<TaskSetValue<int>>("source_file_count", static_cast<int>(sourceFileCount)));
-  taskSequential->addTask(std::make_shared<TaskSetValue<int>>("indexed_source_file_count", 0));
-  taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("interrupted_indexing", false));
-  taskSequential->addTask(std::make_shared<TaskSetValue<float>>("index_time", 0.0F));
-
-  const int indexerThreadCount = getIndexerThreadCount();
-
-  if(!indexerCommandProvider->empty()) {
-    const int adjustedIndexerThreadCount = std::min<int>(indexerThreadCount, static_cast<int>(indexerCommandProvider->size()));
-
-    // TODO(Hussein): Create Tasks using factory pattern
-    auto storageProvider = std::make_shared<StorageProvider>();
-    // Shared gRPC worker service: TaskBuildIndex hosts it, TaskFillIndexerCommandsQueue feeds it
-    auto indexerWorkerService = std::make_shared<IndexerWorkerServiceImpl>(storageProvider);
-    // add tasks for setting some variables on the blackboard that are used during indexing
-    taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("indexer_threads_started", false));
-    taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("indexer_threads_stopped", false));
-    taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("indexer_command_queue_started", false));
-    taskSequential->addTask(std::make_shared<TaskSetValue<bool>>("indexer_command_queue_stopped", false));
-
-    // TODO(Hussein): Create Tasks using factory pattern
-    auto preIndexTasks = std::make_shared<TaskGroupSequence>();
-    taskSequential->addTask(preIndexTasks);
-    for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-      if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
-        preIndexTasks->addTask(sourceGroup->getPreIndexTask(storageProvider, dialogView));
-      }
-    }
-
-    // TODO(Hussein): Create Tasks using factory pattern
-    auto taskParserWrapper = std::make_shared<TaskParseWrapper>(tempStorage, dialogView);
-    taskSequential->addTask(taskParserWrapper);
-
-    // TODO(Hussein): Create Tasks using factory pattern
-    auto taskParallelIndexing = std::make_shared<TaskflowGroupParallel>();
-    taskParserWrapper->setTask(taskParallelIndexing);
-
-    // add task for refilling the indexer command queue
-    // TODO(Hussein): Create Tasks using factory pattern
-    taskParallelIndexing->addTask(
-        std::make_shared<TaskFillIndexerCommandsQueue>(indexerWorkerService, std::move(indexerCommandProvider), 20));
-
-    // add task for indexing
-    const bool multiProcess = IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && hasCxxSourceGroup();
-    taskParallelIndexing->addChildTasks(std::make_shared<TaskGroupSequence>()->addChildTasks(
-        // block until there are indexer commands to process
-        // TODO(Hussein): Create Tasks using factory pattern
-        std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
-            ->addChildTask(std::make_shared<TaskReturnSuccessIf<bool>>(
-                "indexer_command_queue_started", TaskReturnSuccessIf<bool>::CONDITION_EQUALS, false)),
-        std::make_shared<TaskBuildIndex>(
-            adjustedIndexerThreadCount, indexerWorkerService, storageProvider, dialogView, m_appUUID, multiProcess)));
-
-    // add task for merging the intermediate storages
-    taskParallelIndexing->addTask(std::make_shared<TaskGroupSequence>()->addChildTasks(
-        // block until there are indexers running
-        std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
-            ->addChildTask(std::make_shared<TaskReturnSuccessIf<bool>>(
-                "indexer_threads_started", TaskReturnSuccessIf<bool>::CONDITION_EQUALS, false)),
-        // merge until all indexers stopped and nothing left to merge
-        std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 250)
-            ->addChildTask(std::make_shared<TaskGroupSelector>()->addChildTasks(
-                std::make_shared<TaskMergeStorages>(storageProvider),
-                std::make_shared<TaskReturnSuccessIf<bool>>(
-                    "indexer_threads_stopped", TaskReturnSuccessIf<bool>::CONDITION_EQUALS, false)))));
-
-    // add task for injecting the intermediate storages into the persistent storage
-    taskParallelIndexing->addTask(std::make_shared<TaskGroupSequence>()->addChildTasks(
-        // block until there are indexers running
-        std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
-            ->addChildTask(std::make_shared<TaskReturnSuccessIf<bool>>(
-                "indexer_threads_started", TaskReturnSuccessIf<bool>::CONDITION_EQUALS, false)),
-        std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
-            ->addChildTask(std::make_shared<TaskGroupSelector>()->addChildTasks(
-                std::make_shared<TaskInjectStorage>(storageProvider, tempStorage),
-                // continuing when indexers still running, even if there are no storages right now.
-                std::make_shared<TaskReturnSuccessIf<bool>>(
-                    "indexer_threads_stopped", TaskReturnSuccessIf<bool>::CONDITION_EQUALS, false)))));
-
-    // add task that notifies the user of what's going on
-    taskSequential->addTask(    // we don't need to hide this dialog again, because it's
-                                // overridden by other dialogs later on.
-        std::make_shared<TaskLambda>(
-            [dialogView]() { dialogView->showUnknownProgressDialog(L"Finish Indexing", L"Saving\nRemaining Data"); }));
-
-    // add task that injects the remaining intermediate storages into the persistent storage
-    taskSequential->addTask(
-        std::make_shared<TaskDecoratorRepeat>(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
-            ->addChildTask(std::make_shared<TaskInjectStorage>(storageProvider, tempStorage)));
-  } else {
-    dialogView->hideUnknownProgressDialog();
-  }
-
-  if(!customIndexerCommandProvider->empty()) {
-    const int adjustedIndexerThreadCount = std::min<int>(
-        indexerThreadCount, static_cast<int>(customIndexerCommandProvider->size()));
-
-    taskSequential->addTask(std::make_shared<TaskExecuteCustomCommands>(std::move(customIndexerCommandProvider),
-                                                                        tempStorage,
-                                                                        dialogView,
-                                                                        adjustedIndexerThreadCount,
-                                                                        getProjectSettingsFilePath().getParentDirectory()));
-  }
-
-  // TODO(Hussein): Create Tasks using factory pattern
-  taskSequential->addTask(std::make_shared<TaskFinishParsing>(tempStorage, dialogView));
-
-  taskSequential->addTask(std::make_shared<TaskGroupSelector>()->addChildTasks(
-      std::make_shared<TaskGroupSequence>()->addChildTasks(
-          std::make_shared<TaskFindKeyOnBlackboard>("keep_database"), std::make_shared<TaskLambda>([dialogView, this]() {
-            Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([dialogView, this]() { swapToTempStorage(dialogView); }));
-          })),
-      std::make_shared<TaskGroupSequence>()->addChildTasks(
-          std::make_shared<TaskFindKeyOnBlackboard>("discard_database"), std::make_shared<TaskLambda>([this]() {
-            Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([this]() { discardTempStorage(); }));
-          }))));
-
-  // TODO(Hussein): Create Tasks using factory pattern
-  taskSequential->addTask(std::make_shared<TaskLambda>([dialogView, this]() {
-    m_refreshStage = RefreshStageType::NONE;
-    MessageIndexingFinished().dispatch();
-  }));
-
-  taskSequential->addTask(std::make_shared<TaskGroupSelector>()->addChildTasks(
-      std::make_shared<TaskGroupSequence>()->addChildTasks(
-          std::make_shared<TaskFindKeyOnBlackboard>("refresh_database"), std::make_shared<TaskLambda>([dialogView]() {
-            Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([dialogView]() {
-                             MessageIndexingShowDialog().dispatch();
-                             MessageRefresh().refreshAll().dispatch();
-                           }));
-          })),
-      std::make_shared<TaskGroupSequence>()->addChildTasks(
-          std::make_shared<TaskLambda>([]() { Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([]() {})); }))));
-
-  taskSequential->setIsBackgroundTask(true);
-  return taskSequential;
+  return m_indexTaskBuilder->createIndexTasks(std::move(info),
+                                              std::move(dialogView),
+                                              std::move(tempStorage),
+                                              m_sourceGroups,
+                                              getProjectSettingsFilePath().getParentDirectory(),
+                                              sourceFileCount);
 }
 
 bool Project::checkIfNothingToRefresh(const RefreshInfo& info, std::shared_ptr<DialogView> dialogView) {

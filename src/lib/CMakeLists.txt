@@ -314,6 +314,11 @@ target_sources(
   project/Project.h
   project/IProject.cpp
   project/IProject.hpp
+  project/ITaskFactory.h
+  project/DefaultTaskFactory.cpp
+  project/DefaultTaskFactory.h
+  project/IndexTaskBuilder.cpp
+  project/IndexTaskBuilder.h
   project/RefreshInfo.h
   project/RefreshInfoGenerator.h
   project/RefreshInfoGenerator.cpp

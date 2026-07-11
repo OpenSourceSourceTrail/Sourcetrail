@@ -20,6 +20,8 @@
 
 class DialogView;
 class FilePath;
+class IndexTaskBuilder;
+class ITaskFactory;
 class PersistentStorage;
 class ProjectSettings;
 class StorageCache;
@@ -53,7 +55,8 @@ public:
   Project(std::shared_ptr<ProjectSettings> settings,
           std::shared_ptr<StorageCache> storageCache,
           std::string appUUID,
-          bool hasGUI) noexcept;
+          bool hasGUI,
+          std::shared_ptr<ITaskFactory> taskFactory = nullptr) noexcept;
 
   /**
    * @name Disable copy and move operators
@@ -165,6 +168,7 @@ private:
   std::shared_ptr<ProjectSettings> m_settings;
   std::shared_ptr<StorageCache> m_storageCache;
   std::shared_ptr<PersistentStorage> m_storage;
+  std::unique_ptr<IndexTaskBuilder> m_indexTaskBuilder;
   std::string m_appUUID;
   ProjectStateType m_state = ProjectStateType::NOT_LOADED;
   RefreshStageType m_refreshStage = RefreshStageType::NONE;
