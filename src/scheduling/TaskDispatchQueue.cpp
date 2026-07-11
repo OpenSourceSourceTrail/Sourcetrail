@@ -35,7 +35,11 @@ void TaskDispatchQueue::runContinuation(const std::shared_ptr<TaskRunner>& runne
     mCurrentRunner = nullptr;
   }
 
-  if(state == Task::STATE_HOLD) {
+  // STATE_RUNNING means the task (e.g. a TaskGroupSequence/TaskflowGroupParallel) has more
+  // work to do and needs to be driven forward again, same as STATE_HOLD; only SUCCESS/FAILURE
+  // are terminal. The old TaskScheduler looped on the task until it left STATE_RUNNING, so this
+  // has to keep re-posting here or later listeners/steps never run.
+  if(state == Task::STATE_RUNNING || state == Task::STATE_HOLD) {
     mQueue.post([this, runner]() { runContinuation(runner); });
   }
 }
