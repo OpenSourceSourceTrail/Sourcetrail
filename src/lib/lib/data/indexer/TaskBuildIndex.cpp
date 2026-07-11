@@ -184,12 +184,18 @@ void TaskBuildIndex::handleMessage(MessageIndexingInterrupted* /*message*/) {
 }
 
 void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logFilePath*/) {
-  FilePath indexerProcessPath = IndexerPluginRegistry::getInstance()->indexerExecutablePathFor(mCommandType);
+  FilePath indexerProcessPath;
 #if BUILD_CXX_LANGUAGE_PACKAGE
-  if(indexerProcessPath.empty() && mCommandType == INDEXER_COMMAND_CXX) {
+  // The built-in C/C++ indexer ships a plugin manifest only to advertise its source group
+  // types to the wizard; its real location is layout-dependent (build vs install), so resolve
+  // it via AppPath rather than the manifest-relative path.
+  if(mCommandType == INDEXER_COMMAND_CXX) {
     indexerProcessPath = AppPath::getCxxIndexerFilePath();
   }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  if(indexerProcessPath.empty()) {
+    indexerProcessPath = IndexerPluginRegistry::getInstance()->indexerExecutablePathFor(mCommandType);
+  }
   if(!indexerProcessPath.exists()) {
     mInterrupted = true;
     LOG_ERROR(L"Cannot start indexer process because executable is missing at \"" + indexerProcessPath.wstr() + L"\"");

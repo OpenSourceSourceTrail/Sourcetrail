@@ -1,0 +1,13 @@
+<config>
+  <id>cxx_builtin</id>
+  <name>C/C++ (built-in)</name>
+  <language>C++</language>
+  <commandType>indexer_command_cxx</commandType>
+  <source_group_types>
+    <source_group_type>C Source Group</source_group_type>
+    <source_group_type>C++ Source Group</source_group_type>
+    <source_group_type>C/C++ from Compilation Database</source_group_type>
+    <source_group_type>C/C++ from Visual Studio</source_group_type>
+  </source_group_types>
+  <indexerExecutable>sourcetrail_indexer</indexerExecutable>
+</config>
