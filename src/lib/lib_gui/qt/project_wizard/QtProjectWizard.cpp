@@ -25,6 +25,7 @@
 #include "QtProjectWizardContentUnloadable.h"
 #include "ResourcePaths.h"
 #include "SourceGroupSettingsCustomCommand.h"
+#include "SourceGroupSettingsJavaEmpty.h"
 #include "SourceGroupSettingsUnloadable.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageStatus.h"
@@ -184,6 +185,15 @@ void addSourceGroupContents<SourceGroupSettingsCustomCommand>(QtProjectWizardCon
                                                               std::shared_ptr<SourceGroupSettingsCustomCommand> settings,
                                                               QtProjectWizardWindow* window) {
   group->addContent(new QtProjectWizardContentCustomCommand(settings, window));
+  group->addContent(new QtProjectWizardContentPathsSource(settings, window));
+  group->addContent(new QtProjectWizardContentPathsExclude(settings, window));
+  group->addContent(new QtProjectWizardContentExtensions(settings, window));
+}
+
+template <>
+void addSourceGroupContents<SourceGroupSettingsJavaEmpty>(QtProjectWizardContentGroup* group,
+                                                          std::shared_ptr<SourceGroupSettingsJavaEmpty> settings,
+                                                          QtProjectWizardWindow* window) {
   group->addContent(new QtProjectWizardContentPathsSource(settings, window));
   group->addContent(new QtProjectWizardContentPathsExclude(settings, window));
   group->addContent(new QtProjectWizardContentExtensions(settings, window));
@@ -506,6 +516,8 @@ void QtProjectWizard::selectedSourceGroupChanged(int index) {
 
   if(auto settings = std::dynamic_pointer_cast<SourceGroupSettingsCustomCommand>(group)) {
     addSourceGroupContents(summary, settings, this);
+  } else if(auto settingsJavaEmpty = std::dynamic_pointer_cast<SourceGroupSettingsJavaEmpty>(group)) {
+    addSourceGroupContents(summary, settingsJavaEmpty, this);
   } else if(auto settingsUnloadable = std::dynamic_pointer_cast<SourceGroupSettingsUnloadable>(group)) {
     addSourceGroupContents(summary, settingsUnloadable, this);
   }
@@ -718,6 +730,9 @@ void QtProjectWizard::selectedProjectType(SourceGroupType sourceGroupType) {
     return;
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
+  case SOURCE_GROUP_JAVA_EMPTY:
+    settings = std::make_shared<SourceGroupSettingsJavaEmpty>(sourceGroupId, m_projectSettings.get());
+    break;
   case SOURCE_GROUP_CUSTOM_COMMAND:
     settings = std::make_shared<SourceGroupSettingsCustomCommand>(sourceGroupId, m_projectSettings.get());
     break;

@@ -31,6 +31,7 @@
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
+#include "SourceGroupFactoryModuleJava.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageStatus.h"
@@ -52,6 +53,7 @@ void signalHandler(int signum) {
 
 void addLanguagePackages() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
+  SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleJava>());
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());

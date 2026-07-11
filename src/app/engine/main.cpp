@@ -22,6 +22,7 @@
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
+#include "SourceGroupFactoryModuleJava.h"
 #include "StorageCache.h"
 #include "UserPaths.h"
 #include "Version.h"
@@ -68,6 +69,7 @@ void setupPaths() {
 
 void addLanguagePackages() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
+  SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleJava>());
 #if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());

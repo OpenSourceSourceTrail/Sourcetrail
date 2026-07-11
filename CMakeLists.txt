@@ -202,6 +202,8 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
 endif()
 # Indexer App --------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app/indexer)
+# Java indexer plugin stub (proves plugin discovery/launch; not the real Java parser) ---------------------------------------------
+add_subdirectory(src/app/indexer_java_stub)
 # App ----------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app/gui)
 # CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include "SettingsMigrationLambda.h"
 #include "SettingsMigrationMoveKey.h"
 #include "SourceGroupSettingsCustomCommand.h"
+#include "SourceGroupSettingsJavaEmpty.h"
 #include "SourceGroupSettingsUnloadable.h"
 #include "utilityFile.h"
 #include "utilityString.h"
@@ -153,6 +154,9 @@ std::vector<std::shared_ptr<SourceGroupSettings>> ProjectSettings::getAllSourceG
       settings = std::make_shared<SourceGroupSettingsCxxCdb>(id, this);
       break;
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+    case SOURCE_GROUP_JAVA_EMPTY:
+      settings = std::make_shared<SourceGroupSettingsJavaEmpty>(id, this);
+      break;
     case SOURCE_GROUP_CUSTOM_COMMAND:
       settings = std::make_shared<SourceGroupSettingsCustomCommand>(id, this);
       break;

@@ -9,6 +9,7 @@
 #include "../../scheduling/TaskDecoratorRepeat.h"
 #include "../../scheduling/TaskReturnSuccessIf.h"
 #include "../../scheduling/TaskSetValue.h"
+#include "IndexerCommandType.h"
 
 class DialogView;
 class FilePath;
@@ -66,7 +67,8 @@ public:
                                                             std::shared_ptr<StorageProvider> storageProvider,
                                                             std::shared_ptr<DialogView> dialogView,
                                                             std::string appUUID,
-                                                            bool multiProcessIndexing) = 0;
+                                                            bool multiProcessIndexing,
+                                                            IndexerCommandType commandType) = 0;
   virtual std::shared_ptr<TaskMergeStorages> createMergeStorages(std::shared_ptr<StorageProvider> storageProvider) = 0;
   virtual std::shared_ptr<TaskInjectStorage> createInjectStorage(std::shared_ptr<StorageProvider> storageProvider,
                                                                   std::weak_ptr<Storage> target) = 0;

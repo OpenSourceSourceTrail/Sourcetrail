@@ -29,7 +29,8 @@ public:
                                                     std::shared_ptr<StorageProvider> storageProvider,
                                                     std::shared_ptr<DialogView> dialogView,
                                                     std::string appUUID,
-                                                    bool multiProcessIndexing) override;
+                                                    bool multiProcessIndexing,
+                                                    IndexerCommandType commandType) override;
   std::shared_ptr<TaskMergeStorages> createMergeStorages(std::shared_ptr<StorageProvider> storageProvider) override;
   std::shared_ptr<TaskInjectStorage> createInjectStorage(std::shared_ptr<StorageProvider> storageProvider,
                                                           std::weak_ptr<Storage> target) override;

@@ -52,6 +52,7 @@ Project::Project(std::shared_ptr<ProjectSettings> settings,
     MessageIndexingFinished().dispatch();
   };
   callbacks.hasCxxSourceGroup = [this]() { return hasCxxSourceGroup(); };
+  callbacks.hasJavaSourceGroup = [this]() { return hasJavaSourceGroup(); };
 
   m_indexTaskBuilder = std::make_unique<IndexTaskBuilder>(
       taskFactory ? std::move(taskFactory) : std::make_shared<DefaultTaskFactory>(), m_appUUID, std::move(callbacks));
@@ -508,6 +509,15 @@ bool Project::hasCxxSourceGroup() const {
     }
   }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  return false;
+}
+
+bool Project::hasJavaSourceGroup() const {
+  for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
+    if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED && sourceGroup->getLanguage() == LANGUAGE_JAVA) {
+      return true;
+    }
+  }
   return false;
 }
 

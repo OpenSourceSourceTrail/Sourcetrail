@@ -48,6 +48,9 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
     sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CPP_EMPTY);
   }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_JAVA_EMPTY)) {
+    sourceGroupInfos[LANGUAGE_JAVA].emplace_back(SOURCE_GROUP_JAVA_EMPTY, true);
+  }
   // Custom Command source group is always available, independent of discovered plugins
   sourceGroupInfos[LANGUAGE_CUSTOM].emplace_back(SOURCE_GROUP_CUSTOM_COMMAND);
 
@@ -58,6 +61,7 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   m_sourceGroupTypeIconName[SOURCE_GROUP_CXX_CDB] = L"cdb_icon";
   m_sourceGroupTypeIconName[SOURCE_GROUP_CXX_VS] = L"vs_icon";
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  m_sourceGroupTypeIconName[SOURCE_GROUP_JAVA_EMPTY] = L"empty_icon";
   m_sourceGroupTypeIconName[SOURCE_GROUP_CUSTOM_COMMAND] = L"empty_icon";
 
   // define descriptions for each kind of Source Group
@@ -79,6 +83,8 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
           "<a href=\""} +
       "documentation"_g + "#visual-studio\">Sourcetrail Visual Studio Extension</a> installed.</p>";
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  m_sourceGroupTypeDescriptions[SOURCE_GROUP_JAVA_EMPTY] =
+      "Create a new Source Group by defining which Java files will be indexed.";
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_CUSTOM_COMMAND] =
       "Create a new Source Group executing a custom command on each source file. "
       "This Source Group type can be used on <a "

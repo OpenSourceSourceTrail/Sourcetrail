@@ -197,6 +197,8 @@ target_sources(
   data/indexer/IndexerCommand.h
   data/indexer/IndexerCommandCustom.cpp
   data/indexer/IndexerCommandCustom.h
+  data/indexer/IndexerCommandJava.cpp
+  data/indexer/IndexerCommandJava.h
   data/indexer/IndexerCommandProvider.cpp
   data/indexer/IndexerCommandProvider.h
   data/indexer/IndexerCommandType.cpp
@@ -334,6 +336,10 @@ target_sources(
   project/SourceGroupFactoryModule.h
   project/SourceGroupFactoryModuleCustom.cpp
   project/SourceGroupFactoryModuleCustom.h
+  project/SourceGroupFactoryModuleJava.cpp
+  project/SourceGroupFactoryModuleJava.h
+  project/SourceGroupJavaEmpty.cpp
+  project/SourceGroupJavaEmpty.h
   settings/migration/SettingsMigration.cpp
   settings/migration/SettingsMigration.h
   settings/migration/SettingsMigrationDeleteKey.cpp
@@ -350,8 +356,12 @@ target_sources(
   settings/source_group/component/SourceGroupSettingsWithSourceExtensions.cpp
   settings/source_group/component/SourceGroupSettingsWithSourceExtensions.h
   settings/source_group/component/SourceGroupSettingsWithSourceExtensionsEmpty.h
+  settings/source_group/component/SourceGroupSettingsWithSourceExtensionsJava.h
   settings/source_group/component/SourceGroupSettingsWithSourcePaths.cpp
   settings/source_group/component/SourceGroupSettingsWithSourcePaths.h
+  settings/source_group/component/java/SourceGroupSettingsWithJavaClassPath.cpp
+  settings/source_group/component/java/SourceGroupSettingsWithJavaClassPath.h
+  settings/source_group/type/SourceGroupSettingsJavaEmpty.h
   settings/source_group/type/SourceGroupSettingsUnloadable.cpp
   settings/source_group/type/SourceGroupSettingsUnloadable.h
   settings/source_group/SourceGroupSettings.cpp

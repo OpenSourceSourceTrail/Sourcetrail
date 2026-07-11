@@ -17,6 +17,8 @@
 #include "IApplicationSettings.hpp"
 #include "IndexerWorkerServiceImpl.h"
 #include "ITaskFactory.h"
+#include "language_packages.h"
+#include "LanguageType.h"
 #include "PersistentStorage.h"
 #include "SourceGroup.h"
 #include "SourceGroupStatusType.h"
@@ -38,6 +40,25 @@
 
 namespace {
 constexpr int DefaultIndexerThreadCount = 4;
+
+// Single-language assumption (routing across mixed-language projects is a later increment):
+// resolve the worker command type from the first enabled non-custom source group's language.
+IndexerCommandType getStandardCommandType(const std::vector<std::shared_ptr<SourceGroup>>& sourceGroups) {
+  for(const std::shared_ptr<SourceGroup>& sourceGroup : sourceGroups) {
+    if(sourceGroup->getStatus() != SOURCE_GROUP_STATUS_ENABLED) {
+      continue;
+    }
+    if(sourceGroup->getLanguage() == LANGUAGE_JAVA) {
+      return INDEXER_COMMAND_JAVA;
+    }
+#if BUILD_CXX_LANGUAGE_PACKAGE
+    if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
+      return INDEXER_COMMAND_CXX;
+    }
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  }
+  return INDEXER_COMMAND_UNKNOWN;
+}
 
 int getIndexerThreadCount() {
   int indexerThreadCount = IApplicationSettings::getInstanceRaw()->getIndexerThreadCount();
@@ -149,7 +170,11 @@ void IndexTaskBuilder::addIndexerPipeline(const std::shared_ptr<TaskGroupSequenc
       m_taskFactory->createFillIndexerCommandsQueue(indexerWorkerService, std::move(indexerCommandProvider), 20));
 
   // add task for indexing
-  const bool multiProcess = IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && m_callbacks.hasCxxSourceGroup();
+  // Java has no in-process indexer (it is always an external plugin executable), so it must
+  // run multi-process regardless of the multi-process-indexing setting; CXX can still run
+  // in-process (compiled-in LanguagePackageManager indexer) when that setting is off.
+  const bool multiProcess = m_callbacks.hasJavaSourceGroup() ||
+                            (IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && m_callbacks.hasCxxSourceGroup());
   taskParallelIndexing->addChildTasks(m_taskFactory->createSequence()->addChildTasks(
       // block until there are indexer commands to process
       makeBlockUntilTrue("indexer_command_queue_started", 25),
@@ -158,7 +183,8 @@ void IndexTaskBuilder::addIndexerPipeline(const std::shared_ptr<TaskGroupSequenc
                                       storageProvider,
                                       dialogView,
                                       m_appUUID,
-                                      multiProcess)));
+                                      multiProcess,
+                                      getStandardCommandType(sourceGroups))));
 
   // add task for merging the intermediate storages
   taskParallelIndexing->addTask(m_taskFactory->createSequence()->addChildTasks(

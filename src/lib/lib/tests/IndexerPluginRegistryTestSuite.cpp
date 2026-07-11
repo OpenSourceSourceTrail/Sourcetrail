@@ -90,6 +90,34 @@ TEST_F(IndexerPluginRegistryFixture, parsesManifestAndAnswersCapabilityQueries) 
   EXPECT_EQ(plugin.indexerExecutablePath, registry->indexerExecutablePathFor(INDEXER_COMMAND_CUSTOM));
 }
 
+TEST_F(IndexerPluginRegistryFixture, parsesJavaManifestAndAnswersCapabilityQueries) {
+  writeManifest("java_stub",
+                R"(<?xml version="1.0"?>
+<config>
+  <id>java_stub</id>
+  <name>Java (stub)</name>
+  <language>Java</language>
+  <commandType>indexer_command_java</commandType>
+  <indexerExecutable>indexer</indexerExecutable>
+  <source_group_types>
+    <source_group_type>Java Source Group</source_group_type>
+  </source_group_types>
+</config>
+)");
+
+  auto registry = IndexerPluginRegistry::getInstance();
+  registry->discover(FilePath(mPluginsDirectory.string()));
+
+  ASSERT_EQ(1, registry->getPlugins().size());
+  const IndexerPluginRegistry::Plugin& plugin = registry->getPlugins().front();
+  EXPECT_EQ(LANGUAGE_JAVA, plugin.language);
+  EXPECT_EQ(INDEXER_COMMAND_JAVA, plugin.commandType);
+
+  EXPECT_TRUE(registry->supportsSourceGroupType(SOURCE_GROUP_JAVA_EMPTY));
+  EXPECT_TRUE(registry->supportsLanguage(LANGUAGE_JAVA));
+  EXPECT_EQ(plugin.indexerExecutablePath, registry->indexerExecutablePathFor(INDEXER_COMMAND_JAVA));
+}
+
 TEST_F(IndexerPluginRegistryFixture, ignoresPluginDirectoryWithoutManifest) {
   std::filesystem::create_directories(mPluginsDirectory / "no_manifest");
 

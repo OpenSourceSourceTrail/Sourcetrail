@@ -162,6 +162,7 @@ private:
   void discardTempStorage();
 
   [[nodiscard]] bool hasCxxSourceGroup() const;
+  [[nodiscard]] bool hasJavaSourceGroup() const;
 
   std::shared_ptr<TaskGroupSequence> createIndexTasks(RefreshInfo info,
                                                       std::shared_ptr<DialogView> dialogView,

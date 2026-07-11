@@ -15,6 +15,8 @@
 #include "logging.h"
 #include "utilityString.h"
 
+#include "IndexerCommandJava.h"
+
 #if BUILD_CXX_LANGUAGE_PACKAGE
 #  include "IndexerCommandCxx.h"
 #endif
@@ -198,6 +200,16 @@ sourcetrail::IndexerCommand toProto(const IndexerCommand* cmd) {
   }
 #endif
 
+  if(const auto* java = dynamic_cast<const IndexerCommandJava*>(cmd)) {
+    msg.set_type(sourcetrail::IndexerCommand::JAVA);
+
+    for(const FilePath& p : java->getClassPaths()) {
+      msg.add_class_paths(utility::encodeToUtf8(p.wstr()));
+    }
+    msg.set_language_standard(utility::encodeToUtf8(java->getLanguageStandard()));
+    return msg;
+  }
+
   LOG_ERROR(L"toProto: unhandled IndexerCommand type for file: " + cmd->getSourceFilePath().wstr());
   msg.set_type(sourcetrail::IndexerCommand::UNKNOWN);
   return msg;
@@ -235,6 +247,19 @@ std::shared_ptr<IndexerCommand> fromProto(const sourcetrail::IndexerCommand& msg
         sourceFilePath, indexedPaths, excludeFilters, includeFilters, workingDir, compilerFlags);
   }
 #endif
+
+  case sourcetrail::IndexerCommand::JAVA: {
+    FilePath sourceFilePath(utility::decodeFromUtf8(msg.source_file_path()));
+
+    std::set<FilePath> classPaths;
+    for(const auto& p : msg.class_paths()) {
+      classPaths.insert(FilePath(utility::decodeFromUtf8(p)));
+    }
+
+    std::wstring languageStandard = utility::decodeFromUtf8(msg.language_standard());
+
+    return std::make_shared<IndexerCommandJava>(sourceFilePath, classPaths, languageStandard);
+  }
 
   case sourcetrail::IndexerCommand::UNKNOWN:
   default:

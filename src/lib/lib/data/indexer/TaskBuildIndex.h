@@ -6,6 +6,7 @@
 
 #include <grpcpp/server.h>
 
+#include "IndexerCommandType.h"
 #include "IndexerWorkerServiceImpl.h"
 #include "MessageListener.h"
 #include "Task.h"
@@ -24,7 +25,8 @@ public:
                  std::shared_ptr<StorageProvider> storageProvider,
                  std::shared_ptr<DialogView> dialogView,
                  std::string appUUID,
-                 bool multiProcessIndexing);
+                 bool multiProcessIndexing,
+                 IndexerCommandType commandType);
 
 protected:
   void doEnter(std::shared_ptr<Blackboard> blackboard) override;
@@ -46,6 +48,7 @@ protected:
   std::shared_ptr<DialogView> mDialogView;
   const std::string mAppUUID;
   bool mMultiProcessIndexing;
+  IndexerCommandType mCommandType;
 
   std::shared_ptr<IndexerWorkerServiceImpl> mIndexerWorkerService;
   std::unique_ptr<grpc::Server> mGrpcServer;

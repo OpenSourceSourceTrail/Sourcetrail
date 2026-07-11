@@ -64,12 +64,13 @@ message StorageError {
   bool indexed = 5;
 }
 
-// IndexerCommand (common base + CXX extension) -------------------------------
+// IndexerCommand (common base + CXX/Java extensions) --------------------------
 
 message IndexerCommand {
   enum CommandType {
     UNKNOWN = 0;
     CXX = 1;
+    JAVA = 2;
   }
   CommandType type = 1;
   string source_file_path = 2; // UTF-8 encoded wstring
@@ -80,6 +81,10 @@ message IndexerCommand {
   repeated string include_filters = 5;
   string working_directory = 6;
   repeated string compiler_flags = 7; // UTF-8 encoded wstrings
+
+  // Java fields (only set when type == JAVA)
+  repeated string class_paths = 8;
+  string language_standard = 9;
 }
 
 // IntermediateStorage --------------------------------------------------------

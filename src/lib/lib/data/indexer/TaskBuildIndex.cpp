@@ -28,11 +28,13 @@ TaskBuildIndex::TaskBuildIndex(size_t processCount,
                                std::shared_ptr<StorageProvider> storageProvider,
                                std::shared_ptr<DialogView> dialogView,
                                std::string appUUID,
-                               bool multiProcessIndexing)
+                               bool multiProcessIndexing,
+                               IndexerCommandType commandType)
     : mStorageProvider(std::move(storageProvider))
     , mDialogView(std::move(dialogView))
     , mAppUUID(std::move(appUUID))
     , mMultiProcessIndexing(multiProcessIndexing)
+    , mCommandType(commandType)
     , mIndexerWorkerService(std::move(indexerWorkerService))
     , mProcessCount(processCount) {}
 
@@ -182,13 +184,12 @@ void TaskBuildIndex::handleMessage(MessageIndexingInterrupted* /*message*/) {
 }
 
 void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logFilePath*/) {
-  FilePath indexerProcessPath;
+  FilePath indexerProcessPath = IndexerPluginRegistry::getInstance()->indexerExecutablePathFor(mCommandType);
 #if BUILD_CXX_LANGUAGE_PACKAGE
-  indexerProcessPath = IndexerPluginRegistry::getInstance()->indexerExecutablePathFor(INDEXER_COMMAND_CXX);
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-  if(indexerProcessPath.empty()) {
+  if(indexerProcessPath.empty() && mCommandType == INDEXER_COMMAND_CXX) {
     indexerProcessPath = AppPath::getCxxIndexerFilePath();
   }
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   if(!indexerProcessPath.exists()) {
     mInterrupted = true;
     LOG_ERROR(L"Cannot start indexer process because executable is missing at \"" + indexerProcessPath.wstr() + L"\"");
