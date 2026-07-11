@@ -30,6 +30,12 @@ public:
   // Called by TaskBuildIndex to wait until all in-flight work is finished
   std::vector<FilePath> drainAndGetCrashedFiles();
 
+  // Called by TaskBuildIndex right before shutting down the gRPC server, so that
+  // outstanding WatchInterrupt streams (which otherwise only exit on client
+  // cancellation or an actual interrupt) return promptly instead of blocking
+  // Server::Shutdown() forever.
+  void requestShutdown();
+
   // Number of storages received (= files finished indexing)
   size_t getIndexedFileCount() const;
 
@@ -63,6 +69,7 @@ private:
   std::mutex mCommandMutex;
 
   std::atomic<bool> mInterrupted{false};
+  std::atomic<bool> mShuttingDown{false};
 
   // track in-flight files (for crash detection) + crashed files
   std::mutex mStatusMutex;

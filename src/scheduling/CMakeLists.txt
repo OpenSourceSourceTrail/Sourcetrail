@@ -1,4 +1,6 @@
 # ${CMAKE_SOURCE_DIR}/src/scheduling/CMakeLists.txt
+find_package(Taskflow REQUIRED)
+
 add_library(Sourcetrail_scheduling)
 add_library(Sourcetrail::scheduling ALIAS Sourcetrail_scheduling)
 
@@ -15,6 +17,7 @@ target_sources(
           ${CMAKE_CURRENT_LIST_DIR}/TaskGroupParallel.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskGroupSelector.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskGroupSequence.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/TaskflowGroupParallel.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskLambda.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskRunner.cpp
           ${CMAKE_CURRENT_LIST_DIR}/TaskScheduler.cpp
@@ -25,7 +28,7 @@ target_include_directories(Sourcetrail_scheduling PUBLIC ${CMAKE_CURRENT_LIST_DI
 target_link_libraries(
   Sourcetrail_scheduling
   PUBLIC Sourcetrail::core Sourcetrail::core::utility::logging Sourcetrail::core::utility::GlobalId
-  PRIVATE Boost::date_time Sourcetrail::core::utility::ScopedFunctor)
+  PRIVATE Boost::date_time Sourcetrail::core::utility::ScopedFunctor Taskflow::Taskflow)
 
 if(ENABLE_UNIT_TEST)
   add_subdirectory(mocks)

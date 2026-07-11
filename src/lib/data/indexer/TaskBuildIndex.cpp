@@ -143,7 +143,12 @@ void TaskBuildIndex::doExit(std::shared_ptr<Blackboard> blackboard) {
     }
   }
 
-  // Shut down gRPC server
+  // Shut down gRPC server. requestShutdown() unblocks any outstanding
+  // WatchInterrupt streams first, since Server::Shutdown() otherwise waits
+  // forever for them to return on a normal, non-interrupted indexing run.
+  if(mIndexerWorkerService) {
+    mIndexerWorkerService->requestShutdown();
+  }
   if(mGrpcServer) {
     mGrpcServer->Shutdown();
     mGrpcServer.reset();

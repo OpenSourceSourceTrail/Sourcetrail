@@ -29,6 +29,11 @@ void IndexerWorkerServiceImpl::setInterrupted(bool interrupted) {
   notifyInterruptListeners();
 }
 
+void IndexerWorkerServiceImpl::requestShutdown() {
+  mShuttingDown.store(true);
+  notifyInterruptListeners();
+}
+
 std::vector<FilePath> IndexerWorkerServiceImpl::drainAndGetCrashedFiles() {
   // Called from TaskBuildIndex::doExit *after* all worker threads/processes are joined,
   // so no further gRPC calls can mutate state here. Any source file still recorded as
@@ -142,9 +147,13 @@ grpc::Status IndexerWorkerServiceImpl::WatchInterrupt(grpc::ServerContext* ctx,
     writer->Write(event);
   }
 
-  // Block until the client disconnects or the context is cancelled
+  // Block until the client disconnects, the context is cancelled, an interrupt
+  // fires, or the service is shutting down (requestShutdown()). Without the
+  // shutdown check this loop can outlive the client and block
+  // grpc::Server::Shutdown() forever on a completely normal indexing run,
+  // since neither cancellation nor an interrupt is guaranteed to happen.
   ctx->AsyncNotifyWhenDone(nullptr);
-  while(!ctx->IsCancelled() && !mInterrupted.load()) {
+  while(!ctx->IsCancelled() && !mInterrupted.load() && !mShuttingDown.load()) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 

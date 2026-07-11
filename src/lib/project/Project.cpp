@@ -10,7 +10,7 @@
 
 #include "../../scheduling/TaskDecoratorRepeat.h"
 #include "../../scheduling/TaskFindKeyOnBlackboard.h"
-#include "../../scheduling/TaskGroupParallel.h"
+#include "../../scheduling/TaskflowGroupParallel.h"
 #include "../../scheduling/TaskGroupSelector.h"
 #include "../../scheduling/TaskGroupSequence.h"
 #include "../../scheduling/TaskLambda.h"
@@ -580,7 +580,7 @@ std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,
     taskSequential->addTask(taskParserWrapper);
 
     // TODO(Hussein): Create Tasks using factory pattern
-    auto taskParallelIndexing = std::make_shared<TaskGroupParallel>();
+    auto taskParallelIndexing = std::make_shared<TaskflowGroupParallel>();
     taskParserWrapper->setTask(taskParallelIndexing);
 
     // add task for refilling the indexer command queue
