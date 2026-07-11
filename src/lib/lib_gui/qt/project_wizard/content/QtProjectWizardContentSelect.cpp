@@ -11,6 +11,7 @@
 #include <QVariant>
 
 #include "globalStrings.h"
+#include "IndexerPluginRegistry.h"
 #include "LanguageType.h"
 #include "QtFlowLayout.h"
 #include "QtProjectWizardWindow.h"
@@ -27,16 +28,27 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
     const bool recommended;
   };
 
-  // define which kind of source groups are available for each language
+  // define which kind of source groups are available for each language, gated by which
+  // indexer plugins are currently discovered
+  const IndexerPluginRegistry::Ptr pluginRegistry = IndexerPluginRegistry::getInstance();
   std::map<LanguageType, std::vector<SourceGroupInfo>> sourceGroupInfos;
 #if BUILD_CXX_LANGUAGE_PACKAGE
-  sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_CDB, true);
-  sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_VS);
-  sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_C_EMPTY);
-  sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_CDB, true);
-  sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_VS);
-  sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CPP_EMPTY);
+  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_CXX_CDB)) {
+    sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_CDB, true);
+    sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_CDB, true);
+  }
+  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_CXX_VS)) {
+    sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_VS);
+    sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_VS);
+  }
+  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_C_EMPTY)) {
+    sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_C_EMPTY);
+  }
+  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_CPP_EMPTY)) {
+    sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CPP_EMPTY);
+  }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  // Custom Command source group is always available, independent of discovered plugins
   sourceGroupInfos[LANGUAGE_CUSTOM].emplace_back(SOURCE_GROUP_CUSTOM_COMMAND);
 
   // define which icons should be used for which kind of source group

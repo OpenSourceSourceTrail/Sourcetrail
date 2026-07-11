@@ -10,6 +10,7 @@ struct MockedProject : IProject {
 
   MOCK_METHOD(bool, isLoaded, (), (const, override));
   MOCK_METHOD(bool, isIndexing, (), (const, override));
+  MOCK_METHOD(bool, isReindexable, (), (const, override));
 
   MOCK_METHOD(bool, settingsEqualExceptNameAndLocation, (const ProjectSettings&), (const, override));
   MOCK_METHOD(void, setStateOutdated, (), (override));

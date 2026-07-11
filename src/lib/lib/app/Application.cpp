@@ -398,6 +398,12 @@ void Application::loadWindow(bool showStartWindow) {
 }
 
 void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRequested) {
+  if(mProject && !mProject->isReindexable()) {
+    MessageStatus(L"Cannot refresh project: an indexer plugin required by one of its source groups is missing.", true)
+        .dispatch();
+    return;
+  }
+
   if(mProject && checkSharedMemory()) {
     mProject->refresh(getDialogView(DialogView::UseCase::INDEXING), refreshMode, shallowIndexingRequested);
 

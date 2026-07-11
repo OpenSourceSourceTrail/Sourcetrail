@@ -4,6 +4,8 @@
 #include <memory>
 #include <vector>
 
+#include "SourceGroupType.h"
+
 class SourceGroup;
 class SourceGroupSettings;
 class SourceGroupFactoryModule;
@@ -13,6 +15,8 @@ public:
   static std::shared_ptr<SourceGroupFactory> getInstance();
 
   void addModule(std::shared_ptr<SourceGroupFactoryModule> module);
+
+  [[nodiscard]] bool supports(SourceGroupType type) const;
 
   std::vector<std::shared_ptr<SourceGroup>> createSourceGroups(
       std::vector<std::shared_ptr<SourceGroupSettings>> allSourceGroupSettings);

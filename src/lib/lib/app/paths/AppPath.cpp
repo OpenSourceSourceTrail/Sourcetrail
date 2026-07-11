@@ -37,3 +37,7 @@ bool AppPath::setCxxIndexerDirectoryPath(const FilePath& path) {
   }
   return false;
 }
+
+FilePath AppPath::getPluginsDirectoryPath() {
+  return s_sharedDataDirectoryPath.getConcatenated(L"plugins");
+}

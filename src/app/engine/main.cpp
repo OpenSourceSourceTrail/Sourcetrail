@@ -16,6 +16,7 @@
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
 #include "impls/Factory.hpp"
+#include "IndexerPluginRegistry.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
 #include "ScopedFunctor.h"
@@ -71,6 +72,8 @@ void addLanguagePackages() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif
+
+  IndexerPluginRegistry::getInstance()->discover();
 }
 
 // Signal handler sets this flag; main loop checks it.

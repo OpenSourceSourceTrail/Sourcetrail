@@ -6,7 +6,9 @@
 #include <QMainWindow>
 
 #include "FilePath.h"
+#include "MessageListener.h"
 #include "QtWindowStack.h"
+#include "type/MessageRefreshUI.h"
 
 class Bookmark;
 class MessageBase;
@@ -44,7 +46,9 @@ private:
 };
 
 
-class QtMainWindow : public QMainWindow {
+class QtMainWindow
+    : public QMainWindow
+    , public MessageListener<MessageRefreshUI> {
   Q_OBJECT
 
 public:
@@ -90,6 +94,8 @@ protected:
   void resizeEvent(QResizeEvent* event) override;
 
   bool focusNextPrevChild(bool next) override;
+
+  void handleMessage(MessageRefreshUI* message) override;
 
 public slots:
   void about();
@@ -174,6 +180,8 @@ private:
 
   void setShowDockWidgetTitleBars(bool showTitleBars);
 
+  void updateRefreshActionsEnabled();
+
   template <typename T>
   T* createWindow();
 
@@ -191,6 +199,9 @@ private:
   QMenu* m_recentProjectsMenu;
 
   QAction* m_showTitleBarsAction;
+
+  QAction* m_refreshAction = nullptr;
+  QAction* m_forceRefreshAction = nullptr;
 
   bool m_showDockWidgetTitleBars = true;
 

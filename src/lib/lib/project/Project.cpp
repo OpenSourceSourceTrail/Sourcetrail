@@ -15,6 +15,7 @@
 #include "FilePath.h"
 #include "FileSystem.h"
 #include "IApplicationSettings.hpp"
+#include "IndexerPluginRegistry.h"
 #include "IndexTaskBuilder.h"
 #include "ITaskFactory.h"
 #include "PersistentStorage.h"
@@ -22,6 +23,7 @@
 #include "RefreshInfoGenerator.h"
 #include "SourceGroup.h"
 #include "SourceGroupFactory.h"
+#include "SourceGroupSettings.h"
 #include "SourceGroupStatusType.h"
 #include "StorageCache.h"
 #include "TabId.h"
@@ -82,6 +84,20 @@ bool Project::isLoaded() const {
 
 bool Project::isIndexing() const {
   return m_refreshStage == RefreshStageType::INDEXING;
+}
+
+bool Project::isReindexable() const {
+  const IndexerPluginRegistry::Ptr pluginRegistry = IndexerPluginRegistry::getInstance();
+  const std::shared_ptr<SourceGroupFactory> sourceGroupFactory = SourceGroupFactory::getInstance();
+  for(const std::shared_ptr<SourceGroupSettings>& sourceGroupSettings : m_settings->getAllSourceGroupSettings()) {
+    const SourceGroupType type = sourceGroupSettings->getType();
+    // A type is reindexable if it is covered by a discovered plugin, or already handled by a
+    // compiled-in source group module (keeps the default in-tree build working without plugins).
+    if(!pluginRegistry->supportsSourceGroupType(type) && !sourceGroupFactory->supports(type)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool Project::settingsEqualExceptNameAndLocation(const ProjectSettings& otherSettings) const {

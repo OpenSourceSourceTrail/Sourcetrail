@@ -120,6 +120,15 @@ public:
   }
 
   /**
+   * @brief Checks whether the current project can be (re-)indexed, i.e. whether every one
+   * of its source groups is covered by a currently discovered indexer plugin.
+   * @return True if there is no loaded project, or if it is reindexable.
+   */
+  [[nodiscard]] bool isCurrentProjectReindexable() const noexcept {
+    return !mProject || mProject->isReindexable();
+  }
+
+  /**
    * @brief Checks if the application has a GUI.
    * @return True if the application has a GUI, false otherwise.
    */

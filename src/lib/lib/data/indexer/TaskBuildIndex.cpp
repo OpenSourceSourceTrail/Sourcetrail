@@ -8,6 +8,8 @@
 #include "Blackboard.h"
 #include "DialogView.h"
 #include "GrpcIndexer.h"
+#include "IndexerCommandType.h"
+#include "IndexerPluginRegistry.h"
 #include "ParserClientImpl.h"
 #include "StorageProvider.h"
 #include "TimeStamp.h"
@@ -180,7 +182,13 @@ void TaskBuildIndex::handleMessage(MessageIndexingInterrupted* /*message*/) {
 }
 
 void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logFilePath*/) {
-  const FilePath indexerProcessPath = AppPath::getCxxIndexerFilePath();
+  FilePath indexerProcessPath;
+#if BUILD_CXX_LANGUAGE_PACKAGE
+  indexerProcessPath = IndexerPluginRegistry::getInstance()->indexerExecutablePathFor(INDEXER_COMMAND_CXX);
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  if(indexerProcessPath.empty()) {
+    indexerProcessPath = AppPath::getCxxIndexerFilePath();
+  }
   if(!indexerProcessPath.exists()) {
     mInterrupted = true;
     LOG_ERROR(L"Cannot start indexer process because executable is missing at \"" + indexerProcessPath.wstr() + L"\"");

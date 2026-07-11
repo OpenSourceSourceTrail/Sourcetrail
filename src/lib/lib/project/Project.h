@@ -98,6 +98,14 @@ public:
   [[nodiscard]] bool isIndexing() const override;
 
   /**
+   * @brief Check whether every source group of this project is covered by a currently
+   * discovered indexer plugin, i.e. whether the project can be (re-)indexed.
+   *
+   * @return True if reindexable
+   */
+  [[nodiscard]] bool isReindexable() const override;
+
+  /**
    * @brief Check if the project settings are equal except name and location
    *
    * @param otherSettings Other project settings

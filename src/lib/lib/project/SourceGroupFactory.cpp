@@ -27,6 +27,15 @@ std::vector<std::shared_ptr<SourceGroup>> SourceGroupFactory::createSourceGroups
   return sourceGroups;
 }
 
+bool SourceGroupFactory::supports(SourceGroupType type) const {
+  for(const std::shared_ptr<SourceGroupFactoryModule>& module : m_modules) {
+    if(module->supports(type)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 std::shared_ptr<SourceGroup> SourceGroupFactory::createSourceGroup(std::shared_ptr<SourceGroupSettings> settings) {
   std::shared_ptr<SourceGroup> sourceGroup;
 

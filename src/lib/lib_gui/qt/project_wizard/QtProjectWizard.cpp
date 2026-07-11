@@ -246,16 +246,17 @@ void QtProjectWizard::newProjectFromCDB([[maybe_unused]] const FilePath& filePat
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 }
 
-void QtProjectWizard::editProject(const FilePath& settingsPath) {
+void QtProjectWizard::editProject(const FilePath& settingsPath, bool readOnly) {
   std::shared_ptr<ProjectSettings> settings = std::make_shared<ProjectSettings>(settingsPath);
   settings->reload();
-  editProject(settings);
+  editProject(settings, readOnly);
 }
 
-void QtProjectWizard::editProject(std::shared_ptr<ProjectSettings> settings) {
+void QtProjectWizard::editProject(std::shared_ptr<ProjectSettings> settings, bool readOnly) {
   m_projectSettings = settings;
   m_allSourceGroupSettings = settings->getAllSourceGroupSettings();
   m_editing = true;
+  m_readOnly = readOnly;
 
   setup();
 }
@@ -293,7 +294,7 @@ void QtProjectWizard::populateWindow(QWidget* widget) {
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
     buttonsLayout->setSpacing(0);
 
-    QPushButton* addButton = new QtIconButton(
+    m_addButton = new QtIconButton(
         ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_add.png"),
         ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_add_hover.png"));
 
@@ -303,31 +304,37 @@ void QtProjectWizard::populateWindow(QWidget* widget) {
     m_duplicateButton = new QtIconButton(ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_copy.png"),
                                          ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_copy_hover.png"));
 
-    addButton->setIconSize(QSize(20, 20));
+    m_addButton->setIconSize(QSize(20, 20));
     m_removeButton->setIconSize(QSize(20, 20));
     m_duplicateButton->setIconSize(QSize(20, 20));
 
-    addButton->setToolTip(QStringLiteral("Add Source Group"));
+    m_addButton->setToolTip(QStringLiteral("Add Source Group"));
     m_removeButton->setToolTip(QStringLiteral("Remove Source Group"));
     m_duplicateButton->setToolTip(QStringLiteral("Copy Source Group"));
 
-    addButton->setObjectName(QStringLiteral("action_button"));
+    m_addButton->setObjectName(QStringLiteral("action_button"));
     m_removeButton->setObjectName(QStringLiteral("action_button"));
     m_duplicateButton->setObjectName(QStringLiteral("action_button"));
 
     m_removeButton->setEnabled(false);
     m_duplicateButton->setEnabled(false);
 
-    connect(addButton, &QPushButton::clicked, this, &QtProjectWizard::newSourceGroup);
+    connect(m_addButton, &QPushButton::clicked, this, &QtProjectWizard::newSourceGroup);
     connect(m_removeButton, &QPushButton::clicked, this, &QtProjectWizard::removeSelectedSourceGroup);
     connect(m_duplicateButton, &QPushButton::clicked, this, &QtProjectWizard::duplicateSelectedSourceGroup);
 
-    buttonsLayout->addWidget(addButton);
+    buttonsLayout->addWidget(m_addButton);
     buttonsLayout->addWidget(m_removeButton);
     buttonsLayout->addWidget(m_duplicateButton);
     buttonsLayout->addStretch();
 
     menuLayout->addLayout(buttonsLayout);
+
+    if(m_readOnly) {
+      m_addButton->setVisible(false);
+      m_removeButton->setVisible(false);
+      m_duplicateButton->setVisible(false);
+    }
   }
 
   QFrame* separator = new QFrame();
@@ -356,8 +363,11 @@ void QtProjectWizard::populateWindow(QWidget* widget) {
 
 void QtProjectWizard::windowReady() {
   if(m_editing) {
-    updateTitle(QStringLiteral("Edit Project"));
+    updateTitle(m_readOnly ? QStringLiteral("View Project") : QStringLiteral("Edit Project"));
     updateNextButton(QStringLiteral("Save"));
+    if(m_readOnly) {
+      setNextVisible(false);
+    }
   } else {
     updateTitle(QStringLiteral("New Project"));
     updateNextButton(QStringLiteral("Create"));
@@ -367,7 +377,11 @@ void QtProjectWizard::windowReady() {
   updateSubTitle(QStringLiteral("Overview"));
   updatePreviousButton(QStringLiteral("Add Source Group"));
 
-  connect(this, &QtProjectWizard::previous, this, &QtProjectWizard::newSourceGroup);
+  if(m_readOnly) {
+    setPreviousVisible(false);
+  } else {
+    connect(this, &QtProjectWizard::previous, this, &QtProjectWizard::newSourceGroup);
+  }
   connect(this, &QtProjectWizard::next, this, &QtProjectWizard::createProject);
 
   updateSourceGroupList();
@@ -376,6 +390,10 @@ void QtProjectWizard::windowReady() {
     m_sourceGroupList->setCurrentRow(0);
   } else {
     generalButtonClicked();
+  }
+
+  if(m_readOnly && (m_contentWidget != nullptr)) {
+    m_contentWidget->setEnabled(false);
   }
 }
 

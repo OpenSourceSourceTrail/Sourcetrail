@@ -9,6 +9,7 @@
 #include "AppPath.h"
 #include "GrpcIndexer.h"
 #include "IApplicationSettings.hpp"
+#include "IndexerPluginRegistry.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
 #include "logging.h"
@@ -92,6 +93,8 @@ int main(int argc, char* argv[]) {
 #if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif
+
+  IndexerPluginRegistry::getInstance()->discover();
 
   try {
     GrpcIndexer indexer(engineEndpoint, static_cast<Id>(processId));

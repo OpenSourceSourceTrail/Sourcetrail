@@ -50,6 +50,14 @@ struct IProject {
   [[nodiscard]] virtual bool isIndexing() const = 0;
 
   /**
+   * @brief Check whether every source group of this project is covered by a currently
+   * discovered indexer plugin, i.e. whether the project can be (re-)indexed.
+   *
+   * @return True if reindexable
+   */
+  [[nodiscard]] virtual bool isReindexable() const = 0;
+
+  /**
    * @brief Check if the project settings are equal except name and location
    *
    * @param otherSettings Other project settings

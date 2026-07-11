@@ -525,7 +525,8 @@ void QtMainWindow::editProject() {
   if(currentProject) {
     auto* wizard = createWindow<QtProjectWizard>();
 
-    wizard->editProject(currentProject->getProjectSettingsFilePath());
+    wizard->editProject(currentProject->getProjectSettingsFilePath(),
+                        !Application::getInstance()->isCurrentProjectReindexable());
   }
 }
 
@@ -589,6 +590,20 @@ void QtMainWindow::refresh() {
 void QtMainWindow::forceRefresh() {
   MessageIndexingShowDialog().dispatch();
   MessageRefresh().refreshAll().dispatch();
+}
+
+void QtMainWindow::handleMessage(MessageRefreshUI* /*message*/) {
+  updateRefreshActionsEnabled();
+}
+
+void QtMainWindow::updateRefreshActionsEnabled() {
+  const bool reindexable = Application::getInstance()->isCurrentProjectReindexable();
+  if(m_refreshAction != nullptr) {
+    m_refreshAction->setEnabled(reindexable);
+  }
+  if(m_forceRefreshAction != nullptr) {
+    m_forceRefreshAction->setEnabled(reindexable);
+  }
 }
 
 void QtMainWindow::saveAsImage() {
@@ -730,20 +745,24 @@ void QtMainWindow::setupEditMenu() {
   menuBar()->addMenu(menu);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
-  menu->addAction(tr("&Refresh"), QKeySequence::Refresh, this, &QtMainWindow::refresh);
+  m_refreshAction = menu->addAction(tr("&Refresh"), QKeySequence::Refresh, this, &QtMainWindow::refresh);
   if constexpr(utility::getOsType() == OsType::Windows) {
-    menu->addAction(tr("&Full Refresh"), QKeySequence(tr("Shift+F5")), this, &QtMainWindow::forceRefresh);
+    m_forceRefreshAction = menu->addAction(tr("&Full Refresh"), QKeySequence(tr("Shift+F5")), this, &QtMainWindow::forceRefresh);
   } else {
-    menu->addAction(tr("&Full Refresh"), QKeySequence(tr("Shift+Ctrl+R")), this, &QtMainWindow::forceRefresh);
+    m_forceRefreshAction = menu->addAction(
+        tr("&Full Refresh"), QKeySequence(tr("Shift+Ctrl+R")), this, &QtMainWindow::forceRefresh);
   }
 #else
-  menu->addAction(tr("&Refresh"), this, &QtMainWindow::refresh, QKeySequence::Refresh);
+  m_refreshAction = menu->addAction(tr("&Refresh"), this, &QtMainWindow::refresh, QKeySequence::Refresh);
   if constexpr(utility::getOsType() == OsType::Windows) {
-    menu->addAction(tr("&Full Refresh"), this, &QtMainWindow::forceRefresh, QKeySequence(tr("Shift+F5")));
+    m_forceRefreshAction = menu->addAction(tr("&Full Refresh"), this, &QtMainWindow::forceRefresh, QKeySequence(tr("Shift+F5")));
   } else {
-    menu->addAction(tr("&Full Refresh"), this, &QtMainWindow::forceRefresh, QKeySequence(tr("Shift+Ctrl+R")));
+    m_forceRefreshAction = menu->addAction(
+        tr("&Full Refresh"), this, &QtMainWindow::forceRefresh, QKeySequence(tr("Shift+Ctrl+R")));
   }
 #endif
+
+  updateRefreshActionsEnabled();
 
   menu->addSeparator();
 

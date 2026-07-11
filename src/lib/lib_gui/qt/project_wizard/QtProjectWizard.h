@@ -29,8 +29,8 @@ public:
 
   void newProjectFromCDB(const FilePath& filePath);
 
-  void editProject(const FilePath& settingsPath);
-  void editProject(std::shared_ptr<ProjectSettings> settings);
+  void editProject(const FilePath& settingsPath, bool readOnly = false);
+  void editProject(std::shared_ptr<ProjectSettings> settings, bool readOnly = false);
 
 protected:
   void populateWindow(QWidget* widget) override;
@@ -52,9 +52,11 @@ private:
   ApplicationSettings m_appSettings;
 
   bool m_editing = false;
+  bool m_readOnly = false;
   int m_previouslySelectedIndex = -1;
 
   QPushButton* m_generalButton = nullptr;
+  QPushButton* m_addButton = nullptr;
   QPushButton* m_removeButton = nullptr;
   QPushButton* m_duplicateButton = nullptr;
   QListWidget* m_sourceGroupList = nullptr;

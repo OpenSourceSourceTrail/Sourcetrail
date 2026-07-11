@@ -18,6 +18,7 @@
 #include "IApplicationSettings.hpp"
 #include "impls/Factory.hpp"
 #include "includes.h"
+#include "IndexerPluginRegistry.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
 #include "logging.h"
@@ -56,6 +57,8 @@ void addLanguagePackages() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
+
+  IndexerPluginRegistry::getInstance()->discover();
 }
 
 void checkRunFromScript() {
