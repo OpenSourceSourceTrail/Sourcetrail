@@ -1,29 +1,14 @@
 #include "TaskflowGroupParallel.h"
 
-#include <algorithm>
 #include <chrono>
 #include <future>
-#include <thread>
+
+#include "TaskExecutor.h"
 
 TaskflowGroupParallel::TaskflowGroupParallel() : m_needsToStartThreads(true), m_taskFailed(false) {}
 
 tf::Executor& TaskflowGroupParallel::executor() {
-  // A plain function-local static gets its alignment honored directly by the
-  // linker/runtime. tf::Executor contains cache-line-aligned internals
-  // (tf::TaskQueue); embedding it inline in a make_shared<TaskflowGroupParallel>()
-  // allocation caused a heap-buffer-overflow because the combined control-block
-  // allocation didn't respect that over-alignment. Sharing one process-wide
-  // executor also avoids spinning up a fresh N-thread pool per indexing run.
-  //
-  // Each branch task runs a blocking while-loop that never yields its worker
-  // until its whole subtree finishes, and some branches (merge/inject) only
-  // make progress once another branch (TaskBuildIndex) sets a blackboard
-  // flag. That means every concurrently active branch needs its own worker
-  // at all times, or the flag-setting branch can be starved forever (e.g.
-  // under WSL2 / containers where hardware_concurrency() is small). Floor
-  // the pool well above the handful of branches indexing ever adds.
-  static tf::Executor sExecutor(std::max<unsigned>(std::thread::hardware_concurrency(), 8));
-  return sExecutor;
+  return TaskExecutor::get();
 }
 
 void TaskflowGroupParallel::addTask(std::shared_ptr<Task> task) {

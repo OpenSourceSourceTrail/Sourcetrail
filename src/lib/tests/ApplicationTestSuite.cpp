@@ -23,7 +23,6 @@
 #include "MockedSharedMemoryGarbageCollector.hpp"
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedMessageQueue.hpp"
-#include "mocks/MockedTaskManager.hpp"
 #include "type/MessageStatus.h"
 #include "Version.h"
 
@@ -39,8 +38,6 @@ struct SingletonApplicationFix : testing::Test {
     IMessageQueue::setInstance(mMockedMessageQueue);
 
     mMockedMessageStatus = std::make_unique<testing::StrictMock<MockedMessageStatus>>();
-    mTaskManager = std::make_shared<scheduling::mocks::MockedTaskManager>();
-    scheduling::ITaskManager::setInstance(mTaskManager);
 
     mMessageQueue = std::make_shared<MockedMessageQueue>();
     IMessageQueue::setInstance(mMessageQueue);
@@ -53,9 +50,6 @@ struct SingletonApplicationFix : testing::Test {
     mMockedSharedMemoryGarbageCollector.reset();
     IApplicationSettings::setInstance(nullptr);
     mMockedAppSettings.reset();
-
-    scheduling::ITaskManager::setInstance(nullptr);
-    mTaskManager.reset();
 
     IMessageQueue::setInstance(nullptr);
     mMessageQueue.reset();
@@ -76,7 +70,6 @@ struct SingletonApplicationFix : testing::Test {
       std::make_shared<testing::StrictMock<lib::MockedFactory>>();
   std::shared_ptr<lib::MockedSharedMemoryGarbageCollector> mMockedSharedMemoryGarbageCollector =
       std::make_shared<lib::MockedSharedMemoryGarbageCollector>();
-  std::shared_ptr<scheduling::mocks::MockedTaskManager> mTaskManager;
   std::shared_ptr<MockedMessageQueue> mMessageQueue;
 };
 
@@ -94,9 +87,6 @@ TEST_F(SingletonApplicationFix, getInstanceWithoutCreate) {
 
 TEST_F(SingletonApplicationFix, singleton) {
   EXPECT_CALL(*mMockedFactory, createMessageQueue).WillOnce(testing::Return(mMessageQueue));
-  EXPECT_CALL(*mMockedFactory, createTaskManager).WillOnce(testing::Return(mTaskManager));
-  auto task = std::make_shared<TaskScheduler>(GlobalId{});
-  EXPECT_CALL(*mTaskManager, getScheduler).WillRepeatedly(testing::Return(task));
 
   MockAppSettingsForGetInstance();
   EXPECT_CALL(*mMockedFactory, createSharedMemoryGarbageCollector).WillOnce(testing::Return(mMockedSharedMemoryGarbageCollector));
@@ -192,9 +182,6 @@ struct ApplicationFix : SingletonApplicationFix {
     EXPECT_CALL(*mMockedSharedMemoryGarbageCollector, stop).WillOnce(testing::Return());
 
     EXPECT_CALL(*mMockedFactory, createMessageQueue).WillOnce(testing::Return(mMessageQueue));
-    EXPECT_CALL(*mMockedFactory, createTaskManager).WillOnce(testing::Return(mTaskManager));
-    auto task = std::make_shared<TaskScheduler>(GlobalId{});
-    EXPECT_CALL(*mTaskManager, getScheduler).WillRepeatedly(testing::Return(task));
     Application::createInstance(Version{}, mMockedFactory, nullptr, nullptr);
     mApp = Application::getInstance();
   }

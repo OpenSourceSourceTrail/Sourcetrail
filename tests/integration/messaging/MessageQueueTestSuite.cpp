@@ -12,12 +12,9 @@
 #ifndef _WIN32
 #  undef private
 #endif
-#include "../../../src/scheduling/TaskScheduler.h"
-#include "ITaskManager.hpp"
 #include "Message.h"
 #include "MessageFilter.h"
 #include "MessageListener.h"
-#include "mocks/MockedTaskManager.hpp"
 #include "TabId.h"
 
 
@@ -307,9 +304,6 @@ struct MessageQueueProcess : testing::Test {
 
     messageQueue->mMessageBuffer.clear();
     messageQueue->mFilters.clear();
-
-    mMockedTaskManager = std::make_shared<scheduling::mocks::MockedTaskManager>();
-    scheduling::ITaskManager::setInstance(mMockedTaskManager);
   }
 
   void TearDown() override {
@@ -317,13 +311,9 @@ struct MessageQueueProcess : testing::Test {
     messageQueue->mFilters.clear();
     messageQueue->mMessageBuffer.clear();
     IMessageQueue::setInstance(nullptr);
-
-    scheduling::ITaskManager::setInstance(nullptr);
-    mMockedTaskManager.reset();
   }
 
   details::MessageQueue* messageQueue = nullptr;
-  std::shared_ptr<scheduling::mocks::MockedTaskManager> mMockedTaskManager;
 };
 
 
@@ -340,9 +330,6 @@ TEST_F(MessageQueueProcess, goodCase) {
 }
 
 TEST_F(MessageQueueProcess, goodCaseAsTask) {
-  auto fakeTask = std::make_shared<TaskScheduler>(Id{});
-  EXPECT_CALL(*mMockedTaskManager, getScheduler).WillOnce(testing::Return(fakeTask));
-
   messageQueue->setSendMessagesAsTasks(true);
 
   TestMessageListener messageListener;
@@ -357,7 +344,8 @@ TEST_F(MessageQueueProcess, goodCaseAsTask) {
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(50ms);
 
-  EXPECT_EQ(0, messageListener.m_messageCount);
+  // Dispatched as a task on TabId::app(): delivered asynchronously, not inline.
+  EXPECT_EQ(1, messageListener.m_messageCount);
 }
 
 #  if !defined(_WIN32)

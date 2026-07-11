@@ -19,7 +19,6 @@
 #include "IDECommunicationController.h"
 #include "impls/Factory.hpp"
 #include "ISharedMemoryGarbageCollector.hpp"
-#include "ITaskManager.hpp"
 #include "logging.h"
 #include "MainView.h"
 #include "MessageQueue.h"
@@ -28,7 +27,7 @@
 #include "SharedMemory.h"
 #include "StorageCache.h"
 #include "TabId.h"
-#include "TaskScheduler.h"
+#include "TaskDispatchRegistry.h"
 #include "type/MessageQuitApplication.h"
 #include "type/MessageStatus.h"
 #include "UserPaths.h"
@@ -118,9 +117,7 @@ void Application::createInstance(const Version& version,
     collector->run(Application::getUUID());
   }
 
-  scheduling::ITaskManager::setInstance(factory->createTaskManager());
-  scheduling::ITaskManager::getInstanceRaw()->createScheduler(TabId::app());
-  scheduling::ITaskManager::getInstanceRaw()->createScheduler(TabId::background());
+  // Task dispatch queues for TabId::app() / TabId::background() start lazily on first use.
   IMessageQueue::setInstance(factory->createMessageQueue());
 
   loadSettings();    // Must be called after creating IMessageQueue
@@ -144,8 +141,8 @@ void Application::createInstance(const Version& version,
 void Application::destroyInstance() {
   LOG_INFO("destroyInstance");
   IMessageQueue::getInstance()->stopMessageLoop();
-  scheduling::ITaskManager::getInstanceRaw()->destroyScheduler(TabId::background());
-  scheduling::ITaskManager::getInstanceRaw()->destroyScheduler(TabId::app());
+  TaskDispatchRegistry::getInstance().destroyQueue(TabId::background());
+  TaskDispatchRegistry::getInstance().destroyQueue(TabId::app());
 
   sInstance.reset();
 }
@@ -373,9 +370,7 @@ void Application::handleMessage(MessageBookmarkUpdate* message) {
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
 void Application::startMessagingAndScheduling() {
-  scheduling::ITaskManager::getInstanceRaw()->getScheduler(TabId::app())->startSchedulerLoopThreaded();
-  scheduling::ITaskManager::getInstanceRaw()->getScheduler(TabId::background())->startSchedulerLoopThreaded();
-
+  // Task dispatch queues for TabId::app() / TabId::background() start lazily on first use.
   IMessageQueue* queue = IMessageQueue::getInstance().get();
   queue->addMessageFilter(std::make_shared<MessageFilterErrorCountUpdate>());
   queue->addMessageFilter(std::make_shared<MessageFilterFocusInOut>());

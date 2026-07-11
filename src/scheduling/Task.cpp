@@ -2,15 +2,14 @@
 
 #include <utility>
 
-#include "impls/TaskManager.hpp"
-#include "TaskScheduler.h"
+#include "TaskDispatchRegistry.h"
 
 void Task::dispatch(Id schedulerId, std::shared_ptr<Task> task) {
-  scheduling::ITaskManager::getInstanceRaw()->getScheduler(schedulerId)->pushTask(std::move(task));
+  TaskDispatchRegistry::getInstance().getQueue(schedulerId).pushTask(std::move(task));
 }
 
 void Task::dispatchNext(Id schedulerId, std::shared_ptr<Task> task) {
-  scheduling::ITaskManager::getInstanceRaw()->getScheduler(schedulerId)->pushNextTask(std::move(task));
+  TaskDispatchRegistry::getInstance().getQueue(schedulerId).pushNextTask(std::move(task));
 }
 
 void Task::setIsBackgroundTask(bool background) {

@@ -1,7 +1,6 @@
 #include "Factory.hpp"
 
 #include "details/SharedMemoryGarbageCollector.h"
-#include "impls/TaskManager.hpp"
 #include "logging.h"
 #include "MessageQueue.h"
 #include "Project.h"
@@ -46,10 +45,6 @@ ISharedMemoryGarbageCollector::Ptr Factory::createSharedMemoryGarbageCollector()
   }
 
   return instance;
-}
-
-scheduling::ITaskManager::Ptr Factory::createTaskManager() noexcept {
-  return std::make_shared<scheduling::impls::TaskManager>();
 }
 
 }    // namespace lib

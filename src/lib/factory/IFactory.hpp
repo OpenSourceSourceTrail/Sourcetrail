@@ -2,7 +2,6 @@
 #include <memory>
 
 #include "ISharedMemoryGarbageCollector.hpp"
-#include "ITaskManager.hpp"
 #include "MessageQueue.h"
 #include "ProjectSettings.h"
 
@@ -21,8 +20,6 @@ struct IFactory {
   virtual IMessageQueue::Ptr createMessageQueue() noexcept = 0;
 
   virtual ISharedMemoryGarbageCollector::Ptr createSharedMemoryGarbageCollector() noexcept = 0;
-
-  virtual scheduling::ITaskManager::Ptr createTaskManager() noexcept = 0;
 };
 
 }    // namespace lib

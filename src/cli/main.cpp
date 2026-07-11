@@ -110,13 +110,15 @@ int main(int argc, char* argv[]) {
 
   IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
 
-  ConsoleApplication consoleApp;
-
   setupPaths();
 
   auto factory = std::make_shared<lib::Factory>();
   Application::createInstance(version, factory, nullptr, nullptr);
   [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
+
+  // Must be constructed after Application::createInstance(), which is what sets up the
+  // IMessageQueue singleton that ConsoleApplication registers itself with as a MessageListener.
+  ConsoleApplication consoleApp;
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
   addLanguagePackages();

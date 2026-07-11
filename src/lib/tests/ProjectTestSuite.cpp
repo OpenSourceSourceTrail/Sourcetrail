@@ -12,18 +12,17 @@
 #undef private
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandProvider.h"
-#include "ITaskManager.hpp"
 #include "MockedApplicationSetting.hpp"
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedMessageQueue.hpp"
 #include "mocks/MockedProjectSettings.hpp"
 #include "mocks/MockedSourceGroup.hpp"
 #include "mocks/MockedStorageCache.hpp"
-#include "mocks/MockedTaskManager.hpp"
 #include "PersistentStorage.h"
 #include "SourceGroupSettings.h"
 #include "SourceGroupSettingsCppEmpty.h"
 #include "TabId.h"
+#include "TaskDispatchRegistry.h"
 
 using namespace std::chrono_literals;
 using namespace testing;
@@ -105,18 +104,18 @@ struct ProjectFix : Test {
     mDialogView = std::make_shared<StrictMock<MockedDialogView>>();
 
     IApplicationSettings::setInstance(std::make_shared<MockedApplicationSettings>());
-    mTaskManager = std::make_shared<scheduling::mocks::MockedTaskManager>();
-    scheduling::ITaskManager::setInstance(mTaskManager);
   }
 
   void TearDown() override {
-    scheduling::ITaskManager::setInstance(nullptr);
+    // Join whatever buildIndex() may have dispatched to TabId::app() before
+    // the mocks below get destroyed out from under a still-running background thread.
+    TaskDispatchRegistry::getInstance().destroyQueue(TabId::app());
+
     IApplicationSettings::setInstance(nullptr);
     IMessageQueue::setInstance(nullptr);
     mMockedMessageQueue.reset();
   }
 
-  std::shared_ptr<scheduling::mocks::MockedTaskManager> mTaskManager;
   std::shared_ptr<StrictMock<MockedMessageQueue>> mMockedMessageQueue;
   std::shared_ptr<StrictMock<MockedProjectSettings>> mSettings;
   std::shared_ptr<StrictMock<MockedStorageCache>> mStorageCache;
@@ -365,10 +364,6 @@ TEST_F(ProjectFix, buildIndex_goodCase) {
   EXPECT_CALL(*mDialogView, showUnknownProgressDialog);
   EXPECT_CALL(*mStorageCache, setUseErrorCache);
   // And:
-  const auto taskScheduler = std::make_shared<TaskScheduler>(TabId::app());
-  // EXPECT_CALL(*mTaskManager, createScheduler(testing::_)).WillOnce(Return(taskScheduler));
-  EXPECT_CALL(*mTaskManager, getScheduler(testing::_)).WillOnce(Return(taskScheduler));
-  // And:
   EXPECT_CALL(*mDialogView, hideUnknownProgressDialog);
   auto mockedIndexerCommandProvider = std::make_shared<MockedIndexerCommandProvider>();
   EXPECT_CALL(*sourceGroup, getIndexerCommandProvider).WillOnce(Return(mockedIndexerCommandProvider));
@@ -382,8 +377,6 @@ TEST_F(ProjectFix, buildIndex_goodCase) {
 
 // TODO(Hussein): The test isn't complete
 TEST_F(ProjectFix, DISABLED_buildIndex_emptyFilesInSourceGroup) {
-  std::ignore = scheduling::ITaskManager::getInstanceRaw()->createScheduler(TabId::app());
-
   mProject->m_storage = std::make_shared<MockedPersistentStorage>();
   auto sourceGroup = std::make_shared<MockedSourceGroup>();
   auto sourceGroupSettings = std::make_shared<const SourceGroupSettingsCppEmpty>("ID", nullptr);

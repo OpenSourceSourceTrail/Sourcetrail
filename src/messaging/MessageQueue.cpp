@@ -8,7 +8,7 @@
 #include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/algorithm/for_each.hpp>
 
-#include "../../../scheduling/TaskGroupParallel.h"
+#include "../../../scheduling/TaskflowGroupParallel.h"
 #include "../../../scheduling/TaskGroupSequence.h"
 #include "../../../scheduling/TaskLambda.h"
 #include "logging.h"
@@ -38,23 +38,24 @@ void MessageQueue::registerListener(MessageListenerBase* listener) noexcept {
 
 void MessageQueue::unregisterListener(MessageListenerBase* listener) noexcept {
   const std::scoped_lock<std::mutex> lock(mListenersMutex);
-  if(auto found = ranges::find(mListeners, listener); found != mListeners.end()) {
-    mListeners.erase(found);
-
-    // TODO(Hussein): That sound fishy for me. It need `mListenersMutex`
-    const auto index = static_cast<size_t>(std::distance(mListeners.begin(), found));
-    // mCurrentListenerIndex and mListenersLength need to be updated in case this happens
-    // while a message is handled.
-    if(index <= mCurrentListenerIndex) {
-      mCurrentListenerIndex--;
-    }
-
-    if(index < mListenersLength) {
-      mListenersLength--;
-    }
+  auto found = ranges::find(mListeners, listener);
+  if(found == mListeners.end()) {
+    LOG_ERROR("Listener was not found");
+    return;
   }
 
-  LOG_ERROR("Listener was not found");
+  // mCurrentListenerIndex and mListenersLength need to be updated in case this happens
+  // while a message is handled. Index must be computed before erase() invalidates `found`.
+  const auto index = static_cast<size_t>(std::distance(mListeners.begin(), found));
+  mListeners.erase(found);
+
+  if(index <= mCurrentListenerIndex) {
+    mCurrentListenerIndex--;
+  }
+
+  if(index < mListenersLength) {
+    mListenersLength--;
+  }
 }
 
 MessageListenerBase* MessageQueue::getListenerById(Id listenerId) const noexcept {
@@ -202,7 +203,7 @@ void MessageQueue::sendMessage(const std::shared_ptr<MessageBase>& message) {
 void MessageQueue::sendMessageAsTask(const std::shared_ptr<MessageBase>& message, bool asNextTask) const {
   std::shared_ptr<TaskGroup> taskGroup;
   if(message->isParallel()) {
-    taskGroup = std::make_shared<TaskGroupParallel>();
+    taskGroup = std::make_shared<TaskflowGroupParallel>();
   } else {
     taskGroup = std::make_shared<TaskGroupSequence>();
   }

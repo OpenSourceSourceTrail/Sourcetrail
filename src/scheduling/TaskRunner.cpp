@@ -3,9 +3,7 @@
 #include <utility>
 
 #include "Blackboard.h"
-#include "ITaskManager.hpp"
 #include "logging.h"
-#include "TaskScheduler.h"
 
 TaskRunner::TaskRunner(std::shared_ptr<Task> task) : m_task(std::move(task)), m_reset(false) {}
 
@@ -40,11 +38,7 @@ Task::TaskState TaskRunner::update(std::shared_ptr<Blackboard> blackboard) {
     LOG_ERROR("Unknown exception thrown during task running");
   }
 
-  Id schedulerId = 0;
-  if(blackboard->get<Id>("scheduler_id", schedulerId)) {
-    scheduling::ITaskManager::getInstanceRaw()->getScheduler(schedulerId)->terminateRunningTasks();
-  }
-
+  m_task->terminate();
   return Task::STATE_FAILURE;
 }
 

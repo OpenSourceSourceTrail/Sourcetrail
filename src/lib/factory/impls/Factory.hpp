@@ -15,8 +15,6 @@ public:
   IMessageQueue::Ptr createMessageQueue() noexcept override;
 
   ISharedMemoryGarbageCollector::Ptr createSharedMemoryGarbageCollector() noexcept override;
-
-  scheduling::ITaskManager::Ptr createTaskManager() noexcept override;
 };
 
 }    // namespace lib

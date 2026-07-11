@@ -3,10 +3,9 @@
 #include <thread>
 
 #include "../../../scheduling/TaskLambda.h"
-#include "../../../scheduling/TaskScheduler.h"
 #include "Application.h"
-#include "ITaskManager.hpp"
 #include "ScreenSearchInterfaces.h"
+#include "TaskDispatchRegistry.h"
 #include "TabId.h"
 #include "type/code/MessageScrollToLine.h"
 #include "type/indexing/MessageIndexingFinished.h"
@@ -43,7 +42,7 @@ void TabsController::clear() {
 void TabsController::addTab(Id tabId, SearchMatch match) {
   std::lock_guard<std::mutex> lock(m_tabsMutex);
 
-  scheduling::ITaskManager::getInstanceRaw()->createScheduler(tabId)->startSchedulerLoopThreaded();
+  TaskDispatchRegistry::getInstance().getQueue(tabId);
 
   m_tabs.emplace(tabId, std::make_shared<Tab>(tabId, m_viewFactory, m_storageAccess, m_screenSearchSender));
 
@@ -89,11 +88,9 @@ void TabsController::removeTab(Id tabId) {
   Task::dispatch(TabId::background(), std::make_shared<TaskLambda>([tabId, this]() {
                    m_screenSearchSender->clearMatches();
 
-                   TaskScheduler* scheduler = scheduling::ITaskManager::getInstanceRaw()->getScheduler(tabId).get();
-                   scheduler->terminateRunningTasks();
-                   scheduler->stopSchedulerLoop();
-
-                   scheduling::ITaskManager::getInstanceRaw()->destroyScheduler(tabId);
+                   auto& registry = TaskDispatchRegistry::getInstance();
+                   registry.getQueue(tabId).terminateRunningTasks();
+                   registry.destroyQueue(tabId);
 
                    getView()->destroyTab(tabId);
                  }));

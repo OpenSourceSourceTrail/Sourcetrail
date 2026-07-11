@@ -8,8 +8,8 @@
 #include "TaskGroup.h"
 #include "TaskRunner.h"
 
-// Like TaskGroupParallel, but drives each branch through a taskflow::Executor
-// work-stealing pool instead of one std::thread per branch.
+// Runs each added task as a branch on the shared TaskExecutor's work-stealing
+// pool, instead of one std::thread per branch.
 class TaskflowGroupParallel : public TaskGroup {
 public:
   TaskflowGroupParallel();

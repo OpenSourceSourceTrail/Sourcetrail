@@ -8,5 +8,4 @@ TEST(FactoryTestSuite, goodCase) {
   EXPECT_THAT(factory.createProject(nullptr, nullptr, "", false), testing::NotNull());
   EXPECT_THAT(factory.createMessageQueue(), testing::NotNull());
   EXPECT_THAT(factory.createSharedMemoryGarbageCollector(), testing::NotNull());
-  EXPECT_THAT(factory.createTaskManager(), testing::NotNull());
 }

@@ -15,7 +15,6 @@ struct MockedFactory : IFactory {
               (noexcept, override));
   MOCK_METHOD(IMessageQueue::Ptr, createMessageQueue, (), (noexcept, override));
   MOCK_METHOD(ISharedMemoryGarbageCollector::Ptr, createSharedMemoryGarbageCollector, (), (noexcept, override));
-  MOCK_METHOD(scheduling::ITaskManager::Ptr, createTaskManager, (), (noexcept, override));
 };
 
 }    // namespace lib
