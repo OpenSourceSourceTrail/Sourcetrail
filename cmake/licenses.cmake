@@ -79,4 +79,4 @@ addlicense(
 
 set(LICENSE_ARRAY "${LICENSE_ARRAY}\n")
 
-configure_file(${CMAKE_SOURCE_DIR}/cmake/licenses.h.in ${CMAKE_BINARY_DIR}/src/lib_gui/licenses.h)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/licenses.h.in ${CMAKE_BINARY_DIR}/src/lib/lib_gui/licenses.h)

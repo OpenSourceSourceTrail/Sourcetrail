@@ -181,33 +181,33 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
     PUBLIC GTest::gmock
            GTest::gtest
            spdlog::spdlog
-           Sourcetrail::core::utility::utilityString
-           Sourcetrail::core::utility::TextCodec)
+           Sourcetrail::lib::core::utility::utilityString
+           Sourcetrail::lib::core::utility::TextCodec)
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
-add_subdirectory(src/external)
-add_subdirectory(src/proto)
-add_subdirectory(src/lib)
-add_subdirectory(src/lib_gui)
+add_subdirectory(src/lib/external)
+add_subdirectory(src/lib/proto)
+add_subdirectory(src/lib/lib)
+add_subdirectory(src/lib/lib_gui)
 #---------------------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/core)
-add_subdirectory(src/scheduling)
-add_subdirectory(src/messaging)
-add_subdirectory(src/core/utility/utilityApp)
+add_subdirectory(src/lib/core)
+add_subdirectory(src/lib/scheduling)
+add_subdirectory(src/lib/messaging)
+add_subdirectory(src/lib/core/utility/utilityApp)
 # Lib Cxx ------------------------------------------------------------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_subdirectory(src/lib_cxx)
+  add_subdirectory(src/lib/lib_cxx)
 endif()
 # Indexer App --------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/indexer)
+add_subdirectory(src/app/indexer)
 # App ----------------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/app)
+add_subdirectory(src/app/gui)
 # CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------
-add_subdirectory(src/cli)
+add_subdirectory(src/app/cli)
 # Engine daemon (Qt-free) ---------------------------------------------------------------------------------------------------------
-add_subdirectory(src/engine)
+add_subdirectory(src/app/engine)
 # Tests --------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
@@ -224,10 +224,10 @@ if(ENABLE_UNIT_TEST
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/tests/)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib_gui/tests/)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib/tests/)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests/)
     if(BUILD_CXX_LANGUAGE_PACKAGE)
-      add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib_cxx/tests/)
+      add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_cxx/tests/)
     endif()
   endif()
 

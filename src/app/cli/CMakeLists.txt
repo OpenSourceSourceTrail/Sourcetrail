@@ -1,0 +1,30 @@
+#${CMAKE_SOURCE_DIR}/src/app/cli/CMakeLists.txt
+add_executable(Sourcetrail_cli main.cpp ConsoleApplication.cpp ConsoleApplication.h)
+
+set_target_properties(Sourcetrail_cli PROPERTIES OUTPUT_NAME sourcetrail_cli RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
+
+target_link_libraries(
+  Sourcetrail_cli
+  PRIVATE Sourcetrail::lib::core
+          Sourcetrail::lib::lib
+          Sourcetrail::lib::proto::convert
+          Sourcetrail::lib::utility::PathDetection
+          Sourcetrail::lib::messaging
+          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
+          Sourcetrail::lib::core::utility::logging
+          Sourcetrail::lib::core::utility::ScopedFunctor
+          Sourcetrail::lib::core::utility::utilityApp
+          Sourcetrail::lib::core::utility::commandline::CommandLineParser)
+
+target_include_directories(
+  Sourcetrail_cli
+  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
+          "${CMAKE_BINARY_DIR}/src/lib/lib"
+          "${CMAKE_BINARY_DIR}/src/lib/lib_gui")
+
+if(APPLE)
+  find_library(CORE_FOUNDATION CoreFoundation)
+  target_link_libraries(Sourcetrail_cli PRIVATE ${CORE_FOUNDATION})
+endif()
+
+add_dependencies(Sourcetrail_cli Sourcetrail_indexer versionnumber)

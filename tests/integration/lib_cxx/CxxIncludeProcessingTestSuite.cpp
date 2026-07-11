@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
+#include "../../../src/lib/lib/tests/mocks/MockedApplicationSetting.hpp"
 #include "IncludeDirective.h"
 #include "IncludeProcessing.h"
 #include "language_packages.h"
