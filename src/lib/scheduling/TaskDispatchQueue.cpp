@@ -28,18 +28,25 @@ void TaskDispatchQueue::runContinuation(const std::shared_ptr<TaskRunner>& runne
     mCurrentRunner = runner;
   }
 
-  const Task::TaskState state = runner->update(mSchedulerId);
+  // STATE_RUNNING means the task (e.g. a TaskGroupSequence/TaskflowGroupParallel) has more work
+  // to do and must be driven forward. Drive it to completion here before returning to the queue:
+  // an async group (TaskflowGroupParallel) leaves its worker threads running while it reports
+  // STATE_RUNNING, so starting the next queued task now would run a second task tree concurrently
+  // and race on shared controller state (e.g. GraphController's dummy-node map). This mirrors the
+  // old TaskScheduler, which looped on the task until it left STATE_RUNNING.
+  Task::TaskState state = runner->update(mSchedulerId);
+  while(state == Task::STATE_RUNNING) {
+    state = runner->update(mSchedulerId);
+  }
 
   {
     std::lock_guard<std::mutex> lock(mCurrentRunnerMutex);
     mCurrentRunner = nullptr;
   }
 
-  // STATE_RUNNING means the task (e.g. a TaskGroupSequence/TaskflowGroupParallel) has more
-  // work to do and needs to be driven forward again, same as STATE_HOLD; only SUCCESS/FAILURE
-  // are terminal. The old TaskScheduler looped on the task until it left STATE_RUNNING, so this
-  // has to keep re-posting here or later listeners/steps never run.
-  if(state == Task::STATE_RUNNING || state == Task::STATE_HOLD) {
+  // STATE_HOLD is a cooperative yield (background/delayed tasks); re-post to the back so other
+  // queued tasks can interleave, then resume this one later. SUCCESS/FAILURE are terminal.
+  if(state == Task::STATE_HOLD) {
     mQueue.post([this, runner]() { runContinuation(runner); });
   }
 }

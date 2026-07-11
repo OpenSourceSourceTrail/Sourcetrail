@@ -8,9 +8,10 @@
 #include "TaskRunner.h"
 
 // Runs Task trees dispatched to one id, FIFO, on a single worker thread owned
-// by an underlying DispatchQueue. Replaces TaskScheduler: a background task
-// that returns STATE_HOLD re-posts itself to the back of the queue instead of
-// being requeued by a hand-rolled poll loop.
+// by an underlying DispatchQueue. Replaces TaskScheduler. A task tree is driven
+// to a terminal state before the next queued task starts, so async task groups
+// never overlap; only a task that returns STATE_HOLD (a background/delayed task)
+// yields, re-posting itself to the back of the queue so others can interleave.
 class TaskDispatchQueue final {
 public:
   explicit TaskDispatchQueue(Id schedulerId);
