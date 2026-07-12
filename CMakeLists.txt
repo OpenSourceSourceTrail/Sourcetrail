@@ -12,6 +12,10 @@ project(
 set(BUILD_CXX_LANGUAGE_PACKAGE
     OFF
     CACHE BOOL "Add C and C++ support to the Sourcetrail indexer.")
+find_program(SR_MAVEN_EXECUTABLE mvn)
+set(BUILD_JAVA_INDEXER
+    ${SR_MAVEN_EXECUTABLE}
+    CACHE BOOL "Add the Java indexer plugin (requires Maven + JDK 21).")
 set(BUILD_DOC
     OFF
     CACHE BOOL "Build documentation.")
@@ -62,7 +66,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 17)
 #---------------------------------------------------------------------------------------------------------------------------------
-include(cmake/add_files.cmake)
 include(cmake/version_setup.cmake)
 include(cmake/licenses.cmake)
 include(cmake/create_symlink.cmake)
@@ -140,6 +143,8 @@ endif()
 # Settings -----------------------------------------------------------------------------------------------------------------------
 find_package(expected-lite REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+find_package(protobuf CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SQLite3 CONFIG REQUIRED)
@@ -153,6 +158,7 @@ find_package(
   Boost 1.83
   COMPONENTS date_time
              filesystem
+             locale
              program_options
              system
   REQUIRED)
@@ -162,8 +168,7 @@ find_package(
   COMPONENTS Widgets
              PrintSupport
              Network
-             Svg
-             Core5Compat)
+             Svg)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(cmake/copy_qt_binaries.cmake)
@@ -180,178 +185,37 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
     PUBLIC GTest::gmock
            GTest::gtest
            spdlog::spdlog
-           Sourcetrail::core::utility::utilityString
-           Sourcetrail::core::utility::TextCodec)
+           Sourcetrail::lib::core::utility::utilityString
+           Sourcetrail::lib::core::utility::TextCodec)
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
-add_subdirectory(src/external)
-add_subdirectory(src/lib)
-add_subdirectory(src/lib_gui)
+add_subdirectory(src/lib/external)
+add_subdirectory(src/lib/proto)
+add_subdirectory(src/lib/lib)
+add_subdirectory(src/lib/lib_gui)
 #---------------------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/core)
-add_subdirectory(src/scheduling)
-add_subdirectory(src/messaging)
-add_subdirectory(src/lib_gui/utility/utilityApp)
+add_subdirectory(src/lib/core)
+add_subdirectory(src/lib/scheduling)
+add_subdirectory(src/lib/messaging)
+add_subdirectory(src/lib/core/utility/utilityApp)
 # Lib Cxx ------------------------------------------------------------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_subdirectory(src/lib_cxx)
+  add_subdirectory(src/lib/lib_cxx)
 endif()
-# Lib ----------------------------------------------------------------------------------------------------------------------------
-add_library(Sourcetrail_lib ${LIB_FILES})
-add_library(Sourcetrail::lib ALIAS Sourcetrail_lib)
-
-target_include_directories(
-  Sourcetrail_lib
-  PUBLIC ${LIB_INCLUDE_PATHS}
-         ${LIB_GUI_INCLUDE_PATHS}
-         ${CMAKE_SOURCE_DIR}/src/lib_gui/utility/
-         ${CMAKE_SOURCE_DIR}/src/lib_gui/utility/path_detector/
-         ${CMAKE_BINARY_DIR}/src/lib)
-
-target_link_libraries(
-  Sourcetrail_lib
-  PUBLIC Sourcetrail::messaging
-         Sourcetrail::core::utility::ConfigManager
-         Sourcetrail::core::utility::LowMemoryStringMap
-         Sourcetrail::core::utility::Status
-         Sourcetrail::core::utility::Tree
-         Sourcetrail::core::utility::utility
-         Sourcetrail::core::utility::Migration
-         Sourcetrail::core::utility::Migrator
-         Sourcetrail::core::utility::file::FilePath
-         Sourcetrail::core::utility::file::FilePathFilter
-         Sourcetrail::core::utility::toUnderlying
-         Sourcetrail::scheduling
-         CppSQLite::CppSQLite3
-         nonstd::expected-lite
-  PRIVATE Sourcetrail::core
-          Sourcetrail::core::utility::ConfigManager
-          Sourcetrail::core::utility::logging
-          Sourcetrail::core::utility::ScopedFunctor
-          Sourcetrail::core::utility::Status
-          Sourcetrail::core::utility::TextAccess
-          Sourcetrail::core::utility::TextCodec
-          Sourcetrail::core::utility::utilityUuid
-          Sourcetrail::lib_gui
-          Sourcetrail::libGui::utility::utilityApp
-          Sourcetrail::core::utility::file::FileSystem
-          Sourcetrail::core::utility::file::utilityFile
-          Sourcetrail::core::utility::file::FileManager
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
-          Boost::filesystem
-          Boost::program_options
-          Boost::system
-          SQLite::SQLite3
-          $<$<PLATFORM_ID:Windows>:bcrypt>)
-
-#configure language package defines
-configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/language_packages.h")
-# Lib gui_utility ----------------------------------------------------------------------------------------------------------------
-add_library(Sourcetrail_lib_gui_utility)
-add_library(Sourcetrail::lib_gui::utility ALIAS Sourcetrail_lib_gui_utility)
-
-target_sources(
-  Sourcetrail_lib_gui_utility
-  PRIVATE src/lib_gui/utility/utilityPathDetection.cpp src/lib_gui/utility/path_detector/CombinedPathDetector.cpp
-          src/lib_gui/utility/path_detector/PathDetector.cpp)
-
-target_include_directories(Sourcetrail_lib_gui_utility PUBLIC src/lib_gui/utility/ src/lib_gui/utility/path_detector/
-                                                              src/lib_gui/utility/path_detector/cxx_header/)
-
-target_link_libraries(
-  Sourcetrail_lib_gui_utility
-  PUBLIC Sourcetrail::core::utility::ApplicationArchitectureType Sourcetrail::core::utility::OsType
-  PRIVATE Boost::system
-          Qt6::Core
-          Sourcetrail::core
-          Sourcetrail::lib
-          Sourcetrail::core::utility::ScopedFunctor
-          Sourcetrail::core::utility::logging
-          Sourcetrail::libGui::utility::utilityApp)
-
-# Lib Gui ------------------------------------------------------------------------------------------------------------------------
-# target for running versionnumber script
-# workaround for running customcommand (ninja dependency cycle)
-add_custom_target(versionnumber ALL)
-# Lib Gui ------------------------------------------------------------------------------------------------------------------------
-add_library(Sourcetrail_lib_gui ${LIB_GUI_FILES} bin/resources.qrc ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h)
-
-add_library(Sourcetrail::lib_gui ALIAS Sourcetrail_lib_gui)
-
-target_link_libraries(
-  Sourcetrail_lib_gui
-  PUBLIC Sourcetrail::lib
-         Qt6::Widgets
-         Qt6::Network
-         Qt6::Svg
-         Sourcetrail::core::utility::SingleValueCache
-         Sourcetrail::core::utility::LowMemoryStringMap
-         Sourcetrail::core::utility::Migrator
-         Sourcetrail::core::utility::file::FilePathFilter
-         Sourcetrail::core::utility::file::FileSystem
-         Sourcetrail::libGui::utility::utilityApp
-  PRIVATE Sourcetrail::core
-          Sourcetrail::core::utility::logging
-          Sourcetrail::core::utility::OrderedCache
-          Sourcetrail::core::utility::ScopedFunctor
-          Sourcetrail::core::utility::Status
-          Sourcetrail::core::utility::TextAccess
-          Sourcetrail::core::utility::TextCodec
-          Sourcetrail::core::utility::toUnderlying
-          Sourcetrail::core::utility::utility
-          Sourcetrail::core::utility::utilityUuid
-          Sourcetrail::core::utility::file::utilityFile
-          Sourcetrail::core::utility::file::FilePath
-          Sourcetrail::core::utility::file::FileManager
-          Sourcetrail::lib_gui::utility
-          Sourcetrail::libGui::utility::utilityApp
-          Sourcetrail::messaging
-          Qt6::Core5Compat
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>)
-
-# command for versioning script
-add_custom_command(
-  TARGET versionnumber
-  PRE_BUILD
-  COMMAND ${CMAKE_COMMAND} -DBINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/version.cmake
-  BYPRODUCTS ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h DEPENDS Sourcetrail_lib_gui
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMENT "check/update version number")
-
-add_dependencies(Sourcetrail_lib_gui versionnumber)
-
-target_include_directories(
-  Sourcetrail_lib_gui
-  PUBLIC ${LIB_GUI_INCLUDE_PATHS}
-         ${LIB_INCLUDE_PATHS}
-         ${CMAKE_BINARY_DIR}/src/lib_gui
-         ${CMAKE_BINARY_DIR}/src/lib)
-
-# configure platform specific include file
-configure_file("${PROJECT_SOURCE_DIR}/src/lib_gui/platform_includes/includes.h.in"
-               "${PROJECT_BINARY_DIR}/src/lib_gui/includes.h")
-
-#configure the versioning file
-configure_file(${CMAKE_SOURCE_DIR}/cmake/productVersion.h.in ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h)
-
-set_target_properties(
-  Sourcetrail_lib_gui
-  PROPERTIES AUTOMOC ON
-             AUTORCC ON
-             INCLUDE_CURRENT_DIR ON)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-  set_source_files_properties(${CMAKE_BINARY_DIR}/Sourcetrail_lib_gui_autogen/mocs_compilation.cpp
-                              PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
-endif()
-
-set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
 # Indexer App --------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/indexer)
+add_subdirectory(src/app/indexer)
+# Java indexer plugin (Maven-built, pure-JVM gRPC worker) -------------------------------------------------------------------------
+if(BUILD_JAVA_INDEXER)
+  add_subdirectory(java)
+endif()
 # App ----------------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/app)
+add_subdirectory(src/app/gui)
+# CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------
+add_subdirectory(src/app/cli)
+# Engine daemon (Qt-free) ---------------------------------------------------------------------------------------------------------
+add_subdirectory(src/app/engine)
 # Tests --------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
@@ -368,10 +232,10 @@ if(ENABLE_UNIT_TEST
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/tests/)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib_gui/tests/)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib/tests/)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests/)
     if(BUILD_CXX_LANGUAGE_PACKAGE)
-      add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib_cxx/tests/)
+      add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_cxx/tests/)
     endif()
   endif()
 
@@ -387,7 +251,7 @@ create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user"
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
-install(TARGETS Sourcetrail Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+install(TARGETS Sourcetrail Sourcetrail_indexer Sourcetrail_cli Sourcetrail_engine RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIME_DIR}/data/)
 

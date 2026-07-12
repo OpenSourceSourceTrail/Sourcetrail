@@ -12,7 +12,6 @@
 #include "language_packages.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedTaskManager.hpp"
 #include "ProjectSettings.h"
 #include "SourceGroupCustomCommand.h"
 #include "SourceGroupSettingsCustomCommand.h"
@@ -24,7 +23,6 @@
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
 #  include "IndexerCommandCxx.h"
-#  include "ITaskManager.hpp"
 #  include "SourceGroupCxxCdb.h"
 #  include "SourceGroupCxxEmpty.h"
 #  include "SourceGroupSettingsCEmpty.h"
@@ -156,9 +154,6 @@ struct SourceGroupFix : testing::Test {
 
     mMockedMessageQueue = std::make_shared<testing::StrictMock<MockedMessageQueue>>();
     IMessageQueue::setInstance(mMockedMessageQueue);
-
-    mMockedTaskManager = std::make_shared<testing::StrictMock<scheduling::mocks::MockedTaskManager>>();
-    scheduling::ITaskManager::setInstance(mMockedTaskManager);
   }
 
   void TearDown() override {
@@ -166,13 +161,10 @@ struct SourceGroupFix : testing::Test {
     mMockedApplicationSettings.reset();
     IMessageQueue::setInstance(nullptr);
     mMockedMessageQueue.reset();
-    scheduling::ITaskManager::setInstance(nullptr);
-    mMockedTaskManager.reset();
   }
 
   std::shared_ptr<testing::StrictMock<MockedApplicationSettings>> mMockedApplicationSettings;
   std::shared_ptr<testing::StrictMock<MockedMessageQueue>> mMockedMessageQueue;
-  std::shared_ptr<testing::StrictMock<scheduling::mocks::MockedTaskManager>> mMockedTaskManager;
 };
 
 #ifdef DISABLED
@@ -285,7 +277,6 @@ TEST_F(SourceGroupFix, sourceGroupCustomCommandGeneratesExpectedOutput) {
 
 TEST_F(SourceGroupFix, canDestroyApplicationInstance) {
   EXPECT_CALL(*mMockedMessageQueue, stopMessageLoop).WillOnce(testing::Return());
-  EXPECT_CALL(*mMockedTaskManager, destroyScheduler).Times(2);
 
   Application::destroyInstance();
   EXPECT_TRUE(0 == Application::getInstance().use_count());

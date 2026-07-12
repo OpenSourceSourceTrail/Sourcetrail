@@ -1,0 +1,361 @@
+syntax = "proto3";
+
+package sourcetrail;
+
+import "sourcetrail_common.proto";
+
+// Boundary A: client (GUI/CLI) <-> engine daemon
+service EngineService {
+  // Project lifecycle
+  rpc LoadProject(LoadProjectRequest) returns (LoadProjectResponse);
+  rpc Refresh(RefreshRequest) returns (RefreshResponse);
+  rpc IndexingInterrupted(IndexingInterruptedRequest) returns (IndexingInterruptedResponse);
+
+  // Bookmark mutations
+  rpc AddNodeBookmark(AddNodeBookmarkRequest) returns (BookmarkIdResponse);
+  rpc AddEdgeBookmark(AddEdgeBookmarkRequest) returns (BookmarkIdResponse);
+  rpc AddBookmarkCategory(AddBookmarkCategoryRequest) returns (BookmarkIdResponse);
+  rpc UpdateBookmark(UpdateBookmarkRequest) returns (EmptyResponse);
+  rpc RemoveBookmark(RemoveBookmarkRequest) returns (EmptyResponse);
+  rpc RemoveBookmarkCategory(RemoveBookmarkCategoryRequest) returns (EmptyResponse);
+
+  // Storage queries
+  rpc GetNodeIdForFileNode(FilePathRequest) returns (IdResponse);
+  rpc GetNodeIdForNameHierarchy(NameHierarchyRequest) returns (IdResponse);
+  rpc GetNodeIdsForNameHierarchies(NameHierarchiesRequest) returns (IdsResponse);
+  rpc GetNameHierarchyForNodeId(IdRequest) returns (NameHierarchyResponse);
+  rpc GetNameHierarchiesForNodeIds(IdsRequest) returns (NameHierarchiesResponse);
+  rpc GetNodeIdToParentFileMap(IdsRequest) returns (NodeIdToParentFileMapResponse);
+  rpc GetNodeTypeForNodeWithId(IdRequest) returns (NodeKindResponse);
+  rpc GetEdgeById(IdRequest) returns (StorageEdgeResponse);
+  rpc GetFullTextSearchLocations(FullTextSearchRequest) returns (SourceLocationCollectionResponse);
+  rpc GetAutocompletionMatches(AutocompletionRequest) returns (SearchMatchesResponse);
+  rpc GetSearchMatchesForTokenIds(IdsRequest) returns (SearchMatchesResponse);
+  rpc GetGraphForAll(EmptyRequest) returns (GraphResponse);
+  rpc GetGraphForNodeTypes(NodeKindMaskRequest) returns (GraphResponse);
+  rpc GetGraphForActiveTokenIds(ActiveTokensRequest) returns (ActiveGraphResponse);
+  rpc GetGraphForChildrenOfNodeId(IdRequest) returns (GraphResponse);
+  rpc GetGraphForTrail(TrailRequest) returns (GraphResponse);
+  rpc GetAvailableNodeTypes(EmptyRequest) returns (NodeKindMaskResponse);
+  rpc GetAvailableEdgeTypes(EmptyRequest) returns (EdgeTypeMaskResponse);
+  rpc GetActiveTokenIdsForId(ActiveTokenIdRequest) returns (ActiveTokenIdsResponse);
+  rpc GetNodeIdsForLocationIds(IdsRequest) returns (IdsResponse);
+  rpc GetSourceLocationsForTokenIds(IdsRequest) returns (SourceLocationCollectionResponse);
+  rpc GetSourceLocationsForLocationIds(IdsRequest) returns (SourceLocationCollectionResponse);
+  rpc GetSourceLocationsForFile(FilePathRequest) returns (SourceLocationFileResponse);
+  rpc GetSourceLocationsForLinesInFile(LinesInFileRequest) returns (SourceLocationFileResponse);
+  rpc GetSourceLocationsOfTypeInFile(LocationTypeInFileRequest) returns (SourceLocationFileResponse);
+  rpc GetFileContent(FileContentRequest) returns (FileContentResponse);
+  rpc GetFileInfoForFileId(IdRequest) returns (FileInfoResponse);
+  rpc GetFileInfoForFilePath(FilePathRequest) returns (FileInfoResponse);
+  rpc GetFileInfosForFilePaths(FilePathsRequest) returns (FileInfosResponse);
+  rpc GetStorageStats(EmptyRequest) returns (StorageStatsResponse);
+  rpc GetErrorCount(EmptyRequest) returns (ErrorCountResponse);
+  rpc GetErrorsLimited(ErrorFilterRequest) returns (ErrorInfosResponse);
+  rpc GetErrorsForFileLimited(ErrorFilterFileRequest) returns (ErrorInfosResponse);
+  rpc GetErrorSourceLocations(ErrorInfosRequest) returns (SourceLocationCollectionResponse);
+  rpc GetAllNodeBookmarks(EmptyRequest) returns (NodeBookmarksResponse);
+  rpc GetAllEdgeBookmarks(EmptyRequest) returns (EdgeBookmarksResponse);
+  rpc GetAllBookmarkCategories(EmptyRequest) returns (BookmarkCategoriesResponse);
+  rpc GetTooltipInfoForTokenIds(TooltipTokenIdsRequest) returns (TooltipInfoResponse);
+  rpc GetTooltipInfoForSourceLocationIdsAndLocalSymbolIds(TooltipLocationRequest) returns (TooltipInfoResponse);
+
+  // Status stream: engine pushes events; client re-dispatches to local MessageQueue
+  rpc WatchEvents(WatchEventsRequest) returns (stream EngineEvent);
+}
+
+// ---------- Shared primitives -----------------------------------------------
+
+message EmptyRequest {}
+message EmptyResponse {}
+message IdRequest { uint64 id = 1; }
+message IdResponse { uint64 id = 1; }
+message IdsRequest { repeated uint64 ids = 1; }
+message IdsResponse { repeated uint64 ids = 1; }
+message FilePathRequest { string file_path = 1; }
+message FilePathsRequest { repeated string file_paths = 1; }
+message NodeKindMaskRequest { int32 mask = 1; }
+message NodeKindMaskResponse { int32 mask = 1; }
+message NodeKindResponse { int32 kind = 1; }
+message EdgeTypeMaskResponse { int32 mask = 1; }
+message NameHierarchyRequest { string serialized = 1; }
+message NameHierarchyResponse { string serialized = 1; }
+message NameHierarchiesRequest { repeated string serialized = 1; }
+message NameHierarchiesResponse { repeated string serialized = 1; }
+
+// ---------- Domain types ----------------------------------------------------
+
+message StorageEdgeResponse { StorageEdge edge = 1; }
+
+message ProtoSourceLocation {
+  uint64 location_id = 1;
+  repeated uint64 token_ids = 2;
+  int32 type = 3;
+  uint64 start_line = 4;
+  uint64 start_col = 5;
+  uint64 end_line = 6;
+  uint64 end_col = 7;
+}
+
+message ProtoSourceLocationFile {
+  string file_path = 1;
+  string language = 2;
+  bool is_whole = 3;
+  bool is_complete = 4;
+  bool is_indexed = 5;
+  repeated ProtoSourceLocation locations = 6;
+}
+
+message ProtoGraph {
+  message ProtoNode {
+    uint64 id = 1;
+    int32 node_kind = 2;
+    string name_hierarchy_serialized = 3;
+    int32 definition_kind = 4;
+    uint64 child_count = 5;
+  }
+  message ProtoEdge {
+    uint64 id = 1;
+    int32 type = 2;
+    uint64 from_node_id = 3;
+    uint64 to_node_id = 4;
+  }
+  repeated ProtoNode nodes = 1;
+  repeated ProtoEdge edges = 2;
+}
+
+message ProtoSearchMatch {
+  string name = 1;
+  string text = 2;
+  string subtext = 3;
+  repeated uint64 token_ids = 4;
+  repeated string token_names_serialized = 5;
+  string type_name = 6;
+  int32 node_kind = 7;
+  int32 search_type = 8;
+  repeated uint64 indices = 9;
+  int32 score = 10;
+  bool has_children = 11;
+  int32 command_type = 12;
+}
+
+message ProtoFileInfo {
+  string file_path = 1;
+  string last_write_time = 2;
+}
+
+message ProtoBookmarkCategory {
+  uint64 id = 1;
+  string name = 2;
+}
+
+message ProtoBookmark {
+  uint64 id = 1;
+  string name = 2;
+  string comment = 3;
+  string timestamp = 4;
+  ProtoBookmarkCategory category = 5;
+}
+
+message ProtoNodeBookmark {
+  ProtoBookmark base = 1;
+  repeated uint64 node_ids = 2;
+}
+
+message ProtoEdgeBookmark {
+  ProtoBookmark base = 1;
+  repeated uint64 edge_ids = 2;
+  uint64 active_node_id = 3;
+}
+
+message ProtoStorageStats {
+  uint64 node_count = 1;
+  uint64 edge_count = 2;
+  uint64 file_count = 3;
+  uint64 completed_file_count = 4;
+  uint64 file_loc_count = 5;
+  string timestamp = 6;
+}
+
+message ProtoErrorInfo {
+  uint64 id = 1;
+  string message = 2;
+  string file_path = 3;
+  uint64 line_number = 4;
+  uint64 column_number = 5;
+  string translation_unit = 6;
+  bool fatal = 7;
+  bool indexed = 8;
+}
+
+message ProtoErrorFilter {
+  bool error = 1;
+  bool fatal = 2;
+  bool unindexed_error = 3;
+  bool unindexed_fatal = 4;
+  uint64 limit = 5;
+}
+
+message ProtoTooltipSnippet {
+  string code = 1;
+  ProtoSourceLocationFile location_file = 2;
+}
+
+message ProtoTooltipInfo {
+  string title = 1;
+  int32 count = 2;
+  string count_text = 3;
+  repeated ProtoTooltipSnippet snippets = 4;
+  float offset_x = 5;
+  float offset_y = 6;
+}
+
+// ---------- Request/response messages ---------------------------------------
+
+message LoadProjectRequest { string project_file_path = 1; }
+message LoadProjectResponse {}
+message RefreshRequest { bool all = 1; }
+message RefreshResponse {}
+message IndexingInterruptedRequest {}
+message IndexingInterruptedResponse {}
+
+message AddNodeBookmarkRequest {
+  ProtoBookmark base = 1;
+  repeated uint64 node_ids = 2;
+}
+message AddEdgeBookmarkRequest {
+  ProtoBookmark base = 1;
+  repeated uint64 edge_ids = 2;
+  uint64 active_node_id = 3;
+}
+message AddBookmarkCategoryRequest { string name = 1; }
+message BookmarkIdResponse { uint64 id = 1; }
+message UpdateBookmarkRequest {
+  uint64 bookmark_id = 1;
+  string name = 2;
+  string comment = 3;
+  string category_name = 4;
+}
+message RemoveBookmarkRequest { uint64 bookmark_id = 1; }
+message RemoveBookmarkCategoryRequest { uint64 category_id = 1; }
+
+message SourceLocationCollectionResponse {
+  repeated ProtoSourceLocationFile files = 1;
+}
+message SourceLocationFileResponse { ProtoSourceLocationFile file = 1; }
+message GraphResponse { ProtoGraph graph = 1; }
+message ActiveGraphResponse {
+  ProtoGraph graph = 1;
+  bool is_active_namespace = 2;
+}
+message SearchMatchesResponse { repeated ProtoSearchMatch matches = 1; }
+message FileInfoResponse { ProtoFileInfo file_info = 1; }
+message FileInfosResponse { repeated ProtoFileInfo file_infos = 1; }
+message StorageStatsResponse { ProtoStorageStats stats = 1; }
+message ErrorCountResponse {
+  uint64 total = 1;
+  uint64 fatal = 2;
+}
+message ErrorInfosResponse { repeated ProtoErrorInfo errors = 1; }
+message ErrorInfosRequest { repeated ProtoErrorInfo errors = 1; }
+message NodeIdToParentFileMapResponse {
+  message Entry {
+    uint64 node_id = 1;
+    uint64 parent_file_id = 2;
+    string name_hierarchy_serialized = 3;
+  }
+  repeated Entry entries = 1;
+}
+message ActiveTokenIdsResponse {
+  repeated uint64 ids = 1;
+  uint64 declaration_id = 2;
+}
+message ActiveTokenIdRequest { uint64 token_id = 1; }
+message NodeBookmarksResponse { repeated ProtoNodeBookmark bookmarks = 1; }
+message EdgeBookmarksResponse { repeated ProtoEdgeBookmark bookmarks = 1; }
+message BookmarkCategoriesResponse { repeated ProtoBookmarkCategory categories = 1; }
+message TooltipInfoResponse { ProtoTooltipInfo info = 1; }
+
+message FullTextSearchRequest {
+  string search_term = 1;
+  bool case_sensitive = 2;
+}
+message AutocompletionRequest {
+  string query = 1;
+  int32 accepted_node_types_mask = 2;
+  bool accept_commands = 3;
+}
+message ActiveTokensRequest {
+  repeated uint64 token_ids = 1;
+  repeated uint64 expanded_node_ids = 2;
+}
+message TrailRequest {
+  uint64 origin_id = 1;
+  uint64 target_id = 2;
+  int32 node_types_mask = 3;
+  int32 edge_types_mask = 4;
+  bool node_non_indexed = 5;
+  uint64 depth = 6;
+  bool directed = 7;
+}
+message LinesInFileRequest {
+  string file_path = 1;
+  uint64 start_line = 2;
+  uint64 end_line = 3;
+}
+message LocationTypeInFileRequest {
+  string file_path = 1;
+  int32 location_type = 2;
+}
+message FileContentRequest {
+  string file_path = 1;
+  bool shows_errors = 2;
+}
+message FileContentResponse { string content = 1; }
+message ErrorFilterRequest { ProtoErrorFilter filter = 1; }
+message ErrorFilterFileRequest {
+  ProtoErrorFilter filter = 1;
+  string file_path = 2;
+}
+message TooltipTokenIdsRequest {
+  repeated uint64 token_ids = 1;
+  int32 origin = 2;
+}
+message TooltipLocationRequest {
+  repeated uint64 location_ids = 1;
+  repeated uint64 local_symbol_ids = 2;
+}
+
+// Engine event stream -------------------------------------------------------
+
+message WatchEventsRequest {}
+
+message EngineEvent {
+  oneof event {
+    IndexingProgressEvent indexing_progress = 1;
+    IndexingFinishedEvent indexing_finished = 2;
+    IndexingErrorEvent indexing_error = 3;
+    StatusInfoEvent status_info = 4;
+  }
+}
+
+message IndexingProgressEvent {
+  uint64 indexed_file_count = 1;
+  uint64 total_file_count = 2;
+  string current_file = 3;
+}
+
+message IndexingFinishedEvent {
+  bool success = 1;
+  string project_path = 2;
+}
+
+message IndexingErrorEvent {
+  string error_message = 1;
+  bool fatal = 2;
+}
+
+message StatusInfoEvent {
+  string message = 1;
+  bool is_error = 2;
+}

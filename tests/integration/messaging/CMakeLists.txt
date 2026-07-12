@@ -5,7 +5,7 @@ add_sourcetrail_test(
   SOURCES
   MessageQueueTestSuite.cpp
   DEPS
-  Sourcetrail::messaging
+  Sourcetrail::lib::messaging
   TEST_PREFIX
   "integration.messaging"
   WORKING_DIRECTORY

@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../../../src/lib/tests/mocks/MockedApplicationSetting.hpp"
+#include "../../../src/lib/lib/tests/mocks/MockedApplicationSetting.hpp"
 #include "CxxParser.h"
 #include "IndexerCommandCxx.h"
 #include "IndexerStateInfo.h"

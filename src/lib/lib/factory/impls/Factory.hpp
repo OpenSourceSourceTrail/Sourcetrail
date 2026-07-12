@@ -1,0 +1,20 @@
+#pragma once
+
+#include "IFactory.hpp"
+
+namespace lib {
+
+class Factory : public IFactory {
+public:
+  ~Factory() override;
+  std::shared_ptr<IProject> createProject(std::shared_ptr<ProjectSettings> settings,
+                                          std::shared_ptr<StorageCache> storageCache,
+                                          std::string appUUID,
+                                          bool hasGUI) noexcept override;
+
+  IMessageQueue::Ptr createMessageQueue() noexcept override;
+
+  ISharedMemoryGarbageCollector::Ptr createSharedMemoryGarbageCollector() noexcept override;
+};
+
+}    // namespace lib

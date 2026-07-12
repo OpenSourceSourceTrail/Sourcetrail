@@ -22,12 +22,12 @@ foreach(test_name IN LISTS test_lib_names)
     Qt6::Core
     Qt6::Gui
     Qt6::Sql
-    Sourcetrail::messaging
+    Sourcetrail::lib::messaging
     Sourcetrail::gtest_main
-    Sourcetrail::core::utility::TextAccess
-    Sourcetrail::core::utility::file::FileSystem
-    Sourcetrail::core::utility::file::utilityFile
-    $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib_cxx>
+    Sourcetrail::lib::core::utility::TextAccess
+    Sourcetrail::lib::core::utility::file::FileSystem
+    Sourcetrail::lib::core::utility::file::utilityFile
+    $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
     lib::mocks
     Boost::date_time
     spdlog::spdlog
