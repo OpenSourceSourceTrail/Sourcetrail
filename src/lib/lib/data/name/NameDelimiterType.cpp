@@ -8,6 +8,8 @@ std::wstring nameDelimiterTypeToString(NameDelimiterType delimiter) {
     return L"/";
   case NAME_DELIMITER_CXX:
     return L"::";
+  case NAME_DELIMITER_JAVA:
+    return L".";
   default:
     break;
   }
@@ -20,6 +22,9 @@ NameDelimiterType stringToNameDelimiterType(const std::wstring& s) {
   }
   if(s == nameDelimiterTypeToString(NAME_DELIMITER_CXX)) {
     return NAME_DELIMITER_CXX;
+  }
+  if(s == nameDelimiterTypeToString(NAME_DELIMITER_JAVA)) {
+    return NAME_DELIMITER_JAVA;
   }
   return NAME_DELIMITER_UNKNOWN;
 }

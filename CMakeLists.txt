@@ -12,6 +12,10 @@ project(
 set(BUILD_CXX_LANGUAGE_PACKAGE
     OFF
     CACHE BOOL "Add C and C++ support to the Sourcetrail indexer.")
+find_program(SR_MAVEN_EXECUTABLE mvn)
+set(BUILD_JAVA_INDEXER
+    ${SR_MAVEN_EXECUTABLE}
+    CACHE BOOL "Add the Java indexer plugin (requires Maven + JDK 21).")
 set(BUILD_DOC
     OFF
     CACHE BOOL "Build documentation.")
@@ -202,8 +206,10 @@ if(BUILD_CXX_LANGUAGE_PACKAGE)
 endif()
 # Indexer App --------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app/indexer)
-# Java indexer plugin stub (proves plugin discovery/launch; not the real Java parser) ---------------------------------------------
-add_subdirectory(src/app/indexer_java_stub)
+# Java indexer plugin (Maven-built, pure-JVM gRPC worker) -------------------------------------------------------------------------
+if(BUILD_JAVA_INDEXER)
+  add_subdirectory(java)
+endif()
 # App ----------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app/gui)
 # CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------

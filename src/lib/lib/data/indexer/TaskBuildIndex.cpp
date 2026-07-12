@@ -185,6 +185,8 @@ void TaskBuildIndex::handleMessage(MessageIndexingInterrupted* /*message*/) {
 
 void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logFilePath*/) {
   FilePath indexerProcessPath;
+  FilePath launcherPath;
+  std::vector<std::wstring> launcherArgs;
 #if BUILD_CXX_LANGUAGE_PACKAGE
   // The built-in C/C++ indexer ships a plugin manifest only to advertise its source group
   // types to the wizard; its real location is layout-dependent (build vs install), so resolve
@@ -194,7 +196,13 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
   }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
   if(indexerProcessPath.empty()) {
-    indexerProcessPath = IndexerPluginRegistry::getInstance()->indexerExecutablePathFor(mCommandType);
+    if(std::optional<IndexerPluginRegistry::Plugin> plugin =
+           IndexerPluginRegistry::getInstance()->pluginFor(mCommandType);
+       plugin.has_value()) {
+      indexerProcessPath = plugin->indexerExecutablePath;
+      launcherPath = plugin->launcherPath;
+      launcherArgs = plugin->launcherArgs;
+    }
   }
   if(!indexerProcessPath.exists()) {
     mInterrupted = true;
@@ -207,15 +215,21 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
   const std::string endpoint = fmt::format("localhost:{}", mEnginePort);
 
   std::vector<std::wstring> commandArguments;
+  if(!launcherPath.empty()) {
+    commandArguments.insert(commandArguments.end(), launcherArgs.begin(), launcherArgs.end());
+    commandArguments.push_back(indexerProcessPath.wstr());
+  }
   commandArguments.push_back(std::to_wstring(processId));
   commandArguments.push_back(L"--engine-endpoint");
   commandArguments.push_back(utility::decodeFromUtf8(endpoint));
   commandArguments.push_back(AppPath::getSharedDataDirectoryPath().getAbsolute().wstr());
   commandArguments.push_back(UserPaths::getUserDataDirectoryPath().getAbsolute().wstr());
 
+  const std::wstring processPath = launcherPath.empty() ? indexerProcessPath.wstr() : launcherPath.wstr();
+
   int result = 1;
   while((!mIndexerCommandQueueStopped || result != 0) && !mInterrupted) {
-    result = utility::executeProcess(indexerProcessPath.wstr(), commandArguments, FilePath(), false, -1).exitCode;
+    result = utility::executeProcess(processPath, commandArguments, FilePath(), false, -1).exitCode;
     LOG_INFO(fmt::format("Indexer process {} returned with {}", processId, result));
   }
 

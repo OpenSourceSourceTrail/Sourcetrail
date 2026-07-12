@@ -1,10 +1,14 @@
 <config>
-  <id>java_stub</id>
-  <name>Java (stub)</name>
+  <id>java</id>
+  <name>Java</name>
   <language>Java</language>
   <commandType>indexer_command_java</commandType>
   <source_group_types>
     <source_group_type>Java Source Group</source_group_type>
   </source_group_types>
-  <indexerExecutable>sourcetrail_indexer_java_stub</indexerExecutable>
+  <launcher>java</launcher>
+  <launcherArgs>
+    <arg>-jar</arg>
+  </launcherArgs>
+  <indexerExecutable>sourcetrail_java_indexer.jar</indexerExecutable>
 </config>

@@ -96,12 +96,19 @@ std::vector<SourceGroupType> IndexerPluginRegistry::availableSourceGroupTypes() 
 }
 
 FilePath IndexerPluginRegistry::indexerExecutablePathFor(IndexerCommandType commandType) const {
-  for(const Plugin& plugin : m_plugins) {
-    if(plugin.commandType == commandType) {
-      return plugin.indexerExecutablePath;
-    }
+  if(std::optional<Plugin> plugin = pluginFor(commandType); plugin.has_value()) {
+    return plugin->indexerExecutablePath;
   }
   return FilePath();
+}
+
+std::optional<IndexerPluginRegistry::Plugin> IndexerPluginRegistry::pluginFor(IndexerCommandType commandType) const {
+  for(const Plugin& plugin : m_plugins) {
+    if(plugin.commandType == commandType) {
+      return plugin;
+    }
+  }
+  return std::nullopt;
 }
 
 const std::vector<IndexerPluginRegistry::Plugin>& IndexerPluginRegistry::getPlugins() const {
@@ -138,6 +145,14 @@ std::optional<IndexerPluginRegistry::Plugin> IndexerPluginRegistry::loadManifest
   }
   plugin.indexerExecutablePath = manifestFilePath.getParentDirectory().getConcatenated(
       utility::decodeFromUtf8(indexerExecutable));
+
+  const std::string launcher = config->getValueOrDefault<std::string>("launcher", "");
+  if(!launcher.empty()) {
+    plugin.launcherPath = FilePath(utility::decodeFromUtf8(launcher));
+    for(const std::string& arg : config->getValuesOrDefaults<std::string>("launcherArgs/arg", {})) {
+      plugin.launcherArgs.push_back(utility::decodeFromUtf8(arg));
+    }
+  }
 
   return plugin;
 }

@@ -18,6 +18,8 @@ public:
     std::vector<SourceGroupType> sourceGroupTypes;
     IndexerCommandType commandType = INDEXER_COMMAND_UNKNOWN;
     FilePath indexerExecutablePath;
+    FilePath launcherPath;
+    std::vector<std::wstring> launcherArgs;
   };
 
   using Ptr = std::shared_ptr<IndexerPluginRegistry>;
@@ -33,6 +35,8 @@ public:
   [[nodiscard]] std::vector<SourceGroupType> availableSourceGroupTypes() const;
 
   [[nodiscard]] FilePath indexerExecutablePathFor(IndexerCommandType commandType) const;
+
+  [[nodiscard]] std::optional<Plugin> pluginFor(IndexerCommandType commandType) const;
 
   [[nodiscard]] const std::vector<Plugin>& getPlugins() const;
 
