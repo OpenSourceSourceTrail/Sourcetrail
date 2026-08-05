@@ -91,7 +91,13 @@ if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
   endif()
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options(-fdiagnostics-color=always)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  # /Z7 embeds debug info in the .obj instead of routing every compile through mspdbsrv, which avoids
+  # "C1041: cannot open program database" when ninja runs many cl.exe in parallel. Linker PDBs are unaffected.
+  add_compile_options(/DNOMINMAX /Z7)
+  add_link_options(/DEBUG /OPT:REF /OPT:ICF)
 endif()
+
 #---------------------------------------------------------------------------------------------------------------------------------
 include(cmake/set_alternate_linker.cmake)
 set(USE_ALTERNATE_LINKER
@@ -148,6 +154,7 @@ find_package(protobuf CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SQLite3 CONFIG REQUIRED)
+find_package(Taskflow CONFIG REQUIRED)
 # Boost --------------------------------------------------------------------------------------------------------------------------
 set(Boost_USE_MULTITHREAD ON)
 set(Boost_USE_STATIC_LIBS
@@ -164,7 +171,7 @@ find_package(
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
 find_package(
-  Qt6 6.8 REQUIRED
+  Qt6 6.11 REQUIRED
   COMPONENTS Widgets
              PrintSupport
              Network
@@ -227,7 +234,7 @@ if(ENABLE_UNIT_TEST
   create_symlink("${CMAKE_SOURCE_DIR}/bin/test/data" "${CMAKE_BINARY_DIR}/test/data")
 
   find_package(
-    Qt6 6.8
+    Qt6 6.11
     COMPONENTS Test Sql
     REQUIRED)
 
