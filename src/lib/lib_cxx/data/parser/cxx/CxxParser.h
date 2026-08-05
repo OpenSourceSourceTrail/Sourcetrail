@@ -38,9 +38,8 @@ public:
 private:
   void runTool(clang::tooling::CompilationDatabase* pCompilationDatabase, const FilePath& sourceFilePath);
 
-  [[nodiscard]] std::shared_ptr<CxxDiagnosticConsumer> getDiagnostics(const FilePath& sourceFilePath,
-                                                                      std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache,
-                                                                      bool logErrors) const;
+  [[nodiscard]] std::shared_ptr<CxxDiagnosticConsumer> getDiagnostics(
+      const FilePath& sourceFilePath, std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache) const;
 
   friend class TaskParseCxx;
 

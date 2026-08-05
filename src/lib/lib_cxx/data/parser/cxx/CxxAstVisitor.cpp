@@ -71,7 +71,6 @@ bool CxxAstVisitor::checkIgnoresTypeLoc(const clang::TypeLoc& tl) const {
   if((!tl.getAs<clang::TagTypeLoc>().isNull()) || (!tl.getAs<clang::TypedefTypeLoc>().isNull()) ||
      (!tl.getAs<clang::TemplateTypeParmTypeLoc>().isNull()) || (!tl.getAs<clang::TemplateSpecializationTypeLoc>().isNull()) ||
      (!tl.getAs<clang::InjectedClassNameTypeLoc>().isNull()) || (!tl.getAs<clang::DependentNameTypeLoc>().isNull()) ||
-     (!tl.getAs<clang::DependentTemplateSpecializationTypeLoc>().isNull()) ||
      (!tl.getAs<clang::SubstTemplateTypeParmTypeLoc>().isNull()) || (!tl.getAs<clang::BuiltinTypeLoc>().isNull()) ||
      (!tl.getAs<clang::AutoTypeLoc>().isNull())) {
     return false;
@@ -116,6 +115,22 @@ bool CxxAstVisitor::checkIgnoresTypeLoc(const clang::TypeLoc& tl) const {
 
 #define DEF_TRAVERSE_TYPE(__TYPE__, CODE_BEFORE, CODE_AFTER) DEF_TRAVERSE_CUSTOM_TYPE(__TYPE__, __TYPE__, CODE_BEFORE, CODE_AFTER)
 
+// clang::RecursiveASTVisitor's type and type location traversals take a trailing "traverse qualifier" flag that has
+// to be declared and forwarded here, otherwise these methods shadow the base ones instead of overriding them.
+#define DEF_TRAVERSE_CUSTOM_TYPE_LOC(__NAME_TYPE__, __PARAM_TYPE__, CODE_BEFORE, CODE_AFTER)                                      \
+  bool CxxAstVisitor::Traverse##__NAME_TYPE__(clang::__PARAM_TYPE__ v, bool traverseQualifier) {                                  \
+    FOREACH_COMPONENT(beginTraverse##__NAME_TYPE__(v));                                                                          \
+    bool ret = true;                                                                                                             \
+    { CODE_BEFORE; }                                                                                                             \
+    Base::Traverse##__NAME_TYPE__(v, traverseQualifier);                                                                          \
+    { CODE_AFTER; }                                                                                                              \
+    FOREACH_COMPONENT(endTraverse##__NAME_TYPE__(v));                                                                            \
+    return ret;                                                                                                                  \
+  }
+
+#define DEF_TRAVERSE_TYPE_LOC(__TYPE__, CODE_BEFORE, CODE_AFTER)                                                                 \
+  DEF_TRAVERSE_CUSTOM_TYPE_LOC(__TYPE__, __TYPE__, CODE_BEFORE, CODE_AFTER)
+
 bool CxxAstVisitor::TraverseDecl(clang::Decl* decl) {
   bool traverse = true;
   if(decl) {
@@ -155,13 +170,13 @@ bool CxxAstVisitor::TraverseDecl(clang::Decl* decl) {
 }
 
 // same as Base::TraverseQualifiedTypeLoc(..) but we need to make sure to call this.TraverseTypeLoc(..)
-bool CxxAstVisitor::TraverseQualifiedTypeLoc(clang::QualifiedTypeLoc tl) {
+bool CxxAstVisitor::TraverseQualifiedTypeLoc(clang::QualifiedTypeLoc tl, bool /*traverseQualifier*/) {
   return TraverseTypeLoc(tl.getUnqualifiedLoc());
 }
 
-DEF_TRAVERSE_TYPE(TypeLoc, {}, {})
+DEF_TRAVERSE_TYPE_LOC(TypeLoc, {}, {})
 
-DEF_TRAVERSE_CUSTOM_TYPE(Type, QualType, {}, {})
+DEF_TRAVERSE_CUSTOM_TYPE_LOC(Type, QualType, {}, {})
 
 DEF_TRAVERSE_TYPE_PTR(Stmt, {}, {})
 
@@ -266,8 +281,19 @@ bool CxxAstVisitor::TraverseNestedNameSpecifierLoc(clang::NestedNameSpecifierLoc
     FOREACH_COMPONENT(beginTraverseNestedNameSpecifierLoc(loc));
 
     // todo: call method of base class...
-    if(clang::NestedNameSpecifierLoc prefix = loc.getPrefix()) {
-      ret = TraverseNestedNameSpecifierLoc(prefix);
+    // mirrors clang::RecursiveASTVisitor::TraverseNestedNameSpecifierLoc: a prefix only exists for namespace and
+    // type qualifiers, and it is reached differently for each of them.
+    switch(loc.getNestedNameSpecifier().getKind()) {
+    case clang::NestedNameSpecifier::Kind::Namespace:
+      ret = TraverseNestedNameSpecifierLoc(loc.castAsNamespaceAndPrefix().Prefix);
+      break;
+    case clang::NestedNameSpecifier::Kind::Type:
+      ret = TraverseNestedNameSpecifierLoc(loc.castAsTypeLoc().getPrefix());
+      break;
+    case clang::NestedNameSpecifier::Kind::Global:
+    case clang::NestedNameSpecifier::Kind::MicrosoftSuper:
+    case clang::NestedNameSpecifier::Kind::Null:
+      break;
     }
 
     FOREACH_COMPONENT(endTraverseNestedNameSpecifierLoc(loc));
@@ -378,7 +404,7 @@ bool CxxAstVisitor::TraverseClassTemplateSpecializationDecl(clang::ClassTemplate
 DEF_TRAVERSE_TYPE_PTR(ClassTemplatePartialSpecializationDecl, {}, {})
 DEF_TRAVERSE_TYPE_PTR(DeclRefExpr, {}, {})
 DEF_TRAVERSE_TYPE_PTR(CXXForRangeStmt, {}, {})
-DEF_TRAVERSE_TYPE(TemplateSpecializationTypeLoc, {}, {})
+DEF_TRAVERSE_TYPE_LOC(TemplateSpecializationTypeLoc, {}, {})
 DEF_TRAVERSE_TYPE_PTR(UnresolvedLookupExpr, {}, {})
 DEF_TRAVERSE_TYPE_PTR(UnresolvedMemberExpr, {}, {})
 

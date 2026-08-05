@@ -13,41 +13,24 @@ CxxSpecifierNameResolver::CxxSpecifierNameResolver(CanonicalFilePathCache* canon
 
 CxxSpecifierNameResolver::CxxSpecifierNameResolver(const CxxNameResolver* other) : CxxNameResolver(other) {}
 
-std::unique_ptr<CxxName> CxxSpecifierNameResolver::getName(const clang::NestedNameSpecifier* nestedNameSpecifier) {
-  if(nestedNameSpecifier) {
-    clang::NestedNameSpecifier::SpecifierKind nnsKind = nestedNameSpecifier->getKind();
-    switch(nnsKind) {
-    case clang::NestedNameSpecifier::Identifier: {
-      std::unique_ptr<CxxName> name = std::make_unique<CxxDeclName>(
-          utility::decodeFromUtf8(nestedNameSpecifier->getAsIdentifier()->getName().str()));
+std::unique_ptr<CxxName> CxxSpecifierNameResolver::getName(clang::NestedNameSpecifier nestedNameSpecifier) {
+  switch(nestedNameSpecifier.getKind()) {
+  case clang::NestedNameSpecifier::Kind::Namespace:
+    // covers both namespaces and namespace aliases: clang::NamespaceAliasDecl derives from clang::NamespaceBaseDecl.
+    // The parent hierarchy comes from the decl context, so the prefix does not have to be walked here.
+    return CxxDeclNameResolver(this).getName(nestedNameSpecifier.getAsNamespaceAndPrefix().Namespace);
 
-      if(const clang::NestedNameSpecifier* prefix = nestedNameSpecifier->getPrefix()) {
-        std::unique_ptr<CxxName> parentName = getName(prefix);
-        if(parentName) {
-          name->setParent(std::move(parentName));
-        }
-      }
+  case clang::NestedNameSpecifier::Kind::Type:
+    // a dependent qualifier such as "typename T::type" is a clang::DependentNameType and lands here as well
+    return CxxTypeName::makeUnsolvedIfNull(CxxTypeNameResolver(this).getName(nestedNameSpecifier.getAsType()));
 
-      return name;
-    }
+  case clang::NestedNameSpecifier::Kind::MicrosoftSuper:
+    return CxxDeclNameResolver(this).getName(nestedNameSpecifier.getAsRecordDecl());
 
-    case clang::NestedNameSpecifier::Namespace:
-      return CxxDeclNameResolver(this).getName(nestedNameSpecifier->getAsNamespace());
-
-    case clang::NestedNameSpecifier::NamespaceAlias:
-      return CxxDeclNameResolver(this).getName(nestedNameSpecifier->getAsNamespaceAlias());
-
-    case clang::NestedNameSpecifier::TypeSpec:
-    case clang::NestedNameSpecifier::TypeSpecWithTemplate:
-      return CxxTypeName::makeUnsolvedIfNull(CxxTypeNameResolver(this).getName(nestedNameSpecifier->getAsType()));
-
-    case clang::NestedNameSpecifier::Global:
-      // no context name hierarchy needed.
-      break;
-
-    case clang::NestedNameSpecifier::Super:
-      return CxxDeclNameResolver(this).getName(nestedNameSpecifier->getAsRecordDecl());
-    }
+  case clang::NestedNameSpecifier::Kind::Global:
+  case clang::NestedNameSpecifier::Kind::Null:
+    // no context name hierarchy needed.
+    break;
   }
 
   return nullptr;

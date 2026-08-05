@@ -19,7 +19,7 @@ private:
 
   bool TraverseDecl(clang::Decl* decl) override;
   bool TraverseStmt(clang::Stmt* stmt) override;
-  bool TraverseTypeLoc(clang::TypeLoc type) override;
+  bool TraverseTypeLoc(clang::TypeLoc type, bool traverseQualifier = true) override;
 
   std::string getIndentString() const;
 

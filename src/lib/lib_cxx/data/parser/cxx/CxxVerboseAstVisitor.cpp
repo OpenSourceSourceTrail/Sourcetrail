@@ -95,7 +95,7 @@ bool CxxVerboseAstVisitor::TraverseStmt(clang::Stmt* stmt) {
   return true;
 }
 
-bool CxxVerboseAstVisitor::TraverseTypeLoc(clang::TypeLoc type) {
+bool CxxVerboseAstVisitor::TraverseTypeLoc(clang::TypeLoc type, bool traverseQualifier) {
   if(!type.isNull()) {
     const ParseLocation loc = getParseLocation(type.getSourceRange());
     LOG_INFO(fmt::format(fmt::runtime("Indexer - {}{}TypeLoc <{}:{}, {}:{}>"),
@@ -106,7 +106,7 @@ bool CxxVerboseAstVisitor::TraverseTypeLoc(clang::TypeLoc type) {
                          loc.endColumnNumber));
     {
       const ScopedSwitcher<unsigned int> switcher(mIndentation, mIndentation + 1);
-      return base::TraverseTypeLoc(type);
+      return base::TraverseTypeLoc(type, traverseQualifier);
     }
   }
   return true;
