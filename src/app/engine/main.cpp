@@ -19,6 +19,7 @@
 #include "IndexerPluginRegistry.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
+#include "PlatformUserPaths.h"
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
@@ -36,36 +37,6 @@
 namespace {
 
 constexpr uint16_t DefaultEnginePort = 54321;
-
-std::filesystem::path getExecutableDirectory() {
-#if defined(__linux__)
-  std::error_code ec;
-  auto path = std::filesystem::canonical("/proc/self/exe", ec);
-  if(!ec) {
-    return path.parent_path();
-  }
-#endif
-  return std::filesystem::current_path();
-}
-
-void setupPaths() {
-  const std::filesystem::path appPath = getExecutableDirectory();
-  AppPath::setSharedDataDirectoryPath(FilePath(appPath.wstring() + L"/"));
-  AppPath::setCxxIndexerDirectoryPath(FilePath(appPath.wstring() + L"/"));
-
-  if(const FilePath appImageShare = FilePath(appPath.wstring() + L"/../share/data"); appImageShare.exists()) {
-    AppPath::setSharedDataDirectoryPath(FilePath(appPath.wstring() + L"/../share").getAbsolute());
-  }
-
-  std::filesystem::path userDataPath;
-  if(const char* home = std::getenv("HOME"); home != nullptr) {
-    userDataPath = std::filesystem::path(home) / ".config/sourcetrail/";
-  }
-  UserPaths::setUserDataDirectoryPath(FilePath(userDataPath.wstring()));
-
-  std::error_code ec;
-  std::filesystem::create_directories(userDataPath, ec);
-}
 
 void addLanguagePackages() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
@@ -112,7 +83,7 @@ int main(int argc, char* argv[]) {
 
   IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
 
-  setupPaths();
+  platform_paths::setupPaths();
 
   auto factory = std::make_shared<lib::Factory>();
   Application::createInstance(version, factory, nullptr, nullptr);
@@ -125,12 +96,18 @@ int main(int argc, char* argv[]) {
   StorageCache* storageAccess = Application::getInstance()->getStorageCache();
 
   EngineServiceImpl engineService(storageAccess);
+  engineService.setShutdownHandler([]() { gStopRequested = 1; });
 
   grpc::ServerBuilder builder;
-  const std::string address = fmt::format("localhost:{}", port);
+  // 127.0.0.1 rather than "localhost": on Windows the latter may resolve to ::1 first, leaving a
+  // client that dialed the IPv4 loopback unable to connect.
+  const std::string address = fmt::format("127.0.0.1:{}", port);
   int assignedPort = 0;
   builder.AddListeningPort(address, grpc::InsecureServerCredentials(), &assignedPort);
   builder.RegisterService(&engineService);
+  // Graph and file-content responses routinely exceed gRPC's 4 MB default on real projects.
+  builder.SetMaxReceiveMessageSize(-1);
+  builder.SetMaxSendMessageSize(-1);
   const std::unique_ptr<grpc::Server> server = builder.BuildAndStart();
 
   if(!server) {
@@ -138,7 +115,11 @@ int main(int argc, char* argv[]) {
     return EXIT_FAILURE;
   }
 
-  fmt::println("Sourcetrail_engine listening on localhost:{}", assignedPort);
+  // Machine-readable handshake line, emitted first and flushed, so a parent process that spawned us
+  // with "--port 0" can learn the ephemeral port. Keep this the very first line of stdout.
+  fmt::println("ENGINE_PORT {}", assignedPort);
+  std::cout.flush();
+  fmt::println("Sourcetrail_engine listening on 127.0.0.1:{}", assignedPort);
   std::cout.flush();
 
   std::ignore = std::signal(SIGINT, signalHandler);

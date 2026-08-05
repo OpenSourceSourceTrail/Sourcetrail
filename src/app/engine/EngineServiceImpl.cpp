@@ -43,6 +43,19 @@ grpc::Status EngineServiceImpl::IndexingInterrupted(grpc::ServerContext* /*ctx*/
   return grpc::Status::OK;
 }
 
+void EngineServiceImpl::setShutdownHandler(std::function<void()> handler) {
+  mShutdownHandler = std::move(handler);
+}
+
+grpc::Status EngineServiceImpl::Shutdown(grpc::ServerContext* /*ctx*/,
+                                          const sourcetrail::EmptyRequest* /*req*/,
+                                          sourcetrail::EmptyResponse* /*resp*/) {
+  if(mShutdownHandler) {
+    mShutdownHandler();
+  }
+  return grpc::Status::OK;
+}
+
 // ---- Bookmark mutations ----------------------------------------------------
 
 grpc::Status EngineServiceImpl::AddNodeBookmark(grpc::ServerContext* /*ctx*/,

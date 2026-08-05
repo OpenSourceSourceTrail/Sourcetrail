@@ -11,6 +11,10 @@ service EngineService {
   rpc Refresh(RefreshRequest) returns (RefreshResponse);
   rpc IndexingInterrupted(IndexingInterruptedRequest) returns (IndexingInterruptedResponse);
 
+  // Asks the engine to exit. SIGTERM does not exist on Windows, so a parent process that spawned
+  // the engine cannot portably signal it -- this RPC is the cross-platform shutdown path.
+  rpc Shutdown(EmptyRequest) returns (EmptyResponse);
+
   // Bookmark mutations
   rpc AddNodeBookmark(AddNodeBookmarkRequest) returns (BookmarkIdResponse);
   rpc AddEdgeBookmark(AddEdgeBookmarkRequest) returns (BookmarkIdResponse);

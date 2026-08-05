@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <memory>
 
 #include <grpcpp/grpcpp.h>
@@ -12,6 +13,11 @@ class EngineServiceImpl final : public sourcetrail::EngineService::Service {
 public:
   explicit EngineServiceImpl(StorageAccess* storageAccess);
   ~EngineServiceImpl() override = default;
+
+  /** Invoked when a client calls Shutdown(); the owner uses this to leave its main loop. */
+  void setShutdownHandler(std::function<void()> handler);
+
+  grpc::Status Shutdown(grpc::ServerContext* ctx, const sourcetrail::EmptyRequest* req, sourcetrail::EmptyResponse* resp) override;
 
   // Lifecycle
   grpc::Status LoadProject(grpc::ServerContext* ctx,
@@ -218,6 +224,8 @@ public:
 
 private:
   StorageAccess* mStorageAccess;
+
+  std::function<void()> mShutdownHandler;
 
   std::mutex mEventListenersMutex;
   std::vector<grpc::ServerWriter<sourcetrail::EngineEvent>*> mEventListeners;

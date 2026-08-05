@@ -13,6 +13,8 @@ target_sources(
   # }
   app/paths/AppPath.cpp
   app/paths/AppPath.h
+  app/paths/PlatformUserPaths.cpp
+  app/paths/PlatformUserPaths.h
   app/paths/ResourcePaths.cpp
   app/paths/ResourcePaths.h
   app/paths/UserPaths.cpp
