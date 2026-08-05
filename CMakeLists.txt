@@ -215,7 +215,7 @@ endif()
 add_subdirectory(src/app/indexer)
 # Java indexer plugin (Maven-built, pure-JVM gRPC worker) -------------------------------------------------------------------------
 if(BUILD_JAVA_INDEXER)
-  add_subdirectory(java)
+  add_subdirectory(indexers/java)
 endif()
 # App ----------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app/gui)
