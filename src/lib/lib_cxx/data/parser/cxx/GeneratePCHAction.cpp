@@ -36,6 +36,7 @@ std::unique_ptr<clang::ASTConsumer> GeneratePCHAction::CreateASTConsumer(clang::
                                                             OutputFile,
                                                             Sysroot,
                                                             Buffer,
+                                                            CI.getCodeGenOpts(),
                                                             FrontendOpts.ModuleFileExtensions,
                                                             true,    // always allow errors in the PCH
                                                             FrontendOpts.IncludeTimestamps,

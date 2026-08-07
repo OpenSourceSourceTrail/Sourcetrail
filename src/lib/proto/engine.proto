@@ -9,7 +9,25 @@ service EngineService {
   // Project lifecycle
   rpc LoadProject(LoadProjectRequest) returns (LoadProjectResponse);
   rpc Refresh(RefreshRequest) returns (RefreshResponse);
+
+  // Refresh is deliberately not a single RPC. Project::refresh interleaves engine-side work (state
+  // machine, settings migration, SourceGroup::prepareIndexing) with questions that only a client
+  // can answer, so the engine returns the question text and the client drives the dialogs:
+  //   PrepareRefresh -> (client confirms) -> GetRefreshInfo -> (client dialog) -> BuildIndex
+  rpc PrepareRefresh(PrepareRefreshRequest) returns (PrepareRefreshResponse);
+  rpc GetRefreshInfo(GetRefreshInfoRequest) returns (GetRefreshInfoResponse);
+  rpc BuildIndex(BuildIndexRequest) returns (BuildIndexResponse);
+  rpc SetStateOutdated(EmptyRequest) returns (EmptyResponse);
+
+  // What this engine can index, derived from the manifest.xml plugins it discovered at startup.
+  // The client uses this to enable/disable New Project, Edit Project and Refresh; it never looks
+  // at indexer binaries or manifests itself.
+  rpc GetCapabilities(EmptyRequest) returns (CapabilitiesResponse);
   rpc IndexingInterrupted(IndexingInterruptedRequest) returns (IndexingInterruptedResponse);
+
+  // Asks the engine to exit. SIGTERM does not exist on Windows, so a parent process that spawned
+  // the engine cannot portably signal it -- this RPC is the cross-platform shutdown path.
+  rpc Shutdown(EmptyRequest) returns (EmptyResponse);
 
   // Bookmark mutations
   rpc AddNodeBookmark(AddNodeBookmarkRequest) returns (BookmarkIdResponse);
@@ -62,6 +80,12 @@ service EngineService {
 
   // Status stream: engine pushes events; client re-dispatches to local MessageQueue
   rpc WatchEvents(WatchEventsRequest) returns (stream EngineEvent);
+
+  // Bidirectional session. Indexing asks the user two synchronous questions -- whether to keep or
+  // discard the database when indexing finishes, and whether to partially clear files -- which a
+  // one-way event stream cannot express. The engine sends DialogRequests and blocks on the
+  // matching DialogResponse, correlated by request_id.
+  rpc Session(stream ClientMessage) returns (stream EngineMessage);
 }
 
 // ---------- Shared primitives -----------------------------------------------
@@ -106,6 +130,14 @@ message ProtoSourceLocationFile {
   repeated ProtoSourceLocation locations = 6;
 }
 
+// A single entry of TokenComponentBundledEdges. The component's Direction is *derived* from the
+// per-id directions (it collapses to DIRECTION_NONE when they disagree), so the direction must be
+// carried per id -- a single direction field would not round-trip a mixed bundle.
+message ProtoBundledEdge {
+  uint64 id = 1;
+  bool forward = 2;
+}
+
 message ProtoGraph {
   message ProtoNode {
     uint64 id = 1;
@@ -113,15 +145,31 @@ message ProtoGraph {
     string name_hierarchy_serialized = 3;
     int32 definition_kind = 4;
     uint64 child_count = 5;
+    // TokenComponentAccess; absent when the node carries no access component.
+    optional int32 access_kind = 6;
+    // TokenComponentFilePath; both fields present together or not at all.
+    optional string file_path = 7;
+    optional bool file_path_complete = 8;
   }
   message ProtoEdge {
     uint64 id = 1;
     int32 type = 2;
     uint64 from_node_id = 3;
     uint64 to_node_id = 4;
+    // TokenComponentIsAmbiguous (presence-only component).
+    bool is_ambiguous = 5;
+    // TokenComponentInheritanceChain.
+    repeated uint64 inheritance_chain_edge_ids = 6;
+    // TokenComponentBundledEdges. has_bundled_edges distinguishes "no component" from "component
+    // present but empty"; the GUI dereferences this component without a null check.
+    bool has_bundled_edges = 7;
+    repeated ProtoBundledEdge bundled_edges = 8;
   }
   repeated ProtoNode nodes = 1;
   repeated ProtoEdge edges = 2;
+  // Graph::TrailMode
+  int32 trail_mode = 3;
+  bool has_trail_origin = 4;
 }
 
 message ProtoSearchMatch {
@@ -213,9 +261,80 @@ message ProtoTooltipInfo {
 // ---------- Request/response messages ---------------------------------------
 
 message LoadProjectRequest { string project_file_path = 1; }
-message LoadProjectResponse {}
+
+// Returned state lets the client answer isLoaded()/isReindexable()/getDescription() from a cached
+// value: those are called from Qt enable/paint paths and must never block on a round trip.
+message LoadProjectResponse {
+  bool loaded = 1;
+  bool reindexable = 2;
+  bool indexing = 3;
+  string description = 4;
+  // Empty when the load succeeded; otherwise a message for the client to surface.
+  string error_message = 5;
+}
+
 message RefreshRequest { bool all = 1; }
 message RefreshResponse {}
+
+// RefreshMode, mirroring the RefreshMode enum class.
+enum ProtoRefreshMode {
+  REFRESH_NONE = 0;
+  REFRESH_UPDATED_FILES = 1;
+  REFRESH_UPDATED_AND_INCOMPLETE_FILES = 2;
+  REFRESH_ALL_FILES = 3;
+}
+
+message ProtoRefreshInfo {
+  repeated string files_to_index = 1;
+  repeated string files_to_clear = 2;
+  repeated string non_indexed_files_to_clear = 3;
+  ProtoRefreshMode mode = 4;
+  bool shallow = 5;
+}
+
+message PrepareRefreshRequest {
+  ProtoRefreshMode mode = 1;
+  bool shallow = 2;
+}
+
+message PrepareRefreshResponse {
+  // False when the project is not in a refreshable state; error_message says why.
+  bool ok = 1;
+  string error_message = 2;
+  // Non-empty when the engine needs the user to confirm before indexing can proceed (outdated or
+  // migrated database, corrupted database). The engine asks nothing itself.
+  string question = 3;
+  // Drives the indexing dialog's mode selection.
+  repeated ProtoRefreshMode enabled_modes = 4;
+  ProtoRefreshMode initial_mode = 5;
+  bool allows_shallow_indexing = 6;
+}
+
+message GetRefreshInfoRequest { ProtoRefreshMode mode = 1; }
+message GetRefreshInfoResponse { ProtoRefreshInfo info = 1; }
+
+message BuildIndexRequest { ProtoRefreshInfo info = 1; }
+// Returns as soon as indexing is scheduled; progress arrives on the session stream.
+message BuildIndexResponse { bool started = 1; }
+
+message PluginInfo {
+  string id = 1;
+  string name = 2;
+  int32 language = 3;
+  repeated int32 source_group_types = 4;
+  int32 command_type = 5;
+}
+
+message CapabilitiesResponse {
+  repeated PluginInfo plugins = 1;
+  // Union of every plugin's source group types, plus the types the engine supports without any
+  // plugin (Custom Command needs only a user-supplied shell command, no indexer binary).
+  repeated int32 supported_source_group_types = 2;
+  repeated int32 supported_languages = 3;
+  // False only when the engine can index nothing at all; the client greys out New/Edit/Refresh.
+  bool can_create_project = 4;
+  string engine_version = 5;
+}
 message IndexingInterruptedRequest {}
 message IndexingInterruptedResponse {}
 
@@ -336,18 +455,35 @@ message EngineEvent {
     IndexingFinishedEvent indexing_finished = 2;
     IndexingErrorEvent indexing_error = 3;
     StatusInfoEvent status_info = 4;
+    IndexingStartedEvent indexing_started = 5;
+    UnknownProgressEvent unknown_progress = 6;
+    ProgressEvent progress = 7;
+    ClearDialogsEvent clear_dialogs = 8;
+    ErrorCountEvent error_count = 9;
   }
 }
 
+message IndexingStartedEvent {}
+
+// Mirrors DialogView::updateIndexingDialog. These counts never travel on the engine's message bus
+// (MessageIndexingStatus carries only a percentage), so the engine's DialogView forwards them here.
 message IndexingProgressEvent {
-  uint64 indexed_file_count = 1;
-  uint64 total_file_count = 2;
-  string current_file = 3;
+  uint64 started_file_count = 1;
+  uint64 finished_file_count = 2;
+  uint64 total_file_count = 3;
+  repeated string source_paths = 4;
 }
 
 message IndexingFinishedEvent {
-  bool success = 1;
-  string project_path = 2;
+  uint64 indexed_file_count = 1;
+  uint64 total_indexed_file_count = 2;
+  uint64 completed_file_count = 3;
+  uint64 total_file_count = 4;
+  float time_seconds = 5;
+  uint64 error_total = 6;
+  uint64 error_fatal = 7;
+  bool interrupted = 8;
+  bool shallow = 9;
 }
 
 message IndexingErrorEvent {
@@ -358,4 +494,68 @@ message IndexingErrorEvent {
 message StatusInfoEvent {
   string message = 1;
   bool is_error = 2;
+}
+
+// DialogView::showUnknownProgressDialog / showProgressDialog / clearDialogs
+message UnknownProgressEvent {
+  string title = 1;
+  string message = 2;
+}
+message ProgressEvent {
+  string title = 1;
+  string message = 2;
+  uint64 progress = 3;
+}
+message ClearDialogsEvent {}
+
+message ErrorCountEvent {
+  uint64 total = 1;
+  uint64 fatal = 2;
+}
+
+// ---------- Bidirectional session -------------------------------------------
+
+// A question the engine needs the user to answer before it can continue.
+message DialogRequest {
+  uint64 request_id = 1;
+  oneof request {
+    ConfirmRequest confirm = 2;
+    FinishedIndexingRequest finished_indexing = 3;
+  }
+}
+
+message ConfirmRequest {
+  string message = 1;
+  // Button labels, in order; the response carries the selected index.
+  repeated string options = 2;
+}
+
+// DialogView::finishedIndexingDialog -- the answer decides whether the freshly built temporary
+// database replaces the project's database, so the engine cannot proceed without it.
+message FinishedIndexingRequest {
+  IndexingFinishedEvent summary = 1;
+}
+
+message DialogResponse {
+  uint64 request_id = 1;
+  // Index into ConfirmRequest.options, or the DatabasePolicy for a finished-indexing request.
+  int32 selected_option = 2;
+}
+
+message Hello {
+  string client_version = 1;
+}
+
+message ClientMessage {
+  oneof message {
+    Hello hello = 1;
+    DialogResponse dialog_response = 2;
+  }
+}
+
+message EngineMessage {
+  oneof message {
+    EngineEvent event = 1;
+    DialogRequest dialog_request = 2;
+  }
 }

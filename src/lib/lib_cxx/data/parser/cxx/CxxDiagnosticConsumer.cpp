@@ -9,34 +9,14 @@
 #include "utilityClang.h"
 #include "utilityString.h"
 
-CxxDiagnosticConsumer::CxxDiagnosticConsumer(clang::raw_ostream& os,
-                                             clang::DiagnosticOptions* diags,
-                                             std::shared_ptr<ParserClient> client,
+CxxDiagnosticConsumer::CxxDiagnosticConsumer(std::shared_ptr<ParserClient> client,
                                              std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache,
-                                             const FilePath& sourceFilePath,
-                                             bool useLogging)
-    : clang::TextDiagnosticPrinter(os, diags)
-    , m_client(client)
-    , m_canonicalFilePathCache(canonicalFilePathCache)
-    , m_sourceFilePath(sourceFilePath)
-    , m_useLogging(useLogging) {}
-
-void CxxDiagnosticConsumer::BeginSourceFile(const clang::LangOptions& langOptions, const clang::Preprocessor* preProcessor) {
-  if(m_useLogging) {
-    clang::TextDiagnosticPrinter::BeginSourceFile(langOptions, preProcessor);
-  }
-}
-
-void CxxDiagnosticConsumer::EndSourceFile() {
-  if(m_useLogging) {
-    clang::TextDiagnosticPrinter::EndSourceFile();
-  }
-}
+                                             const FilePath& sourceFilePath)
+    : m_client(client), m_canonicalFilePathCache(canonicalFilePathCache), m_sourceFilePath(sourceFilePath) {}
 
 void CxxDiagnosticConsumer::HandleDiagnostic(clang::DiagnosticsEngine::Level level, const clang::Diagnostic& info) {
-  if(m_useLogging) {
-    clang::TextDiagnosticPrinter::HandleDiagnostic(level, info);
-  }
+  // keeps the consumer's warning and error counters up to date
+  clang::DiagnosticConsumer::HandleDiagnostic(level, info);
 
   if(level >= clang::DiagnosticsEngine::Error) {
     llvm::SmallString<100> messageStr;

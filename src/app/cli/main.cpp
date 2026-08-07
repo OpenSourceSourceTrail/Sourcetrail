@@ -22,6 +22,7 @@
 #include "IndexerPluginRegistry.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
+#include "PlatformUserPaths.h"
 #include "productVersion.h"
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
@@ -56,40 +57,6 @@ void addLanguagePackages() {
   IndexerPluginRegistry::getInstance()->discover();
 }
 
-std::filesystem::path getExecutableDirectory() {
-#if defined(__linux__)
-  std::error_code errorCode;
-  auto path = std::filesystem::canonical("/proc/self/exe", errorCode);
-  if(!errorCode) {
-    return path.parent_path();
-  }
-#endif
-  return std::filesystem::current_path();
-}
-
-// Qt-free replacement for lib_gui's platform_includes setupApp()/setupPlatform().
-void setupPaths() {
-  const std::filesystem::path appPath = getExecutableDirectory();
-
-  AppPath::setSharedDataDirectoryPath(FilePath(appPath.wstring() + L"/"));
-  AppPath::setCxxIndexerDirectoryPath(FilePath(appPath.wstring() + L"/"));
-
-  // Check if bundled as Linux AppImage
-  if(const FilePath appImageShare = FilePath(appPath.wstring() + L"/../share/data"); appImageShare.exists()) {
-    AppPath::setSharedDataDirectoryPath(FilePath(appPath.wstring() + L"/../share").getAbsolute());
-  }
-
-  std::filesystem::path userDataPath;
-  if(const char* home = std::getenv("HOME"); home != nullptr) {
-    userDataPath = std::filesystem::path(home) / ".config/sourcetrail/";
-  }
-
-  UserPaths::setUserDataDirectoryPath(FilePath(userDataPath.wstring()));
-
-  std::error_code errorCode;
-  std::filesystem::create_directories(userDataPath, errorCode);
-}
-
 }    // namespace
 
 int main(int argc, char* argv[]) {
@@ -115,7 +82,7 @@ int main(int argc, char* argv[]) {
 
   IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
 
-  setupPaths();
+  platform_paths::setupPaths();
 
   auto factory = std::make_shared<lib::Factory>();
   Application::createInstance(version, factory, nullptr, nullptr);

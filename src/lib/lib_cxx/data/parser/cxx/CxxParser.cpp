@@ -2,7 +2,7 @@
 // clang
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
-#include <clang/Driver/Options.h>
+#include <clang/Options/Options.h>
 #include <clang/Frontend/CompilerInvocation.h>
 #include <clang/Tooling/Tooling.h>
 // llvm
@@ -136,7 +136,7 @@ void CxxParser::buildIndex(const std::wstring& fileName,
                            const std::vector<std::wstring>& compilerFlags) {
   auto canonicalFilePathCache = std::make_shared<CanonicalFilePathCache>(m_fileRegister);
 
-  auto diagnostics = getDiagnostics(FilePath(), canonicalFilePathCache, false);
+  auto diagnostics = getDiagnostics(FilePath(), canonicalFilePathCache);
   auto action = std::make_unique<ASTAction>(m_client, canonicalFilePathCache, m_indexerStateInfo);
 
   auto args = getCommandlineArgumentsEssential(compilerFlags);
@@ -150,9 +150,11 @@ void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabas
   clang::tooling::ClangTool tool(*pCompilationDatabase, std::vector<std::string>(1, utility::encodeToUtf8(sourceFilePath.wstr())));
 
   auto pCanonicalFilePathCache = std::make_shared<CanonicalFilePathCache>(m_fileRegister);
-  auto pDiagnostics = getDiagnostics(sourceFilePath, pCanonicalFilePathCache, true);
+  auto pDiagnostics = getDiagnostics(sourceFilePath, pCanonicalFilePathCache);
 
   tool.setDiagnosticConsumer(pDiagnostics.get());
+  // clang::tooling::ClangTool otherwise writes its own failure messages straight to stderr
+  tool.setPrintErrorMessage(false);
 
   ClangInvocationInfo info;
   info = ClangInvocationInfo::getClangInvocationString(pCompilationDatabase);
@@ -183,10 +185,7 @@ void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabas
   }
 }
 
-std::shared_ptr<CxxDiagnosticConsumer> CxxParser::getDiagnostics(const FilePath& sourceFilePath,
-                                                                 std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache,
-                                                                 bool logErrors) const {
-  llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> options = new clang::DiagnosticOptions();
-  return std::make_shared<CxxDiagnosticConsumer>(
-      llvm::errs(), &*options, m_client, std::move(canonicalFilePathCache), sourceFilePath, logErrors);
+std::shared_ptr<CxxDiagnosticConsumer> CxxParser::getDiagnostics(
+    const FilePath& sourceFilePath, std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache) const {
+  return std::make_shared<CxxDiagnosticConsumer>(m_client, std::move(canonicalFilePathCache), sourceFilePath);
 }

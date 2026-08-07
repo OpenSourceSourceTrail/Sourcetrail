@@ -90,11 +90,11 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
     clang::tooling::ClangTool tool(compilationDatabase, {utility::encodeToUtf8(pchInputFilePath.wstr())});
     auto* action = new GeneratePCHAction(client, canonicalFilePathCache);    // NOLINT(cppcoreguidelines-owning-memory)
 
-    const llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions> options =
-        new clang::DiagnosticOptions;    // NOLINT(cppcoreguidelines-owning-memory)
-    CxxDiagnosticConsumer diagnostics(llvm::errs(), &*options, client, canonicalFilePathCache, pchInputFilePath, true);
+    CxxDiagnosticConsumer diagnostics(client, canonicalFilePathCache, pchInputFilePath);
 
     tool.setDiagnosticConsumer(&diagnostics);
+    // clang::tooling::ClangTool otherwise writes its own failure messages straight to stderr
+    tool.setPrintErrorMessage(false);
     tool.clearArgumentsAdjusters();
     tool.run(new SingleFrontendActionFactory(action));    // NOLINT(cppcoreguidelines-owning-memory)
 

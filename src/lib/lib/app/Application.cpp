@@ -246,7 +246,10 @@ void Application::handleMessage(MessageCloseProject* /*pMessage*/) {
 
   mProject.reset();
   updateTitle();
-  mMainView->clear();
+  // mMainView is null in headless processes (engine/CLI), which pass no view factory.
+  if(mHasGui) {
+    mMainView->clear();
+  }
 }
 
 void Application::handleMessage(MessageIndexingFinished* /*pMessage*/) {

@@ -14,7 +14,7 @@
     <grpc.version>1.68.1</grpc.version>
     <protobuf.version>3.25.5</protobuf.version>
     <!-- The proto contracts shared with the C++ engine; single source of truth. -->
-    <proto.sourceDir>${project.basedir}/../../src/lib/proto</proto.sourceDir>
+    <proto.sourceDir>${project.basedir}/../../../src/lib/proto</proto.sourceDir>
   </properties>
 
   <dependencies>

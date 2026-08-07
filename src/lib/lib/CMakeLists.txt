@@ -13,6 +13,8 @@ target_sources(
   # }
   app/paths/AppPath.cpp
   app/paths/AppPath.h
+  app/paths/PlatformUserPaths.cpp
+  app/paths/PlatformUserPaths.h
   app/paths/ResourcePaths.cpp
   app/paths/ResourcePaths.h
   app/paths/UserPaths.cpp
@@ -169,21 +171,6 @@ target_sources(
   data/graph/Node.h
   data/graph/Token.cpp
   data/graph/Token.h
-  data/indexer/interprocess/shared_types/SharedIndexerCommand.cpp
-  data/indexer/interprocess/shared_types/SharedIndexerCommand.h
-  data/indexer/interprocess/shared_types/SharedIntermediateStorage.cpp
-  data/indexer/interprocess/shared_types/SharedIntermediateStorage.h
-  data/indexer/interprocess/shared_types/SharedStorageTypes.h
-  data/indexer/interprocess/BaseInterprocessDataManager.cpp
-  data/indexer/interprocess/BaseInterprocessDataManager.h
-  data/indexer/interprocess/InterprocessIndexer.cpp
-  data/indexer/interprocess/InterprocessIndexer.h
-  data/indexer/interprocess/InterprocessIndexerCommandManager.cpp
-  data/indexer/interprocess/InterprocessIndexerCommandManager.h
-  data/indexer/interprocess/InterprocessIndexingStatusManager.cpp
-  data/indexer/interprocess/InterprocessIndexingStatusManager.h
-  data/indexer/interprocess/InterprocessIntermediateStorageManager.cpp
-  data/indexer/interprocess/InterprocessIntermediateStorageManager.h
   data/indexer/grpc/GrpcIndexer.cpp
   data/indexer/grpc/GrpcIndexer.h
   data/indexer/grpc/IndexerWorkerServiceImpl.cpp
