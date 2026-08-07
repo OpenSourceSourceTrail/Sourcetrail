@@ -21,6 +21,10 @@ public:
   int getBundledEdgesCount() const;
   std::set<Id> getBundledEdgesIds() const;
 
+  // Per-id directions. getBundledEdgesIds() collapses these away and getDirection() derives a
+  // single value from them, so serialization needs this to reproduce the component faithfully.
+  const std::map<Id, Direction>& getBundledEdgesWithDirection() const;
+
   void addBundledEdgesId(Id id, bool forward);
   void removeBundledEdgesId(Id id);
 

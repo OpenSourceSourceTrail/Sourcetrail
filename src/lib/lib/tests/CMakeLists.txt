@@ -13,6 +13,8 @@ set(test_lib_names
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite
+    ConvertGraphTestSuite
+    ConvertLocationsTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
     GraphTestSuite

@@ -32,6 +32,10 @@ std::set<Id> TokenComponentBundledEdges::getBundledEdgesIds() const {
   return ids;
 }
 
+const std::map<Id, TokenComponentBundledEdges::Direction>& TokenComponentBundledEdges::getBundledEdgesWithDirection() const {
+  return m_ids;
+}
+
 void TokenComponentBundledEdges::addBundledEdgesId(Id id, bool forward) {
   m_ids.emplace(id, forward ? DIRECTION_FORWARD : DIRECTION_BACKWARD);
 

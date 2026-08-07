@@ -37,7 +37,14 @@ target_link_libraries(
          protobuf::libprotobuf)
 
 # Domain ↔ proto mapper library (depends on lib domain types declared later)
-add_library(Sourcetrail_proto_convert STATIC Convert.cpp Convert.h)
+add_library(
+  Sourcetrail_proto_convert STATIC
+  Convert.cpp
+  Convert.h
+  ConvertGraph.cpp
+  ConvertGraph.h
+  ConvertLocations.cpp
+  ConvertLocations.h)
 add_library(Sourcetrail::lib::proto::convert ALIAS Sourcetrail_proto_convert)
 
 target_include_directories(Sourcetrail_proto_convert PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
