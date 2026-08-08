@@ -11,7 +11,7 @@
 #include "FileSystem.h"
 #include "ProjectSettings.h"
 #include "SourceGroupSettingsCustomCommand.h"
-#include "SqliteIndexStorage.h"
+#include "StorageVersion.h"
 
 QtProjectWizardContentCustomCommand::QtProjectWizardContentCustomCommand(std::shared_ptr<SourceGroupSettingsCustomCommand> settings,
                                                                          QtProjectWizardWindow* window)
@@ -30,7 +30,7 @@ void QtProjectWizardContentCustomCommand::populate(QGridLayout* layout, int& row
                     "\"</li>"
                     "<li><b>%{DATABASE_VERSION}</b> - Database version used by this Sourcetrail version: "
                     "\"" +
-                    QString::number(SqliteIndexStorage::getStorageVersion()) +
+                    QString::number(kStorageVersion) +
                     "\"</li>"
                     "<li><b>%{PROJECT_FILE_PATH}</b> - Path to project file: \"" +
                     QString::fromStdWString(m_settings->getProjectSettings()->getProjectFilePath().wstr()) +

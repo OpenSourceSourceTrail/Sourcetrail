@@ -8,7 +8,7 @@
 #include "globalStrings.h"
 #include "QtDeviceScaledPixmap.h"
 #include "ResourcePaths.h"
-#include "SqliteIndexStorage.h"
+#include "StorageVersion.h"
 #include "utilityApp.h"
 #include "utilityQt.h"
 #include "Version.h"
@@ -49,7 +49,7 @@ void QtAbout::setupAbout() {
   }
 
   {
-    auto* dbVersionLabel = new QLabel{"Database Version " + QString::number(SqliteIndexStorage::getStorageVersion()), this};
+    auto* dbVersionLabel = new QLabel{"Database Version " + QString::number(kStorageVersion), this};
     windowLayout->addWidget(dbVersionLabel, 0, Qt::Alignment(Qt::AlignmentFlag::AlignHCenter));
   }
 

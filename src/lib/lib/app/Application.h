@@ -5,7 +5,7 @@
 
 #include "DialogView.h"
 #include "FilePath.h"
-#include "Project.h"
+#include "IProject.hpp"
 // messages
 #include "MessageListener.h"
 #include "type/bookmark/MessageBookmarkUpdate.hpp"

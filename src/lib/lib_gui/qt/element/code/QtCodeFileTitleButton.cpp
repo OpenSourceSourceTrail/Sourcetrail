@@ -6,7 +6,7 @@
 #include "ColorScheme.h"
 #include "FileSystem.h"
 #include "IApplicationSettings.hpp"
-#include "Project.h"
+#include "IProject.hpp"
 #include "QtContextMenu.h"
 #include "ResourcePaths.h"
 #include "type/code/MessageActivateFile.h"

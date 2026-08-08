@@ -1,7 +1,7 @@
 #include "UndoRedoController.h"
 
 #include "Application.h"
-#include "Project.h"
+#include "IProject.hpp"
 #include "StorageAccess.h"
 #include "type/MessageFlushUpdates.h"
 #include "type/search/MessageSearch.h"

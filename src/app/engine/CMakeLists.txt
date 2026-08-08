@@ -7,7 +7,7 @@ set_target_properties(Sourcetrail_engine PROPERTIES
 target_link_libraries(
   Sourcetrail_engine
   PRIVATE Sourcetrail::lib::core
-          Sourcetrail::lib::lib
+          Sourcetrail::lib::lib_engine
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::lib::proto::api
           Sourcetrail::lib::proto::convert

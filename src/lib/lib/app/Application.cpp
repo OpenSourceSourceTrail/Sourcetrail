@@ -9,7 +9,6 @@
 #include <spdlog/spdlog.h>
 
 #include "ColorScheme.h"
-#include "CppSQLite3.h"
 #include "DialogView.h"
 #include "filter_types/MessageFilterErrorCountUpdate.h"
 #include "filter_types/MessageFilterFocusInOut.h"
@@ -17,7 +16,7 @@
 #include "GraphViewStyle.h"
 #include "IApplicationSettings.hpp"
 #include "IDECommunicationController.h"
-#include "impls/Factory.hpp"
+#include "IFactory.hpp"
 #include "ISharedMemoryGarbageCollector.hpp"
 #include "logging.h"
 #include "MainView.h"
@@ -312,12 +311,6 @@ void Application::handleMessage(MessageLoadProject* message) {
       }
 
       updateTitle();
-    } catch(CppSQLite3Exception& cppSQLite3Exception) {
-      const auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with sqlite exception: {}",
-                                            projectSettingsFilePath.wstr(),
-                                            utility::decodeFromUtf8(cppSQLite3Exception.errorMessage()));
-      LOG_ERROR(errorMessage);
-      MessageStatus(errorMessage, true).dispatch();
     } catch(std::exception& exception) {
       const auto errorMessage = fmt::format(L"Failed to load project at \"{}\" with exception: {}",
                                             projectSettingsFilePath.wstr(),

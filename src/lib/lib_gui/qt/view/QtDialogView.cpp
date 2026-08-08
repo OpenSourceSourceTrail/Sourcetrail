@@ -9,7 +9,7 @@
 #include <QTimer>
 
 #include "../../../scheduling/TaskLambda.h"
-#include "Project.h"
+#include "IProject.hpp"
 #include "QtIndexingDialog.h"
 #include "QtIndexingProgressDialog.h"
 #include "QtIndexingReportDialog.h"
@@ -97,7 +97,7 @@ void QtDialogView::hideProgressDialog() {
   setParentWindow(nullptr);
 }
 
-void QtDialogView::startIndexingDialog(Project* project,
+void QtDialogView::startIndexingDialog(IProject* project,
                                        const std::vector<RefreshMode>& enabledModes,
                                        const RefreshMode initialMode,
                                        bool enabledShallowOption,

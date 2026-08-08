@@ -7,7 +7,7 @@
 #include "ErrorCountInfo.h"
 #include "RefreshInfo.h"
 
-class Project;
+struct IProject;
 class StorageAccess;
 
 enum DatabasePolicy { DATABASE_POLICY_KEEP, DATABASE_POLICY_DISCARD, DATABASE_POLICY_REFRESH, DATABASE_POLICY_UNKNOWN };
@@ -32,7 +32,7 @@ public:
   virtual void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress);
   virtual void hideProgressDialog();
 
-  virtual void startIndexingDialog(Project* project,
+  virtual void startIndexingDialog(IProject* project,
                                    const std::vector<RefreshMode>& enabledModes,
                                    const RefreshMode initialMode,
                                    bool enabledShallowOption,

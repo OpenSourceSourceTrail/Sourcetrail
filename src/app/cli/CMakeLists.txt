@@ -6,7 +6,7 @@ set_target_properties(Sourcetrail_cli PROPERTIES OUTPUT_NAME sourcetrail_cli RUN
 target_link_libraries(
   Sourcetrail_cli
   PRIVATE Sourcetrail::lib::core
-          Sourcetrail::lib::lib
+          Sourcetrail::lib::lib_engine
           Sourcetrail::lib::proto::convert
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::lib::messaging

@@ -5,7 +5,7 @@
 #include "Application.h"
 #include "DialogView.h"
 #include "IApplicationSettings.hpp"
-#include "Project.h"
+#include "IProject.hpp"
 #include "StorageAccess.h"
 #include "TabId.h"
 

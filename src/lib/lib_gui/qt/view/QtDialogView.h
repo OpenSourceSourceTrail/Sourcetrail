@@ -33,7 +33,7 @@ public:
   void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress) override;
   void hideProgressDialog() override;
 
-  void startIndexingDialog(Project* project,
+  void startIndexingDialog(IProject* project,
                            const std::vector<RefreshMode>& enabledModes,
                            const RefreshMode initialMode,
                            bool enabledShallowOption,

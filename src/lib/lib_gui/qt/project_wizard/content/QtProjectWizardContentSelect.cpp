@@ -16,7 +16,7 @@
 #include "QtFlowLayout.h"
 #include "QtProjectWizardWindow.h"
 #include "ResourcePaths.h"
-#include "SqliteIndexStorage.h"
+#include "StorageVersion.h"
 #include "utilityString.h"
 
 QtProjectWizardContentSelect::QtProjectWizardContentSelect(QtProjectWizardWindow* window) : QtProjectWizardContent(window) {}
@@ -91,7 +91,7 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
       "href=\"https://github.com/CoatiSoftware/SourcetrailDB\">SourcetrailDB</a> binaries that "
       "add "
       "custom language support to Sourcetrail.<br /><br />Current Database Version: " +
-      std::to_string(SqliteIndexStorage::getStorageVersion());
+      std::to_string(kStorageVersion);
 
   auto* vlayout = new QVBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   vlayout->setContentsMargins(0, 10, 0, 0);

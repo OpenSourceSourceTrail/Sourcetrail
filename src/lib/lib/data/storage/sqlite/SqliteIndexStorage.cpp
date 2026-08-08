@@ -6,10 +6,11 @@
 #include "logging.h"
 #include "SourceLocationCollection.h"
 #include "SourceLocationFile.h"
+#include "StorageVersion.h"
 #include "TextAccess.h"
 #include "utilityString.h"
 
-const size_t SqliteIndexStorage::sStorageVersion = 25;
+const size_t SqliteIndexStorage::sStorageVersion = kStorageVersion;
 
 namespace {
 std::pair<std::wstring, std::wstring> splitLocalSymbolName(const std::wstring& name) {

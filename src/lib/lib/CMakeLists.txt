@@ -8,8 +8,6 @@ target_sources(
   # Base Factory {
   factory/IFactory.hpp
   factory/IFactory.cpp
-  factory/impls/Factory.hpp
-  factory/impls/Factory.cpp
   # }
   app/paths/AppPath.cpp
   app/paths/AppPath.h
@@ -197,8 +195,6 @@ target_sources(
   data/indexer/MemoryIndexerCommandProvider.h
   data/indexer/TaskBuildIndex.cpp
   data/indexer/TaskBuildIndex.h
-  data/indexer/TaskExecuteCustomCommands.cpp
-  data/indexer/TaskExecuteCustomCommands.h
   data/indexer/TaskFillIndexerCommandQueue.cpp
   data/indexer/TaskFillIndexerCommandQueue.h
   data/location/LocationType.cpp
@@ -228,25 +224,10 @@ target_sources(
   data/parser/ReferenceKind.h
   data/parser/SymbolKind.cpp
   data/parser/SymbolKind.h
-  data/parser/TaskParseWrapper.cpp
-  data/parser/TaskParseWrapper.h
   data/search/SearchIndex.cpp
   data/search/SearchIndex.h
   data/search/SearchMatch.cpp
   data/search/SearchMatch.h
-  data/storage/migration/SqliteStorageMigration.cpp
-  data/storage/migration/SqliteStorageMigration.h
-  data/storage/migration/SqliteStorageMigrationLambda.cpp
-  data/storage/migration/SqliteStorageMigrationLambda.h
-  data/storage/migration/SqliteStorageMigrator.h
-  data/storage/sqlite/SqliteBookmarkStorage.cpp
-  data/storage/sqlite/SqliteBookmarkStorage.h
-  data/storage/sqlite/SqliteDatabaseIndex.cpp
-  data/storage/sqlite/SqliteDatabaseIndex.h
-  data/storage/sqlite/SqliteIndexStorage.cpp
-  data/storage/sqlite/SqliteIndexStorage.h
-  data/storage/sqlite/SqliteStorage.cpp
-  data/storage/sqlite/SqliteStorage.h
   data/storage/type/StorageBookmarkCategory.h
   data/storage/type/StorageBookmark.h
   data/storage/type/StorageBookmarkedEdge.h
@@ -263,8 +244,6 @@ target_sources(
   data/storage/type/StorageSymbol.h
   data/storage/IntermediateStorage.cpp
   data/storage/IntermediateStorage.h
-  data/storage/PersistentStorage.cpp
-  data/storage/PersistentStorage.h
   data/storage/Storage.cpp
   data/storage/Storage.h
   data/storage/StorageAccess.h
@@ -293,26 +272,13 @@ target_sources(
   data/NodeType.h
   data/NodeTypeSet.cpp
   data/NodeTypeSet.h
-  data/TaskCleanStorage.cpp
-  data/TaskCleanStorage.h
-  data/TaskFinishParsing.cpp
-  data/TaskFinishParsing.h
   data/TaskInjectStorage.cpp
   data/TaskInjectStorage.h
   data/TaskMergeStorages.cpp
   data/TaskMergeStorages.h
-  project/Project.cpp
-  project/Project.h
   project/IProject.cpp
   project/IProject.hpp
-  project/ITaskFactory.h
-  project/DefaultTaskFactory.cpp
-  project/DefaultTaskFactory.h
-  project/IndexTaskBuilder.cpp
-  project/IndexTaskBuilder.h
   project/RefreshInfo.h
-  project/RefreshInfoGenerator.h
-  project/RefreshInfoGenerator.cpp
   project/SourceGroup.cpp
   project/SourceGroup.h
   project/SourceGroupCustomCommand.cpp
@@ -449,7 +415,6 @@ target_link_libraries(
          Sourcetrail::lib::core::utility::file::FilePathFilter
          Sourcetrail::lib::core::utility::toUnderlying
          Sourcetrail::lib::scheduling
-         CppSQLite::CppSQLite3
          nonstd::expected-lite
   PRIVATE Sourcetrail::lib::core
           Sourcetrail::lib::core::utility::ConfigManager
@@ -463,16 +428,85 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::file::FileSystem
           Sourcetrail::lib::core::utility::file::utilityFile
           Sourcetrail::lib::core::utility::file::FileManager
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
           Boost::filesystem
           Boost::json
           Boost::program_options
           Boost::system
-          SQLite::SQLite3
           $<$<PLATFORM_ID:Windows>:bcrypt>)
 
 configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in"
                "${CMAKE_BINARY_DIR}/src/lib/lib/language_packages.h")
+
+# The engine-only half: everything that opens, migrates or drives the index database, plus the task
+# graph that fills it. Kept out of Sourcetrail_lib so the GUI physically cannot reach SQLite --
+# see the sqliteFreeGuiTestSuite check in tests/.
+add_library(Sourcetrail_lib_engine)
+add_library(Sourcetrail::lib::lib_engine ALIAS Sourcetrail_lib_engine)
+
+target_sources(
+  Sourcetrail_lib_engine
+  PRIVATE factory/impls/Factory.cpp
+          factory/impls/Factory.hpp
+          data/TaskCleanStorage.cpp
+          data/TaskCleanStorage.h
+          data/TaskFinishParsing.cpp
+          data/TaskFinishParsing.h
+          data/indexer/TaskExecuteCustomCommands.cpp
+          data/indexer/TaskExecuteCustomCommands.h
+          data/parser/TaskParseWrapper.cpp
+          data/parser/TaskParseWrapper.h
+          data/storage/PersistentStorage.cpp
+          data/storage/PersistentStorage.h
+          data/storage/migration/SqliteStorageMigration.cpp
+          data/storage/migration/SqliteStorageMigration.h
+          data/storage/migration/SqliteStorageMigrationLambda.cpp
+          data/storage/migration/SqliteStorageMigrationLambda.h
+          data/storage/migration/SqliteStorageMigrator.h
+          data/storage/sqlite/SqliteBookmarkStorage.cpp
+          data/storage/sqlite/SqliteBookmarkStorage.h
+          data/storage/sqlite/SqliteDatabaseIndex.cpp
+          data/storage/sqlite/SqliteDatabaseIndex.h
+          data/storage/sqlite/SqliteIndexStorage.cpp
+          data/storage/sqlite/SqliteIndexStorage.h
+          data/storage/sqlite/SqliteStorage.cpp
+          data/storage/sqlite/SqliteStorage.h
+          project/DefaultTaskFactory.cpp
+          project/DefaultTaskFactory.h
+          project/ITaskFactory.h
+          project/IndexTaskBuilder.cpp
+          project/IndexTaskBuilder.h
+          project/Project.cpp
+          project/Project.h
+          project/RefreshInfoGenerator.cpp
+          project/RefreshInfoGenerator.h)
+
+target_include_directories(
+  Sourcetrail_lib_engine
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/factory/impls
+         ${CMAKE_CURRENT_SOURCE_DIR}/data
+         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage
+         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/migration
+         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/sqlite
+         ${CMAKE_CURRENT_SOURCE_DIR}/project)
+
+target_link_libraries(
+  Sourcetrail_lib_engine
+  PUBLIC Sourcetrail::lib::lib
+         CppSQLite::CppSQLite3
+  PRIVATE Sourcetrail::lib::core
+          Sourcetrail::lib::core::utility::logging
+          Sourcetrail::lib::core::utility::ScopedFunctor
+          Sourcetrail::lib::core::utility::Status
+          Sourcetrail::lib::core::utility::TextAccess
+          Sourcetrail::lib::core::utility::TextCodec
+          Sourcetrail::lib::core::utility::utilityApp
+          Sourcetrail::lib::core::utility::file::FileSystem
+          Sourcetrail::lib::core::utility::file::utilityFile
+          Sourcetrail::lib::core::utility::file::FileManager
+          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
+          Boost::filesystem
+          Boost::system
+          SQLite::SQLite3)
 
 # Path detection utility (non-GUI)
 add_library(Sourcetrail_lib_path_detection)

@@ -5,7 +5,7 @@
 #include "ProjectSettings.h"
 #include "RefreshInfo.h"
 #include "SourceGroupSettingsCustomCommand.h"
-#include "SqliteIndexStorage.h"
+#include "StorageVersion.h"
 #include "utility.h"
 
 SourceGroupCustomCommand::SourceGroupCustomCommand(std::shared_ptr<SourceGroupSettingsCustomCommand> settings)
@@ -40,7 +40,7 @@ std::vector<std::shared_ptr<IndexerCommand>> SourceGroupCustomCommand::getIndexe
                                                                        std::vector<std::wstring>{},
                                                                        m_settings->getProjectSettings()->getProjectFilePath(),
                                                                        m_settings->getProjectSettings()->getTempDBFilePath(),
-                                                                       std::to_wstring(SqliteIndexStorage::getStorageVersion()),
+                                                                       std::to_wstring(kStorageVersion),
                                                                        sourcePath,
                                                                        runInParallel));
     }

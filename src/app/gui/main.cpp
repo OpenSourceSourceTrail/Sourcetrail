@@ -13,18 +13,19 @@
 #include "Application.h"
 #include "ApplicationSettings.h"
 #include "ApplicationSettingsPrefiller.h"
+#include "ClientFactory.h"
 #include "CommandLineParser.h"
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
-#include "impls/Factory.hpp"
 #include "includes.h"
-#include "IndexerPluginRegistry.h"
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
 #include "logging.h"
 #include "productVersion.h"
+#include "GrpcStorageAccess.h"
 #include "QtApplication.h"
 #include "QtCoreApplication.h"
+#include "QtEngineSupervisor.h"
 #include "QtNetworkFactory.h"
 #include "QtViewFactory.h"
 #include "ResourcePaths.h"
@@ -60,7 +61,20 @@ void addLanguagePackages() {
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
-  IndexerPluginRegistry::getInstance()->discover();
+}
+
+/**
+ * Starts the engine and returns the factory an Application needs to talk to it.
+ *
+ * The supervisor outlives the returned factory's use, so it is created by the caller; everything
+ * here is deliberately non-fatal -- if the engine never comes up the GUI still runs, showing empty
+ * views, which is the whole point of routing storage through GrpcStorageAccess.
+ */
+std::shared_ptr<lib::IFactory> startEngineAndMakeFactory(QtEngineSupervisor& supervisor,
+                                                         std::shared_ptr<GrpcStorageAccess>& storageAccess) {
+  supervisor.start();
+  storageAccess = std::make_shared<GrpcStorageAccess>(supervisor.getChannel());
+  return std::make_shared<client::ClientFactory>(supervisor.getChannel(), storageAccess);
 }
 
 void checkRunFromScript() {
@@ -81,8 +95,9 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
 
   setupApp(argc, argv);
 
-  auto factory = std::make_shared<lib::Factory>();
-  Application::createInstance(version, factory, nullptr, nullptr);
+  QtEngineSupervisor supervisor;
+  std::shared_ptr<GrpcStorageAccess> storageAccess;
+  Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), nullptr, nullptr);
   [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
@@ -136,8 +151,9 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   QtViewFactory viewFactory;
   QtNetworkFactory networkFactory;
 
-  auto factory = std::make_shared<lib::Factory>();
-  Application::createInstance(version, factory, &viewFactory, &networkFactory);
+  QtEngineSupervisor supervisor;
+  std::shared_ptr<GrpcStorageAccess> storageAccess;
+  Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), &viewFactory, &networkFactory);
   [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());

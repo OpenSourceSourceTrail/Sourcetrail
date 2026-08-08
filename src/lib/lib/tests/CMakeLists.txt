@@ -58,7 +58,7 @@ foreach(test_name IN LISTS test_lib_names)
     DEPS
     lib_test_utilities
     lib::mocks
-    Sourcetrail::lib::lib
+    Sourcetrail::lib::lib_engine
     Sourcetrail::gtest_main
     Sourcetrail::lib::core::utility::TextAccess
     Qt6::Gui

@@ -33,6 +33,7 @@ target_link_libraries(
   PUBLIC Sourcetrail::lib::core
          Sourcetrail::lib::lib
          Sourcetrail::lib::lib_gui
+         Sourcetrail::lib::client
          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
          Qt6::Widgets
          Qt6::Network
@@ -63,4 +64,16 @@ file(COPY ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico DESTINATION 
 
 if(WIN32 AND NOT ${SR_IS_CI})
   copy_qt_binaries("${CMAKE_BINARY_DIR}/app/" TRUE)
+endif()
+
+# The regression guard for the whole GUI <-> engine boundary: the GUI must reach the index database
+# only through gRPC. A single #include of a storage header re-links SQLite into this binary and is
+# otherwise invisible, so assert on the symbol table rather than on anyone's discipline.
+if((ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST) AND NOT WIN32)
+  find_program(NM_EXECUTABLE nm)
+  if(NM_EXECUTABLE)
+    add_test(NAME "guard.gui.linksNoSqlite"
+             COMMAND ${CMAKE_COMMAND} -DBINARY=$<TARGET_FILE:Sourcetrail> -DNM=${NM_EXECUTABLE} -P
+                     "${CMAKE_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
+  endif()
 endif()

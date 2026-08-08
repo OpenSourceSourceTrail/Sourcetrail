@@ -7,8 +7,13 @@ add_library(Sourcetrail::lib::client ALIAS Sourcetrail_client)
 
 target_sources(
   Sourcetrail_client
-  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.cpp
+  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.h
+          ${CMAKE_CURRENT_LIST_DIR}/EngineCall.h
+          ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.cpp
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.h
+          ${CMAKE_CURRENT_LIST_DIR}/GrpcProject.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/GrpcProject.h
           ${CMAKE_CURRENT_LIST_DIR}/GrpcStorageAccess.cpp
           ${CMAKE_CURRENT_LIST_DIR}/GrpcStorageAccess.h)
 
@@ -20,6 +25,7 @@ target_link_libraries(
          # EngineChannel.h exposes the stub, so its headers reach whoever includes it.
          Sourcetrail::lib::proto::api
          gRPC::grpc++
+         Sourcetrail::lib::messaging # ClientFactory hands out the concrete MessageQueue
   PRIVATE Sourcetrail::lib::proto::convert
           Sourcetrail::lib::core
           Sourcetrail::lib::core::utility::logging

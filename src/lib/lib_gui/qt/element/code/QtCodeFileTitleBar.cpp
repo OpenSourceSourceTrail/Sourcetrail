@@ -6,7 +6,7 @@
 #include <QVariant>
 
 #include "Application.h"
-#include "Project.h"
+#include "IProject.hpp"
 #include "QtIconStateButton.h"
 #include "QtSelfRefreshIconButton.h"
 #include "ResourcePaths.h"

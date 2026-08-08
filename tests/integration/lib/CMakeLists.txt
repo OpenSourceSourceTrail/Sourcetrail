@@ -29,6 +29,7 @@ foreach(test_name IN LISTS test_lib_names)
     Sourcetrail::lib::core::utility::file::utilityFile
     $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
     lib::mocks
+    Sourcetrail::lib::lib_engine
     Boost::date_time
     spdlog::spdlog
     TEST_PREFIX
