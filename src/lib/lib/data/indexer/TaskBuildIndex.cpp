@@ -21,7 +21,16 @@
 namespace {
 constexpr auto DelayTimeBeforeFinishUpdateInMs = 50;
 constexpr auto DelayTimeBeforeStartWorkInMs = 200;
+
+/** Below this, a non-zero exit means the worker never got going. */
+constexpr std::chrono::milliseconds CrashLoopThreshold{2000};
+/** Multiplied by the failure count, so the three attempts are spread over a few seconds. */
+constexpr std::chrono::milliseconds RespawnBackoff{500};
 }    // namespace
+
+bool TaskBuildIndex::isCrashLoopExit(int exitCode, std::chrono::milliseconds ranFor) {
+  return exitCode != 0 && ranFor < CrashLoopThreshold;
+}
 
 TaskBuildIndex::TaskBuildIndex(size_t processCount,
                                std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
@@ -77,13 +86,15 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
 }
 
 Task::TaskState TaskBuildIndex::doUpdate(std::shared_ptr<Blackboard> blackboard) {
+  // Read the stop flag before the thread count: a worker only exits normally once the flag is set, so
+  // this order makes "no workers left, flag still clear" mean they all died rather than a lost race.
+  blackboard->get<bool>("indexer_command_queue_stopped", mIndexerCommandQueueStopped);
+
   size_t runningThreadCount = 0;
   {
     const std::lock_guard<std::mutex> lock(mRunningThreadCountMutex);
     runningThreadCount = mRunningThreadCount;
   }
-
-  blackboard->get<bool>("indexer_command_queue_stopped", mIndexerCommandQueueStopped);
 
   // Update progress from gRPC service counts
   if(mIndexerWorkerService) {
@@ -109,6 +120,11 @@ Task::TaskState TaskBuildIndex::doUpdate(std::shared_ptr<Blackboard> blackboard)
     LOG_INFO("interrupted indexing.");
     blackboard->set("interrupted_indexing", true);
     return STATE_SUCCESS;
+  } else if(runningThreadCount == 0) {
+    // Every worker gave up while there was still work queued. Failing here is the whole point: the
+    // alternative is waiting forever for a queue nobody is draining.
+    LOG_ERROR("All indexer workers stopped before the command queue was drained.");
+    return STATE_FAILURE;
   }
 
   std::this_thread::sleep_for(std::chrono::milliseconds(DelayTimeBeforeFinishUpdateInMs));
@@ -187,22 +203,13 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
   FilePath indexerProcessPath;
   FilePath launcherPath;
   std::vector<std::wstring> launcherArgs;
-#if BUILD_CXX_LANGUAGE_PACKAGE
-  // The built-in C/C++ indexer ships a plugin manifest only to advertise its source group
-  // types to the wizard; its real location is layout-dependent (build vs install), so resolve
-  // it via AppPath rather than the manifest-relative path.
-  if(mCommandType == INDEXER_COMMAND_CXX) {
-    indexerProcessPath = AppPath::getCxxIndexerFilePath();
-  }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-  if(indexerProcessPath.empty()) {
-    if(std::optional<IndexerPluginRegistry::Plugin> plugin =
-           IndexerPluginRegistry::getInstance()->pluginFor(mCommandType);
-       plugin.has_value()) {
-      indexerProcessPath = plugin->indexerExecutablePath;
-      launcherPath = plugin->launcherPath;
-      launcherArgs = plugin->launcherArgs;
-    }
+  // Every indexer, including the built-in C/C++ one, is resolved through its manifest. That is what
+  // makes the plugin system real rather than cosmetic: one lookup path, no privileged indexer.
+  if(std::optional<IndexerPluginRegistry::Plugin> plugin = IndexerPluginRegistry::getInstance()->pluginFor(mCommandType);
+     plugin.has_value()) {
+    indexerProcessPath = plugin->indexerExecutablePath;
+    launcherPath = plugin->launcherPath;
+    launcherArgs = plugin->launcherArgs;
   }
   if(!indexerProcessPath.exists()) {
     mInterrupted = true;
@@ -228,9 +235,28 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
   const std::wstring processPath = launcherPath.empty() ? indexerProcessPath.wstr() : launcherPath.wstr();
 
   int result = 1;
+  int consecutiveFailures = 0;
   while((!mIndexerCommandQueueStopped || result != 0) && !mInterrupted) {
+    const auto startedAt = std::chrono::steady_clock::now();
     result = utility::executeProcess(processPath, commandArguments, FilePath(), false, -1).exitCode;
-    LOG_INFO(fmt::format("Indexer process {} returned with {}", processId, result));
+    const auto ranFor = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startedAt);
+    LOG_INFO(fmt::format("Indexer process {} returned with {} after {}ms", processId, result, ranFor.count()));
+
+    if(!isCrashLoopExit(result, ranFor)) {
+      consecutiveFailures = 0;
+      continue;
+    }
+
+    if(++consecutiveFailures >= MaxConsecutiveWorkerFailures) {
+      // Abandon this worker only. The others keep draining the queue, and if they all reach this point
+      // doUpdate fails the task instead of hanging.
+      LOG_ERROR(fmt::format("Indexer process {} died immediately {} times in a row; abandoning this worker. Indexer: {}",
+                            processId,
+                            consecutiveFailures,
+                            indexerProcessPath.str()));
+      break;
+    }
+    std::this_thread::sleep_for(RespawnBackoff * consecutiveFailures);
   }
 
   {

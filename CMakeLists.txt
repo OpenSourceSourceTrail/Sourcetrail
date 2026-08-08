@@ -265,6 +265,10 @@ install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIM
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/user/ DESTINATION ${INSTALL_RUNTIME_DIR}/user/)
 
+# Indexer plugin manifests. Without these the installed build discovers no indexer at all and comes up
+# read-only, so they ship next to the binaries the manifests point at.
+install(DIRECTORY ${CMAKE_BINARY_DIR}/app/plugins/ DESTINATION ${INSTALL_RUNTIME_DIR}/plugins/ OPTIONAL)
+
 # Install desktop file for application
 install(FILES "${CMAKE_SOURCE_DIR}/cmake/Sourcetrail.desktop" DESTINATION "${APPIMAGE_ROOT}/share/applications")
 

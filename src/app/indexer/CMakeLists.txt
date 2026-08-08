@@ -12,17 +12,13 @@ add_executable(Sourcetrail_indexer main.cpp)
 
 set_target_properties(Sourcetrail_indexer PROPERTIES OUTPUT_NAME sourcetrail_indexer)
 
-# Advertise the built-in C/C++ indexer as a discoverable plugin so the project wizard
-# offers the C/C++ source group types. The actual executable is resolved via
-# AppPath::getCxxIndexerFilePath(), so only the manifest is copied (not the binary).
+# Advertise the built-in C/C++ indexer as a discoverable plugin. The manifest is the only way its
+# executable is resolved -- no special case in TaskBuildIndex -- so indexerExecutable has to point at
+# the real binary, which sits two levels up from <plugins>/cxx/ in both the build and install layouts.
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   set(CXX_PLUGIN_DIR "${CMAKE_BINARY_DIR}/app/plugins/cxx")
-  add_custom_command(
-    TARGET Sourcetrail_indexer
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CXX_PLUGIN_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml" "${CXX_PLUGIN_DIR}/manifest.xml"
-    COMMENT "Copying built-in C/C++ indexer plugin manifest")
+  set(CXX_INDEXER_RELATIVE_PATH "../../sourcetrail_indexer${CMAKE_EXECUTABLE_SUFFIX}")
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml.in "${CXX_PLUGIN_DIR}/manifest.xml" @ONLY)
 endif()
 
 if(WIN32)

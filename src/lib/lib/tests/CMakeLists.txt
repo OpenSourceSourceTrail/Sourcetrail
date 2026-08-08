@@ -45,6 +45,7 @@ set(test_lib_names
     StatusControllerTestSuite
     TabIdTestSuite
     TabTestSuite
+    TaskBuildIndexTestSuite
     TimeStampTestSuite
     TreeTestSuite
     UserPathsTestSuite)

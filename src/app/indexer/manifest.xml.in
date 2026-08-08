@@ -9,5 +9,5 @@
     <source_group_type>C/C++ from Compilation Database</source_group_type>
     <source_group_type>C/C++ from Visual Studio</source_group_type>
   </source_group_types>
-  <indexerExecutable>sourcetrail_indexer</indexerExecutable>
+  <indexerExecutable>@CXX_INDEXER_RELATIVE_PATH@</indexerExecutable>
 </config>

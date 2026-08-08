@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <thread>
@@ -27,6 +28,17 @@ public:
                  std::string appUUID,
                  bool multiProcessIndexing,
                  IndexerCommandType commandType);
+
+  /**
+   * Does this exit look like a worker that died on startup rather than one that finished a batch?
+   *
+   * A worker that pulls no work and exits non-zero within a moment is not making progress, so
+   * respawning it immediately is a busy loop. A slow non-zero exit did real work first and is retried.
+   */
+  [[nodiscard]] static bool isCrashLoopExit(int exitCode, std::chrono::milliseconds ranFor);
+
+  /** Consecutive crash-loop exits after which a worker is abandoned. */
+  static constexpr int MaxConsecutiveWorkerFailures = 3;
 
 protected:
   void doEnter(std::shared_ptr<Blackboard> blackboard) override;
