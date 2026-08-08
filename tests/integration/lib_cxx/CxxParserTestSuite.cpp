@@ -2339,7 +2339,10 @@ TEST_F(CxxParserTestSuite, FindsUseOfDependentTemplateSpecializationType) {
       "};\n"
       "B<bool>::type f = 0.0f;\n");
 
-  EXPECT_THAT(client->typeUses, testing::Contains(L"B<typename U>::type -> A<typename T>::type<float> <12:10 12:17>"));
+  // Clang 21 removed ElaboratedType: the reference is now located at the `type` name token (12:34)
+  // instead of the `typename` keyword that used to start the elaborated type loc, and the alias
+  // template is resolved at the instantiation rather than left dependent on the pattern.
+  EXPECT_THAT(client->typeUses, testing::Contains(L"B<bool>::type -> A<bool>::type<float> <12:34 12:37>"));
   EXPECT_THAT(client->typeUses, testing::Contains(L"B<bool>::type f -> B<bool>::type <14:10 14:13>"));
 }
 

@@ -61,10 +61,11 @@ void CxxAstVisitorComponentIndexer::beginTraverseNestedNameSpecifierLoc(const cl
       if(symbolKind != SYMBOL_KIND_MAX) {
         const Id symbolId = getOrCreateSymbolId(recordDecl);
         m_client->recordSymbolKind(symbolId, symbolKind);
-        m_client->recordLocation(symbolId, getParseLocation(loc.getLocalBeginLoc()), ParseLocationType::QUALIFIER);
+        m_client->recordLocation(
+            symbolId, getParseLocation(utility::getTypeNameLoc(loc.castAsTypeLoc())), ParseLocationType::QUALIFIER);
       }
     } else if(const clang::Type* type = nestedNameSpecifier.getAsType()) {
-      const ParseLocation parseLocation = getParseLocation(loc.getLocalBeginLoc());
+      const ParseLocation parseLocation = getParseLocation(utility::getTypeNameLoc(loc.castAsTypeLoc()));
 
       if(const clang::TemplateTypeParmType* tpt = clang::dyn_cast_or_null<clang::TemplateTypeParmType>(type)) {
         clang::TemplateTypeParmDecl* d = tpt->getDecl();
@@ -469,15 +470,7 @@ void CxxAstVisitorComponentIndexer::visitTypeLoc(clang::TypeLoc tl) {
         m_client->recordDefinitionKind(symbolId, DEFINITION_EXPLICIT);
       }
 
-      clang::SourceLocation loc;
-      if(!tl.getAs<clang::DependentNameTypeLoc>().isNull()) {
-        const clang::DependentNameTypeLoc& dntl = tl.castAs<clang::DependentNameTypeLoc>();
-        loc = dntl.getNameLoc();
-      } else {
-        loc = tl.getBeginLoc();
-      }
-
-      const ParseLocation parseLocation = getParseLocation(loc);
+      const ParseLocation parseLocation = getParseLocation(utility::getTypeNameLoc(tl));
 
       m_client->recordReference(getAstVisitor()->getComponent<CxxAstVisitorComponentTypeRefKind>()->isTraversingInheritance() ?
                                     REFERENCE_INHERITANCE :

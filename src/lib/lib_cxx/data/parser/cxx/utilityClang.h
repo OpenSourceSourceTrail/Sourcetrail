@@ -14,9 +14,20 @@ namespace clang {
 class SourceRange;
 class Preprocessor;
 class SourceManager;
+class TypeLoc;
 }    // namespace clang
 
 namespace utility {
+/**
+ * Location of a TypeLoc's own name token, excluding any nested-name-specifier.
+ *
+ * Clang 21 removed ElaboratedType and folded the qualifier into the concrete TypeLocs, so for
+ * `test::TestStruct` TypeLoc::getBeginLoc() now points at `test` rather than at `TestStruct`.
+ * Sourcetrail records the name token, so it has to ask for it explicitly. Falls back to
+ * getBeginLoc() for TypeLocs that carry no separate name location (builtins, pointers, ...).
+ */
+clang::SourceLocation getTypeNameLoc(clang::TypeLoc typeLoc);
+
 template <typename T>
 const T* getFirstDecl(const T* decl);
 bool isImplicit(const clang::Decl* d);

@@ -3,6 +3,7 @@
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
 #include <clang/AST/DeclTemplate.h>
+#include <clang/AST/TypeLoc.h>
 #include <clang/Basic/FileManager.h>
 #include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
@@ -11,6 +12,37 @@
 #include "FilePath.h"
 #include "ParseLocation.h"
 #include "utilityString.h"
+
+clang::SourceLocation utility::getTypeNameLoc(clang::TypeLoc typeLoc) {
+  if(typeLoc.isNull()) {
+    return {};
+  }
+
+  // TagTypeLoc covers RecordTypeLoc and EnumTypeLoc; ElaboratedNameTypeLoc covers TypedefTypeLoc,
+  // UsingTypeLoc and UnresolvedUsingTypeLoc. Each of these gained a qualifier in Clang 21.
+  if(const auto tagLoc = typeLoc.getAs<clang::TagTypeLoc>(); !tagLoc.isNull()) {
+    return tagLoc.getNameLoc();
+  }
+  if(const auto typedefLoc = typeLoc.getAs<clang::TypedefTypeLoc>(); !typedefLoc.isNull()) {
+    return typedefLoc.getNameLoc();
+  }
+  if(const auto usingLoc = typeLoc.getAs<clang::UsingTypeLoc>(); !usingLoc.isNull()) {
+    return usingLoc.getNameLoc();
+  }
+  if(const auto unresolvedUsingLoc = typeLoc.getAs<clang::UnresolvedUsingTypeLoc>(); !unresolvedUsingLoc.isNull()) {
+    return unresolvedUsingLoc.getNameLoc();
+  }
+  if(const auto injectedLoc = typeLoc.getAs<clang::InjectedClassNameTypeLoc>(); !injectedLoc.isNull()) {
+    return injectedLoc.getNameLoc();
+  }
+  if(const auto dependentLoc = typeLoc.getAs<clang::DependentNameTypeLoc>(); !dependentLoc.isNull()) {
+    return dependentLoc.getNameLoc();
+  }
+  if(const auto specLoc = typeLoc.getAs<clang::TemplateSpecializationTypeLoc>(); !specLoc.isNull()) {
+    return specLoc.getTemplateNameLoc();
+  }
+  return typeLoc.getBeginLoc();
+}
 
 bool utility::isImplicit(const clang::Decl* d) {
   if(!d) {

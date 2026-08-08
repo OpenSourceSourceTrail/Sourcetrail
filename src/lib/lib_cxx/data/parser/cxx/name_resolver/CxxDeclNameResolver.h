@@ -2,11 +2,13 @@
 #define CXX_DECL_NAME_RESOLVER_H
 
 #include <clang/AST/DeclTemplate.h>
+#include <clang/AST/Expr.h>
 
 #include "CxxDeclName.h"
 #include "CxxNameResolver.h"
 #include "CxxTypeName.h"
 #include "CxxTypeNameResolver.h"
+#include "utilityString.h"
 
 class CanonicalFilePathCache;
 
@@ -67,6 +69,28 @@ std::vector<std::wstring> CxxDeclNameResolver::getTemplateParameterStringsOfPart
             // class, or depends on first template parameter.
             templateParameterNames.push_back(L"arg" + std::to_wstring(decl->getDepth()) + L"_" + std::to_wstring(decl->getIndex()));
           }
+        } else {
+          templateParameterNames.push_back(getTemplateArgumentName(templateArgument));
+        }
+      } else if(argKind == clang::TemplateArgument::Expression) {
+        // A non-type template parameter used as an argument, e.g. the `q` of `class A<&g_p, q>`.
+        // Clang 21 canonicalizes these, so printing the argument yields "value-parameter-0-0"
+        // rather than the written name; recover it from the parameter list as above.
+        const clang::NonTypeTemplateParmDecl* decl = nullptr;
+        if(const clang::Expr* expr = templateArgument.getAsExpr()) {
+          if(const auto* declRef = clang::dyn_cast<clang::DeclRefExpr>(expr->IgnoreParenImpCasts())) {
+            decl = clang::dyn_cast<clang::NonTypeTemplateParmDecl>(declRef->getDecl());
+          }
+        }
+
+        // Only the written name, not the full parameter string the type/template branches use above:
+        // `class A<&g_p, q>` names its second argument `q`, not `P * q`.
+        if(decl != nullptr && decl->getDepth() == parameterList->getDepth() && !decl->getName().empty()) {
+          templateParameterNames.push_back(utility::decodeFromUtf8(parameterList->getParam(decl->getIndex())->getName().str()));
+        } else if(decl != nullptr && decl->getDepth() != parameterList->getDepth()) {
+          // TODO: fix case when arg depends on template parameter of outer template
+          // class, or depends on first template parameter.
+          templateParameterNames.push_back(L"arg" + std::to_wstring(decl->getDepth()) + L"_" + std::to_wstring(decl->getIndex()));
         } else {
           templateParameterNames.push_back(getTemplateArgumentName(templateArgument));
         }
