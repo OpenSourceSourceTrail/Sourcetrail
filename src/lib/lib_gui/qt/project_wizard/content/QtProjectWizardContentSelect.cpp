@@ -11,7 +11,7 @@
 #include <QVariant>
 
 #include "globalStrings.h"
-#include "IndexerPluginRegistry.h"
+#include "Capabilities.h"
 #include "LanguageType.h"
 #include "QtFlowLayout.h"
 #include "QtProjectWizardWindow.h"
@@ -28,31 +28,34 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
     const bool recommended;
   };
 
-  // define which kind of source groups are available for each language, gated by which
-  // indexer plugins are currently discovered
-  const IndexerPluginRegistry::Ptr pluginRegistry = IndexerPluginRegistry::getInstance();
+  // define which kind of source groups are available for each language, gated by what the engine
+  // reports it can index -- the plugin directory belongs to the engine, not to this process
+  const client::Capabilities& capabilities = client::Capabilities::instance();
   std::map<LanguageType, std::vector<SourceGroupInfo>> sourceGroupInfos;
 #if BUILD_CXX_LANGUAGE_PACKAGE
-  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_CXX_CDB)) {
+  if(capabilities.supportsSourceGroupType(SOURCE_GROUP_CXX_CDB)) {
     sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_CDB, true);
     sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_CDB, true);
   }
-  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_CXX_VS)) {
+  if(capabilities.supportsSourceGroupType(SOURCE_GROUP_CXX_VS)) {
     sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_VS);
     sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_VS);
   }
-  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_C_EMPTY)) {
+  if(capabilities.supportsSourceGroupType(SOURCE_GROUP_C_EMPTY)) {
     sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_C_EMPTY);
   }
-  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_CPP_EMPTY)) {
+  if(capabilities.supportsSourceGroupType(SOURCE_GROUP_CPP_EMPTY)) {
     sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CPP_EMPTY);
   }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
-  if(pluginRegistry->supportsSourceGroupType(SOURCE_GROUP_JAVA_EMPTY)) {
+  if(capabilities.supportsSourceGroupType(SOURCE_GROUP_JAVA_EMPTY)) {
     sourceGroupInfos[LANGUAGE_JAVA].emplace_back(SOURCE_GROUP_JAVA_EMPTY, true);
   }
-  // Custom Command source group is always available, independent of discovered plugins
-  sourceGroupInfos[LANGUAGE_CUSTOM].emplace_back(SOURCE_GROUP_CUSTOM_COMMAND);
+  // Custom Command needs no indexer binary, so the engine reports it even on a bare install -- but
+  // with no engine there is nothing to run it either, hence the same gate as everything else.
+  if(capabilities.supportsSourceGroupType(SOURCE_GROUP_CUSTOM_COMMAND)) {
+    sourceGroupInfos[LANGUAGE_CUSTOM].emplace_back(SOURCE_GROUP_CUSTOM_COMMAND);
+  }
 
   // define which icons should be used for which kind of source group
 #if BUILD_CXX_LANGUAGE_PACKAGE

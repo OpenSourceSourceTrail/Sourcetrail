@@ -30,6 +30,11 @@ public:
                                    const sourcetrail::IndexingInterruptedRequest* req,
                                    sourcetrail::IndexingInterruptedResponse* resp) override;
 
+  /** What this engine can index, so a client never has to look at the plugin directory itself. */
+  grpc::Status GetCapabilities(grpc::ServerContext* ctx,
+                               const sourcetrail::EmptyRequest* req,
+                               sourcetrail::CapabilitiesResponse* resp) override;
+
   // Bookmark mutations
   grpc::Status AddNodeBookmark(grpc::ServerContext* ctx,
                                const sourcetrail::AddNodeBookmarkRequest* req,

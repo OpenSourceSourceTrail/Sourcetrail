@@ -49,6 +49,7 @@
 #include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageCloseProject.h"
 #include "type/MessageLoadProject.h"
+#include "Capabilities.h"
 #include "type/MessageRefresh.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageResetZoom.h"
@@ -597,7 +598,18 @@ void QtMainWindow::handleMessage(MessageRefreshUI* /*message*/) {
 }
 
 void QtMainWindow::updateRefreshActionsEnabled() {
-  const bool reindexable = Application::getInstance()->isCurrentProjectReindexable();
+  // Without an engine nothing can be indexed, which leaves browsing an existing database as the only
+  // thing that still works -- so everything that would start indexing goes dead, and nothing else.
+  const bool canIndex = client::Capabilities::instance().canCreateProject();
+  if(m_newProjectAction != nullptr) {
+    m_newProjectAction->setEnabled(canIndex);
+    m_newProjectAction->setToolTip(canIndex ? QString{} : tr("No indexer available: the engine is not running."));
+  }
+  if(m_editProjectAction != nullptr) {
+    m_editProjectAction->setEnabled(canIndex);
+  }
+
+  const bool reindexable = canIndex && Application::getInstance()->isCurrentProjectReindexable();
   if(m_refreshAction != nullptr) {
     m_refreshAction->setEnabled(reindexable);
   }
@@ -716,10 +728,10 @@ void QtMainWindow::setupProjectMenu() {
   menuBar()->addMenu(menu);
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
-  menu->addAction(tr("&New Project..."), QKeySequence::New, this, &QtMainWindow::newProject);
+  m_newProjectAction = menu->addAction(tr("&New Project..."), QKeySequence::New, this, &QtMainWindow::newProject);
   menu->addAction(tr("&Open Project..."), QKeySequence::Open, this, &QtMainWindow::openProject);
 #else
-  menu->addAction(tr("&New Project..."), this, &QtMainWindow::newProject, QKeySequence::New);
+  m_newProjectAction = menu->addAction(tr("&New Project..."), this, &QtMainWindow::newProject, QKeySequence::New);
   menu->addAction(tr("&Open Project..."), this, &QtMainWindow::openProject, QKeySequence::Open);
 #endif
 
@@ -729,7 +741,8 @@ void QtMainWindow::setupProjectMenu() {
 
   menu->addSeparator();
 
-  menu->addAction(tr("&Edit Project..."), this, &QtMainWindow::editProject);
+  m_editProjectAction = menu->addAction(tr("&Edit Project..."), this, &QtMainWindow::editProject);
+  updateRefreshActionsEnabled();
   menu->addSeparator();
 
   menu->addAction(tr("Close Project"), this, &QtMainWindow::closeProject);

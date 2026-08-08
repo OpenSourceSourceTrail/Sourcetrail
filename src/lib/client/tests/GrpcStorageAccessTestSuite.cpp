@@ -6,6 +6,7 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "Capabilities.h"
 #include "EngineChannel.h"
 #include "EngineServiceImpl.h"
 #include "GrpcStorageAccess.h"
@@ -241,4 +242,23 @@ TEST_F(GrpcStorageAccessFix, channelIsMarkedDegradedOnFailureAndReportsIt) {
   EXPECT_FALSE(mChannel->isConnected());
   EXPECT_FALSE(connected);
   EXPECT_EQ(transitions, 1);
+}
+
+TEST_F(GrpcStorageAccessFix, capabilitiesAreServedAndGoEmptyWithoutAnEngine) {
+  client::Capabilities& capabilities = client::Capabilities::instance();
+  capabilities.setChannel(mChannel.get());
+
+  // No plugin is discovered in this fixture, which is precisely the bare-install case: Custom Command
+  // still works because the user supplies the command line, so a project can still be created.
+  EXPECT_TRUE(capabilities.supportsSourceGroupType(SOURCE_GROUP_CUSTOM_COMMAND));
+  EXPECT_TRUE(capabilities.canCreateProject());
+
+  stopServer();
+  capabilities.invalidate();
+
+  // Read-only mode: no engine, no capabilities, and no crash.
+  EXPECT_FALSE(capabilities.canCreateProject());
+  EXPECT_FALSE(capabilities.supportsSourceGroupType(SOURCE_GROUP_CUSTOM_COMMAND));
+
+  capabilities.setChannel(nullptr);
 }

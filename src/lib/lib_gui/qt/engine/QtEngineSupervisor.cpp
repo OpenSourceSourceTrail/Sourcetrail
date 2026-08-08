@@ -9,6 +9,7 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "Capabilities.h"
 #include "EngineChannel.h"
 #include "logging.h"
 #include "type/MessageStatus.h"
@@ -119,6 +120,8 @@ void QtEngineSupervisor::readStdout() {
     // rather than on spawn -- otherwise a binary that crashes right after listening restarts forever.
     mAttempt = 0;
     mChannel->reconnect("127.0.0.1:" + std::to_string(port));
+    // Also drops the cached capabilities: a restarted engine may have a different plugin set.
+    client::Capabilities::instance().setChannel(mChannel.get());
     status(L"Engine connected");
     Q_EMIT engineConnected();
   }

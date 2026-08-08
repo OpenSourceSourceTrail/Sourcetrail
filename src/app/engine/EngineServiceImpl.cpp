@@ -10,6 +10,7 @@
 #include "ErrorInfo.h"
 #include "FileInfo.h"
 #include "FilePath.h"
+#include "IndexerPluginRegistry.h"
 #include "logging.h"
 #include "NameHierarchy.h"
 #include "NodeBookmark.h"
@@ -26,6 +27,7 @@
 #include "type/MessageLoadProject.h"
 #include "type/MessageRefresh.h"
 #include "utilityString.h"
+#include "Version.h"
 
 EngineServiceImpl::EngineServiceImpl(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 
@@ -53,6 +55,38 @@ grpc::Status EngineServiceImpl::IndexingInterrupted(grpc::ServerContext* /*ctx*/
                                                     const sourcetrail::IndexingInterruptedRequest* /*req*/,
                                                     sourcetrail::IndexingInterruptedResponse* /*resp*/) {
   MessageIndexingInterrupted{}.dispatch();
+  return grpc::Status::OK;
+}
+
+grpc::Status EngineServiceImpl::GetCapabilities(grpc::ServerContext* /*ctx*/,
+                                                const sourcetrail::EmptyRequest* /*req*/,
+                                                sourcetrail::CapabilitiesResponse* resp) {
+  const IndexerPluginRegistry::Ptr registry = IndexerPluginRegistry::getInstance();
+
+  for(const IndexerPluginRegistry::Plugin& plugin : registry->getPlugins()) {
+    sourcetrail::PluginInfo* info = resp->add_plugins();
+    info->set_id(plugin.id);
+    info->set_name(plugin.name);
+    info->set_language(plugin.language);
+    info->set_command_type(plugin.commandType);
+    for(const SourceGroupType type : plugin.sourceGroupTypes) {
+      info->add_source_group_types(type);
+    }
+    resp->add_supported_languages(plugin.language);
+  }
+
+  for(const SourceGroupType type : registry->availableSourceGroupTypes()) {
+    resp->add_supported_source_group_types(type);
+  }
+
+  // Custom Command is supported with no plugin installed at all: the user supplies the command line,
+  // so the engine only has to run it. This is why can_create_project stays true on a bare install --
+  // the client goes read-only when the engine is *unreachable*, not when it is empty.
+  resp->add_supported_source_group_types(SOURCE_GROUP_CUSTOM_COMMAND);
+  resp->add_supported_languages(LANGUAGE_CUSTOM);
+
+  resp->set_can_create_project(resp->supported_source_group_types_size() > 0);
+  resp->set_engine_version(Version::getApplicationVersion().toString());
   return grpc::Status::OK;
 }
 

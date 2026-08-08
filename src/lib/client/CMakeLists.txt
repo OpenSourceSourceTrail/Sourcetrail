@@ -7,7 +7,9 @@ add_library(Sourcetrail::lib::client ALIAS Sourcetrail_client)
 
 target_sources(
   Sourcetrail_client
-  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.cpp
+  PRIVATE ${CMAKE_CURRENT_LIST_DIR}/Capabilities.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/Capabilities.h
+          ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.cpp
           ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineCall.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.cpp

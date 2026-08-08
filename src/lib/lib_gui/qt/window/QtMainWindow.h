@@ -200,6 +200,8 @@ private:
 
   QAction* m_showTitleBarsAction;
 
+  QAction* m_newProjectAction = nullptr;
+  QAction* m_editProjectAction = nullptr;
   QAction* m_refreshAction = nullptr;
   QAction* m_forceRefreshAction = nullptr;
 
