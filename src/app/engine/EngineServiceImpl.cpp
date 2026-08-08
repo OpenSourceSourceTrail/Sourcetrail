@@ -2,13 +2,26 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "ConvertGraph.h"
+#include "ConvertLocations.h"
+#include "ConvertQuery.h"
+#include "EdgeBookmark.h"
+#include "ErrorFilter.h"
+#include "ErrorInfo.h"
+#include "FileInfo.h"
 #include "FilePath.h"
+#include "logging.h"
 #include "NameHierarchy.h"
+#include "NodeBookmark.h"
 #include "NodeKind.h"
 #include "NodeType.h"
+#include "NodeTypeSet.h"
+#include "SearchMatch.h"
+#include "SourceLocationCollection.h"
+#include "SourceLocationFile.h"
 #include "StorageAccess.h"
 #include "TextAccess.h"
-#include "logging.h"
+#include "TooltipInfo.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageRefresh.h"
@@ -19,15 +32,15 @@ EngineServiceImpl::EngineServiceImpl(StorageAccess* storageAccess) : mStorageAcc
 // ---- Lifecycle -------------------------------------------------------------
 
 grpc::Status EngineServiceImpl::LoadProject(grpc::ServerContext* /*ctx*/,
-                                             const sourcetrail::LoadProjectRequest* req,
-                                             sourcetrail::LoadProjectResponse* /*resp*/) {
+                                            const sourcetrail::LoadProjectRequest* req,
+                                            sourcetrail::LoadProjectResponse* /*resp*/) {
   MessageLoadProject{FilePath(utility::decodeFromUtf8(req->project_file_path())), false}.dispatch();
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::Refresh(grpc::ServerContext* /*ctx*/,
-                                         const sourcetrail::RefreshRequest* req,
-                                         sourcetrail::RefreshResponse* /*resp*/) {
+                                        const sourcetrail::RefreshRequest* req,
+                                        sourcetrail::RefreshResponse* /*resp*/) {
   MessageRefresh msg;
   if(req->all()) {
     msg.refreshAll();
@@ -37,8 +50,8 @@ grpc::Status EngineServiceImpl::Refresh(grpc::ServerContext* /*ctx*/,
 }
 
 grpc::Status EngineServiceImpl::IndexingInterrupted(grpc::ServerContext* /*ctx*/,
-                                                     const sourcetrail::IndexingInterruptedRequest* /*req*/,
-                                                     sourcetrail::IndexingInterruptedResponse* /*resp*/) {
+                                                    const sourcetrail::IndexingInterruptedRequest* /*req*/,
+                                                    sourcetrail::IndexingInterruptedResponse* /*resp*/) {
   MessageIndexingInterrupted{}.dispatch();
   return grpc::Status::OK;
 }
@@ -48,8 +61,8 @@ void EngineServiceImpl::setShutdownHandler(std::function<void()> handler) {
 }
 
 grpc::Status EngineServiceImpl::Shutdown(grpc::ServerContext* /*ctx*/,
-                                          const sourcetrail::EmptyRequest* /*req*/,
-                                          sourcetrail::EmptyResponse* /*resp*/) {
+                                         const sourcetrail::EmptyRequest* /*req*/,
+                                         sourcetrail::EmptyResponse* /*resp*/) {
   if(mShutdownHandler) {
     mShutdownHandler();
   }
@@ -59,45 +72,54 @@ grpc::Status EngineServiceImpl::Shutdown(grpc::ServerContext* /*ctx*/,
 // ---- Bookmark mutations ----------------------------------------------------
 
 grpc::Status EngineServiceImpl::AddNodeBookmark(grpc::ServerContext* /*ctx*/,
-                                                 const sourcetrail::AddNodeBookmarkRequest* /*req*/,
-                                                 sourcetrail::BookmarkIdResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                const sourcetrail::AddNodeBookmarkRequest* req,
+                                                sourcetrail::BookmarkIdResponse* resp) {
+  sourcetrail::ProtoNodeBookmark msg;
+  *msg.mutable_base() = req->base();
+  *msg.mutable_node_ids() = req->node_ids();
+  resp->set_id(mStorageAccess->addNodeBookmark(proto::convert::fromProto(msg)));
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::AddEdgeBookmark(grpc::ServerContext* /*ctx*/,
-                                                 const sourcetrail::AddEdgeBookmarkRequest* /*req*/,
-                                                 sourcetrail::BookmarkIdResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                const sourcetrail::AddEdgeBookmarkRequest* req,
+                                                sourcetrail::BookmarkIdResponse* resp) {
+  sourcetrail::ProtoEdgeBookmark msg;
+  *msg.mutable_base() = req->base();
+  *msg.mutable_edge_ids() = req->edge_ids();
+  msg.set_active_node_id(req->active_node_id());
+  resp->set_id(mStorageAccess->addEdgeBookmark(proto::convert::fromProto(msg)));
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::AddBookmarkCategory(grpc::ServerContext* /*ctx*/,
-                                                     const sourcetrail::AddBookmarkCategoryRequest* req,
-                                                     sourcetrail::BookmarkIdResponse* resp) {
+                                                    const sourcetrail::AddBookmarkCategoryRequest* req,
+                                                    sourcetrail::BookmarkIdResponse* resp) {
   const Id id = mStorageAccess->addBookmarkCategory(utility::decodeFromUtf8(req->name()));
   resp->set_id(id);
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::UpdateBookmark(grpc::ServerContext* /*ctx*/,
-                                                const sourcetrail::UpdateBookmarkRequest* req,
-                                                sourcetrail::EmptyResponse* /*resp*/) {
+                                               const sourcetrail::UpdateBookmarkRequest* req,
+                                               sourcetrail::EmptyResponse* /*resp*/) {
   mStorageAccess->updateBookmark(static_cast<Id>(req->bookmark_id()),
-                                  utility::decodeFromUtf8(req->name()),
-                                  utility::decodeFromUtf8(req->comment()),
-                                  utility::decodeFromUtf8(req->category_name()));
+                                 utility::decodeFromUtf8(req->name()),
+                                 utility::decodeFromUtf8(req->comment()),
+                                 utility::decodeFromUtf8(req->category_name()));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::RemoveBookmark(grpc::ServerContext* /*ctx*/,
-                                                const sourcetrail::RemoveBookmarkRequest* req,
-                                                sourcetrail::EmptyResponse* /*resp*/) {
+                                               const sourcetrail::RemoveBookmarkRequest* req,
+                                               sourcetrail::EmptyResponse* /*resp*/) {
   mStorageAccess->removeBookmark(static_cast<Id>(req->bookmark_id()));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::RemoveBookmarkCategory(grpc::ServerContext* /*ctx*/,
-                                                        const sourcetrail::RemoveBookmarkCategoryRequest* req,
-                                                        sourcetrail::EmptyResponse* /*resp*/) {
+                                                       const sourcetrail::RemoveBookmarkCategoryRequest* req,
+                                                       sourcetrail::EmptyResponse* /*resp*/) {
   mStorageAccess->removeBookmarkCategory(static_cast<Id>(req->category_id()));
   return grpc::Status::OK;
 }
@@ -105,22 +127,22 @@ grpc::Status EngineServiceImpl::RemoveBookmarkCategory(grpc::ServerContext* /*ct
 // ---- Storage queries — Phase 4 implementations ----------------------------
 
 grpc::Status EngineServiceImpl::GetNodeIdForFileNode(grpc::ServerContext* /*ctx*/,
-                                                      const sourcetrail::FilePathRequest* req,
-                                                      sourcetrail::IdResponse* resp) {
+                                                     const sourcetrail::FilePathRequest* req,
+                                                     sourcetrail::IdResponse* resp) {
   resp->set_id(mStorageAccess->getNodeIdForFileNode(FilePath(utility::decodeFromUtf8(req->file_path()))));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetNodeIdForNameHierarchy(grpc::ServerContext* /*ctx*/,
-                                                            const sourcetrail::NameHierarchyRequest* req,
-                                                            sourcetrail::IdResponse* resp) {
+                                                          const sourcetrail::NameHierarchyRequest* req,
+                                                          sourcetrail::IdResponse* resp) {
   resp->set_id(mStorageAccess->getNodeIdForNameHierarchy(NameHierarchy::deserialize(utility::decodeFromUtf8(req->serialized()))));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetNodeIdsForNameHierarchies(grpc::ServerContext* /*ctx*/,
-                                                              const sourcetrail::NameHierarchiesRequest* req,
-                                                              sourcetrail::IdsResponse* resp) {
+                                                             const sourcetrail::NameHierarchiesRequest* req,
+                                                             sourcetrail::IdsResponse* resp) {
   std::vector<NameHierarchy> hierarchies;
   hierarchies.reserve(static_cast<size_t>(req->serialized_size()));
   for(const auto& s : req->serialized()) {
@@ -133,16 +155,16 @@ grpc::Status EngineServiceImpl::GetNodeIdsForNameHierarchies(grpc::ServerContext
 }
 
 grpc::Status EngineServiceImpl::GetNameHierarchyForNodeId(grpc::ServerContext* /*ctx*/,
-                                                            const sourcetrail::IdRequest* req,
-                                                            sourcetrail::NameHierarchyResponse* resp) {
+                                                          const sourcetrail::IdRequest* req,
+                                                          sourcetrail::NameHierarchyResponse* resp) {
   const NameHierarchy nh = mStorageAccess->getNameHierarchyForNodeId(static_cast<Id>(req->id()));
   resp->set_serialized(utility::encodeToUtf8(NameHierarchy::serialize(nh)));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetNameHierarchiesForNodeIds(grpc::ServerContext* /*ctx*/,
-                                                              const sourcetrail::IdsRequest* req,
-                                                              sourcetrail::NameHierarchiesResponse* resp) {
+                                                             const sourcetrail::IdsRequest* req,
+                                                             sourcetrail::NameHierarchiesResponse* resp) {
   std::vector<Id> ids(req->ids().begin(), req->ids().end());
   for(const NameHierarchy& nh : mStorageAccess->getNameHierarchiesForNodeIds(ids)) {
     resp->add_serialized(utility::encodeToUtf8(NameHierarchy::serialize(nh)));
@@ -151,8 +173,8 @@ grpc::Status EngineServiceImpl::GetNameHierarchiesForNodeIds(grpc::ServerContext
 }
 
 grpc::Status EngineServiceImpl::GetNodeIdToParentFileMap(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::IdsRequest* req,
-                                                          sourcetrail::NodeIdToParentFileMapResponse* resp) {
+                                                         const sourcetrail::IdsRequest* req,
+                                                         sourcetrail::NodeIdToParentFileMapResponse* resp) {
   std::vector<Id> ids(req->ids().begin(), req->ids().end());
   for(const auto& [nodeId, pair] : mStorageAccess->getNodeIdToParentFileMap(ids)) {
     auto* entry = resp->add_entries();
@@ -164,16 +186,16 @@ grpc::Status EngineServiceImpl::GetNodeIdToParentFileMap(grpc::ServerContext* /*
 }
 
 grpc::Status EngineServiceImpl::GetNodeTypeForNodeWithId(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::IdRequest* req,
-                                                          sourcetrail::NodeKindResponse* resp) {
+                                                         const sourcetrail::IdRequest* req,
+                                                         sourcetrail::NodeKindResponse* resp) {
   const NodeType nt = mStorageAccess->getNodeTypeForNodeWithId(static_cast<Id>(req->id()));
   resp->set_kind(nodeKindToInt(nt.getKind()));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetEdgeById(grpc::ServerContext* /*ctx*/,
-                                             const sourcetrail::IdRequest* req,
-                                             sourcetrail::StorageEdgeResponse* resp) {
+                                            const sourcetrail::IdRequest* req,
+                                            sourcetrail::StorageEdgeResponse* resp) {
   const StorageEdge edge = mStorageAccess->getEdgeById(static_cast<Id>(req->id()));
   resp->mutable_edge()->set_id(edge.id);
   resp->mutable_edge()->set_type(edge.type);
@@ -182,72 +204,116 @@ grpc::Status EngineServiceImpl::GetEdgeById(grpc::ServerContext* /*ctx*/,
   return grpc::Status::OK;
 }
 
-// Complex query types (Graph, SourceLocationCollection) — Phase 4 TODO
 grpc::Status EngineServiceImpl::GetFullTextSearchLocations(grpc::ServerContext* /*ctx*/,
-                                                            const sourcetrail::FullTextSearchRequest* /*req*/,
-                                                            sourcetrail::SourceLocationCollectionResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                           const sourcetrail::FullTextSearchRequest* req,
+                                                           sourcetrail::SourceLocationCollectionResponse* resp) {
+  const auto collection = mStorageAccess->getFullTextSearchLocations(
+      utility::decodeFromUtf8(req->search_term()), req->case_sensitive());
+  if(collection) {
+    *resp = proto::convert::toProto(*collection);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetAutocompletionMatches(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::AutocompletionRequest* /*req*/,
-                                                          sourcetrail::SearchMatchesResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                         const sourcetrail::AutocompletionRequest* req,
+                                                         sourcetrail::SearchMatchesResponse* resp) {
+  const auto matches = mStorageAccess->getAutocompletionMatches(
+      utility::decodeFromUtf8(req->query()),
+      proto::convert::nodeTypeSetFromMask(req->accepted_node_types_mask()),
+      req->accept_commands());
+  for(const SearchMatch& match : matches) {
+    *resp->add_matches() = proto::convert::toProto(match);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetSearchMatchesForTokenIds(grpc::ServerContext* /*ctx*/,
-                                                             const sourcetrail::IdsRequest* /*req*/,
-                                                             sourcetrail::SearchMatchesResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                            const sourcetrail::IdsRequest* req,
+                                                            sourcetrail::SearchMatchesResponse* resp) {
+  const std::vector<Id> tokenIds(req->ids().begin(), req->ids().end());
+  for(const SearchMatch& match : mStorageAccess->getSearchMatchesForTokenIds(tokenIds)) {
+    *resp->add_matches() = proto::convert::toProto(match);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetGraphForAll(grpc::ServerContext* /*ctx*/,
-                                                const sourcetrail::EmptyRequest* /*req*/,
-                                                sourcetrail::GraphResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                               const sourcetrail::EmptyRequest* /*req*/,
+                                               sourcetrail::GraphResponse* resp) {
+  if(const auto graph = mStorageAccess->getGraphForAll(); graph) {
+    *resp->mutable_graph() = proto::convert::toProto(*graph);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetGraphForNodeTypes(grpc::ServerContext* /*ctx*/,
-                                                      const sourcetrail::NodeKindMaskRequest* /*req*/,
-                                                      sourcetrail::GraphResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                     const sourcetrail::NodeKindMaskRequest* req,
+                                                     sourcetrail::GraphResponse* resp) {
+  const auto graph = mStorageAccess->getGraphForNodeTypes(proto::convert::nodeTypeSetFromMask(req->mask()));
+  if(graph) {
+    *resp->mutable_graph() = proto::convert::toProto(*graph);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetGraphForActiveTokenIds(grpc::ServerContext* /*ctx*/,
-                                                           const sourcetrail::ActiveTokensRequest* /*req*/,
-                                                           sourcetrail::ActiveGraphResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                          const sourcetrail::ActiveTokensRequest* req,
+                                                          sourcetrail::ActiveGraphResponse* resp) {
+  const std::vector<Id> tokenIds(req->token_ids().begin(), req->token_ids().end());
+  const std::vector<Id> expandedNodeIds(req->expanded_node_ids().begin(), req->expanded_node_ids().end());
+
+  bool isActiveNamespace = false;
+  const auto graph = mStorageAccess->getGraphForActiveTokenIds(tokenIds, expandedNodeIds, &isActiveNamespace);
+  if(graph) {
+    *resp->mutable_graph() = proto::convert::toProto(*graph);
+  }
+  resp->set_is_active_namespace(isActiveNamespace);
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetGraphForChildrenOfNodeId(grpc::ServerContext* /*ctx*/,
-                                                             const sourcetrail::IdRequest* /*req*/,
-                                                             sourcetrail::GraphResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                            const sourcetrail::IdRequest* req,
+                                                            sourcetrail::GraphResponse* resp) {
+  if(const auto graph = mStorageAccess->getGraphForChildrenOfNodeId(static_cast<Id>(req->id())); graph) {
+    *resp->mutable_graph() = proto::convert::toProto(*graph);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetGraphForTrail(grpc::ServerContext* /*ctx*/,
-                                                  const sourcetrail::TrailRequest* /*req*/,
-                                                  sourcetrail::GraphResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                 const sourcetrail::TrailRequest* req,
+                                                 sourcetrail::GraphResponse* resp) {
+  const auto graph = mStorageAccess->getGraphForTrail(req->origin_id(),
+                                                      req->target_id(),
+                                                      req->node_types_mask(),
+                                                      req->edge_types_mask(),
+                                                      req->node_non_indexed(),
+                                                      req->depth(),
+                                                      req->directed());
+  if(graph) {
+    *resp->mutable_graph() = proto::convert::toProto(*graph);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetAvailableNodeTypes(grpc::ServerContext* /*ctx*/,
-                                                       const sourcetrail::EmptyRequest* /*req*/,
-                                                       sourcetrail::NodeKindMaskResponse* resp) {
+                                                      const sourcetrail::EmptyRequest* /*req*/,
+                                                      sourcetrail::NodeKindMaskResponse* resp) {
   resp->set_mask(static_cast<int32_t>(mStorageAccess->getAvailableNodeTypes()));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetAvailableEdgeTypes(grpc::ServerContext* /*ctx*/,
-                                                       const sourcetrail::EmptyRequest* /*req*/,
-                                                       sourcetrail::EdgeTypeMaskResponse* resp) {
+                                                      const sourcetrail::EmptyRequest* /*req*/,
+                                                      sourcetrail::EdgeTypeMaskResponse* resp) {
   resp->set_mask(static_cast<int32_t>(mStorageAccess->getAvailableEdgeTypes()));
   return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetActiveTokenIdsForId(grpc::ServerContext* /*ctx*/,
-                                                        const sourcetrail::ActiveTokenIdRequest* req,
-                                                        sourcetrail::ActiveTokenIdsResponse* resp) {
+                                                       const sourcetrail::ActiveTokenIdRequest* req,
+                                                       sourcetrail::ActiveTokenIdsResponse* resp) {
   Id declarationId = 0;
   const std::vector<Id> ids = mStorageAccess->getActiveTokenIdsForId(static_cast<Id>(req->token_id()), &declarationId);
   for(const Id id : ids) {
@@ -258,8 +324,8 @@ grpc::Status EngineServiceImpl::GetActiveTokenIdsForId(grpc::ServerContext* /*ct
 }
 
 grpc::Status EngineServiceImpl::GetNodeIdsForLocationIds(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::IdsRequest* req,
-                                                          sourcetrail::IdsResponse* resp) {
+                                                         const sourcetrail::IdsRequest* req,
+                                                         sourcetrail::IdsResponse* resp) {
   std::vector<Id> locationIds(req->ids().begin(), req->ids().end());
   for(const Id id : mStorageAccess->getNodeIdsForLocationIds(locationIds)) {
     resp->add_ids(id);
@@ -268,38 +334,60 @@ grpc::Status EngineServiceImpl::GetNodeIdsForLocationIds(grpc::ServerContext* /*
 }
 
 grpc::Status EngineServiceImpl::GetSourceLocationsForTokenIds(grpc::ServerContext* /*ctx*/,
-                                                               const sourcetrail::IdsRequest* /*req*/,
-                                                               sourcetrail::SourceLocationCollectionResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                              const sourcetrail::IdsRequest* req,
+                                                              sourcetrail::SourceLocationCollectionResponse* resp) {
+  const std::vector<Id> tokenIds(req->ids().begin(), req->ids().end());
+  if(const auto collection = mStorageAccess->getSourceLocationsForTokenIds(tokenIds); collection) {
+    *resp = proto::convert::toProto(*collection);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetSourceLocationsForLocationIds(grpc::ServerContext* /*ctx*/,
-                                                                  const sourcetrail::IdsRequest* /*req*/,
-                                                                  sourcetrail::SourceLocationCollectionResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                                 const sourcetrail::IdsRequest* req,
+                                                                 sourcetrail::SourceLocationCollectionResponse* resp) {
+  const std::vector<Id> locationIds(req->ids().begin(), req->ids().end());
+  if(const auto collection = mStorageAccess->getSourceLocationsForLocationIds(locationIds); collection) {
+    *resp = proto::convert::toProto(*collection);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetSourceLocationsForFile(grpc::ServerContext* /*ctx*/,
-                                                           const sourcetrail::FilePathRequest* /*req*/,
-                                                           sourcetrail::SourceLocationFileResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                          const sourcetrail::FilePathRequest* req,
+                                                          sourcetrail::SourceLocationFileResponse* resp) {
+  const auto file = mStorageAccess->getSourceLocationsForFile(FilePath(utility::decodeFromUtf8(req->file_path())));
+  if(file) {
+    *resp->mutable_file() = proto::convert::toProto(*file);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetSourceLocationsForLinesInFile(grpc::ServerContext* /*ctx*/,
-                                                                   const sourcetrail::LinesInFileRequest* /*req*/,
-                                                                   sourcetrail::SourceLocationFileResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                                 const sourcetrail::LinesInFileRequest* req,
+                                                                 sourcetrail::SourceLocationFileResponse* resp) {
+  const auto file = mStorageAccess->getSourceLocationsForLinesInFile(
+      FilePath(utility::decodeFromUtf8(req->file_path())), req->start_line(), req->end_line());
+  if(file) {
+    *resp->mutable_file() = proto::convert::toProto(*file);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetSourceLocationsOfTypeInFile(grpc::ServerContext* /*ctx*/,
-                                                                const sourcetrail::LocationTypeInFileRequest* /*req*/,
-                                                                sourcetrail::SourceLocationFileResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                               const sourcetrail::LocationTypeInFileRequest* req,
+                                                               sourcetrail::SourceLocationFileResponse* resp) {
+  const auto file = mStorageAccess->getSourceLocationsOfTypeInFile(
+      FilePath(utility::decodeFromUtf8(req->file_path())), static_cast<LocationType>(req->location_type()));
+  if(file) {
+    *resp->mutable_file() = proto::convert::toProto(*file);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetFileContent(grpc::ServerContext* /*ctx*/,
-                                                const sourcetrail::FileContentRequest* req,
-                                                sourcetrail::FileContentResponse* resp) {
+                                               const sourcetrail::FileContentRequest* req,
+                                               sourcetrail::FileContentResponse* resp) {
   auto textAccess = mStorageAccess->getFileContent(FilePath(utility::decodeFromUtf8(req->file_path())), req->shows_errors());
   if(textAccess) {
     resp->set_content(textAccess->getText());
@@ -308,26 +396,37 @@ grpc::Status EngineServiceImpl::GetFileContent(grpc::ServerContext* /*ctx*/,
 }
 
 grpc::Status EngineServiceImpl::GetFileInfoForFileId(grpc::ServerContext* /*ctx*/,
-                                                      const sourcetrail::IdRequest* /*req*/,
-                                                      sourcetrail::FileInfoResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                     const sourcetrail::IdRequest* req,
+                                                     sourcetrail::FileInfoResponse* resp) {
+  *resp->mutable_file_info() = proto::convert::toProto(mStorageAccess->getFileInfoForFileId(req->id()));
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetFileInfoForFilePath(grpc::ServerContext* /*ctx*/,
-                                                        const sourcetrail::FilePathRequest* /*req*/,
-                                                        sourcetrail::FileInfoResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                       const sourcetrail::FilePathRequest* req,
+                                                       sourcetrail::FileInfoResponse* resp) {
+  const FileInfo info = mStorageAccess->getFileInfoForFilePath(FilePath(utility::decodeFromUtf8(req->file_path())));
+  *resp->mutable_file_info() = proto::convert::toProto(info);
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetFileInfosForFilePaths(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::FilePathsRequest* /*req*/,
-                                                          sourcetrail::FileInfosResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                         const sourcetrail::FilePathsRequest* req,
+                                                         sourcetrail::FileInfosResponse* resp) {
+  std::vector<FilePath> filePaths;
+  filePaths.reserve(static_cast<size_t>(req->file_paths_size()));
+  for(const auto& path : req->file_paths()) {
+    filePaths.emplace_back(utility::decodeFromUtf8(path));
+  }
+  for(const FileInfo& info : mStorageAccess->getFileInfosForFilePaths(filePaths)) {
+    *resp->add_file_infos() = proto::convert::toProto(info);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetStorageStats(grpc::ServerContext* /*ctx*/,
-                                                 const sourcetrail::EmptyRequest* /*req*/,
-                                                 sourcetrail::StorageStatsResponse* resp) {
+                                                const sourcetrail::EmptyRequest* /*req*/,
+                                                sourcetrail::StorageStatsResponse* resp) {
   const StorageStats stats = mStorageAccess->getStorageStats();
   auto* protoStats = resp->mutable_stats();
   protoStats->set_node_count(stats.nodeCount);
@@ -339,8 +438,8 @@ grpc::Status EngineServiceImpl::GetStorageStats(grpc::ServerContext* /*ctx*/,
 }
 
 grpc::Status EngineServiceImpl::GetErrorCount(grpc::ServerContext* /*ctx*/,
-                                               const sourcetrail::EmptyRequest* /*req*/,
-                                               sourcetrail::ErrorCountResponse* resp) {
+                                              const sourcetrail::EmptyRequest* /*req*/,
+                                              sourcetrail::ErrorCountResponse* resp) {
   const ErrorCountInfo info = mStorageAccess->getErrorCount();
   resp->set_total(info.total);
   resp->set_fatal(info.fatal);
@@ -348,59 +447,91 @@ grpc::Status EngineServiceImpl::GetErrorCount(grpc::ServerContext* /*ctx*/,
 }
 
 grpc::Status EngineServiceImpl::GetErrorsLimited(grpc::ServerContext* /*ctx*/,
-                                                   const sourcetrail::ErrorFilterRequest* /*req*/,
-                                                   sourcetrail::ErrorInfosResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                 const sourcetrail::ErrorFilterRequest* req,
+                                                 sourcetrail::ErrorInfosResponse* resp) {
+  const ErrorFilter filter = proto::convert::fromProto(req->filter());
+  for(const ErrorInfo& error : mStorageAccess->getErrorsLimited(filter)) {
+    *resp->add_errors() = proto::convert::toProto(error);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetErrorsForFileLimited(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::ErrorFilterFileRequest* /*req*/,
-                                                          sourcetrail::ErrorInfosResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                        const sourcetrail::ErrorFilterFileRequest* req,
+                                                        sourcetrail::ErrorInfosResponse* resp) {
+  const ErrorFilter filter = proto::convert::fromProto(req->filter());
+  const FilePath filePath(utility::decodeFromUtf8(req->file_path()));
+  for(const ErrorInfo& error : mStorageAccess->getErrorsForFileLimited(filter, filePath)) {
+    *resp->add_errors() = proto::convert::toProto(error);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetErrorSourceLocations(grpc::ServerContext* /*ctx*/,
-                                                         const sourcetrail::ErrorInfosRequest* /*req*/,
-                                                         sourcetrail::SourceLocationCollectionResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                        const sourcetrail::ErrorInfosRequest* req,
+                                                        sourcetrail::SourceLocationCollectionResponse* resp) {
+  std::vector<ErrorInfo> errors;
+  errors.reserve(static_cast<size_t>(req->errors_size()));
+  for(const auto& errorMsg : req->errors()) {
+    errors.push_back(proto::convert::fromProto(errorMsg));
+  }
+  if(const auto collection = mStorageAccess->getErrorSourceLocations(errors); collection) {
+    *resp = proto::convert::toProto(*collection);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetAllNodeBookmarks(grpc::ServerContext* /*ctx*/,
-                                                     const sourcetrail::EmptyRequest* /*req*/,
-                                                     sourcetrail::NodeBookmarksResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                    const sourcetrail::EmptyRequest* /*req*/,
+                                                    sourcetrail::NodeBookmarksResponse* resp) {
+  for(const NodeBookmark& bookmark : mStorageAccess->getAllNodeBookmarks()) {
+    *resp->add_bookmarks() = proto::convert::toProto(bookmark);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetAllEdgeBookmarks(grpc::ServerContext* /*ctx*/,
-                                                     const sourcetrail::EmptyRequest* /*req*/,
-                                                     sourcetrail::EdgeBookmarksResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                    const sourcetrail::EmptyRequest* /*req*/,
+                                                    sourcetrail::EdgeBookmarksResponse* resp) {
+  for(const EdgeBookmark& bookmark : mStorageAccess->getAllEdgeBookmarks()) {
+    *resp->add_bookmarks() = proto::convert::toProto(bookmark);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetAllBookmarkCategories(grpc::ServerContext* /*ctx*/,
-                                                          const sourcetrail::EmptyRequest* /*req*/,
-                                                          sourcetrail::BookmarkCategoriesResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                         const sourcetrail::EmptyRequest* /*req*/,
+                                                         sourcetrail::BookmarkCategoriesResponse* resp) {
+  for(const BookmarkCategory& category : mStorageAccess->getAllBookmarkCategories()) {
+    *resp->add_categories() = proto::convert::toProto(category);
+  }
+  return grpc::Status::OK;
 }
 
 grpc::Status EngineServiceImpl::GetTooltipInfoForTokenIds(grpc::ServerContext* /*ctx*/,
-                                                           const sourcetrail::TooltipTokenIdsRequest* /*req*/,
-                                                           sourcetrail::TooltipInfoResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+                                                          const sourcetrail::TooltipTokenIdsRequest* req,
+                                                          sourcetrail::TooltipInfoResponse* resp) {
+  const std::vector<Id> tokenIds(req->token_ids().begin(), req->token_ids().end());
+  const TooltipInfo info = mStorageAccess->getTooltipInfoForTokenIds(tokenIds, static_cast<TooltipOrigin>(req->origin()));
+  *resp->mutable_info() = proto::convert::toProto(info);
+  return grpc::Status::OK;
 }
 
-grpc::Status EngineServiceImpl::GetTooltipInfoForSourceLocationIdsAndLocalSymbolIds(
-    grpc::ServerContext* /*ctx*/,
-    const sourcetrail::TooltipLocationRequest* /*req*/,
-    sourcetrail::TooltipInfoResponse* /*resp*/) {
-  return grpc::Status(grpc::StatusCode::UNIMPLEMENTED, "Phase 4");
+grpc::Status EngineServiceImpl::GetTooltipInfoForSourceLocationIdsAndLocalSymbolIds(grpc::ServerContext* /*ctx*/,
+                                                                                    const sourcetrail::TooltipLocationRequest* req,
+                                                                                    sourcetrail::TooltipInfoResponse* resp) {
+  const std::vector<Id> locationIds(req->location_ids().begin(), req->location_ids().end());
+  const std::vector<Id> localSymbolIds(req->local_symbol_ids().begin(), req->local_symbol_ids().end());
+  const TooltipInfo info = mStorageAccess->getTooltipInfoForSourceLocationIdsAndLocalSymbolIds(locationIds, localSymbolIds);
+  *resp->mutable_info() = proto::convert::toProto(info);
+  return grpc::Status::OK;
 }
 
 // ---- Event stream ----------------------------------------------------------
 
 grpc::Status EngineServiceImpl::WatchEvents(grpc::ServerContext* ctx,
-                                             const sourcetrail::WatchEventsRequest* /*req*/,
-                                             grpc::ServerWriter<sourcetrail::EngineEvent>* writer) {
+                                            const sourcetrail::WatchEventsRequest* /*req*/,
+                                            grpc::ServerWriter<sourcetrail::EngineEvent>* writer) {
   {
     const std::lock_guard<std::mutex> lock(mEventListenersMutex);
     mEventListeners.push_back(writer);

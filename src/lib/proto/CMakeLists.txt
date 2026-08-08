@@ -44,7 +44,9 @@ add_library(
   ConvertGraph.cpp
   ConvertGraph.h
   ConvertLocations.cpp
-  ConvertLocations.h)
+  ConvertLocations.h
+  ConvertQuery.cpp
+  ConvertQuery.h)
 add_library(Sourcetrail::lib::proto::convert ALIAS Sourcetrail_proto_convert)
 
 target_include_directories(Sourcetrail_proto_convert PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

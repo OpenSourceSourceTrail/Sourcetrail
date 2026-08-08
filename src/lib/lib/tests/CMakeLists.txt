@@ -15,6 +15,7 @@ set(test_lib_names
     ComponentTestSuite
     ConvertGraphTestSuite
     ConvertLocationsTestSuite
+    ConvertQueryTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
     GraphTestSuite

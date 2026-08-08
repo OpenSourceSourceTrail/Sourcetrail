@@ -24,9 +24,7 @@ public:
                            const sourcetrail::LoadProjectRequest* req,
                            sourcetrail::LoadProjectResponse* resp) override;
 
-  grpc::Status Refresh(grpc::ServerContext* ctx,
-                       const sourcetrail::RefreshRequest* req,
-                       sourcetrail::RefreshResponse* resp) override;
+  grpc::Status Refresh(grpc::ServerContext* ctx, const sourcetrail::RefreshRequest* req, sourcetrail::RefreshResponse* resp) override;
 
   grpc::Status IndexingInterrupted(grpc::ServerContext* ctx,
                                    const sourcetrail::IndexingInterruptedRequest* req,
@@ -71,153 +69,153 @@ public:
                                             sourcetrail::IdsResponse* resp) override;
 
   grpc::Status GetNameHierarchyForNodeId(grpc::ServerContext* ctx,
-                                          const sourcetrail::IdRequest* req,
-                                          sourcetrail::NameHierarchyResponse* resp) override;
+                                         const sourcetrail::IdRequest* req,
+                                         sourcetrail::NameHierarchyResponse* resp) override;
 
   grpc::Status GetNameHierarchiesForNodeIds(grpc::ServerContext* ctx,
-                                             const sourcetrail::IdsRequest* req,
-                                             sourcetrail::NameHierarchiesResponse* resp) override;
+                                            const sourcetrail::IdsRequest* req,
+                                            sourcetrail::NameHierarchiesResponse* resp) override;
 
   grpc::Status GetNodeIdToParentFileMap(grpc::ServerContext* ctx,
-                                         const sourcetrail::IdsRequest* req,
-                                         sourcetrail::NodeIdToParentFileMapResponse* resp) override;
+                                        const sourcetrail::IdsRequest* req,
+                                        sourcetrail::NodeIdToParentFileMapResponse* resp) override;
 
   grpc::Status GetNodeTypeForNodeWithId(grpc::ServerContext* ctx,
-                                         const sourcetrail::IdRequest* req,
-                                         sourcetrail::NodeKindResponse* resp) override;
+                                        const sourcetrail::IdRequest* req,
+                                        sourcetrail::NodeKindResponse* resp) override;
 
   grpc::Status GetEdgeById(grpc::ServerContext* ctx,
-                            const sourcetrail::IdRequest* req,
-                            sourcetrail::StorageEdgeResponse* resp) override;
+                           const sourcetrail::IdRequest* req,
+                           sourcetrail::StorageEdgeResponse* resp) override;
 
   grpc::Status GetFullTextSearchLocations(grpc::ServerContext* ctx,
-                                           const sourcetrail::FullTextSearchRequest* req,
-                                           sourcetrail::SourceLocationCollectionResponse* resp) override;
+                                          const sourcetrail::FullTextSearchRequest* req,
+                                          sourcetrail::SourceLocationCollectionResponse* resp) override;
 
   grpc::Status GetAutocompletionMatches(grpc::ServerContext* ctx,
-                                         const sourcetrail::AutocompletionRequest* req,
-                                         sourcetrail::SearchMatchesResponse* resp) override;
+                                        const sourcetrail::AutocompletionRequest* req,
+                                        sourcetrail::SearchMatchesResponse* resp) override;
 
   grpc::Status GetSearchMatchesForTokenIds(grpc::ServerContext* ctx,
-                                            const sourcetrail::IdsRequest* req,
-                                            sourcetrail::SearchMatchesResponse* resp) override;
+                                           const sourcetrail::IdsRequest* req,
+                                           sourcetrail::SearchMatchesResponse* resp) override;
 
   grpc::Status GetGraphForAll(grpc::ServerContext* ctx,
-                               const sourcetrail::EmptyRequest* req,
-                               sourcetrail::GraphResponse* resp) override;
+                              const sourcetrail::EmptyRequest* req,
+                              sourcetrail::GraphResponse* resp) override;
 
   grpc::Status GetGraphForNodeTypes(grpc::ServerContext* ctx,
-                                     const sourcetrail::NodeKindMaskRequest* req,
-                                     sourcetrail::GraphResponse* resp) override;
+                                    const sourcetrail::NodeKindMaskRequest* req,
+                                    sourcetrail::GraphResponse* resp) override;
 
   grpc::Status GetGraphForActiveTokenIds(grpc::ServerContext* ctx,
-                                          const sourcetrail::ActiveTokensRequest* req,
-                                          sourcetrail::ActiveGraphResponse* resp) override;
+                                         const sourcetrail::ActiveTokensRequest* req,
+                                         sourcetrail::ActiveGraphResponse* resp) override;
 
   grpc::Status GetGraphForChildrenOfNodeId(grpc::ServerContext* ctx,
-                                            const sourcetrail::IdRequest* req,
-                                            sourcetrail::GraphResponse* resp) override;
+                                           const sourcetrail::IdRequest* req,
+                                           sourcetrail::GraphResponse* resp) override;
 
   grpc::Status GetGraphForTrail(grpc::ServerContext* ctx,
-                                 const sourcetrail::TrailRequest* req,
-                                 sourcetrail::GraphResponse* resp) override;
+                                const sourcetrail::TrailRequest* req,
+                                sourcetrail::GraphResponse* resp) override;
 
   grpc::Status GetAvailableNodeTypes(grpc::ServerContext* ctx,
-                                      const sourcetrail::EmptyRequest* req,
-                                      sourcetrail::NodeKindMaskResponse* resp) override;
+                                     const sourcetrail::EmptyRequest* req,
+                                     sourcetrail::NodeKindMaskResponse* resp) override;
 
   grpc::Status GetAvailableEdgeTypes(grpc::ServerContext* ctx,
-                                      const sourcetrail::EmptyRequest* req,
-                                      sourcetrail::EdgeTypeMaskResponse* resp) override;
+                                     const sourcetrail::EmptyRequest* req,
+                                     sourcetrail::EdgeTypeMaskResponse* resp) override;
 
   grpc::Status GetActiveTokenIdsForId(grpc::ServerContext* ctx,
-                                       const sourcetrail::ActiveTokenIdRequest* req,
-                                       sourcetrail::ActiveTokenIdsResponse* resp) override;
+                                      const sourcetrail::ActiveTokenIdRequest* req,
+                                      sourcetrail::ActiveTokenIdsResponse* resp) override;
 
   grpc::Status GetNodeIdsForLocationIds(grpc::ServerContext* ctx,
-                                         const sourcetrail::IdsRequest* req,
-                                         sourcetrail::IdsResponse* resp) override;
+                                        const sourcetrail::IdsRequest* req,
+                                        sourcetrail::IdsResponse* resp) override;
 
   grpc::Status GetSourceLocationsForTokenIds(grpc::ServerContext* ctx,
-                                              const sourcetrail::IdsRequest* req,
-                                              sourcetrail::SourceLocationCollectionResponse* resp) override;
+                                             const sourcetrail::IdsRequest* req,
+                                             sourcetrail::SourceLocationCollectionResponse* resp) override;
 
   grpc::Status GetSourceLocationsForLocationIds(grpc::ServerContext* ctx,
-                                                 const sourcetrail::IdsRequest* req,
-                                                 sourcetrail::SourceLocationCollectionResponse* resp) override;
+                                                const sourcetrail::IdsRequest* req,
+                                                sourcetrail::SourceLocationCollectionResponse* resp) override;
 
   grpc::Status GetSourceLocationsForFile(grpc::ServerContext* ctx,
-                                          const sourcetrail::FilePathRequest* req,
-                                          sourcetrail::SourceLocationFileResponse* resp) override;
+                                         const sourcetrail::FilePathRequest* req,
+                                         sourcetrail::SourceLocationFileResponse* resp) override;
 
   grpc::Status GetSourceLocationsForLinesInFile(grpc::ServerContext* ctx,
-                                                 const sourcetrail::LinesInFileRequest* req,
-                                                 sourcetrail::SourceLocationFileResponse* resp) override;
+                                                const sourcetrail::LinesInFileRequest* req,
+                                                sourcetrail::SourceLocationFileResponse* resp) override;
 
   grpc::Status GetSourceLocationsOfTypeInFile(grpc::ServerContext* ctx,
-                                               const sourcetrail::LocationTypeInFileRequest* req,
-                                               sourcetrail::SourceLocationFileResponse* resp) override;
+                                              const sourcetrail::LocationTypeInFileRequest* req,
+                                              sourcetrail::SourceLocationFileResponse* resp) override;
 
   grpc::Status GetFileContent(grpc::ServerContext* ctx,
-                               const sourcetrail::FileContentRequest* req,
-                               sourcetrail::FileContentResponse* resp) override;
+                              const sourcetrail::FileContentRequest* req,
+                              sourcetrail::FileContentResponse* resp) override;
 
   grpc::Status GetFileInfoForFileId(grpc::ServerContext* ctx,
-                                     const sourcetrail::IdRequest* req,
-                                     sourcetrail::FileInfoResponse* resp) override;
+                                    const sourcetrail::IdRequest* req,
+                                    sourcetrail::FileInfoResponse* resp) override;
 
   grpc::Status GetFileInfoForFilePath(grpc::ServerContext* ctx,
-                                       const sourcetrail::FilePathRequest* req,
-                                       sourcetrail::FileInfoResponse* resp) override;
+                                      const sourcetrail::FilePathRequest* req,
+                                      sourcetrail::FileInfoResponse* resp) override;
 
   grpc::Status GetFileInfosForFilePaths(grpc::ServerContext* ctx,
-                                         const sourcetrail::FilePathsRequest* req,
-                                         sourcetrail::FileInfosResponse* resp) override;
+                                        const sourcetrail::FilePathsRequest* req,
+                                        sourcetrail::FileInfosResponse* resp) override;
 
   grpc::Status GetStorageStats(grpc::ServerContext* ctx,
-                                const sourcetrail::EmptyRequest* req,
-                                sourcetrail::StorageStatsResponse* resp) override;
+                               const sourcetrail::EmptyRequest* req,
+                               sourcetrail::StorageStatsResponse* resp) override;
 
   grpc::Status GetErrorCount(grpc::ServerContext* ctx,
-                              const sourcetrail::EmptyRequest* req,
-                              sourcetrail::ErrorCountResponse* resp) override;
+                             const sourcetrail::EmptyRequest* req,
+                             sourcetrail::ErrorCountResponse* resp) override;
 
   grpc::Status GetErrorsLimited(grpc::ServerContext* ctx,
-                                 const sourcetrail::ErrorFilterRequest* req,
-                                 sourcetrail::ErrorInfosResponse* resp) override;
+                                const sourcetrail::ErrorFilterRequest* req,
+                                sourcetrail::ErrorInfosResponse* resp) override;
 
   grpc::Status GetErrorsForFileLimited(grpc::ServerContext* ctx,
-                                        const sourcetrail::ErrorFilterFileRequest* req,
-                                        sourcetrail::ErrorInfosResponse* resp) override;
+                                       const sourcetrail::ErrorFilterFileRequest* req,
+                                       sourcetrail::ErrorInfosResponse* resp) override;
 
   grpc::Status GetErrorSourceLocations(grpc::ServerContext* ctx,
-                                        const sourcetrail::ErrorInfosRequest* req,
-                                        sourcetrail::SourceLocationCollectionResponse* resp) override;
+                                       const sourcetrail::ErrorInfosRequest* req,
+                                       sourcetrail::SourceLocationCollectionResponse* resp) override;
 
   grpc::Status GetAllNodeBookmarks(grpc::ServerContext* ctx,
-                                    const sourcetrail::EmptyRequest* req,
-                                    sourcetrail::NodeBookmarksResponse* resp) override;
+                                   const sourcetrail::EmptyRequest* req,
+                                   sourcetrail::NodeBookmarksResponse* resp) override;
 
   grpc::Status GetAllEdgeBookmarks(grpc::ServerContext* ctx,
-                                    const sourcetrail::EmptyRequest* req,
-                                    sourcetrail::EdgeBookmarksResponse* resp) override;
+                                   const sourcetrail::EmptyRequest* req,
+                                   sourcetrail::EdgeBookmarksResponse* resp) override;
 
   grpc::Status GetAllBookmarkCategories(grpc::ServerContext* ctx,
-                                         const sourcetrail::EmptyRequest* req,
-                                         sourcetrail::BookmarkCategoriesResponse* resp) override;
+                                        const sourcetrail::EmptyRequest* req,
+                                        sourcetrail::BookmarkCategoriesResponse* resp) override;
 
   grpc::Status GetTooltipInfoForTokenIds(grpc::ServerContext* ctx,
-                                          const sourcetrail::TooltipTokenIdsRequest* req,
-                                          sourcetrail::TooltipInfoResponse* resp) override;
+                                         const sourcetrail::TooltipTokenIdsRequest* req,
+                                         sourcetrail::TooltipInfoResponse* resp) override;
 
   grpc::Status GetTooltipInfoForSourceLocationIdsAndLocalSymbolIds(grpc::ServerContext* ctx,
-                                                                    const sourcetrail::TooltipLocationRequest* req,
-                                                                    sourcetrail::TooltipInfoResponse* resp) override;
+                                                                   const sourcetrail::TooltipLocationRequest* req,
+                                                                   sourcetrail::TooltipInfoResponse* resp) override;
 
   // Event stream
   grpc::Status WatchEvents(grpc::ServerContext* ctx,
-                            const sourcetrail::WatchEventsRequest* req,
-                            grpc::ServerWriter<sourcetrail::EngineEvent>* writer) override;
+                           const sourcetrail::WatchEventsRequest* req,
+                           grpc::ServerWriter<sourcetrail::EngineEvent>* writer) override;
 
   // Called by the engine when an event occurs (indexing progress, status, etc.)
   void broadcastEvent(const sourcetrail::EngineEvent& event);
