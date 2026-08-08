@@ -5,23 +5,14 @@
 
 #include "AppPath.h"
 
-TEST(AppPath, CxxIndexer) {
-#ifdef D_WINDOWS
-  const auto exec = "sourcetrail_indexer.exe";
-#else
-  const auto exec = "sourcetrail_indexer";
-#endif
-
-  EXPECT_EQ(exec, AppPath::getCxxIndexerFilePath().str());
-  EXPECT_FALSE(AppPath::setCxxIndexerDirectoryPath(FilePath{""}));
-
+TEST(AppPath, sharedDataDirectoryRootsThePluginDirectory) {
   EXPECT_FALSE(AppPath::setSharedDataDirectoryPath(FilePath{""}));
   EXPECT_EQ("", AppPath::getSharedDataDirectoryPath().str());
+
   const auto tempDir = std::filesystem::temp_directory_path();
   EXPECT_TRUE(AppPath::setSharedDataDirectoryPath(FilePath{tempDir / "shared"}));
   EXPECT_EQ(tempDir / "shared", AppPath::getSharedDataDirectoryPath().str());
-  EXPECT_EQ(tempDir / "shared" / exec, AppPath::getCxxIndexerFilePath().str());
 
-  EXPECT_TRUE(AppPath::setCxxIndexerDirectoryPath(FilePath{tempDir}));
-  EXPECT_EQ(tempDir / exec, AppPath::getCxxIndexerFilePath().str());
+  // Every indexer, built-in included, is found by scanning this directory for manifests.
+  EXPECT_EQ(tempDir / "shared" / "plugins", AppPath::getPluginsDirectoryPath().str());
 }

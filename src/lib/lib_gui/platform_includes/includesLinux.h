@@ -38,7 +38,6 @@ inline void setupPlatform(int /*argc*/, [[maybe_unused]] char* argv[]) {
 inline void setupApp([[maybe_unused]] int argc, [[maybe_unused]] char* argv[]) {
   FilePath appPath = FilePath(QCoreApplication::applicationDirPath().toStdWString() + L"/").getAbsolute();
   AppPath::setSharedDataDirectoryPath(appPath);
-  AppPath::setCxxIndexerDirectoryPath(appPath);
 
   // Check if bundled as Linux AppImage
   if(appPath.getConcatenated(L"/../share/data").exists()) {

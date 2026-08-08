@@ -18,8 +18,6 @@
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
 #include "includes.h"
-#include "language_packages.h"
-#include "LanguagePackageManager.h"
 #include "logging.h"
 #include "productVersion.h"
 #include "GrpcStorageAccess.h"
@@ -30,9 +28,6 @@
 #include "QtViewFactory.h"
 #include "ResourcePaths.h"
 #include "ScopedFunctor.h"
-#include "SourceGroupFactory.h"
-#include "SourceGroupFactoryModuleCustom.h"
-#include "SourceGroupFactoryModuleJava.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageStatus.h"
@@ -41,26 +36,10 @@
 #include "utilityString.h"
 #include "Version.h"
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "LanguagePackageCxx.h"
-#  include "SourceGroupFactoryModuleCxx.h"
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-
 namespace {
 void signalHandler(int signum) {
   fmt::println("Interrupt signal received. {}", signum);
   MessageIndexingInterrupted{}.dispatch();
-}
-
-void addLanguagePackages() {
-  SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
-  SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleJava>());
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
-  SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
-  LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-
 }
 
 /**
@@ -101,7 +80,6 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
   [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
-  addLanguagePackages();
 
   // TODO(Hussein): Replace with Boost or Qt
   std::ignore = std::signal(SIGINT, signalHandler);
@@ -160,7 +138,6 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   MessageStatus{utility::decodeFromUtf8(message)}.dispatch();
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
-  addLanguagePackages();
 
   // NOTE(Hussein): Extract to function
   utility::loadFontsFromDirectory(ResourcePaths::getFontsDirectoryPath(), L".otf");

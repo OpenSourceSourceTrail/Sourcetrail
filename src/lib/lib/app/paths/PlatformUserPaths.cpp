@@ -119,7 +119,6 @@ void setupPaths() {
   const FilePath appPath = getExecutableDirectory().getConcatenated(L"/").getAbsolute();
 
   AppPath::setSharedDataDirectoryPath(appPath);
-  AppPath::setCxxIndexerDirectoryPath(appPath);
 
   // Check if bundled as Linux AppImage, which puts shared data one level up under share/.
   if(appPath.getConcatenated(L"../share/data").exists()) {
