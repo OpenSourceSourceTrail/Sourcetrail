@@ -201,6 +201,7 @@ string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 add_subdirectory(src/lib/external)
 add_subdirectory(src/lib/proto)
 add_subdirectory(src/lib/lib)
+add_subdirectory(src/lib/client)
 add_subdirectory(src/lib/lib_gui)
 #---------------------------------------------------------------------------------------------------------------------------------
 add_subdirectory(src/lib/core)
