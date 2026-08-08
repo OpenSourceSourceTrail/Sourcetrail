@@ -13,6 +13,20 @@ add_sourcetrail_test(
 
 add_sourcetrail_test(
   NAME
+  QtEngineSupervisorTestSuite
+  SOURCES
+  QtEngineSupervisorTestSuite.cpp
+  DEPS
+  Sourcetrail::lib::lib_gui
+  Sourcetrail::lib::messaging
+  Qt6::Test
+  TEST_PREFIX
+  "unittests.lib_gui."
+  WORKING_DIRECTORY
+  "${CMAKE_BINARY_DIR}/test/")
+
+add_sourcetrail_test(
+  NAME
   utilityAppTestSuite
   SOURCES
   utilityAppTestSuite.cpp

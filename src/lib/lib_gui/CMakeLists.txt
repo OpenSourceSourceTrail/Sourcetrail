@@ -65,6 +65,8 @@ target_sources(
   qt/element/search/QtSearchBarButton.h
   qt/element/search/QtSmartSearchBox.cpp
   qt/element/search/QtSmartSearchBox.h
+  qt/engine/QtEngineSupervisor.cpp
+  qt/engine/QtEngineSupervisor.h
   qt/element/dialog/QtLineEdit.cpp
   qt/element/dialog/QtLineEdit.h
   qt/element/dialog/QtListBox.cpp
@@ -322,6 +324,7 @@ endif()
 target_link_libraries(
   Sourcetrail_lib_gui
   PUBLIC Sourcetrail::lib::lib
+         Sourcetrail::lib::client # QtEngineSupervisor hands its EngineChannel to the GUI
          Qt6::Widgets
          Qt6::Network
          Qt6::Svg

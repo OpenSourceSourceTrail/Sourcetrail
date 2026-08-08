@@ -17,12 +17,13 @@ target_include_directories(Sourcetrail_client PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(
   Sourcetrail_client
   PUBLIC Sourcetrail::lib::lib # StorageAccess and the domain types it returns
-  PRIVATE Sourcetrail::lib::proto::api
-          Sourcetrail::lib::proto::convert
+         # EngineChannel.h exposes the stub, so its headers reach whoever includes it.
+         Sourcetrail::lib::proto::api
+         gRPC::grpc++
+  PRIVATE Sourcetrail::lib::proto::convert
           Sourcetrail::lib::core
           Sourcetrail::lib::core::utility::logging
-          Sourcetrail::lib::core::utility::TextAccess
-          gRPC::grpc++)
+          Sourcetrail::lib::core::utility::TextAccess)
 
 if(ENABLE_UNIT_TEST)
   add_subdirectory(tests)
