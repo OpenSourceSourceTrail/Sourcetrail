@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <fmt/core.h>
+
 #include <grpcpp/server_builder.h>
 #include <spdlog/sinks/sink.h>
 #include <spdlog/spdlog.h>
@@ -12,6 +13,7 @@
 #include "ApplicationSettings.h"
 #include "ApplicationSettingsPrefiller.h"
 #include "AppPath.h"
+#include "EngineEventPublisher.h"
 #include "EngineServiceImpl.h"
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
@@ -20,6 +22,7 @@
 #include "language_packages.h"
 #include "LanguagePackageManager.h"
 #include "PlatformUserPaths.h"
+#include "productVersion.h"
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
@@ -27,7 +30,6 @@
 #include "StorageCache.h"
 #include "UserPaths.h"
 #include "Version.h"
-#include "productVersion.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
 #  include "LanguagePackageCxx.h"
@@ -97,6 +99,11 @@ int main(int argc, char* argv[]) {
 
   EngineServiceImpl engineService(storageAccess);
   engineService.setShutdownHandler([]() { gStopRequested = 1; });
+
+  // Must come after createInstance: the publisher registers with IMessageQueue, and the dialog-view
+  // factory is what Application hands to Project instead of the do-nothing base DialogView.
+  const EngineEventPublisher eventPublisher(&engineService);
+  eventPublisher.installDialogViewFactory();
 
   grpc::ServerBuilder builder;
   // 127.0.0.1 rather than "localhost": on Windows the latter may resolve to ::1 first, leaving a

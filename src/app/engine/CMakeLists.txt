@@ -1,4 +1,10 @@
-add_executable(Sourcetrail_engine main.cpp EngineServiceImpl.cpp EngineServiceImpl.h)
+add_executable(
+  Sourcetrail_engine
+  main.cpp
+  EngineEventPublisher.cpp
+  EngineEventPublisher.h
+  EngineServiceImpl.cpp
+  EngineServiceImpl.h)
 
 set_target_properties(Sourcetrail_engine PROPERTIES
   OUTPUT_NAME sourcetrail_engine

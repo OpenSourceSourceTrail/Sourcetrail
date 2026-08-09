@@ -1,6 +1,7 @@
 #pragma once
 // STL
 #include <cassert>
+#include <functional>
 #include <memory>
 
 #include "DialogView.h"
@@ -163,6 +164,14 @@ public:
   std::shared_ptr<DialogView> getDialogView(DialogView::UseCase useCase);
 
   /**
+   * @brief Supplies the DialogView used when there is no MainView.
+   *
+   * A GUI-less Application otherwise hands out the do-nothing base DialogView, which silently drops
+   * every progress report. The engine sets this to a view that forwards them to its clients.
+   */
+  void setDialogViewFactory(std::function<std::shared_ptr<DialogView>(DialogView::UseCase)> factory);
+
+  /**
    * @brief Updates the history menu.
    * @param message The message containing the update information.
    */
@@ -214,6 +223,7 @@ private:
   std::shared_ptr<StorageCache> mStorageCache;
 
   std::shared_ptr<MainView> mMainView;
+  std::function<std::shared_ptr<DialogView>(DialogView::UseCase)> mDialogViewFactory;
 
   std::shared_ptr<IDECommunicationController> mIdeCommunicationController;
 };

@@ -2,6 +2,7 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "Application.h"
 #include "ConvertGraph.h"
 #include "ConvertLocations.h"
 #include "ConvertQuery.h"
@@ -35,8 +36,24 @@ EngineServiceImpl::EngineServiceImpl(StorageAccess* storageAccess) : mStorageAcc
 
 grpc::Status EngineServiceImpl::LoadProject(grpc::ServerContext* /*ctx*/,
                                             const sourcetrail::LoadProjectRequest* req,
-                                            sourcetrail::LoadProjectResponse* /*resp*/) {
-  MessageLoadProject{FilePath(utility::decodeFromUtf8(req->project_file_path())), false}.dispatch();
+                                            sourcetrail::LoadProjectResponse* resp) {
+  // Synchronous on purpose: the client is blocked on this response and has no other way to learn
+  // whether the project opened. setSendAsTask(false) is what makes dispatchImmediately immediate --
+  // MessageQueue::processMessage still hands the message to the task queue otherwise.
+  MessageLoadProject message{FilePath(utility::decodeFromUtf8(req->project_file_path())), false};
+  message.setSendAsTask(false);
+  message.dispatchImmediately();
+
+  const std::shared_ptr<IProject> project = Application::getInstance()->getCurrentProject();
+  if(!project) {
+    resp->set_error_message("Project could not be loaded.");
+    return grpc::Status::OK;
+  }
+
+  resp->set_loaded(project->isLoaded());
+  resp->set_indexing(project->isIndexing());
+  resp->set_reindexable(project->isReindexable());
+  resp->set_description(project->getDescription());
   return grpc::Status::OK;
 }
 

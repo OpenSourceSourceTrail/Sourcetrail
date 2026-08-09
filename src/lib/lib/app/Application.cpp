@@ -219,7 +219,15 @@ std::shared_ptr<DialogView> Application::getDialogView(DialogView::UseCase useCa
     return mMainView->getDialogView(useCase);
   }
 
+  if(mDialogViewFactory) {
+    return mDialogViewFactory(useCase);
+  }
+
   return std::make_shared<DialogView>(useCase, nullptr);
+}
+
+void Application::setDialogViewFactory(std::function<std::shared_ptr<DialogView>(DialogView::UseCase)> factory) {
+  mDialogViewFactory = std::move(factory);
 }
 
 void Application::updateHistoryMenu(std::shared_ptr<MessageBase> message) {
@@ -395,8 +403,7 @@ void Application::loadWindow(bool showStartWindow) {
 
 void Application::refreshProject(RefreshMode refreshMode, bool shallowIndexingRequested) {
   if(mProject && !mProject->isReindexable()) {
-    MessageStatus(L"Cannot refresh project: an indexer plugin required by one of its source groups is missing.", true)
-        .dispatch();
+    MessageStatus(L"Cannot refresh project: an indexer plugin required by one of its source groups is missing.", true).dispatch();
     return;
   }
 

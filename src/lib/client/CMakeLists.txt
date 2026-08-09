@@ -14,6 +14,8 @@ target_sources(
           ${CMAKE_CURRENT_LIST_DIR}/EngineCall.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.cpp
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.h
+          ${CMAKE_CURRENT_LIST_DIR}/EngineEventClient.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/EngineEventClient.h
           ${CMAKE_CURRENT_LIST_DIR}/GrpcProject.cpp
           ${CMAKE_CURRENT_LIST_DIR}/GrpcProject.h
           ${CMAKE_CURRENT_LIST_DIR}/GrpcStorageAccess.cpp

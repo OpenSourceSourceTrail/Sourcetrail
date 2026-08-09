@@ -8,6 +8,7 @@ add_sourcetrail_test(
   GrpcStorageAccessTestSuite
   SOURCES
   GrpcStorageAccessTestSuite.cpp
+  EngineEventTestSuite.cpp
   "${CMAKE_SOURCE_DIR}/src/app/engine/EngineServiceImpl.cpp"
   DEPS
   lib::mocks

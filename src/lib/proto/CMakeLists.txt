@@ -41,6 +41,8 @@ add_library(
   Sourcetrail_proto_convert STATIC
   Convert.cpp
   Convert.h
+  ConvertEvents.cpp
+  ConvertEvents.h
   ConvertGraph.cpp
   ConvertGraph.h
   ConvertLocations.cpp

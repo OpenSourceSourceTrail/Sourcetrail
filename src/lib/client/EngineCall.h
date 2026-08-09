@@ -1,11 +1,12 @@
 #pragma once
+#include <chrono>
 #include <optional>
 #include <string>
 
 #include <grpcpp/grpcpp.h>
 
-#include "EngineChannel.h"
 #include "engine.grpc.pb.h"
+#include "EngineChannel.h"
 #include "logging.h"
 
 namespace client {
@@ -21,18 +22,22 @@ using UnaryRpc = grpc::Status (Stub::*)(grpc::ClientContext*, const Request&, Re
  * Returns nullopt when the engine is unreachable, misses the deadline, or answers non-OK. The
  * deadline matters as much as the error handling: a UI thread blocked on a hung engine is
  * indistinguishable from a frozen application.
+ *
+ * `timeout` overrides the channel default for the rare call that legitimately takes longer than a
+ * UI is willing to wait -- LoadProject opens the database and builds its caches.
  */
 template <class Request, class Response>
 std::optional<Response> call(EngineChannel* channel,
                              const char* rpcName,
                              UnaryRpc<Request, Response> method,
-                             const Request& request) {
+                             const Request& request,
+                             std::optional<std::chrono::milliseconds> timeout = std::nullopt) {
   if(channel == nullptr || channel->getStub() == nullptr) {
     return std::nullopt;
   }
 
   grpc::ClientContext context;
-  context.set_deadline(std::chrono::system_clock::now() + channel->getCallTimeout());
+  context.set_deadline(std::chrono::system_clock::now() + timeout.value_or(channel->getCallTimeout()));
 
   Response response;
   const grpc::Status status = (channel->getStub()->*method)(&context, request, &response);

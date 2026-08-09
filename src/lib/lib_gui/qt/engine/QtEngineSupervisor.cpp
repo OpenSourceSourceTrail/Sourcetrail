@@ -12,6 +12,7 @@
 #include "Capabilities.h"
 #include "EngineChannel.h"
 #include "logging.h"
+#include "type/MessageRefreshUI.h"
 #include "type/MessageStatus.h"
 
 namespace {
@@ -123,6 +124,10 @@ void QtEngineSupervisor::readStdout() {
     // Also drops the cached capabilities: a restarted engine may have a different plugin set.
     client::Capabilities::instance().setChannel(mChannel.get());
     status(L"Engine connected");
+    // The project menu computed its enabled state during QtMainWindow's constructor, when there was
+    // no engine and therefore no capabilities; without this New/Edit Project stay dead for the rest
+    // of the session. QtMainWindow re-runs updateRefreshActionsEnabled() on this message.
+    MessageRefreshUI{}.noStyleReload().dispatch();
     Q_EMIT engineConnected();
   }
 }

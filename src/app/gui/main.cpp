@@ -15,12 +15,13 @@
 #include "ApplicationSettingsPrefiller.h"
 #include "ClientFactory.h"
 #include "CommandLineParser.h"
+#include "EngineEventClient.h"
 #include "FilePath.h"
+#include "GrpcStorageAccess.h"
 #include "IApplicationSettings.hpp"
 #include "includes.h"
 #include "logging.h"
 #include "productVersion.h"
-#include "GrpcStorageAccess.h"
 #include "QtApplication.h"
 #include "QtCoreApplication.h"
 #include "QtEngineSupervisor.h"
@@ -79,6 +80,12 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
   Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), nullptr, nullptr);
   [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
+  // Indexing progress, status lines and "the index is ready" all originate on the engine's message
+  // bus; this is the only thing that carries them across. Started after createInstance, which is
+  // what sets up the local IMessageQueue it dispatches onto.
+  client::EngineEventClient eventClient(supervisor.getChannel());
+  eventClient.start();
+
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
 
   // TODO(Hussein): Replace with Boost or Qt
@@ -133,6 +140,11 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   std::shared_ptr<GrpcStorageAccess> storageAccess;
   Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), &viewFactory, &networkFactory);
   [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
+
+  // See runConsole: without this the GUI never hears back from the engine, so nothing refreshes
+  // after a load and indexing progress stays at 0%.
+  client::EngineEventClient eventClient(supervisor.getChannel());
+  eventClient.start();
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());
   MessageStatus{utility::decodeFromUtf8(message)}.dispatch();
