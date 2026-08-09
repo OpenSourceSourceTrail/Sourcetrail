@@ -193,7 +193,9 @@ void QtDialogView::updateIndexingDialog(size_t startedFileCount,
 
     window->updateIndexingProgress(finishedFileCount, totalFileCount, sourcePaths.empty() ? FilePath() : sourcePaths.back());
 
-    m_mainWindow->setWindowsTaskbarProgress(float(finishedFileCount) / static_cast<float>(totalFileCount));
+    // Before the first file is counted totalFileCount is 0, and 0/0 puts a NaN on the taskbar.
+    m_mainWindow->setWindowsTaskbarProgress(totalFileCount > 0 ? float(finishedFileCount) / static_cast<float>(totalFileCount) :
+                                                                 0.0F);
 
     setUIBlocked(m_dialogsVisible);
   });
