@@ -171,7 +171,7 @@ find_package(
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
 find_package(
-  Qt6 6.11 REQUIRED
+  Qt6 6.10 REQUIRED
   COMPONENTS Widgets
              PrintSupport
              Network
@@ -235,7 +235,7 @@ if(ENABLE_UNIT_TEST
   create_symlink("${CMAKE_SOURCE_DIR}/bin/test/data" "${CMAKE_BINARY_DIR}/test/data")
 
   find_package(
-    Qt6 6.11
+    Qt6 6.10
     COMPONENTS Test Sql
     REQUIRED)
 

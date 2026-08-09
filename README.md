@@ -20,6 +20,21 @@ Sourcetrail is:
 * supporting C/C++
 * ~~offering an SDK ([SourcetrailDB](https://github.com/CoatiSoftware/SourcetrailDB)) to write custom language extensions~~
 
+## How it works
+
+Sourcetrail is split into several processes that talk over gRPC:
+
+| Binary | Role |
+| --- | --- |
+| `Sourcetrail` | Qt GUI. Owns no database; it supervises the engine and reads everything through it. |
+| `Sourcetrail_engine` | Headless daemon. Owns the SQLite index and serves the GUI/CLI over gRPC. |
+| `Sourcetrail_indexer` | Indexer worker process, spawned per indexing job. |
+| `Sourcetrail_cli` | Headless, Qt-free front end. |
+
+Indexers are plugins: each ships a manifest under `<build>/app/plugins/<name>/` and the
+engine discovers them at startup. The GUI only offers the languages the running engine
+reports, so a build without the C/C++ package simply shows fewer project types.
+
 ## Using Sourcetrail
 
 To setup Sourcetrail on your machine, you can either download the respective build for your operating system from our list of [Releases](https://github.com/OpenSourceSourceTrail/Sourcetrail/releases) and install it on your machine.
@@ -72,15 +87,23 @@ Building Sourcetrail requires several dependencies to be in place on your machin
 ### Required dependencies
 
 * __Conan 2__
-    * __Reason__: Package Manager
+    * __Reason__: Package Manager. Pulls Boost, gRPC/protobuf, spdlog, fmt, SQLite and the rest.
     * __Install__: pip3 install conan
 
-* __Qt 6.8.2__
-    * __Reason__: Used for rendering the GUI and for starting additional (indexer) processes.
+* __Qt 6.10__
+    * __Reason__: Used for rendering the GUI and for starting additional (engine/indexer) processes.
     * __Prebuilt Download__: http://download.qt.io/official_releases/qt/
     * __aqt installer__: https://github.com/miurahr/aqtinstall
 
+### Optional dependencies
+
+* __Maven + JDK 21__
+    * __Reason__: Builds the Java indexer plugin. CMake enables `BUILD_JAVA_INDEXER` automatically when `mvn` is on your `PATH`; pass `-DBUILD_JAVA_INDEXER=OFF` to skip it.
+
 ### Building
+
+The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed with
+`_build_cxx` for C/C++ indexing support. They all build into `<repo>/build/`.
 
 #### On Windows `Faced some problems with Conan2 and Windows`
 * To set up your build environment run:
@@ -88,10 +111,9 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     $ pip install conan
     $ git clone --recurse-submodules https://github.com/OpenSourceSourceTrail/Sourcetrail.git
     $ cd Sourcetrail
-    $ conan install . -s build_type=Release -of .conan/vc/ -b missing
-    $ cmake --preset=vc_release
-    $ cd ../build/Release/
-    $ ninja
+    $ conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
+    $ cmake --preset=ci_msvc_release
+    $ cmake --build build
     ```
 
 #### On Unix
@@ -102,14 +124,14 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     $ git clone  --recurse-submodules https://github.com/OpenSourceSourceTrail/Sourcetrail.git
     $ cd Sourcetrail
     $ conan install . -s build_type=Release -of .conan/gcc/ -b missing -pr:a .conan/gcc/profile
-    $ cmake --preset=gnu_release
-    $ cd ../build/Release/GNU
-    $ ninja
+    $ cmake --preset=ci_gnu_release
+    $ cmake --build build
     ```
 
 ### Running
 
-* Run Sourcetrail from within the `bin` directory.
+* All executables land in `build/app/`, next to the `data`, `user` and `plugins` directories
+  they need. Run `build/app/Sourcetrail` from there; it starts `Sourcetrail_engine` itself.
 
 ## Enable C/C++ Language Support
 
@@ -123,17 +145,26 @@ Building Sourcetrail requires several dependencies to be in place on your machin
 
 ### Building
 
-* Run CMake with these additional options:
+* Use the `_build_cxx` preset variant and point it at your LLVM build:
     ```
-    -DClang_DIR=<path/to/llvm_build>/lib/cmake/clang
-    -DBUILD_CXX_LANGUAGE_PACKAGE=ON
+    $ cmake --preset=ci_gnu_release_build_cxx -DClang_DIR=<path/to/llvm_build>/lib/cmake/clang
+    $ cmake --build build
     ```
-* Build Sourcetrail as described [above](#building).
+    The preset defaults `Clang_DIR` to `<repo>/external/lib/cmake/clang/`, so you can drop an
+    LLVM install there instead of passing the option. On any other preset, add
+    `-DBUILD_CXX_LANGUAGE_PACKAGE=ON -DClang_DIR=...` by hand.
 
 
 ### How to Run the Tests
 
-The automated test suite of Sourcetrail is powered by [GTest](https://github.com/google/googletest). To run the tests, simply execute the `ctest`.
+The automated test suite of Sourcetrail is powered by [GTest](https://github.com/google/googletest).
+The `ci_*` presets already enable the unit, GUI and integration tests; on a custom configuration
+turn them on with `-DENABLE_UNIT_TEST=ON -DENABLE_GUI_TEST=ON -DENABLE_INTEGRATION_TEST=ON`.
+Run them with:
+
+```
+$ ctest --test-dir build
+```
 
 ### Special thanks
 A special thanks for jetbrain for providing a license for clion. 
