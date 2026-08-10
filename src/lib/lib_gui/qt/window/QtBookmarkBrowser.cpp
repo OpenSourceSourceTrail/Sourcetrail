@@ -18,7 +18,7 @@ QtBookmarkBrowser::QtBookmarkBrowser(ControllerProxy<BookmarkController>* contro
 QtBookmarkBrowser::~QtBookmarkBrowser() = default;
 
 void QtBookmarkBrowser::setupBookmarkBrowser() {
-  setStyleSheet(utility::getStyleSheet("://window/window.css") + utility::getStyleSheet("://bookmark_view/bookmark_view.css"));
+  setStyleSheet(utility::getStyleSheet(":/data/gui/window/window.css") + utility::getStyleSheet(":/data/gui/bookmark_view/bookmark_view.css"));
 
   mHeaderBackground = new QWidget(m_window);    // NOLINT(cppcoreguidelines-owning-memory): Qt handles the memory
   mHeaderBackground->setObjectName(QStringLiteral("header_background"));

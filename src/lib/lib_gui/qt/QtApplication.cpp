@@ -10,7 +10,7 @@ QtApplication::QtApplication(int& argc, char** argv) : QApplication(argc, argv) 
   std::ignore = connect(this, &QGuiApplication::applicationStateChanged, this, [](auto state) {
     MessageWindowFocus(state == Qt::ApplicationActive).dispatch();
   });
-  Q_INIT_RESOURCE(resources);
+  Q_INIT_RESOURCE(resource);
 }
 
 bool QtApplication::event(QEvent* event) {

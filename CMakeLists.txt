@@ -261,7 +261,12 @@ set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
 install(TARGETS Sourcetrail Sourcetrail_indexer Sourcetrail_cli Sourcetrail_engine RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/ DESTINATION ${INSTALL_RUNTIME_DIR}/data/)
+# gui/ and fonts/ are compiled into the binary via bin/app/resource.qrc, so they are not installed.
+install(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/
+  DESTINATION ${INSTALL_RUNTIME_DIR}/data/
+  PATTERN "gui" EXCLUDE
+  PATTERN "fonts" EXCLUDE)
 
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/user/ DESTINATION ${INSTALL_RUNTIME_DIR}/user/)
 

@@ -19,8 +19,8 @@ TEST_F(ResourcePathsFix, goodCase) {
   ASSERT_EQ(tempDir / "data/color_schemes/", ResourcePaths::getColorSchemesDirectoryPath().str());
   ASSERT_EQ(tempDir / "data/syntax_highlighting_rules/", ResourcePaths::getSyntaxHighlightingRulesDirectoryPath().str());
   ASSERT_EQ(tempDir / "data/fallback/", ResourcePaths::getFallbackDirectoryPath().str());
-  ASSERT_EQ(tempDir / "data/fonts/", ResourcePaths::getFontsDirectoryPath().str());
-  ASSERT_EQ(tempDir / "data/gui/", ResourcePaths::getGuiDirectoryPath().str());
+  ASSERT_EQ(":/data/fonts/", ResourcePaths::getFontsDirectoryPath().str());
+  ASSERT_EQ(":/data/gui/", ResourcePaths::getGuiDirectoryPath().str());
   ASSERT_EQ(tempDir / "data/license/", ResourcePaths::getLicenseDirectoryPath().str());
   ASSERT_EQ(tempDir / "data/cxx/include/", ResourcePaths::getCxxCompilerHeaderDirectoryPath().str());
 }

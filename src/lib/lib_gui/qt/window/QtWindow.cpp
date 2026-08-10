@@ -14,7 +14,7 @@
 QtWindow::QtWindow(bool isSubWindow, QWidget* parent) : QtWindowBase(isSubWindow, parent) {}
 
 void QtWindow::setup() {
-  setStyleSheet(utility::getStyleSheet("://window/window.css"));
+  setStyleSheet(utility::getStyleSheet(":/data/gui/window/window.css"));
 
   auto* layout = new QVBoxLayout;    // NOLINT(cppcoreguidelines-owning-memory)
   layout->setContentsMargins(10, 10, 10, 10);
@@ -276,7 +276,7 @@ void QtWindow::setupDone() {
 }
 
 void QtWindow::addLogo() {
-  QtDeviceScaledPixmap sourcetrailLogo("://window/logo_240.png");
+  QtDeviceScaledPixmap sourcetrailLogo(":/data/gui/window/logo_240.png");
 
   const QPoint LogoLabelPosition(m_isSubWindow ? 40 : 23, 25);
   auto* pSourcetrailLogoLabel = new QLabel(this);    // NOLINT(cppcoreguidelines-owning-memory)

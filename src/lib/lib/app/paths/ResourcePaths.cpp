@@ -16,11 +16,11 @@ FilePath ResourcePaths::getFallbackDirectoryPath() {
 }
 
 FilePath ResourcePaths::getFontsDirectoryPath() {
-  return AppPath::getSharedDataDirectoryPath().concatenate(L"data/fonts/");
+  return FilePath{L":/data/fonts/"};
 }
 
 FilePath ResourcePaths::getGuiDirectoryPath() {
-  return AppPath::getSharedDataDirectoryPath().concatenate(L"data/gui/");
+  return FilePath{L":/data/gui/"};
 }
 
 FilePath ResourcePaths::getLicenseDirectoryPath() {

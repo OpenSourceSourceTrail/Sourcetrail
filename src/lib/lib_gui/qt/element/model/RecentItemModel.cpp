@@ -15,10 +15,10 @@ constexpr const char* MIME_TYPE = "application/x-recent-item-model";
 
 QIcon getProjectIcon(LanguageType lang) {
 #if BUILD_CXX_LANGUAGE_PACKAGE
-  static const auto CppIcon = QIcon("://icon/cpp_icon.png");
-  static const auto CIcon = QIcon("://icon/c_icon.png");
+  static const auto CppIcon = QIcon(":/data/gui/icon/cpp_icon.png");
+  static const auto CIcon = QIcon(":/data/gui/icon/c_icon.png");
 #endif
-  static const auto ProjectIcon = QIcon("://icon/empty_icon.png");
+  static const auto ProjectIcon = QIcon(":/data/gui/icon/empty_icon.png");
 
   switch(lang) {
 #if BUILD_CXX_LANGUAGE_PACKAGE

@@ -11,12 +11,10 @@
 
 #include "ColorScheme.h"
 #include "FilePath.h"
-#include "FileSystem.h"
 #include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "QtMainView.h"
 #include "ResourcePaths.h"
-#include "TextAccess.h"
 #include "utilityApp.h"
 #include "utilityString.h"
 
@@ -40,14 +38,13 @@ void setWidgetRetainsSpaceWhenHidden(QWidget* widget) {
 }
 
 void loadFontsFromDirectory(const FilePath& path, const std::wstring& extension) {
-  std::vector<std::wstring> extensions;
-  extensions.push_back(extension);
-  const std::vector<FilePath> fontFilePaths = FileSystem::getFilePathsFromDirectory(path, extensions);
+  const QDir directory{QString::fromStdWString(path.wstr())};
+  const QStringList fontFileNames = directory.entryList({QString::fromStdWString(L"*" + extension)}, QDir::Files);
 
   std::set<int> loadedFontIds;
 
-  for(const FilePath& fontFilePath : fontFilePaths) {
-    QFile file(QString::fromStdWString(fontFilePath.wstr()));
+  for(const QString& fontFileName : fontFileNames) {
+    QFile file(directory.filePath(fontFileName));
     if(file.open(QIODevice::ReadOnly)) {
       const int fontId = QFontDatabase::addApplicationFontFromData(file.readAll());
       if(fontId != -1) {
@@ -65,7 +62,12 @@ void loadFontsFromDirectory(const FilePath& path, const std::wstring& extension)
 
 // NOLINTNEXTLINE(readability-function-cognitive-complexity)
 std::string getStyleSheet(const FilePath& path) {
-  std::string css = TextAccess::createFromFile(path)->getText();
+  QFile styleSheetFile(QString::fromStdWString(path.wstr()));
+  if(!styleSheetFile.open(QIODevice::ReadOnly)) {
+    LOG_WARNING(fmt::format("Failed to read {}", path.str()));
+    return "";
+  }
+  std::string css = styleSheetFile.readAll().toStdString();
 
   size_t pos = 0;
 

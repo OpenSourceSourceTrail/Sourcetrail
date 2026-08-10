@@ -42,14 +42,14 @@ const std::vector<std::filesystem::path> RecentItemModelTestSuite::RecentItems =
     std::filesystem::path{"data/RecentItemModelTestSuite/missing.srctrlprj"},
 };
 
-const QIcon RecentItemModelTestSuite::ProjectIcon = QIcon("://icon/empty_icon.png");
+const QIcon RecentItemModelTestSuite::ProjectIcon = QIcon(":/data/gui/icon/empty_icon.png");
 
 RecentItemModelTestSuite::RecentItemModelTestSuite() = default;
 
 RecentItemModelTestSuite::~RecentItemModelTestSuite() = default;
 
 void RecentItemModelTestSuite::initTestCase() {
-  Q_INIT_RESOURCE(resources);
+  Q_INIT_RESOURCE(resource);
   IMessageQueue::setInstance(std::make_shared<MockedMessageQueue>());
 }
 

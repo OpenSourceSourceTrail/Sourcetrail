@@ -71,7 +71,7 @@ void QtStartScreen::setupStartScreen() {
   const QSize size = sizeHint();
   move(parentWidget()->width() / 2 - size.width() / 2, parentWidget()->height() / 2 - size.height() / 2);
 
-  setStyleSheet(utility::getStyleSheet("://startscreen/startscreen.css"));
+  setStyleSheet(utility::getStyleSheet(":/data/gui/startscreen/startscreen.css"));
 }
 
 void QtStartScreen::hideEvent(QHideEvent* hideEvent) {
@@ -164,7 +164,7 @@ void QtStartScreen::createVersionAndGithub(QHBoxLayout* layout) {
   auto* githubButton = createButton(this, QStringLiteral("View on GitHub"), QStringLiteral("infoButton"), []() {
     QDesktopServices::openUrl(QUrl("github"_g, QUrl::TolerantMode));
   });
-  githubButton->setIcon(QIcon("://startscreen/github_icon.png"));
+  githubButton->setIcon(QIcon(":/data/gui/startscreen/github_icon.png"));
   vBoxLayout->addWidget(githubButton);
 
   vBoxLayout->addSpacing(BoxLayoutSpacing[1]);

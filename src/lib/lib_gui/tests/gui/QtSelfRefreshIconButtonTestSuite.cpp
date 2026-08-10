@@ -13,7 +13,7 @@ QtSelfRefreshIconButtonTestSuite::QtSelfRefreshIconButtonTestSuite() = default;
 QtSelfRefreshIconButtonTestSuite::~QtSelfRefreshIconButtonTestSuite() = default;
 
 void QtSelfRefreshIconButtonTestSuite::initTestCase() {
-  Q_INIT_RESOURCE(resources);
+  Q_INIT_RESOURCE(resource);
   IMessageQueue::setInstance(std::make_shared<MockedMessageQueue>());
 }
 
