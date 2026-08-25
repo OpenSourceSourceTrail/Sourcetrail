@@ -14,7 +14,6 @@ add_library(Sourcetrail::lib::lib_cxx ALIAS Sourcetrail_lib_cxx)
 target_sources(
   Sourcetrail_lib_cxx
   PRIVATE data/indexer/CxxIndexerCommandProvider.cpp
-          data/indexer/IndexerCommandCxx.cpp
           data/indexer/IndexerCxx.cpp
           data/parser/cxx/name/CxxDeclName.cpp
           data/parser/cxx/name/CxxFunctionDeclName.cpp

@@ -52,7 +52,7 @@ std::set<FilePath> SourceGroupCxxCdb::getAllSourceFilePaths(std::shared_ptr<clan
   if(cdb) {
     const std::vector<FilePathFilter> excludeFilters = m_settings->getExcludeFiltersExpandedAndAbsolute();
     for(const FilePath& path :
-        IndexerCommandCxx::getSourceFilesFromCDB(cdb, m_settings->getCompilationDatabasePathExpandedAndAbsolute())) {
+        utility::getSourceFilesFromCDB(cdb, m_settings->getCompilationDatabasePathExpandedAndAbsolute())) {
       bool excluded = FilePathFilter::areMatching(excludeFilters, path);
       if(!excluded && path.exists()) {
         sourceFilePaths.insert(path);

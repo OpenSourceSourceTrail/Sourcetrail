@@ -19,10 +19,12 @@
 #include "FileSystem.h"
 #include "GeneratePCHAction.h"
 #include "logging.h"
+#include "OrderedCache.h"
 #include "ParserClientImpl.h"
 #include "SingleFrontendActionFactory.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"
 #include "StorageProvider.h"
+#include "type/MessageStatus.h"
 #include "TaskLambda.h"
 #include "utility.h"
 #include "utilityString.h"
@@ -100,6 +102,43 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
 
     storageProvider->insert(storage);
   });
+}
+
+std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath) {
+  std::string error;
+  const std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
+
+  if(!error.empty()) {
+    const auto message = fmt::format(
+        L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
+    LOG_ERROR(message);
+    MessageStatus(message, true).dispatch();
+  }
+
+  return getSourceFilesFromCDB(cdb, cdbPath);
+}
+
+std::vector<FilePath> getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
+                                                               const FilePath& cdbPath) {
+  std::vector<FilePath> filePaths;
+  if(cdb) {
+    OrderedCache<FilePath, FilePath> canonicalDirectoryPathCache([](const FilePath& path) { return path.getCanonical(); });
+
+    for(const std::string& fileString : cdb->getAllFiles()) {
+      FilePath path = FilePath(utility::decodeFromUtf8(fileString));
+      if(!path.isAbsolute()) {
+        std::vector<clang::tooling::CompileCommand> commands = cdb->getCompileCommands(fileString);
+        if(!commands.empty()) {
+          path = FilePath(utility::decodeFromUtf8(commands.front().Directory + '/' + commands.front().Filename)).makeCanonical();
+        }
+      }
+      if(!path.isAbsolute()) {
+        path = cdbPath.getParentDirectory().getConcatenated(path).makeCanonical();
+      }
+      filePaths.push_back(canonicalDirectoryPathCache.getValue(path.getParentDirectory()).concatenate(path.fileName()));
+    }
+  }
+  return filePaths;
 }
 
 std::shared_ptr<clang::tooling::JSONCompilationDatabase> loadCDB(const FilePath& cdbPath, std::string* error) {

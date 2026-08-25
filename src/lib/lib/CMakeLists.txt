@@ -181,6 +181,7 @@ target_sources(
           data/indexer/IndexerCommand.h
           data/indexer/IndexerCommandCustom.cpp
           data/indexer/IndexerCommandCustom.h
+          data/indexer/IndexerCommandCxx.cpp
           data/indexer/IndexerCommandJava.cpp
           data/indexer/IndexerCommandJava.h
           data/indexer/IndexerCommandProvider.cpp

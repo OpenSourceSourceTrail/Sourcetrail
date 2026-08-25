@@ -66,9 +66,7 @@ target_include_directories(Sourcetrail_proto_convert PUBLIC "${CMAKE_CURRENT_SOU
 # include paths at generation time without registering a link dependency.
 target_include_directories(
   Sourcetrail_proto_convert
-  PRIVATE
-    "$<TARGET_PROPERTY:Sourcetrail_lib,INTERFACE_INCLUDE_DIRECTORIES>"
-    "$<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:$<TARGET_PROPERTY:Sourcetrail_lib_cxx,INTERFACE_INCLUDE_DIRECTORIES>>")
+  PRIVATE "$<TARGET_PROPERTY:Sourcetrail_lib,INTERFACE_INCLUDE_DIRECTORIES>")
 
 target_link_libraries(
   Sourcetrail_proto_convert

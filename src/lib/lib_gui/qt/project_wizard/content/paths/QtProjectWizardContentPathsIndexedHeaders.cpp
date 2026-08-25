@@ -5,6 +5,7 @@
 
 #include "CompilationDatabase.h"
 #include "IndexerCommandCxx.h"
+#include "utilitySourceGroupCxx.h"
 #include "logging.h"
 #include "OrderedCache.h"
 #include "QtPathListDialog.h"
@@ -20,7 +21,7 @@ std::vector<FilePath> QtProjectWizardContentPathsIndexedHeaders::getIndexedPaths
   {
     const FilePath cdbPath = settings->getCompilationDatabasePathExpandedAndAbsolute();
     if(!cdbPath.empty() && cdbPath.exists()) {
-      for(const FilePath& path : IndexerCommandCxx::getSourceFilesFromCDB(cdbPath)) {
+      for(const FilePath& path : utility::getSourceFilesFromCDB(cdbPath)) {
         indexedHeaderPaths.insert(path.getCanonical().getParentDirectory());
       }
       for(const FilePath& path : utility::CompilationDatabase(cdbPath).getAllHeaderPaths()) {

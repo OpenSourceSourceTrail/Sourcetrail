@@ -20,6 +20,26 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
                                          const std::shared_ptr<DialogView>& dialogView);
 
 std::shared_ptr<clang::tooling::JSONCompilationDatabase> loadCDB(const FilePath& cdbPath, std::string* error = nullptr);
+
+/** Lists the source files a compilation database names, as absolute canonical paths.
+ *
+ * Parsing a compilation database needs Clang, which is why this lives here and not next to
+ * IndexerCommandCxx: the command itself is plain data that the engine and the GUI must be able
+ * to build and serialize without a language package.
+ */
+std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath);
+std::vector<FilePath> getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
+                                            const FilePath& cdbPath);
+
+/** Lists the source files a compilation database names, as absolute canonical paths.
+ *
+ * Parsing a compilation database needs Clang, which is why this lives here and not next to
+ * IndexerCommandCxx: the command itself is plain data that the engine and the GUI must be able
+ * to build and serialize without a language package.
+ */
+std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath);
+std::vector<FilePath> getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
+                                            const FilePath& cdbPath);
 bool containsIncludePchFlags(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb);
 bool containsIncludePchFlag(const std::vector<std::string>& args);
 std::vector<std::wstring> getWithRemoveIncludePchFlag(const std::vector<std::wstring>& args);
