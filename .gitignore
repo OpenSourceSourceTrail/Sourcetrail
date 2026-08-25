@@ -79,3 +79,8 @@ compile_commands.json
 .conan/
 CMakeUserPresets.json
 *.pyc
+
+# LLVM/Clang drop-in for the C/C++ indexer (symlink from scripts/build_llvm_conan.sh, or
+# extracted release asset in CI). The Conan install folder itself sits under the
+# already-ignored .conan/.
+/external/

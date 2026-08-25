@@ -43,7 +43,16 @@ cmake --build build
 
 ### Enabling C/C++ language support (the indexer)
 
-Requires LLVM/Clang 22 or newer (developed against 22.1.8) built with `-DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RTTI=ON` (plus `-DCLANG_LINK_CLANG_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON` on Unix):
+Requires LLVM/Clang 22 or newer (developed against 22.1.8) built with `-DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RTTI=ON` (plus `-DCLANG_LINK_CLANG_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON` on Unix).
+
+On Linux, `scripts/build_llvm_conan.sh` produces that build through Conan from the recipe in `.conan/recipes/llvm-clang/`, then symlinks `<repo>/external` at the resulting package:
+```
+./scripts/build_llvm_conan.sh
+cmake --preset=ci_gnu_release_build_cxx
+```
+That is a **second, separate** `conan install` (into `.conan/llvm/`); it deliberately stays out of the unified GCC/Release graph in `.conan/gcc/` so the main dependency set and its package IDs are unaffected. The first run compiles LLVM from source and takes hours; later runs are cache hits.
+
+With a hand-built LLVM, point at it instead:
 ```
 cmake --preset=ci_gnu_release_build_cxx -DClang_DIR=<path/to/llvm_build>/lib/cmake/clang
 ```

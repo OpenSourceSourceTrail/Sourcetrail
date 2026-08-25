@@ -11,7 +11,7 @@ description: Build Sourcetrail — Conan 2 setup, CMake presets, key options, ad
 - Conan 2 (`pip install conan`)
 - Qt 6.8.2
 - gRPC 1.54.3 + Protobuf (Conan; used for cross-process IPC)
-- Optional: LLVM/Clang 19.1.7 (for C/C++ indexing support)
+- Optional: LLVM/Clang 22.1.8 (for C/C++ indexing support; `scripts/build_llvm_conan.sh`)
 
 ## Conan setup (first time, Linux/GCC)
 
@@ -20,6 +20,16 @@ install (`scripts/run_conan.sh` does exactly this one command).
 
 ```bash
 conan install . -s build_type=Release -of .conan/gcc/ -b missing -pr:a .conan/gcc/profile
+```
+
+LLVM/Clang for the C/C++ indexer is a separate Conan package built from the in-repo recipe
+`.conan/recipes/llvm-clang/` (upstream flags: `LLVM_ENABLE_PROJECTS=clang`,
+`LLVM_ENABLE_RTTI=ON`, `CLANG_LINK_CLANG_DYLIB=ON`, `LLVM_LINK_LLVM_DYLIB=ON`,
+`LLVM_TARGETS_TO_BUILD=host`). It installs into `.conan/llvm/` — never into `.conan/gcc/` —
+and symlinks `external/` at the package so the `build_cxx` presets need no `Clang_DIR`:
+
+```bash
+./scripts/build_llvm_conan.sh   # first run builds LLVM from source (hours)
 ```
 
 ## Configure & build
