@@ -23,7 +23,7 @@ jobs:
         run: git fetch --tags origin
 
       - name: Install dependencies
-        run: sudo apt install -y gcc g++ ninja-build python3-pip
+        run: sudo apt install -y gcc g++ ninja-build python3-pip mold
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3

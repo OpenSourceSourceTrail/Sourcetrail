@@ -216,7 +216,7 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep
+        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep mold
 
       - name: Install Qt (Ubuntu)
         if: runner.os == 'Linux'
