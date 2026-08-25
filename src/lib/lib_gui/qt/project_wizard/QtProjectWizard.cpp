@@ -7,7 +7,6 @@
 #include <QSysInfo>
 #include <QTimer>
 //
-#include "language_packages.h"
 // internal
 #include "ProjectSettings.h"
 #include "ProjectWizardModel.hpp"
@@ -37,27 +36,24 @@
 //
 #include "Application.h"
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "QtProjectWizardContentCppStandard.h"
-#  include "QtProjectWizardContentCrossCompilationOptions.h"
-#  include "QtProjectWizardContentCStandard.h"
-#  include "QtProjectWizardContentCxxPchFlags.h"
-#  include "QtProjectWizardContentFlags.h"
-#  include "QtProjectWizardContentPathCDB.h"
-#  include "QtProjectWizardContentPathCxxPch.h"
-#  include "QtProjectWizardContentPathsFrameworkSearch.h"
-#  include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
-#  include "QtProjectWizardContentPathsHeaderSearch.h"
-#  include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
-#  include "QtProjectWizardContentPathsIndexedHeaders.h"
-#  include "QtProjectWizardContentVS.h"
-#  include "SourceGroupSettingsCEmpty.h"
-#  include "SourceGroupSettingsCppEmpty.h"
-#  include "SourceGroupSettingsCxxCdb.h"
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#include "QtProjectWizardContentCppStandard.h"
+#include "QtProjectWizardContentCrossCompilationOptions.h"
+#include "QtProjectWizardContentCStandard.h"
+#include "QtProjectWizardContentCxxPchFlags.h"
+#include "QtProjectWizardContentFlags.h"
+#include "QtProjectWizardContentPathCDB.h"
+#include "QtProjectWizardContentPathCxxPch.h"
+#include "QtProjectWizardContentPathsFrameworkSearch.h"
+#include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
+#include "QtProjectWizardContentPathsHeaderSearch.h"
+#include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
+#include "QtProjectWizardContentPathsIndexedHeaders.h"
+#include "QtProjectWizardContentVS.h"
+#include "SourceGroupSettingsCEmpty.h"
+#include "SourceGroupSettingsCppEmpty.h"
+#include "SourceGroupSettingsCxxCdb.h"
 
 namespace {
-#if BUILD_CXX_LANGUAGE_PACKAGE
 
 bool applicationSettingsContainVisualStudioHeaderSearchPaths() {
   std::vector<FilePath> expandedPaths;
@@ -91,14 +87,10 @@ void addMsvcCompatibilityFlagsOnDemand(std::shared_ptr<SourceGroupSettingsWithCx
   }
 }
 
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-
 template <typename SettingsType>
 void addSourceGroupContents(QtProjectWizardContentGroup* group,
                             std::shared_ptr<SettingsType> settings,
                             QtProjectWizardWindow* window);
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
 
 template <>
 void addSourceGroupContents<SourceGroupSettingsCEmpty>(QtProjectWizardContentGroup* group,
@@ -178,7 +170,6 @@ void addSourceGroupContents<SourceGroupSettingsCxxCdb>(QtProjectWizardContentGro
   group->addContent(new QtProjectWizardContentPathCxxPch(settings, settings, window));
   group->addContent(new QtProjectWizardContentCxxPchFlags(settings, window, true));
 }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 template <>
 void addSourceGroupContents<SourceGroupSettingsCustomCommand>(QtProjectWizardContentGroup* group,
@@ -231,7 +222,6 @@ void QtProjectWizard::newProject() {
 }
 
 void QtProjectWizard::newProjectFromCDB([[maybe_unused]] const FilePath& filePath) {
-#if BUILD_CXX_LANGUAGE_PACKAGE
   if(!m_projectSettings) {
     m_projectSettings = std::make_shared<ProjectSettings>();
   }
@@ -253,7 +243,6 @@ void QtProjectWizard::newProjectFromCDB([[maybe_unused]] const FilePath& filePat
   sourceGroupSettings->setCompilationDatabasePath(filePath);
 
   createSourceGroup(sourceGroupSettings);
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 }
 
 void QtProjectWizard::editProject(const FilePath& settingsPath, bool readOnly) {
@@ -521,7 +510,6 @@ void QtProjectWizard::selectedSourceGroupChanged(int index) {
   } else if(auto settingsUnloadable = std::dynamic_pointer_cast<SourceGroupSettingsUnloadable>(group)) {
     addSourceGroupContents(summary, settingsUnloadable, this);
   }
-#if BUILD_CXX_LANGUAGE_PACKAGE
   else if(auto settingsCEmpty = std::dynamic_pointer_cast<SourceGroupSettingsCEmpty>(group)) {
     addSourceGroupContents(summary, settingsCEmpty, this);
   } else if(auto settingsCppEmpty = std::dynamic_pointer_cast<SourceGroupSettingsCppEmpty>(group)) {
@@ -533,7 +521,6 @@ void QtProjectWizard::selectedSourceGroupChanged(int index) {
     summary->addContent(new QtProjectWizardContentPathCDB(m_model, this));
     addSourceGroupContents(summary, std::move(settingsCxxCdb), this);
   }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   summary->addSpace();
   summary->addContent(new QtProjectWizardContentRequiredLabel(this));
@@ -688,7 +675,6 @@ void QtProjectWizard::newSourceGroup() {
 }
 
 void QtProjectWizard::newSourceGroupFromVS() {
-#if BUILD_CXX_LANGUAGE_PACKAGE
   QtProjectWizardWindow* window = createWindowWithContent([](QtProjectWizardWindow* window_) {
     window_->setPreferredSize(QSize(560, 320));
     return new QtProjectWizardContentVS(window_);
@@ -701,7 +687,6 @@ void QtProjectWizard::newSourceGroupFromVS() {
   window->setNextEnabled(true);
   window->setPreviousEnabled(true);
   window->updateSubTitle(QStringLiteral("C/C++ from Visual Studio"));
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 }
 
 void QtProjectWizard::selectedProjectType(SourceGroupType sourceGroupType) {
@@ -709,7 +694,6 @@ void QtProjectWizard::selectedProjectType(SourceGroupType sourceGroupType) {
   std::shared_ptr<SourceGroupSettings> settings;
 
   switch(sourceGroupType) {
-#if BUILD_CXX_LANGUAGE_PACKAGE
   case SOURCE_GROUP_C_EMPTY: {
     std::shared_ptr<SourceGroupSettingsCEmpty> cxxSettings = std::make_shared<SourceGroupSettingsCEmpty>(
         sourceGroupId, m_projectSettings.get());
@@ -728,7 +712,6 @@ void QtProjectWizard::selectedProjectType(SourceGroupType sourceGroupType) {
   case SOURCE_GROUP_CXX_VS:
     newSourceGroupFromVS();
     return;
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   case SOURCE_GROUP_JAVA_EMPTY:
     settings = std::make_shared<SourceGroupSettingsJavaEmpty>(sourceGroupId, m_projectSettings.get());

@@ -12,6 +12,7 @@
 #include "FileInfo.h"
 #include "FilePath.h"
 #include "IndexerPluginRegistry.h"
+#include "language_packages.h"
 #include "logging.h"
 #include "NameHierarchy.h"
 #include "NodeBookmark.h"
@@ -29,6 +30,11 @@
 #include "type/MessageRefresh.h"
 #include "utilityString.h"
 #include "Version.h"
+
+#if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "CompilationDatabase.h"
+#  include "utilitySourceGroupCxx.h"
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 EngineServiceImpl::EngineServiceImpl(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 
@@ -104,6 +110,38 @@ grpc::Status EngineServiceImpl::GetCapabilities(grpc::ServerContext* /*ctx*/,
 
   resp->set_can_create_project(resp->supported_source_group_types_size() > 0);
   resp->set_engine_version(Version::getApplicationVersion().toString());
+  return grpc::Status::OK;
+}
+
+grpc::Status EngineServiceImpl::GetCompilationDatabaseInfo(grpc::ServerContext* /*ctx*/,
+                                                           const sourcetrail::CompilationDatabaseInfoRequest* req,
+                                                           sourcetrail::CompilationDatabaseInfoResponse* resp) {
+#if BUILD_CXX_LANGUAGE_PACKAGE
+  const FilePath cdbPath(utility::decodeFromUtf8(req->cdb_path()));
+  if(cdbPath.empty() || !cdbPath.exists()) {
+    resp->set_error("The provided Compilation Database path does not exist.");
+    return grpc::Status::OK;
+  }
+
+  std::string error;
+  const std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
+  if(!cdb) {
+    resp->set_error(error.empty() ? "Unable to open and read the provided compilation database file." : error);
+    return grpc::Status::OK;
+  }
+
+  resp->set_valid(true);
+  for(const FilePath& path : utility::getSourceFilesFromCDB(cdb, cdbPath)) {
+    resp->add_source_files(utility::encodeToUtf8(path.wstr()));
+  }
+  for(const FilePath& path : utility::CompilationDatabase(cdbPath).getAllHeaderPaths()) {
+    resp->add_header_paths(utility::encodeToUtf8(path.wstr()));
+  }
+  resp->set_contains_include_pch_flags(utility::containsIncludePchFlags(cdb));
+#else
+  (void)req;
+  resp->set_error("This engine was built without the C/C++ language package.");
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return grpc::Status::OK;
 }
 

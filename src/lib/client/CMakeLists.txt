@@ -11,6 +11,8 @@ target_sources(
           ${CMAKE_CURRENT_LIST_DIR}/Capabilities.h
           ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.cpp
           ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.h
+          ${CMAKE_CURRENT_LIST_DIR}/CompilationDatabaseInfo.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/CompilationDatabaseInfo.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineCall.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.cpp
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.h

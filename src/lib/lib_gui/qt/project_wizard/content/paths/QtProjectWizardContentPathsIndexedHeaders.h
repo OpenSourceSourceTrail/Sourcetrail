@@ -4,7 +4,6 @@
 #include "QtProjectWizardContentPaths.h"
 
 class SourceGroupSettingsCxxCdb;
-class SourceGroupSettingsCxxCodeblocks;
 
 class QtProjectWizardContentPathsIndexedHeaders : public QtProjectWizardContentPaths {
   Q_OBJECT

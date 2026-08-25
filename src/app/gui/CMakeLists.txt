@@ -34,7 +34,6 @@ target_link_libraries(
          Sourcetrail::lib::lib
          Sourcetrail::lib::lib_gui
          Sourcetrail::lib::client
-         $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
          Qt6::Widgets
          Qt6::Network
   PRIVATE Sourcetrail::lib::core::utility::logging

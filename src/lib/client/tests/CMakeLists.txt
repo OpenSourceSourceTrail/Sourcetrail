@@ -28,3 +28,8 @@ add_sourcetrail_test(
   "${CMAKE_BINARY_DIR}/test/")
 
 target_include_directories(GrpcStorageAccessTestSuite PRIVATE "${CMAKE_SOURCE_DIR}/src/app/engine")
+
+# Compiling the engine's source means inheriting the engine's dependencies: GetCompilationDatabaseInfo
+# parses a compilation database in-process. Phase 3 moves that into the indexer worker and this goes
+# away with the engine's own lib_cxx link.
+target_link_libraries(GrpcStorageAccessTestSuite PRIVATE $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>)

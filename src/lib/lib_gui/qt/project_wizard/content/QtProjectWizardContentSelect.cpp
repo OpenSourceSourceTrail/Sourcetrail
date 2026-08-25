@@ -32,7 +32,6 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   // reports it can index -- the plugin directory belongs to the engine, not to this process
   const client::Capabilities& capabilities = client::Capabilities::instance();
   std::map<LanguageType, std::vector<SourceGroupInfo>> sourceGroupInfos;
-#if BUILD_CXX_LANGUAGE_PACKAGE
   if(capabilities.supportsSourceGroupType(SOURCE_GROUP_CXX_CDB)) {
     sourceGroupInfos[LANGUAGE_C].emplace_back(SOURCE_GROUP_CXX_CDB, true);
     sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CXX_CDB, true);
@@ -47,7 +46,6 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   if(capabilities.supportsSourceGroupType(SOURCE_GROUP_CPP_EMPTY)) {
     sourceGroupInfos[LANGUAGE_CPP].emplace_back(SOURCE_GROUP_CPP_EMPTY);
   }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   if(capabilities.supportsSourceGroupType(SOURCE_GROUP_JAVA_EMPTY)) {
     sourceGroupInfos[LANGUAGE_JAVA].emplace_back(SOURCE_GROUP_JAVA_EMPTY, true);
   }
@@ -58,17 +56,14 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   }
 
   // define which icons should be used for which kind of source group
-#if BUILD_CXX_LANGUAGE_PACKAGE
   m_sourceGroupTypeIconName[SOURCE_GROUP_C_EMPTY] = L"empty_icon";
   m_sourceGroupTypeIconName[SOURCE_GROUP_CPP_EMPTY] = L"empty_icon";
   m_sourceGroupTypeIconName[SOURCE_GROUP_CXX_CDB] = L"cdb_icon";
   m_sourceGroupTypeIconName[SOURCE_GROUP_CXX_VS] = L"vs_icon";
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   m_sourceGroupTypeIconName[SOURCE_GROUP_JAVA_EMPTY] = L"empty_icon";
   m_sourceGroupTypeIconName[SOURCE_GROUP_CUSTOM_COMMAND] = L"empty_icon";
 
   // define descriptions for each kind of Source Group
-#if BUILD_CXX_LANGUAGE_PACKAGE
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_C_EMPTY] = "Create a new Source Group by defining which C files will be indexed.";
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_CPP_EMPTY] =
       "Create a new Source Group by defining which C++ files will be indexed.";
@@ -85,7 +80,6 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
           "<p><b>Note</b>: Requires a running Visual Studio instance with the "
           "<a href=\""} +
       "documentation"_g + "#visual-studio\">Sourcetrail Visual Studio Extension</a> installed.</p>";
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_JAVA_EMPTY] =
       "Create a new Source Group by defining which Java files will be indexed.";
   m_sourceGroupTypeDescriptions[SOURCE_GROUP_CUSTOM_COMMAND] =

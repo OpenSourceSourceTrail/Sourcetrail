@@ -282,40 +282,35 @@ target_sources(
           qt/QtApplication.cpp
           qt/QtApplication.h
           qt/QtCoreApplication.cpp
-          qt/QtCoreApplication.h)
-
-if(BUILD_CXX_LANGUAGE_PACKAGE)
-  target_sources(
-    Sourcetrail_lib_gui
-    PRIVATE qt/project_wizard/content/path/ProjectWizardModel.hpp
-            qt/project_wizard/content/path/ProjectWizardModel.cpp
-            qt/project_wizard/content/path/QtProjectWizardContentPathCDB.cpp
-            qt/project_wizard/content/path/QtProjectWizardContentPathCDB.h
-            qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.cpp
-            qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.h
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.cpp
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.h
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.cpp
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.cpp
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.h
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.cpp
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.cpp
-            qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h
-            qt/project_wizard/content/QtProjectWizardContentCppStandard.cpp
-            qt/project_wizard/content/QtProjectWizardContentCppStandard.h
-            qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.cpp
-            qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.h
-            qt/project_wizard/content/QtProjectWizardContentCStandard.cpp
-            qt/project_wizard/content/QtProjectWizardContentCStandard.h
-            qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.cpp
-            qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.h
-            qt/project_wizard/content/QtProjectWizardContentFlags.cpp
-            qt/project_wizard/content/QtProjectWizardContentFlags.h
-            qt/project_wizard/content/QtProjectWizardContentVS.cpp
-            qt/project_wizard/content/QtProjectWizardContentVS.h)
-endif()
+          qt/QtCoreApplication.h
+          qt/project_wizard/content/path/ProjectWizardModel.hpp
+          qt/project_wizard/content/path/ProjectWizardModel.cpp
+          qt/project_wizard/content/path/QtProjectWizardContentPathCDB.cpp
+          qt/project_wizard/content/path/QtProjectWizardContentPathCDB.h
+          qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.cpp
+          qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.h
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.cpp
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.h
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.cpp
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.cpp
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.h
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.cpp
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.cpp
+          qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h
+          qt/project_wizard/content/QtProjectWizardContentCppStandard.cpp
+          qt/project_wizard/content/QtProjectWizardContentCppStandard.h
+          qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.cpp
+          qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.h
+          qt/project_wizard/content/QtProjectWizardContentCStandard.cpp
+          qt/project_wizard/content/QtProjectWizardContentCStandard.h
+          qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.cpp
+          qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.h
+          qt/project_wizard/content/QtProjectWizardContentFlags.cpp
+          qt/project_wizard/content/QtProjectWizardContentFlags.h
+          qt/project_wizard/content/QtProjectWizardContentVS.cpp
+          qt/project_wizard/content/QtProjectWizardContentVS.h)
 
 target_link_libraries(
   Sourcetrail_lib_gui
@@ -346,8 +341,7 @@ target_link_libraries(
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::lib::core::utility::utilityApp
           Sourcetrail::lib::messaging
-          Boost::locale
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>)
+          Boost::locale)
 
 add_custom_command(
   TARGET versionnumber
