@@ -90,7 +90,7 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     * __Reason__: Package Manager. Pulls Boost, gRPC/protobuf, spdlog, fmt, SQLite and the rest.
     * __Install__: pip3 install conan
 
-* __Qt 6.10__ (6.11 works too)
+* __Qt 6.10__ (6.11 works too on Linux; aqtinstall 3.3.0 cannot fetch 6.11 for Windows)
     * __Reason__: Used for rendering the GUI and for starting additional (engine/indexer) processes.
     * __Prebuilt Download__: http://download.qt.io/official_releases/qt/
     * __aqt installer__ ([aqtinstall](https://github.com/miurahr/aqtinstall)):
@@ -98,12 +98,12 @@ Building Sourcetrail requires several dependencies to be in place on your machin
         ```
         $ pip install aqtinstall
         $ aqt list-qt linux desktop            # available versions
-        $ aqt install-qt linux desktop 6.11.2 linux_gcc_64 --outputdir ~/Qt
+        $ aqt install-qt linux desktop 6.10.3 linux_gcc_64 --outputdir ~/Qt
         ```
 
         The base package covers every Qt component Sourcetrail uses (Widgets, Sql, Test, Svg).
-        Point CMake at it with `-DQt6_DIR=~/Qt/6.11.2/gcc_64/lib/cmake/Qt6`, or set it once in
-        `CMakeUserPresets.json`. On Windows use `aqt install-qt windows desktop 6.11.2 win64_msvc2022_64`.
+        Point CMake at it with `-DQt6_DIR=~/Qt/6.10.3/gcc_64/lib/cmake/Qt6`, or set it once in
+        `CMakeUserPresets.json`. On Windows use `aqt install-qt windows desktop 6.10.3 win64_msvc2022_64`.
 
 ### Optional dependencies
 

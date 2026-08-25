@@ -133,7 +133,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake"
+                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake"
             },
             "inherits": [
                 "all-tests",
@@ -149,7 +149,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
-                "CMAKE_TOOLCHAIN_FILE": ".conan/clang/build/Release/generators/conan_toolchain.cmake"
+                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake"
             },
             "inherits": [
                 "all-tests",

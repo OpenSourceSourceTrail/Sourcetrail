@@ -13,3 +13,8 @@ LD=mold
 [options]
 fmt*:wchar=False
 spdlog*:wchar_support=False
+# libtool 2.4.7's `install-libLTLIBRARIES` target races its own relink step under a parallel
+# `make install`, which fails with "cannot stat 'libltdl/.libs/libltdl.so.7.3.2'" on CI runners.
+# Scoped to libtool so every other package keeps full parallelism.
+[conf]
+libtool/*:tools.build:jobs=1

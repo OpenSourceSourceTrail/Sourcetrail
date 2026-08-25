@@ -27,7 +27,7 @@ jobs:
           aqtversion: '==3.3.*'
           dir: '${{github.workspace}}/Qt/'
           install-deps: 'true'
-          version: '6.11.0'
+          version: '6.10.3'
           host: 'linux'
           target: 'desktop'
           arch: 'linux_gcc_64'
@@ -64,9 +64,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/conan-deps.tgz
-          key: conan4-Linux-gnu-${{ steps.conan-version.outputs.v }}-${{ hashFiles('conanfile.txt', '.conan/*/profile') }}
+          key: conan4-Linux-${{ steps.conan-version.outputs.v }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
           restore-keys: |
-            conan4-Linux-gnu-${{ steps.conan-version.outputs.v }}-
+            conan4-Linux-${{ steps.conan-version.outputs.v }}-
 
       - name: Unpack conan archive
         if: steps.conan-cache.outputs.cache-matched-key != ''
@@ -76,13 +76,13 @@ jobs:
         run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
 
       - name: Pack conan archive
-        if: always() && steps.conan-cache.outputs.cache-hit != 'true'
+        if: ${{ !cancelled() && steps.conan-version.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
         run: |
           conan cache clean "*" --source --build --download --temp
           conan cache save "*:*" --no-source --file ${{ runner.temp }}/conan-deps.tgz
 
       - name: Save conan archive
-        if: always() && steps.conan-cache.outputs.cache-hit != 'true'
+        if: ${{ !cancelled() && steps.conan-version.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ runner.temp }}/conan-deps.tgz

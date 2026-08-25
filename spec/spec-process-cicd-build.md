@@ -1,6 +1,6 @@
 ---
 title: CI/CD Workflow Specification - Build & LLVM Packaging
-version: 1.0
+version: 1.1
 date_created: 2026-08-25
 last_updated: 2026-08-25
 owner: DevOps Team
@@ -89,6 +89,8 @@ graph TD
 
 `fail-fast: false`. There is deliberately **no** Windows `_build_cxx` leg — the LLVM recipe is validated on Linux/GCC only.
 
+`tag` selects the CMake preset (`ci_<tag>_release<with_cxx>`) and nothing else. It is **not** part of the cache key: every Linux leg installs the same gcc/Release dependency set, so all four share one archive. See EDGE-010.
+
 ## Requirements Matrix
 
 ### Functional Requirements
@@ -111,7 +113,7 @@ graph TD
 | SEC-001 | Workflows use the default `GITHUB_TOKEN`; no long-lived secrets | Release upload uses `permissions: contents: write` scoped to the `package` job in `llvm.yml` only |
 | SEC-002 | All other jobs stay read-only on repository contents | No `permissions:` escalation in `build.yml` or `appimage.yml` |
 | SEC-003 | Third-party actions are version-pinned | `actions/*@v4`, `robinraju/release-downloader@v1.12`, `jurplel/install-qt-action@v3` |
-| SEC-004 | Restored cache content is trusted only within its own scope | Cache keys are namespaced by `runner.os`, matrix `tag` and Conan client version; PR-branch caches are isolated by GitHub |
+| SEC-004 | Restored cache content is trusted only within its own scope | Cache keys are namespaced by `runner.os` and Conan client version; PR-branch caches are isolated by GitHub |
 
 ### Performance Requirements
 
@@ -169,7 +171,7 @@ AppImage: file
 
 | Cache | Key | Restore keys | Payload |
 | --- | --- | --- | --- |
-| Conan dependencies | `conan4-<os>-<tag>-<conan_version>-<hash(conanfile.txt, .conan/*/profile)>` | `conan4-<os>-<tag>-<conan_version>-` | One `conan cache save --no-source` tgz at `${runner.temp}/conan-deps.tgz` |
+| Conan dependencies | `conan4-<os>-<conan_version>-<hash(conanfile.txt, .conan/gcc/profile)>` | `conan4-<os>-<conan_version>-` | One `conan cache save --no-source` tgz at `${runner.temp}/conan-deps.tgz` |
 | Qt | managed by `install-qt-action` | — | prefix `install-qt-action-{linux,windows}` |
 
 **Invariant**: the cached path is a single archive file, never `~/.conan2`. See EDGE-001.
@@ -193,7 +195,7 @@ AppImage: file
 - **Runner Requirements**: `ubuntu-24.04` with apt `gcc g++ clang ninja-build python3-pip grep`; `windows-latest` with MSVC 2022 Enterprise (`vcvars64.bat`).
 - **Network Access**: PyPI (Conan), Qt mirrors (aqtinstall), GitHub Releases, Conan Center.
 - **Permissions**: read-only by default; `contents: write` only on `llvm.yml`'s `package` job.
-- **Toolchain**: Qt 6.11.0 via aqtinstall 3.3.x; LLVM/Clang 22.1.8; Conan 2 (unpinned — see EDGE-004).
+- **Toolchain**: Qt 6.10.3 via aqtinstall 3.3.x; LLVM/Clang 22.1.8; Conan 2 (unpinned — see EDGE-004).
 
 ## Error Handling Strategy
 
@@ -242,7 +244,7 @@ AppImage: file
 | System | Integration Type | Data Exchange | SLA Requirements |
 | --- | --- | --- | --- |
 | Conan Center | Package download | Recipes and prebuilt binaries | Best effort; cache absorbs outages |
-| Qt mirrors (aqtinstall) | Binary download | Qt 6.11.0 archives | Best effort; `install-qt-action` cache absorbs outages |
+| Qt mirrors (aqtinstall) | Binary download | Qt 6.10.3 archives | Best effort; `install-qt-action` cache absorbs outages |
 | GitHub Releases | Asset up/download | LLVM Conan package tgz | Durable; not subject to cache eviction |
 | GitHub Actions Cache | Restore/save | Conan dependency archive | 10 GB budget, 7-day unused eviction |
 
@@ -276,11 +278,14 @@ AppImage: file
 | EDGE-002 | A dependency bump lands on a pull-request branch | `restore-keys` yields a partial hit; only the changed package is rebuilt; the new key is saved | Inspect `cache-matched-key` vs `cache-primary-key` in the run log |
 | EDGE-003 | A pull request never sees another pull request's cache | Accepted — GitHub scopes PR caches to their own ref. `main` must therefore hold an entry for the current dependency set, which REQ-004's `paths:` list guarantees | Confirm `conanfile.txt` is present in both `paths:` lists |
 | EDGE-004 | An unpinned `pip install conan` picks up a new client whose package_ids differ | The Conan version is part of the cache key, so the upgrade rotates the key rather than restoring an archive that silently forces a full rebuild | `Resolve conan version` step output appears in the key |
-| EDGE-005 | The build step fails after a cold `conan install` | `Pack conan archive` and `Save conan archive` run under `if: always()`, so the retry is warm | Force a compile error and inspect the run |
+| EDGE-005 | The build step fails after a cold `conan install` | `Pack conan archive` and `Save conan archive` run under `!cancelled()`, so the retry is warm. They are additionally gated on `steps.conan-version.outcome == 'success'` — without it, a leg that dies before Conan is installed reports `conan: command not found` and masks the real error | Force a compile error and inspect the run |
 | EDGE-006 | The `ci_clang_release_build_cxx` leg consumes an LLVM package built with `.conan/gcc/profile` | Works: `lib_cxx` uses `find_package(Clang)` against the install tree and Clang links libstdc++ on Linux, so the ABI matches | The clang `_build_cxx` leg builds and its tests pass |
 | EDGE-007 | The LLVM release asset is deleted or the tag is missing | `_build_cxx` legs fail fast at the download step rather than compiling LLVM for hours and hitting the job timeout | Rename the tag in a scratch branch and observe the failure mode |
 | EDGE-008 | `llvm.yml` is dispatched while the asset already exists | Every build step is skipped via `steps.check.outputs.exists` | Re-dispatch without `force_rebuild` |
 | EDGE-009 | A `conan cache save` archive is restored into a cache that already holds those packages | `conan cache restore` is idempotent; existing revisions are overwritten with identical content | Run the restore twice locally |
+| EDGE-010 | Several Linux legs finish `conan install` at once and race to save the same key | Benign: the losers log `Unable to reserve cache with key ...`, the first writer's archive stands and every later run restores it | Look for exactly one successful `Save conan archive` per key in a cold run |
+| EDGE-011 | `libtool/2.4.7` has no Conan Center binary for this profile and its `make install` races itself under `-j` | `.conan/gcc/profile` pins `libtool/*:tools.build:jobs=1`. Package-scoped, so nothing else loses parallelism, and it only costs anything on a cold cache | Cold-install into an empty `CONAN_HOME`; the failure is `cannot stat 'libltdl/.libs/libltdl.so.7.3.2'` |
+| EDGE-012 | Qt 6.11.x on Windows | aqtinstall 3.3.0 (newest) cannot resolve it — the 6.11 Windows repo is split into arch subdirectories (`qt6_6110/qt6_6110_msvc2022_64/`) that aqt looks for at `qt6_6110/qt6_6110/`. CI pins 6.10.3 on every host | `aqt list-qt windows desktop --arch 6.11.0` fails; `--arch 6.10.3` succeeds |
 
 ## Validation Criteria
 
@@ -321,6 +326,7 @@ AppImage: file
 
 | Version | Date | Changes | Author |
 | --- | --- | --- | --- |
+| 1.1 | 2026-08-25 | Post-run-#599 fixes: one Linux dependency set (clang presets consume `.conan/gcc`), `tag` dropped from the cache key, `libtool` serialised, Qt pinned to 6.10.3, Pack/Save guards tightened. | DevOps Team |
 | 1.0 | 2026-08-25 | Initial specification. Replaces the `~/.conan2` cache with a `conan cache save` archive; moves LLVM/Clang 22 to a release asset built by `llvm.yml`; drops the Windows `_build_cxx` leg and the two manual `clang_build_*` workflows; bumps Qt to 6.11.0. | DevOps Team |
 
 ## Related Specifications

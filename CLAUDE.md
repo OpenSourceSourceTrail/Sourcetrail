@@ -10,7 +10,8 @@ It is **not** a single process: a Qt GUI, a headless engine daemon that owns the
 
 ## Build System
 
-CMake (>= 3.23) + Conan 2 + Ninja. C++20 / C17. Qt 6.11 (CI pins 6.11.0; 6.10 also works).
+CMake (>= 3.23) + Conan 2 + Ninja. C++20 / C17. Qt 6.10 (CI pins 6.10.3; 6.11 works on Linux but
+aqtinstall 3.3.0 cannot resolve it on Windows, so CI stays on 6.10).
 
 The tracked presets are the CI ones — `ci_gnu_release`, `ci_clang_release`, `ci_msvc_release`, each with a `_build_cxx` variant that additionally enables the C/C++ indexer — plus `gnu_debug` for local Linux Debug builds. All of them enable unit + GUI + integration tests (the hidden `all-tests` fragment). The `ci_*` presets configure into `<repo>/build/`; `gnu_debug` uses `<repo>/build-debug/` so the two trees never invalidate each other. Use `CMakeUserPresets.json` for local, uncommitted tweaks (inherit from the tracked presets rather than copying them).
 
