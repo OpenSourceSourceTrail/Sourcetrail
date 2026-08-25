@@ -43,10 +43,7 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::commandline::CommandLineParser
           Sourcetrail::lib::proto::convert)
 
-target_include_directories(
-  Sourcetrail
-  PRIVATE "${CMAKE_BINARY_DIR}/src/lib/lib_gui"
-          "${CMAKE_BINARY_DIR}/src/lib")
+target_include_directories(Sourcetrail PRIVATE "${CMAKE_BINARY_DIR}/src/lib/lib_gui" "${CMAKE_BINARY_DIR}/src/lib")
 
 set_target_properties(Sourcetrail PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
 # add platform specific libraries
