@@ -1,6 +1,6 @@
 ---
 title: CI/CD Workflow Specification - Build & LLVM Packaging
-version: 1.1
+version: 1.2
 date_created: 2026-08-25
 last_updated: 2026-08-25
 owner: DevOps Team
@@ -37,18 +37,26 @@ graph TD
     subgraph "Pull request / push to main"
         A[Trigger] --> B[clang-format]
         A --> C[cmake-format]
+        A --> H[deps, 2 legs]
         B --> D[build matrix, 5 legs]
         C --> D
+        H --> D
         D --> E[clang_tidy]
         D --> F[cppcheck]
         E --> G[End]
         F --> G
     end
 
+    subgraph "deps leg internals"
+        H1{Exact key hit?<br/>lookup-only} -->|yes| H5[Done]
+        H1 -->|no| H2[Restore partial<br/>via restore-keys]
+        H2 --> H3[conan install --build=missing]
+        H3 --> H4[Pack + Save archive]
+    end
+
     subgraph "build leg internals"
         D1[Restore conan archive] --> D2[conan cache restore]
-        D2 --> D3[conan install --build=missing]
-        D3 --> D4[Pack + Save archive<br/>if: always]
+        D2 --> D3[conan install --build=missing<br/>normally a no-op]
         D3 --> D5{with_cxx?}
         D5 -->|yes| D6[Download release asset<br/>conan cache restore<br/>build_llvm_conan.sh]
         D5 -->|no| D7[Configure]
@@ -71,7 +79,8 @@ graph TD
 | --- | --- | --- | --- | --- |
 | `clang-format` | build.yml | Style-check modified `.cpp/.h/.hpp` | — | ubuntu-24.04 |
 | `cmake-format` | build.yml | Style-check CMake files | — | ubuntu-24.04 |
-| `build` | build.yml | Configure, build, test the 5-leg matrix | `clang-format`, `cmake-format` | matrix `os` |
+| `deps` | build.yml | Build the Conan dependency archive once per OS and save it | — | matrix `os` (ubuntu-24.04, windows-latest) |
+| `build` | build.yml | Configure, build, test the 5-leg matrix | `clang-format`, `cmake-format`, `deps` | matrix `os` |
 | `clang_tidy` | build.yml → clang_tidy.yml | Lint changed sources against `compile_commands.json` | `build` (PR only) | ubuntu-24.04 |
 | `cppcheck` | build.yml → cppcheck.yaml | Static analysis on the same artifact | `build` (PR only) | ubuntu-24.04 |
 | `package` | llvm.yml | Produce and publish the LLVM/Clang Conan package | — | ubuntu-24.04 |
@@ -89,7 +98,9 @@ graph TD
 
 `fail-fast: false`. There is deliberately **no** Windows `_build_cxx` leg — the LLVM recipe is validated on Linux/GCC only.
 
-`tag` selects the CMake preset (`ci_<tag>_release<with_cxx>`) and nothing else. It is **not** part of the cache key: every Linux leg installs the same gcc/Release dependency set, so all four share one archive. See EDGE-010.
+`tag` selects the CMake preset (`ci_<tag>_release<with_cxx>`) and nothing else. It is **not** part of the cache key: every Linux leg installs the same gcc/Release dependency set, so all four share one archive.
+
+The `deps` job builds that archive; the matrix only restores it. `build` lists `deps` in `needs` but is **not** gated on its result — its `if:` requires only the two format jobs — so a `deps` failure degrades to a cold leg instead of skipping the run. Each build leg therefore keeps its own restore and `conan install --build=missing`, which is a no-op on the normal path.
 
 ## Requirements Matrix
 
@@ -99,7 +110,7 @@ graph TD
 | --- | --- | --- | --- |
 | REQ-001 | Third-party dependencies are restored from cache, never rebuilt, when `conanfile.txt`, the Conan profiles and the Conan client version are unchanged | High | `conan install` log contains zero `Building from source` lines on a warm run |
 | REQ-002 | A change to one dependency rebuilds only that dependency | High | After editing `conanfile.txt`, the run reports a `restore-keys` partial hit and rebuilds a single package |
-| REQ-003 | The dependency cache is written even when a later step fails | High | A run whose build step fails still shows `Save conan archive` as executed |
+| REQ-003 | The dependency cache is written even when a later package fails to build | High | A `deps` run whose `conan install` fails part-way still shows `Save conan archive` as executed |
 | REQ-004 | The default branch always holds a cache entry for the current dependency set | High | Every file feeding the cache key appears in both `paths:` filters |
 | REQ-005 | LLVM/Clang is never compiled during a pull-request run | High | `_build_cxx` legs contain no LLVM compile output; LLVM acquisition is a download plus a cache restore |
 | REQ-006 | `llvm.yml` checks for an existing published asset before building | High | A re-dispatch without `force_rebuild` exits after the check step |
@@ -121,6 +132,8 @@ graph TD
 | --- | --- | --- | --- |
 | PERF-001 | Cached Conan archive size | < 1 GB per key, all keys < 10 GB total | Repository *Actions → Caches* page |
 | PERF-002 | Warm `conan install` wall clock | ≤ 2 min | Step duration in the run log |
+| PERF-006 | Warm `deps` job wall clock (the tax it adds before the matrix starts) | ≤ 1 min | `deps` job duration when `Look up conan archive` reports `cache-hit: true` |
+| PERF-007 | Cold dependency builds per run | 1 per OS, not 1 per matrix leg | Count `Building from source` across all jobs in a cold run |
 | PERF-003 | LLVM acquisition on a `_build_cxx` leg | ≤ 3 min | `Download LLVM/Clang` + `Install LLVM/Clang` step durations |
 | PERF-004 | From-source LLVM builds per pull request | 0 | Absence of LLVM compile lines in the build leg logs |
 | PERF-005 | Conan cache hit rate on unchanged dependencies | 100% | `Restore conan archive` reports `cache-hit: true` |
@@ -160,8 +173,8 @@ release_asset: file    # llvm-clang-<version>-linux-x86_64.tgz on tag llvm-clang
 
 # build.yml
 build-artifact-<pr>: directory   # compile_commands.json + build/src, consumed by clang_tidy/cppcheck
-build-logs-<tag>: file           # on failure only
-ctest-logs-<tag>: file           # on failure only
+build-logs-<tag><with_cxx>: file  # on failure only
+ctest-logs-<tag><with_cxx>: file  # on failure only
 
 # appimage.yml
 AppImage: file
@@ -171,7 +184,7 @@ AppImage: file
 
 | Cache | Key | Restore keys | Payload |
 | --- | --- | --- | --- |
-| Conan dependencies | `conan4-<os>-<conan_version>-<hash(conanfile.txt, .conan/gcc/profile)>` | `conan4-<os>-<conan_version>-` | One `conan cache save --no-source` tgz at `${runner.temp}/conan-deps.tgz` |
+| Conan dependencies | `conan5-<os>-<CONAN_VERSION>-<hash(conanfile.txt, .conan/gcc/profile)>` | `conan5-<os>-<CONAN_VERSION>-` | One `conan cache save --no-source` tgz at `${runner.temp}/conan-deps.tgz` |
 | Qt | managed by `install-qt-action` | — | prefix `install-qt-action-{linux,windows}` |
 
 **Invariant**: the cached path is a single archive file, never `~/.conan2`. See EDGE-001.
@@ -195,7 +208,7 @@ AppImage: file
 - **Runner Requirements**: `ubuntu-24.04` with apt `gcc g++ clang ninja-build python3-pip grep`; `windows-latest` with MSVC 2022 Enterprise (`vcvars64.bat`).
 - **Network Access**: PyPI (Conan), Qt mirrors (aqtinstall), GitHub Releases, Conan Center.
 - **Permissions**: read-only by default; `contents: write` only on `llvm.yml`'s `package` job.
-- **Toolchain**: Qt 6.10.3 via aqtinstall 3.3.x; LLVM/Clang 22.1.8; Conan 2 (unpinned — see EDGE-004).
+- **Toolchain**: Qt 6.10.3 via aqtinstall 3.3.x; LLVM/Clang 22.1.8; Conan pinned to `env.CONAN_VERSION` in all three workflows — see EDGE-004.
 
 ## Error Handling Strategy
 
@@ -277,13 +290,13 @@ AppImage: file
 | EDGE-001 | The full `~/.conan2` tree (~14 GB: build trees, extracted sources, download tarballs) exceeds the 10 GB repository budget | Never cache the tree. Cache one `conan cache save --no-source` archive of package binaries only, after `conan cache clean --source --build --download --temp` | Compare the archive size against the *Actions → Caches* budget |
 | EDGE-002 | A dependency bump lands on a pull-request branch | `restore-keys` yields a partial hit; only the changed package is rebuilt; the new key is saved | Inspect `cache-matched-key` vs `cache-primary-key` in the run log |
 | EDGE-003 | A pull request never sees another pull request's cache | Accepted — GitHub scopes PR caches to their own ref. `main` must therefore hold an entry for the current dependency set, which REQ-004's `paths:` list guarantees | Confirm `conanfile.txt` is present in both `paths:` lists |
-| EDGE-004 | An unpinned `pip install conan` picks up a new client whose package_ids differ | The Conan version is part of the cache key, so the upgrade rotates the key rather than restoring an archive that silently forces a full rebuild | `Resolve conan version` step output appears in the key |
-| EDGE-005 | The build step fails after a cold `conan install` | `Pack conan archive` and `Save conan archive` run under `!cancelled()`, so the retry is warm. They are additionally gated on `steps.conan-version.outcome == 'success'` — without it, a leg that dies before Conan is installed reports `conan: command not found` and masks the real error | Force a compile error and inspect the run |
+| EDGE-004 | A new Conan client whose package_ids differ | `CONAN_VERSION` is pinned per workflow and is part of the cache key, so a bump rotates the key rather than restoring an archive that silently forces a full rebuild. Pinning is also what lets `deps` compute the key *before* installing anything, which is what makes its `lookup-only` warm path cheap | Bump `CONAN_VERSION`; the next run must report a miss, then a save |
+| EDGE-005 | `conan install` in `deps` dies part-way through a cold build | `Pack conan archive` and `Save conan archive` run under `!cancelled()`, so whatever did build is banked and the retry is warmer. They are additionally gated on `steps.conan.outcome == 'success'` — without it, a job that dies before Conan is installed reports `conan: command not found` and masks the real error | Break one recipe and inspect the run |
 | EDGE-006 | The `ci_clang_release_build_cxx` leg consumes an LLVM package built with `.conan/gcc/profile` | Works: `lib_cxx` uses `find_package(Clang)` against the install tree and Clang links libstdc++ on Linux, so the ABI matches | The clang `_build_cxx` leg builds and its tests pass |
 | EDGE-007 | The LLVM release asset is deleted or the tag is missing | `_build_cxx` legs fail fast at the download step rather than compiling LLVM for hours and hitting the job timeout | Rename the tag in a scratch branch and observe the failure mode |
 | EDGE-008 | `llvm.yml` is dispatched while the asset already exists | Every build step is skipped via `steps.check.outputs.exists` | Re-dispatch without `force_rebuild` |
 | EDGE-009 | A `conan cache save` archive is restored into a cache that already holds those packages | `conan cache restore` is idempotent; existing revisions are overwritten with identical content | Run the restore twice locally |
-| EDGE-010 | Several Linux legs finish `conan install` at once and race to save the same key | Benign: the losers log `Unable to reserve cache with key ...`, the first writer's archive stands and every later run restores it | Look for exactly one successful `Save conan archive` per key in a cold run |
+| EDGE-010 | A cold key with no `deps` job would have all four Linux legs build an identical dependency set at once (~28 min each) and three then lose the save race | `deps` builds it once and the matrix restores. On the warm path `deps` is a `lookup-only` probe that adds only its own job startup | Cold run: one `Save conan archive`, and every build leg's `conan install` logs zero `Building from source` |
 | EDGE-011 | `libtool/2.4.7` has no Conan Center binary for this profile and its `make install` races itself under `-j` | `.conan/gcc/profile` pins `libtool/*:tools.build:jobs=1`. Package-scoped, so nothing else loses parallelism, and it only costs anything on a cold cache | Cold-install into an empty `CONAN_HOME`; the failure is `cannot stat 'libltdl/.libs/libltdl.so.7.3.2'` |
 | EDGE-012 | Qt 6.11.x on Windows | aqtinstall 3.3.0 (newest) cannot resolve it — the 6.11 Windows repo is split into arch subdirectories (`qt6_6110/qt6_6110_msvc2022_64/`) that aqt looks for at `qt6_6110/qt6_6110/`. CI pins 6.10.3 on every host | `aqt list-qt windows desktop --arch 6.11.0` fails; `--arch 6.10.3` succeeds |
 
@@ -326,6 +339,7 @@ AppImage: file
 
 | Version | Date | Changes | Author |
 | --- | --- | --- | --- |
+| 1.2 | 2026-08-25 | Added the `deps` job so dependencies are built once per OS instead of once per matrix leg; pinned the Conan client via `env.CONAN_VERSION`; cache key prefix `conan4-` → `conan5-`. | DevOps Team |
 | 1.1 | 2026-08-25 | Post-run-#599 fixes: one Linux dependency set (clang presets consume `.conan/gcc`), `tag` dropped from the cache key, `libtool` serialised, Qt pinned to 6.10.3, Pack/Save guards tightened. | DevOps Team |
 | 1.0 | 2026-08-25 | Initial specification. Replaces the `~/.conan2` cache with a `conan cache save` archive; moves LLVM/Clang 22 to a release asset built by `llvm.yml`; drops the Windows `_build_cxx` leg and the two manual `clang_build_*` workflows; bumps Qt to 6.11.0. | DevOps Team |
 

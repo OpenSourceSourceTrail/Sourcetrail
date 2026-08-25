@@ -23,6 +23,9 @@ on:
 
 env:
   LLVM_VERSION: "22.1.8"
+  # Must match build.yml/appimage.yml: they restore this package into a cache managed by that
+  # client, and a different version changes package_ids.
+  CONAN_VERSION: "2.31.2"
 
 jobs:
   package:
@@ -69,7 +72,7 @@ jobs:
         run: |
           python3 -m venv ~/env
           echo "$HOME/env/bin" >> "$GITHUB_PATH"
-          ~/env/bin/pip install conan
+          ~/env/bin/pip install "conan==${CONAN_VERSION}"
 
       # `conan install --build=missing` inside the script is itself the cache check: with the
       # binary already in ~/.conan2 this is a no-op, otherwise it compiles LLVM.

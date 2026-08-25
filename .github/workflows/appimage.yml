@@ -6,12 +6,16 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
+# Pinned so the cache key matches the archive's package_ids. Keep in step with build.yml.
+env:
+  CONAN_VERSION: "2.31.2"
+
 jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "true"
 
@@ -47,14 +51,11 @@ jobs:
           chmod +x ${{github.workspace}}/linuxdeploy*.AppImage
 
       - name: Install conan
+        id: conan
         run: |
           python3 -m venv venv
           echo "${{ github.workspace }}/venv/bin" >> "$GITHUB_PATH"
-          ./venv/bin/pip install conan
-
-      - name: Resolve conan version
-        id: conan-version
-        run: echo "v=$(conan --version | tr -d ' ')" >> "$GITHUB_OUTPUT"
+          ./venv/bin/pip install "conan==${{ env.CONAN_VERSION }}"
 
       # Caching ~/.conan2 wholesale exceeds GitHub's 10 GB per-repository budget (the dir is
       # ~14 GB with build trees and extracted sources), so the save is dropped and every run
@@ -64,9 +65,9 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ runner.temp }}/conan-deps.tgz
-          key: conan4-Linux-${{ steps.conan-version.outputs.v }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
+          key: conan5-Linux-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
           restore-keys: |
-            conan4-Linux-${{ steps.conan-version.outputs.v }}-
+            conan5-Linux-${{ env.CONAN_VERSION }}-
 
       - name: Unpack conan archive
         if: steps.conan-cache.outputs.cache-matched-key != ''
@@ -76,13 +77,13 @@ jobs:
         run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
 
       - name: Pack conan archive
-        if: ${{ !cancelled() && steps.conan-version.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
+        if: ${{ !cancelled() && steps.conan.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
         run: |
           conan cache clean "*" --source --build --download --temp
           conan cache save "*:*" --no-source --file ${{ runner.temp }}/conan-deps.tgz
 
       - name: Save conan archive
-        if: ${{ !cancelled() && steps.conan-version.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
+        if: ${{ !cancelled() && steps.conan.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ runner.temp }}/conan-deps.tgz
