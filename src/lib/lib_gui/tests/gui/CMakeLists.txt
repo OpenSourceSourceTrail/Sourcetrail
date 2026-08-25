@@ -18,7 +18,6 @@ foreach(test_name IN LISTS test_lib_gui_names)
            Sourcetrail::lib::lib
            Sourcetrail::lib::lib_gui
            Sourcetrail::lib::proto::convert
-           $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
            $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
            $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
 

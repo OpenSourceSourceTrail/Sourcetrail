@@ -22,6 +22,8 @@
 #include "Version.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "CxxToolchainLocal.h"
+#  include "ICxxToolchain.h"
 #  include "IndexerCommandCxx.h"
 #  include "SourceGroupCxxCdb.h"
 #  include "SourceGroupCxxEmpty.h"
@@ -154,9 +156,17 @@ struct SourceGroupFix : testing::Test {
 
     mMockedMessageQueue = std::make_shared<testing::StrictMock<MockedMessageQueue>>();
     IMessageQueue::setInstance(mMockedMessageQueue);
+
+#if BUILD_CXX_LANGUAGE_PACKAGE
+    // The compilation database case reads a real compile_commands.json, which needs a real toolchain.
+    ICxxToolchain::setInstance(std::make_shared<CxxToolchainLocal>());
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   }
 
   void TearDown() override {
+#if BUILD_CXX_LANGUAGE_PACKAGE
+    ICxxToolchain::setInstance(nullptr);
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
     IApplicationSettings::setInstance(nullptr);
     mMockedApplicationSettings.reset();
     IMessageQueue::setInstance(nullptr);

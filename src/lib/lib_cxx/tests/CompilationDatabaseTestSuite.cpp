@@ -2,12 +2,22 @@
 #include <gtest/gtest.h>
 
 #include "CompilationDatabase.h"
+#include "CxxToolchainLocal.h"
+#include "ICxxToolchain.h"
 #include "ScopedTemporaryFile.hpp"
 
 using namespace testing;
 
 struct MockedLoggerCompilationDatabase : public Test {
 public:
+  // Parsing a compilation database is the toolchain's job; this suite is here, in the package that
+  // has Clang, precisely to exercise the real one.
+  void SetUp() override {
+    ICxxToolchain::setInstance(std::make_shared<CxxToolchainLocal>());
+  }
+  void TearDown() override {
+    ICxxToolchain::setInstance(nullptr);
+  }
 };
 
 TEST_F(MockedLoggerCompilationDatabase, emptyPath) {

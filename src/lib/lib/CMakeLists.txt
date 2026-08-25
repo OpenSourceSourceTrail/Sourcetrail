@@ -181,6 +181,8 @@ target_sources(
           data/indexer/IndexerCommand.h
           data/indexer/IndexerCommandCustom.cpp
           data/indexer/IndexerCommandCustom.h
+          data/indexer/CxxIndexerCommandProvider.cpp
+          data/indexer/CxxIndexerCommandProvider.h
           data/indexer/IndexerCommandCxx.cpp
           data/indexer/IndexerCommandJava.cpp
           data/indexer/IndexerCommandJava.h
@@ -276,6 +278,10 @@ target_sources(
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
           data/TaskMergeStorages.h
+          project/CompilationDatabase.cpp
+          project/CompilationDatabase.h
+          project/ICxxToolchain.cpp
+          project/ICxxToolchain.h
           project/IProject.cpp
           project/IProject.hpp
           project/RefreshInfo.h
@@ -283,16 +289,24 @@ target_sources(
           project/SourceGroup.h
           project/SourceGroupCustomCommand.cpp
           project/SourceGroupCustomCommand.h
+          project/SourceGroupCxxCdb.cpp
+          project/SourceGroupCxxCdb.h
+          project/SourceGroupCxxEmpty.cpp
+          project/SourceGroupCxxEmpty.h
           project/SourceGroupFactory.cpp
           project/SourceGroupFactory.h
           project/SourceGroupFactoryModule.cpp
           project/SourceGroupFactoryModule.h
           project/SourceGroupFactoryModuleCustom.cpp
           project/SourceGroupFactoryModuleCustom.h
+          project/SourceGroupFactoryModuleCxx.cpp
+          project/SourceGroupFactoryModuleCxx.h
           project/SourceGroupFactoryModuleJava.cpp
           project/SourceGroupFactoryModuleJava.h
           project/SourceGroupJavaEmpty.cpp
           project/SourceGroupJavaEmpty.h
+          project/utilitySourceGroupCxx.cpp
+          project/utilitySourceGroupCxx.h
           settings/migration/SettingsMigration.cpp
           settings/migration/SettingsMigration.h
           settings/migration/SettingsMigrationDeleteKey.cpp
@@ -505,7 +519,6 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::file::FileSystem
           Sourcetrail::lib::core::utility::file::utilityFile
           Sourcetrail::lib::core::utility::file::FileManager
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
           Boost::filesystem
           Boost::system
           SQLite::SQLite3)

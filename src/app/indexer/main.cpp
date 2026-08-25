@@ -16,6 +16,8 @@
 #include "UserPaths.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "CxxToolchainLocal.h"
+#  include "ICxxToolchain.h"
 #  include "LanguagePackageCxx.h"
 #endif
 
@@ -92,6 +94,7 @@ int main(int argc, char* argv[]) {
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
   LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
+  ICxxToolchain::setInstance(std::make_shared<CxxToolchainLocal>());
 #endif
 
   IndexerPluginRegistry::getInstance()->discover();

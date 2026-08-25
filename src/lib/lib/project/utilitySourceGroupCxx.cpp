@@ -1,31 +1,26 @@
 #include "utilitySourceGroupCxx.h"
 
 #include <algorithm>
+#include <array>
 #include <iterator>
 #include <string>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
-#include <clang/Tooling/JSONCompilationDatabase.h>
-#include <unordered_map>
+#include <fmt/format.h>
+#include <fmt/xchar.h>
 
-#include "CanonicalFilePathCache.h"
-#include "CxxCompilationDatabaseSingle.h"
-#include "CxxDiagnosticConsumer.h"
-#include "CxxParser.h"
 #include "DialogView.h"
-#include "FilePathFilter.h"
-#include "FileRegister.h"
-#include "FileSystem.h"
-#include "GeneratePCHAction.h"
+#include "FilePath.h"
+#include "ICxxToolchain.h"
+#include "IntermediateStorage.h"
 #include "logging.h"
 #include "OrderedCache.h"
-#include "ParserClientImpl.h"
-#include "SingleFrontendActionFactory.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"
 #include "StorageProvider.h"
-#include "type/MessageStatus.h"
 #include "TaskLambda.h"
+#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityString.h"
 
@@ -62,109 +57,71 @@ std::shared_ptr<Task> createBuildPchTask(const SourceGroupSettingsWithCxxPchOpti
   compilerFlags.push_back(pchOutputFilePath.wstr());
 
   return std::make_shared<TaskLambda>([dialogView, storageProvider, pchInputFilePath, pchOutputFilePath, compilerFlags]() {
+    const ICxxToolchain* toolchain = ICxxToolchain::getInstance();
+    if(toolchain == nullptr) {
+      // NOLINTNEXTLINE(bugprone-lambda-function-name): It will be solved with SOUR-125
+      LOG_WARNING(L"Skipping the precompiled header for \"{}\": this process has no C/C++ toolchain.", pchInputFilePath.wstr());
+      return;
+    }
+
     dialogView->showUnknownProgressDialog(L"Preparing Indexing", L"Processing Precompiled Headers");
     // NOLINTNEXTLINE(bugprone-lambda-function-name): It will be solved with SOUR-125
     LOG_INFO(L"Generating precompiled header output for input file \"{}\" at location \"{}\"",
              pchInputFilePath.wstr(),
              pchOutputFilePath.wstr());
 
-    CxxParser::initializeLLVM();
-
-    if(!pchOutputFilePath.getParentDirectory().exists()) {
-      FileSystem::createDirectory(pchOutputFilePath.getParentDirectory());
+    if(const std::shared_ptr<IntermediateStorage> storage = toolchain->buildPrecompiledHeader(
+           pchInputFilePath, pchOutputFilePath, compilerFlags)) {
+      storageProvider->insert(storage);
     }
-
-    const std::shared_ptr<IntermediateStorage> storage = std::make_shared<IntermediateStorage>();
-    const std::shared_ptr<ParserClientImpl> client = std::make_shared<ParserClientImpl>(storage.get());
-
-    const std::shared_ptr<FileRegister> fileRegister = std::make_shared<FileRegister>(
-        pchInputFilePath, std::set<FilePath>{pchInputFilePath}, std::set<FilePathFilter>{});
-
-    const std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache = std::make_shared<CanonicalFilePathCache>(fileRegister);
-
-    clang::tooling::CompileCommand pchCommand;
-    pchCommand.Filename = utility::encodeToUtf8(pchInputFilePath.fileName());
-    pchCommand.Directory = pchOutputFilePath.getParentDirectory().str();
-    // DON'T use "-fsyntax-only" here because it will cause the output file to be erased
-    pchCommand.CommandLine = utility::concat({"clang-tool"}, CxxParser::getCommandlineArgumentsEssential(compilerFlags));
-
-    const CxxCompilationDatabaseSingle compilationDatabase(pchCommand);
-    clang::tooling::ClangTool tool(compilationDatabase, {utility::encodeToUtf8(pchInputFilePath.wstr())});
-    auto* action = new GeneratePCHAction(client, canonicalFilePathCache);    // NOLINT(cppcoreguidelines-owning-memory)
-
-    CxxDiagnosticConsumer diagnostics(client, canonicalFilePathCache, pchInputFilePath);
-
-    tool.setDiagnosticConsumer(&diagnostics);
-    // clang::tooling::ClangTool otherwise writes its own failure messages straight to stderr
-    tool.setPrintErrorMessage(false);
-    tool.clearArgumentsAdjusters();
-    tool.run(new SingleFrontendActionFactory(action));    // NOLINT(cppcoreguidelines-owning-memory)
-
-    storageProvider->insert(storage);
   });
+}
+
+std::optional<std::vector<CxxCompileCommand>> loadCompilationDatabase(const FilePath& cdbPath, std::string* error) {
+  const ICxxToolchain* toolchain = ICxxToolchain::getInstance();
+  if(toolchain == nullptr) {
+    if(error != nullptr) {
+      *error = "This process was built without the C/C++ language package.";
+    }
+    return std::nullopt;
+  }
+  return toolchain->loadCompilationDatabase(cdbPath, error);
 }
 
 std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath) {
   std::string error;
-  const std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
+  const std::optional<std::vector<CxxCompileCommand>> commands = loadCompilationDatabase(cdbPath, &error);
 
   if(!error.empty()) {
-    const auto message = fmt::format(
-        L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
+    const auto message = fmt::format(L"Loading Clang compilation database failed with error: \"{}\"",
+                                     utility::decodeFromUtf8(error));
     LOG_ERROR(message);
     MessageStatus(message, true).dispatch();
   }
 
-  return getSourceFilesFromCDB(cdb, cdbPath);
+  return commands ? getSourceFilesFromCDB(*commands, cdbPath) : std::vector<FilePath>{};
 }
 
-std::vector<FilePath> getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
-                                                               const FilePath& cdbPath) {
-  std::vector<FilePath> filePaths;
-  if(cdb) {
-    OrderedCache<FilePath, FilePath> canonicalDirectoryPathCache([](const FilePath& path) { return path.getCanonical(); });
+std::vector<FilePath> getSourceFilesFromCDB(const std::vector<CxxCompileCommand>& commands, const FilePath& cdbPath) {
+  OrderedCache<FilePath, FilePath> canonicalDirectoryPathCache([](const FilePath& path) { return path.getCanonical(); });
 
-    for(const std::string& fileString : cdb->getAllFiles()) {
-      FilePath path = FilePath(utility::decodeFromUtf8(fileString));
-      if(!path.isAbsolute()) {
-        std::vector<clang::tooling::CompileCommand> commands = cdb->getCompileCommands(fileString);
-        if(!commands.empty()) {
-          path = FilePath(utility::decodeFromUtf8(commands.front().Directory + '/' + commands.front().Filename)).makeCanonical();
-        }
-      }
-      if(!path.isAbsolute()) {
-        path = cdbPath.getParentDirectory().getConcatenated(path).makeCanonical();
-      }
-      filePaths.push_back(canonicalDirectoryPathCache.getValue(path.getParentDirectory()).concatenate(path.fileName()));
+  std::vector<FilePath> filePaths;
+  filePaths.reserve(commands.size());
+  for(const CxxCompileCommand& command : commands) {
+    FilePath path = FilePath(utility::decodeFromUtf8(command.file));
+    if(!path.isAbsolute()) {
+      path = FilePath(utility::decodeFromUtf8(command.directory + '/' + command.file)).makeCanonical();
     }
+    if(!path.isAbsolute()) {
+      path = cdbPath.getParentDirectory().getConcatenated(path).makeCanonical();
+    }
+    filePaths.push_back(canonicalDirectoryPathCache.getValue(path.getParentDirectory()).concatenate(path.fileName()));
   }
   return filePaths;
 }
 
-std::shared_ptr<clang::tooling::JSONCompilationDatabase> loadCDB(const FilePath& cdbPath, std::string* error) {
-  if(cdbPath.empty() || !cdbPath.exists()) {
-    return {};
-  }
-
-  std::string errorString;
-  std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = std::shared_ptr<clang::tooling::JSONCompilationDatabase>(
-      clang::tooling::JSONCompilationDatabase::loadFromFile(
-          utility::encodeToUtf8(cdbPath.wstr()), errorString, clang::tooling::JSONCommandLineSyntax::AutoDetect));
-
-  if((error != nullptr) && !errorString.empty()) {
-    *error = errorString;
-  }
-
-  return cdb;
-}
-
-bool containsIncludePchFlags(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb) {
-  for(const clang::tooling::CompileCommand& command : cdb->getAllCompileCommands()) {
-    if(containsIncludePchFlag(command.CommandLine)) {
-      return true;
-    }
-  }
-  return false;
+bool containsIncludePchFlags(const std::vector<CxxCompileCommand>& commands) {
+  return std::ranges::any_of(commands, [](const CxxCompileCommand& command) { return containsIncludePchFlag(command.arguments); });
 }
 
 bool containsIncludePchFlag(const std::vector<std::string>& args) {

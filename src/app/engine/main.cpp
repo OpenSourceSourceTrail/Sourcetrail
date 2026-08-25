@@ -30,8 +30,11 @@
 #include "UserPaths.h"
 #include "Version.h"
 
+#include "SourceGroupFactoryModuleCxx.h"
+
 #if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "SourceGroupFactoryModuleCxx.h"
+#  include "CxxToolchainLocal.h"
+#  include "ICxxToolchain.h"
 #endif
 
 namespace {
@@ -41,8 +44,11 @@ constexpr uint16_t DefaultEnginePort = 54321;
 void addSourceGroupModules() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleJava>());
-#if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
+#if BUILD_CXX_LANGUAGE_PACKAGE
+  // Until the toolchain is served by the indexer worker, a build with the package compiled in still
+  // parses compilation databases and builds precompiled headers here.
+  ICxxToolchain::setInstance(std::make_shared<CxxToolchainLocal>());
 #endif
 
   IndexerPluginRegistry::getInstance()->discover();
