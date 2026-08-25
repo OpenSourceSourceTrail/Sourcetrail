@@ -4,9 +4,8 @@ find_package(Clang REQUIRED)
 # Clang's own version config only accepts an exact major.minor, so the floor is checked by hand here.
 if(Clang_VERSION_MAJOR LESS 22)
   message(
-    FATAL_ERROR
-      "Sourcetrail's C/C++ indexer requires LLVM/Clang 22 or newer, found ${Clang_VERSION} at ${Clang_DIR}. "
-      "Point Clang_DIR at a matching <llvm_build>/lib/cmake/clang.")
+    FATAL_ERROR "Sourcetrail's C/C++ indexer requires LLVM/Clang 22 or newer, found ${Clang_VERSION} at ${Clang_DIR}. "
+                "Point Clang_DIR at a matching <llvm_build>/lib/cmake/clang.")
 endif()
 
 add_library(Sourcetrail_lib_cxx)
@@ -72,9 +71,7 @@ target_include_directories(
          ${CMAKE_CURRENT_LIST_DIR}/utility/
          ${CMAKE_CURRENT_LIST_DIR}/utility/codeblocks/)
 
-target_include_directories(
-  Sourcetrail_lib_cxx
-  PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
+target_include_directories(Sourcetrail_lib_cxx PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
 
 target_include_directories(Sourcetrail_lib_cxx SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 

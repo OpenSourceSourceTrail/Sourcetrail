@@ -8,8 +8,10 @@ add_custom_target(
   Sourcetrail_java_indexer ALL
   COMMAND "${SR_MAVEN_EXECUTABLE}" -f "${CMAKE_CURRENT_SOURCE_DIR}/indexer/pom.xml" -q package
   COMMAND ${CMAKE_COMMAND} -E make_directory "${SR_JAVA_PLUGIN_DIR}"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SR_JAVA_INDEXER_JAR}" "${SR_JAVA_PLUGIN_DIR}/sourcetrail_java_indexer.jar"
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/indexer/manifest.xml" "${SR_JAVA_PLUGIN_DIR}/manifest.xml"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SR_JAVA_INDEXER_JAR}"
+          "${SR_JAVA_PLUGIN_DIR}/sourcetrail_java_indexer.jar"
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/indexer/manifest.xml"
+          "${SR_JAVA_PLUGIN_DIR}/manifest.xml"
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/indexer"
   COMMENT "Building Java indexer plugin with Maven"
   VERBATIM)

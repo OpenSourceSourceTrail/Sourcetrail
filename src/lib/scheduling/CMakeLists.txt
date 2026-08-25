@@ -23,6 +23,9 @@ target_include_directories(Sourcetrail_scheduling PUBLIC ${CMAKE_CURRENT_LIST_DI
 
 target_link_libraries(
   Sourcetrail_scheduling
-  PUBLIC Sourcetrail::lib::core Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::GlobalId
-         Sourcetrail::lib::core::utility::DispatchQueue Taskflow::Taskflow
+  PUBLIC Sourcetrail::lib::core
+         Sourcetrail::lib::core::utility::logging
+         Sourcetrail::lib::core::utility::GlobalId
+         Sourcetrail::lib::core::utility::DispatchQueue
+         Taskflow::Taskflow
   PRIVATE Boost::date_time Sourcetrail::lib::core::utility::ScopedFunctor Sourcetrail::lib::core::utility::TaskExecutor)

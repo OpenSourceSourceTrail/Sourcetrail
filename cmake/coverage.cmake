@@ -19,13 +19,13 @@ if(ENABLE_COVERAGE)
       # Run gcovr with similar exclusions as the original script
       COMMAND
         ${GCOVR_EXECUTABLE} -r ${CMAKE_SOURCE_DIR}/src/ -e ${CMAKE_SOURCE_DIR}/src/app -e
-        ${CMAKE_SOURCE_DIR}/src/lib/core/tests -e ${CMAKE_SOURCE_DIR}/src/lib/external -e ${CMAKE_SOURCE_DIR}/src/app/indexer -e
-        ${CMAKE_SOURCE_DIR}/src/lib/lib/tests -e ${CMAKE_SOURCE_DIR}/src/lib/lib_cxx/tests -e
-        ${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests -e ${CMAKE_SOURCE_DIR}/src/lib_utility/tests -e
-        ${CMAKE_SOURCE_DIR}/src/lib/messaging/tests -e ${CMAKE_SOURCE_DIR}/src/lib/scheduling/tests -e
-        ${CMAKE_SOURCE_DIR}/src/test --html-nested=${CMAKE_BINARY_DIR}/coverage/index.html --gcov-delete -j
-        ${CORES_COUNT} --gcov-executable ${GCOV_VERSION} --exclude-unreachable-branches --exclude-throw-branches
-        ${CMAKE_BINARY_DIR}
+        ${CMAKE_SOURCE_DIR}/src/lib/core/tests -e ${CMAKE_SOURCE_DIR}/src/lib/external -e
+        ${CMAKE_SOURCE_DIR}/src/app/indexer -e ${CMAKE_SOURCE_DIR}/src/lib/lib/tests -e
+        ${CMAKE_SOURCE_DIR}/src/lib/lib_cxx/tests -e ${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests -e
+        ${CMAKE_SOURCE_DIR}/src/lib_utility/tests -e ${CMAKE_SOURCE_DIR}/src/lib/messaging/tests -e
+        ${CMAKE_SOURCE_DIR}/src/lib/scheduling/tests -e ${CMAKE_SOURCE_DIR}/src/test
+        --html-nested=${CMAKE_BINARY_DIR}/coverage/index.html --gcov-delete -j ${CORES_COUNT} --gcov-executable
+        ${GCOV_VERSION} --exclude-unreachable-branches --exclude-throw-branches ${CMAKE_BINARY_DIR}
       COMMENT "Generate coverage for GNU"
       # Working directory for the command
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
