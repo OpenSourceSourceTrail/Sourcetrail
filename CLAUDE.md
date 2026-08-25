@@ -10,7 +10,7 @@ It is **not** a single process: a Qt GUI, a headless engine daemon that owns the
 
 ## Build System
 
-CMake (>= 3.23) + Conan 2 + Ninja. C++20 / C17. Qt 6.10.
+CMake (>= 3.23) + Conan 2 + Ninja. C++20 / C17. Qt 6.11 (CI pins 6.11.0; 6.10 also works).
 
 The tracked presets are the CI ones — `ci_gnu_release`, `ci_clang_release`, `ci_msvc_release`, each with a `_build_cxx` variant that additionally enables the C/C++ indexer — plus `gnu_debug` for local Linux Debug builds. All of them enable unit + GUI + integration tests (the hidden `all-tests` fragment). The `ci_*` presets configure into `<repo>/build/`; `gnu_debug` uses `<repo>/build-debug/` so the two trees never invalidate each other. Use `CMakeUserPresets.json` for local, uncommitted tweaks (inherit from the tracked presets rather than copying them).
 
@@ -51,6 +51,13 @@ On Linux, `scripts/build_llvm_conan.sh` produces that build through Conan from t
 cmake --preset=ci_gnu_release_build_cxx
 ```
 That is a **second, separate** `conan install` (into `.conan/llvm/`); it deliberately stays out of the unified GCC/Release graph in `.conan/gcc/` so the main dependency set and its package IDs are unaffected. The first run compiles LLVM from source and takes hours; later runs are cache hits.
+
+To skip that first build, restore the package CI publishes — `.github/workflows/llvm.yml` builds it once and uploads it as a GitHub Release asset on the `llvm-clang-22.1.8` tag:
+```
+gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
+conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+./scripts/build_llvm_conan.sh   # now a cache hit; still makes the external/ symlink
+```
 
 With a hand-built LLVM, point at it instead:
 ```

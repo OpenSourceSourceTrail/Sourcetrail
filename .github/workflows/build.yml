@@ -1,5 +1,9 @@
 name: Build
 
+# NOTE: `paths` must stay identical for both triggers, and must cover every input that feeds
+# the Conan cache key. If `conanfile.txt` is missing here, a dependency bump never re-runs on
+# `main`, so the new cache key is never written to the default branch -- and pull requests can
+# only read caches from the default branch. That is a silent, permanent cache miss.
 on:
   push:
     branches: ["main"]
@@ -7,7 +11,12 @@ on:
       - "**/*.h"
       - "**/*.hpp"
       - "**/*.cpp"
+      - "**/CMakeLists.txt"
       - "**/*.cmake"
+      - "CMakePresets.json"
+      - "conanfile.txt"
+      - ".conan/**"
+      - "scripts/**"
       - .github/workflows/*.yml
   pull_request:
     branches: ["main"]
@@ -15,7 +24,12 @@ on:
       - "**/*.h"
       - "**/*.hpp"
       - "**/*.cpp"
+      - "**/CMakeLists.txt"
       - "**/*.cmake"
+      - "CMakePresets.json"
+      - "conanfile.txt"
+      - ".conan/**"
+      - "scripts/**"
       - .github/workflows/*.yml
 
 jobs:
@@ -67,15 +81,9 @@ jobs:
               environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
               "with_cxx": "",
             }
-          - {
-              name: "Windows Latest MSVC with cxx_build",
-              os: windows-latest,
-              tag: msvc,
-              cc: "cl",
-              cxx: "cl",
-              environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-              "with_cxx": "_build_cxx",
-            }
+          # NOTE: there is deliberately no Windows `_build_cxx` leg. The C/C++ indexer needs
+          # LLVM/Clang 22, and .conan/recipes/llvm-clang/ has only been validated on Linux/GCC.
+          # Re-add this leg once llvm.yml gains a windows-latest job producing the package.
           - {
               name: "Ubuntu Latest GCC",
               os: ubuntu-24.04,
@@ -129,10 +137,10 @@ jobs:
         if: runner.os == 'Linux'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: "==3.2.*"
+          aqtversion: "==3.3.*"
           dir: "${{github.workspace}}/Qt/"
           install-deps: "true"
-          version: "6.8.2"
+          version: "6.11.0"
           host: "linux"
           target: "desktop"
           arch: "linux_gcc_64"
@@ -145,10 +153,10 @@ jobs:
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: "==3.2.*"
+          aqtversion: "==3.3.*"
           dir: "${{github.workspace}}/Qt/"
           install-deps: "true"
-          version: "6.8.2"
+          version: "6.11.0"
           host: "windows"
           target: "desktop"
           arch: "win64_msvc2022_64"
@@ -157,66 +165,101 @@ jobs:
           cache: "true"
           cache-key-prefix: "install-qt-action-windows"
 
+      # `venv/bin` goes on PATH so every later step can call `conan` directly and the cache
+      # steps below stay identical on Linux and Windows.
       - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'
         run: |
           python3 -m venv venv
-          source venv/bin/activate
-          pip install conan gcovr
+          echo "${{ github.workspace }}/venv/bin" >> "$GITHUB_PATH"
+          ./venv/bin/pip install conan gcovr
 
       - name: Install conan (Windows)
         if: runner.os == 'Windows'
         run: python -m pip install conan && conan profile detect
         shell: bash
 
-      - name: Cache Conan packages (Ubuntu)
-        if: runner.os == 'Linux'
-        uses: actions/cache@v4
-        with:
-          path: ~/.conan2
-          key: conan-${{ runner.os }}-${{ matrix.config.tag }}-${{ hashFiles('**/conanfile.txt') }}
+      # The Conan client version is part of the cache key: an upgrade changes package_ids, and
+      # a restored archive from an older client would otherwise look valid and silently trigger
+      # a full from-source rebuild.
+      - name: Resolve conan version
+        id: conan-version
+        run: echo "v=$(conan --version | tr -d ' ')" >> "$GITHUB_OUTPUT"
+        shell: bash
 
-      - name: Cache Conan packages (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/cache@v4
+      # We cache a single `conan cache save` archive, NOT ~/.conan2 itself. The full cache dir
+      # is ~14 GB (build trees, extracted sources, download tarballs) which blows past GitHub's
+      # 10 GB per-repository budget, so the post-job save is dropped and every run starts cold.
+      # The archive holds package binaries only -- a few hundred MB.
+      - name: Restore conan archive
+        id: conan-cache
+        uses: actions/cache/restore@v4
         with:
-          path: "C:\\Users\\runneradmin\\.conan2\\"
-          key: conan-${{ runner.os }}-${{ matrix.config.tag }}-${{ hashFiles('**/conanfile.txt') }}
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: conan4-${{ runner.os }}-${{ matrix.config.tag }}-${{ steps.conan-version.outputs.v }}-${{ hashFiles('conanfile.txt', '.conan/*/profile') }}
+          # A partial hit still restores every unchanged dependency, so a one-package bump
+          # rebuilds one package instead of all of them.
+          restore-keys: |
+            conan4-${{ runner.os }}-${{ matrix.config.tag }}-${{ steps.conan-version.outputs.v }}-
+
+      # Paths are quoted throughout: on Windows `runner.temp` expands to `D:\a\_temp`, and bash
+      # would otherwise eat the backslashes.
+      - name: Unpack conan archive
+        if: steps.conan-cache.outputs.cache-matched-key != ''
+        run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
 
       - name: Install conan dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: |
-          source venv/bin/activate
-          conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
+        run: conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
 
       - name: Install conan dependencies (Windows)
         if: runner.os == 'Windows'
         run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
         shell: bash
 
-      - name: Download llvm build cache (Ubuntu)
-        if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
+      # `cache-hit` is 'true' only on an exact primary-key match, so a partial hit correctly
+      # re-packs under the new key. `always()` matters: actions/cache's implicit post-job save
+      # is skipped when the job fails, so an iterating pull request never banked its deps.
+      - name: Pack conan archive
+        if: always() && steps.conan-cache.outputs.cache-hit != 'true'
+        run: |
+          conan cache clean "*" --source --build --download --temp
+          conan cache save "*:*" --no-source --file "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
+
+      - name: Save conan archive
+        if: always() && steps.conan-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: ${{ steps.conan-cache.outputs.cache-primary-key }}
+
+      # LLVM/Clang comes from the release asset published by llvm.yml -- never built here.
+      # Release assets are not subject to the 7-day cache eviction or the 10 GB budget, which
+      # leaves the whole cache budget to the dependency archive above.
+      - name: Download LLVM/Clang
+        if: matrix.config.with_cxx == '_build_cxx'
         uses: robinraju/release-downloader@v1.12
         with:
-          tag: "2.0.0"
-          fileName: "clang-19.1.7-linux.zip"
+          tag: "llvm-clang-22.1.8"
+          fileName: "llvm-clang-22.1.8-linux-x86_64.tgz"
           token: ${{ secrets.GITHUB_TOKEN }}
-          out-file-path: ${{github.workspace}}/external
-          extract: true
+          out-file-path: ${{ runner.temp }}
+          extract: false
 
-      - name: Download llvm build cache (Windows)
-        if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
-        uses: robinraju/release-downloader@v1.12
-        with:
-          tag: "2.0.0"
-          fileName: "clang-19.1.7-windows.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          out-file-path: ${{github.workspace}}/external
-          extract: true
-
-      - name: Install llvm (Ubuntu)
-        if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
-        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
+      # After the restore, build_llvm_conan.sh's `--build=missing` is a cache hit (seconds), and
+      # it still creates the external/ symlink the `*_build_cxx` presets expect at
+      # ${sourceDir}/external/lib/cmake/clang/.
+      #
+      # The package is built with .conan/gcc/profile and reused by the clang leg: lib_cxx finds
+      # LLVM through find_package(Clang) on the install tree, and clang uses libstdc++ on Linux,
+      # so the ABI matches.
+      - name: Install LLVM/Clang
+        if: matrix.config.with_cxx == '_build_cxx'
+        run: |
+          conan cache restore "${{ runner.temp }}/llvm-clang-22.1.8-linux-x86_64.tgz"
+          ./scripts/build_llvm_conan.sh
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
@@ -225,7 +268,9 @@ jobs:
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         env:
-          CMAKE_PREFIX_PATH: ${{env.Qt5_DIR}}
+          # install-qt-action exports QT_ROOT_DIR for Qt6; Qt5_DIR was a Qt5 leftover and
+          # expanded to an empty string.
+          CMAKE_PREFIX_PATH: ${{env.QT_ROOT_DIR}}
         run: |
           call "${{ matrix.config.environment_script }}"
           cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"

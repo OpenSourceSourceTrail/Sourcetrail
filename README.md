@@ -90,10 +90,20 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     * __Reason__: Package Manager. Pulls Boost, gRPC/protobuf, spdlog, fmt, SQLite and the rest.
     * __Install__: pip3 install conan
 
-* __Qt 6.10__
+* __Qt 6.10__ (6.11 works too)
     * __Reason__: Used for rendering the GUI and for starting additional (engine/indexer) processes.
     * __Prebuilt Download__: http://download.qt.io/official_releases/qt/
-    * __aqt installer__: https://github.com/miurahr/aqtinstall
+    * __aqt installer__ ([aqtinstall](https://github.com/miurahr/aqtinstall)):
+
+        ```
+        $ pip install aqtinstall
+        $ aqt list-qt linux desktop            # available versions
+        $ aqt install-qt linux desktop 6.11.2 linux_gcc_64 --outputdir ~/Qt
+        ```
+
+        The base package covers every Qt component Sourcetrail uses (Widgets, Sql, Test, Svg).
+        Point CMake at it with `-DQt6_DIR=~/Qt/6.11.2/gcc_64/lib/cmake/Qt6`, or set it once in
+        `CMakeUserPresets.json`. On Windows use `aqt install-qt windows desktop 6.11.2 win64_msvc2022_64`.
 
 ### Optional dependencies
 
@@ -164,6 +174,17 @@ resulting package — which is where the `_build_cxx` presets already look for `
 The first run compiles LLVM from source and takes hours; afterwards it is a cache hit. This
 is a separate `conan install` (into `.conan/llvm/`) and does not affect the main dependency
 set in `.conan/gcc/`.
+
+To skip the hours-long first build, download the package CI already published and restore it
+into your Conan cache — the script then resolves it as a cache hit in seconds:
+
+```
+$ gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
+$ conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+$ ./scripts/build_llvm_conan.sh          # cache hit; creates the external/ symlink
+```
+
+That asset is produced by `.github/workflows/llvm.yml`, which is also what CI consumes.
 
 #### Building LLVM by hand
 
