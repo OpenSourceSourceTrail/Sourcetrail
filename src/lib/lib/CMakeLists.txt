@@ -343,6 +343,10 @@ target_sources(
           utility/interprocess/SharedMemory.h
           # Base Factory {
           utility/interprocess/ISharedMemoryGarbageCollector.cpp
+          utility/IncludeDirective.cpp
+          utility/IncludeDirective.h
+          utility/IncludeProcessing.cpp
+          utility/IncludeProcessing.h
           utility/interprocess/ISharedMemoryGarbageCollector.hpp
           utility/interprocess/details/SharedMemoryGarbageCollector.cpp
           utility/interprocess/details/SharedMemoryGarbageCollector.h
@@ -404,6 +408,7 @@ target_link_libraries(
          gRPC::grpc++
          Sourcetrail::lib::core::utility::ConfigManager
          Sourcetrail::lib::core::utility::LowMemoryStringMap
+         Sourcetrail::lib::core::utility::OrderedCache
          Sourcetrail::lib::core::utility::Status
          Sourcetrail::lib::core::utility::Tree
          Sourcetrail::lib::core::utility::utility
@@ -426,6 +431,7 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::file::FileSystem
           Sourcetrail::lib::core::utility::file::utilityFile
           Sourcetrail::lib::core::utility::file::FileManager
+          Sourcetrail::lib::core::utility::file::FileTree
           Boost::filesystem
           Boost::json
           Boost::program_options

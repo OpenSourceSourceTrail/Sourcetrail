@@ -55,8 +55,6 @@ target_sources(
           project/SourceGroupFactoryModuleCxx.cpp
           project/utilitySourceGroupCxx.cpp
           utility/CompilationDatabase.cpp
-          utility/IncludeDirective.cpp
-          utility/IncludeProcessing.cpp
           LanguagePackageCxx.cpp)
 
 target_include_directories(
