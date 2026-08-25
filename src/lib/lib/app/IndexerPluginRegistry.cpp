@@ -145,6 +145,13 @@ std::optional<IndexerPluginRegistry::Plugin> IndexerPluginRegistry::loadManifest
   }
   plugin.indexerExecutablePath = manifestFilePath.getParentDirectory().getConcatenated(
       utility::decodeFromUtf8(indexerExecutable));
+  if(!plugin.indexerExecutablePath.exists()) {
+    // A manifest without its binary is worse than no manifest: the project still looks
+    // reindexable and the failure only surfaces once indexing has already started.
+    LOG_WARNING(L"Ignoring indexer plugin \"" + utility::decodeFromUtf8(plugin.id) +
+                L"\": executable is missing at \"" + plugin.indexerExecutablePath.wstr() + L"\".");
+    return std::nullopt;
+  }
 
   const std::string launcher = config->getValueOrDefault<std::string>("launcher", "");
   if(!launcher.empty()) {

@@ -22,6 +22,7 @@ set(test_lib_names
     GraphViewStyleTestSuite # TODO(SOUR-97)
     HierarchyCacheTestSuite
     IndexerCommandJavaTestSuite
+    IndexerWireEnumsTestSuite
     IndexerCompositeTestSuite
     IndexerPluginRegistryTestSuite
     IntermediateStorageTestSuite

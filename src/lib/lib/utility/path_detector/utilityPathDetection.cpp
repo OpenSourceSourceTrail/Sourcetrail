@@ -1,16 +1,13 @@
 #include "utilityPathDetection.h"
 
-#include "language_packages.h"
 #include "logging.h"
 #include "utilityApp.h"
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "CxxFrameworkPathDetector.h"
-#  include "CxxHeaderPathDetector.h"
-#  include "CxxVs10To14HeaderPathDetector.h"
-#  include "CxxVs15HeaderPathDetector.h"
-#  include "CxxVs17HeaderPathDetector.hpp"
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#include "CxxFrameworkPathDetector.h"
+#include "CxxHeaderPathDetector.h"
+#include "CxxVs10To14HeaderPathDetector.h"
+#include "CxxVs15HeaderPathDetector.h"
+#include "CxxVs17HeaderPathDetector.hpp"
 
 std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
   std::shared_ptr<CombinedPathDetector> combinedDetector = std::make_shared<CombinedPathDetector>();
@@ -19,7 +16,6 @@ std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
     return combinedDetector;
   }
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
   combinedDetector->addDetector(std::make_shared<CxxVs17HeaderPathDetector>());
   combinedDetector->addDetector(std::make_shared<CxxVs15HeaderPathDetector>());
 
@@ -55,25 +51,20 @@ std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
       CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, true, ApplicationArchitectureType::X86_32));
   combinedDetector->addDetector(std::make_shared<CxxVs10To14HeaderPathDetector>(
       CxxVs10To14HeaderPathDetector::VISUAL_STUDIO_2010, true, ApplicationArchitectureType::X86_64));
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   return combinedDetector;
 }
 
 std::shared_ptr<CombinedPathDetector> utility::getCxxHeaderPathDetector() {
   std::shared_ptr<CombinedPathDetector> combinedDetector = getCxxVsHeaderPathDetector();
-#if BUILD_CXX_LANGUAGE_PACKAGE
   combinedDetector->addDetector(std::make_shared<CxxHeaderPathDetector>("clang"));
   combinedDetector->addDetector(std::make_shared<CxxHeaderPathDetector>("gcc"));
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return combinedDetector;
 }
 
 std::shared_ptr<CombinedPathDetector> utility::getCxxFrameworkPathDetector() {
   std::shared_ptr<CombinedPathDetector> combinedDetector = std::make_shared<CombinedPathDetector>();
-#if BUILD_CXX_LANGUAGE_PACKAGE
   combinedDetector->addDetector(std::make_shared<CxxFrameworkPathDetector>("clang"));
   combinedDetector->addDetector(std::make_shared<CxxFrameworkPathDetector>("gcc"));
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   return combinedDetector;
 }

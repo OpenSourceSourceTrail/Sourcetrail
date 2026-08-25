@@ -17,7 +17,6 @@
 #include "IApplicationSettings.hpp"
 #include "IndexerWorkerServiceImpl.h"
 #include "ITaskFactory.h"
-#include "language_packages.h"
 #include "LanguageType.h"
 #include "PersistentStorage.h"
 #include "SourceGroup.h"
@@ -51,11 +50,9 @@ IndexerCommandType getStandardCommandType(const std::vector<std::shared_ptr<Sour
     if(sourceGroup->getLanguage() == LANGUAGE_JAVA) {
       return INDEXER_COMMAND_JAVA;
     }
-#if BUILD_CXX_LANGUAGE_PACKAGE
     if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
       return INDEXER_COMMAND_CXX;
     }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   }
   return INDEXER_COMMAND_UNKNOWN;
 }

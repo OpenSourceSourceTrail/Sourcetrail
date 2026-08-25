@@ -92,13 +92,13 @@
         },
         {
             "name": "ci_gnu_release_build_cxx",
-            "displayName": "CI GNU Release",
-            "binaryDir": "${sourceDir}/build/",
+            "displayName": "CI GNU Release (C/C++ package)",
+            "binaryDir": "${sourceDir}/build-cxx/",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
                 "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install"
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build-cxx/install"
             },
             "inherits": [
                 "all-tests",
@@ -144,8 +144,8 @@
         },
         {
             "name": "ci_clang_release_build_cxx",
-            "displayName": "CI Clang Release",
-            "binaryDir": "${sourceDir}/build/",
+            "displayName": "CI Clang Release (C/C++ package)",
+            "binaryDir": "${sourceDir}/build-cxx/",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "USE_ALTERNATE_LINKER": "mold",
@@ -186,8 +186,8 @@
         },
         {
             "name": "ci_msvc_release_build_cxx",
-            "displayName": "CI VC++ Release with CXX",
-            "binaryDir": "${sourceDir}/build/",
+            "displayName": "CI VC++ Release (C/C++ package)",
+            "binaryDir": "${sourceDir}/build-cxx/",
             "toolset": {
                 "value": "v143",
                 "strategy": "external"
