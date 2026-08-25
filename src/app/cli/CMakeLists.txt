@@ -11,7 +11,6 @@ target_link_libraries(
           Sourcetrail::lib::proto::convert
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::lib::messaging
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
           Sourcetrail::lib::core::utility::logging
           Sourcetrail::lib::core::utility::ScopedFunctor
           Sourcetrail::lib::core::utility::utilityApp

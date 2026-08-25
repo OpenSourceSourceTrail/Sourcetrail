@@ -280,6 +280,8 @@ target_sources(
           data/TaskMergeStorages.h
           project/CompilationDatabase.cpp
           project/CompilationDatabase.h
+          project/CxxToolchainRemote.cpp
+          project/CxxToolchainRemote.h
           project/ICxxToolchain.cpp
           project/ICxxToolchain.h
           project/IProject.cpp

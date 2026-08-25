@@ -1,6 +1,7 @@
 set(PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(PROTO_FILES "${PROTO_DIR}/sourcetrail_common.proto" "${PROTO_DIR}/indexer_worker.proto" "${PROTO_DIR}/engine.proto")
+set(PROTO_FILES "${PROTO_DIR}/sourcetrail_common.proto" "${PROTO_DIR}/indexer_worker.proto" "${PROTO_DIR}/engine.proto"
+                "${PROTO_DIR}/indexer_helper.proto")
 
 set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 

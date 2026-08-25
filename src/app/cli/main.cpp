@@ -32,12 +32,9 @@
 #include "UserPaths.h"
 #include "Version.h"
 
-#include "SourceGroupFactoryModuleCxx.h"
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "CxxToolchainLocal.h"
-#  include "ICxxToolchain.h"
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+#include "CxxToolchainRemote.h"
+#include "ICxxToolchain.h"
+#include "SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
 
 namespace {
 
@@ -51,11 +48,10 @@ void addSourceGroupModules() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleJava>());
 
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
-#if BUILD_CXX_LANGUAGE_PACKAGE
-  // Until the toolchain is served by the indexer worker, a build with the package compiled in still
-  // parses compilation databases and builds precompiled headers here.
-  ICxxToolchain::setInstance(std::make_shared<CxxToolchainLocal>());
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+  // Parsing a compilation database and compiling a precompiled header happen in the C/C++ indexer,
+  // which is why this process links no language package. With no indexer installed the toolchain
+  // simply answers nothing and the project stays browsable.
+  ICxxToolchain::setInstance(std::make_shared<CxxToolchainRemote>());    // BUILD_CXX_LANGUAGE_PACKAGE
 
   IndexerPluginRegistry::getInstance()->discover();
 }

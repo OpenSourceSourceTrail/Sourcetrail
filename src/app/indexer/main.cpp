@@ -16,6 +16,7 @@
 #include "UserPaths.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "CxxHelperMode.h"
 #  include "CxxToolchainLocal.h"
 #  include "ICxxToolchain.h"
 #  include "LanguagePackageCxx.h"
@@ -43,7 +44,22 @@ void suppressCrashMessage() {
 }    // namespace
 
 // argv: <processId> --engine-endpoint <endpoint> <appPath> <userDataPath> [logFilePath]
+//   or: --helper <requestFile> <responseFile>
 int main(int argc, char* argv[]) {
+  if(argc >= 2 && std::string(argv[1]) == "--helper") {
+    // Answering one toolchain question, for a process that has no Clang of its own.
+    if(argc < 4) {
+      LOG_ERROR("Usage: Sourcetrail_indexer --helper <requestFile> <responseFile>");
+      return EXIT_FAILURE;
+    }
+#if BUILD_CXX_LANGUAGE_PACKAGE
+    return helper::run(argv[2], argv[3]);
+#else
+    LOG_ERROR("This indexer was built without the C/C++ language package.");
+    return EXIT_FAILURE;
+#endif
+  }
+
   if(argc < 6) {
     LOG_ERROR("Usage: Sourcetrail_indexer <processId> --engine-endpoint <endpoint> <appPath> <userDataPath> [logFilePath]");
     return EXIT_FAILURE;

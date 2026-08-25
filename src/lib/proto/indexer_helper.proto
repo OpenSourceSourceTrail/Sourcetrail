@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package sourcetrail;
+
+import "sourcetrail_common.proto";
+
+// Boundary C: engine -> indexer helper.
+//
+// Not a service. The engine runs the indexer binary once per question, handing it a serialized
+// CxxToolchainRequest and reading back a CxxToolchainResponse, because these questions are asked a
+// handful of times per refresh and a short-lived child process is far less machinery than a second
+// long-lived connection. The requests exist only because parsing a compilation database and
+// compiling a precompiled header need Clang, which the engine deliberately does not link.
+
+message CxxCompileCommandProto {
+  string directory = 1;
+  string file = 2;
+  repeated string arguments = 3;
+}
+
+message LoadCompilationDatabaseRequest { string cdb_path = 1; }
+
+message BuildPrecompiledHeaderRequest {
+  string pch_input_file_path = 1;
+  string pch_output_file_path = 2;
+  // UTF-8 encoded wstrings.
+  repeated string compiler_flags = 3;
+}
+
+message CxxToolchainRequest {
+  oneof request {
+    LoadCompilationDatabaseRequest load_compilation_database = 1;
+    BuildPrecompiledHeaderRequest build_precompiled_header = 2;
+  }
+}
+
+message CxxToolchainResponse {
+  // False when the helper could not answer at all; `error` then says why.
+  bool ok = 1;
+  string error = 2;
+  repeated CxxCompileCommandProto compile_commands = 3;
+  IntermediateStorage storage = 4;
+}
