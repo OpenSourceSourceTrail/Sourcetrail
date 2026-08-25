@@ -12,14 +12,27 @@ It is **not** a single process: a Qt GUI, a headless engine daemon that owns the
 
 CMake (>= 3.23) + Conan 2 + Ninja. C++20 / C17. Qt 6.10.
 
-All tracked presets are the CI ones — `ci_gnu_release`, `ci_clang_release`, `ci_msvc_release`, each with a `_build_cxx` variant that additionally enables the C/C++ indexer. They all configure into `<repo>/build/` and already enable unit + GUI + integration tests (the hidden `all-tests` fragment). Use `CMakeUserPresets.json` for local, uncommitted tweaks.
+The tracked presets are the CI ones — `ci_gnu_release`, `ci_clang_release`, `ci_msvc_release`, each with a `_build_cxx` variant that additionally enables the C/C++ indexer — plus `gnu_debug` for local Linux Debug builds. All of them enable unit + GUI + integration tests (the hidden `all-tests` fragment). The `ci_*` presets configure into `<repo>/build/`; `gnu_debug` uses `<repo>/build-debug/` so the two trees never invalidate each other. Use `CMakeUserPresets.json` for local, uncommitted tweaks (inherit from the tracked presets rather than copying them).
 
 ### Linux
+
+Linux needs **exactly one** Conan install — GCC, Release. Every local configuration, Debug
+included, reuses that dependency set; never run `conan install -s build_type=Debug`.
+
 ```
 conan install . -s build_type=Release -of .conan/gcc/ -b missing -pr:a .conan/gcc/profile
 cmake --preset=ci_gnu_release
 cmake --build build
 ```
+
+For a Debug build of the application against those same Release dependencies:
+```
+cmake --preset=gnu_debug
+cmake --build build-debug
+```
+`gnu_debug` points at the Release `conan_toolchain.cmake` and sets
+`CMAKE_MAP_IMPORTED_CONFIG_DEBUG=Release;RelWithDebInfo;` so the Conan imported targets
+resolve. `scripts/run_conan.sh` performs the one install.
 
 ### Windows (MSVC)
 ```

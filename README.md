@@ -103,7 +103,8 @@ Building Sourcetrail requires several dependencies to be in place on your machin
 ### Building
 
 The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed with
-`_build_cxx` for C/C++ indexing support. They all build into `<repo>/build/`.
+`_build_cxx` for C/C++ indexing support. They all build into `<repo>/build/`. On Linux there
+is also `gnu_debug`, which builds into `<repo>/build-debug/`.
 
 #### On Windows `Faced some problems with Conan2 and Windows`
 * To set up your build environment run:
@@ -126,6 +127,13 @@ The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed
     $ conan install . -s build_type=Release -of .conan/gcc/ -b missing -pr:a .conan/gcc/profile
     $ cmake --preset=ci_gnu_release
     $ cmake --build build
+    ```
+    That single GCC/Release `conan install` is the only one you need on Linux — do **not** run
+    `conan install -s build_type=Debug`. For a Debug build of Sourcetrail itself, use the
+    `gnu_debug` preset, which links the very same Release-built dependencies:
+    ```
+    $ cmake --preset=gnu_debug
+    $ cmake --build build-debug
     ```
 
 ### Running

@@ -109,6 +109,24 @@
             ]
         },
         {
+            "name": "gnu_debug",
+            "displayName": "GNU Debug (reuses the Release Conan deps)",
+            "binaryDir": "${sourceDir}/build-debug/",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "USE_ALTERNATE_LINKER": "mold",
+                "CMAKE_TOOLCHAIN_FILE": ".conan/gcc/build/Release/generators/conan_toolchain.cmake",
+                "CMAKE_MAP_IMPORTED_CONFIG_DEBUG": "Release;RelWithDebInfo;",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build-debug/install"
+            },
+            "inherits": [
+                "all-tests",
+                "gcc",
+                "ninja",
+                "linux"
+            ]
+        },
+        {
             "name": "ci_clang_release",
             "displayName": "CI Clang Release",
             "binaryDir": "${sourceDir}/build/",

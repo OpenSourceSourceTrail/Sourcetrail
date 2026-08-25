@@ -15,6 +15,9 @@ description: Build Sourcetrail — Conan 2 setup, CMake presets, key options, ad
 
 ## Conan setup (first time, Linux/GCC)
 
+One install only — GCC, Release. Debug builds reuse it; never run a `build_type=Debug`
+install (`scripts/run_conan.sh` does exactly this one command).
+
 ```bash
 conan install . -s build_type=Release -of .conan/gcc/ -b missing -pr:a .conan/gcc/profile
 ```
@@ -22,10 +25,13 @@ conan install . -s build_type=Release -of .conan/gcc/ -b missing -pr:a .conan/gc
 ## Configure & build
 
 ```bash
-# Release build with C/C++ indexing support (preset from CMakeUserPresets.json)
-cmake --preset=gnu_release_build_cxx
-cd ../build/gnu_release_build_cxx
-ninja
+# Release build with C/C++ indexing support -> build/
+cmake --preset=ci_gnu_release_build_cxx
+cmake --build build
+
+# Debug build against the same Release Conan deps -> build-debug/
+cmake --preset=gnu_debug
+cmake --build build-debug
 ```
 
 ## Key CMake options
