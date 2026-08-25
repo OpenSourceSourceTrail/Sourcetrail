@@ -21,7 +21,6 @@
 #include "impls/Factory.hpp"
 #include "IndexerPluginRegistry.h"
 #include "language_packages.h"
-#include "LanguagePackageManager.h"
 #include "PlatformUserPaths.h"
 #include "productVersion.h"
 #include "ScopedFunctor.h"
@@ -34,7 +33,6 @@
 #include "Version.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "LanguagePackageCxx.h"
 #  include "SourceGroupFactoryModuleCxx.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
@@ -45,13 +43,12 @@ void signalHandler(int signum) {
   MessageIndexingInterrupted{}.dispatch();
 }
 
-void addLanguagePackages() {
+void addSourceGroupModules() {
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCustom>());
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleJava>());
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
   SourceGroupFactory::getInstance()->addModule(std::make_shared<SourceGroupFactoryModuleCxx>());
-  LanguagePackageManager::getInstance()->addPackage(std::make_shared<LanguagePackageCxx>());
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   IndexerPluginRegistry::getInstance()->discover();
@@ -93,7 +90,7 @@ int main(int argc, char* argv[]) {
   ConsoleApplication consoleApp;
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
-  addLanguagePackages();
+  addSourceGroupModules();
 
   std::ignore = std::signal(SIGINT, signalHandler);
   std::ignore = std::signal(SIGTERM, signalHandler);
