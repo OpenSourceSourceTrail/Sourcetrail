@@ -428,7 +428,7 @@ TEST_F(ProjectFix, buildIndex_statusIsNoneAndNoFilesToIndex) {
   EXPECT_EQ(mProject->m_refreshStage, Project::RefreshStageType::NONE);
 }
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
+#ifdef BUILD_CXX_LANGUAGE_PACKAGE
 TEST_F(ProjectFix, buildIndex_statusIsNoneAndOneFileToClear) {
   // Given: Refresh none flags and one file to clear.
   const RefreshInfo info{{}, {FilePath{"1.cpp"}}, {}, RefreshMode::None};
