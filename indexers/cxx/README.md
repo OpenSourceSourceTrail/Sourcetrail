@@ -1,277 +1,165 @@
-# Sourcetrail C++20 Indexer
+# Built-in C/C++ Indexer
 
-A from-scratch, modern C++20 rewrite of the Sourcetrail indexing engine. This tool parses C/C++ source code using Clang's `libTooling`, extracts semantic information (symbols, references, inheritance, calls), and stores it in a high-performance SQLite database for fast querying and code navigation.
+Sourcetrail's C/C++ indexer plugin. It parses translation units with Clang's
+`libTooling`, walks the AST to extract symbols, references, inheritance and call
+edges, and streams the result back to the engine, which owns the SQLite index.
+
+Enabled by the CMake option `BUILD_CXX_LANGUAGE_PACKAGE` (default `OFF`). With
+it off, none of this directory is configured and **no indexer worker binary is
+built at all**.
 
 ## Table of Contents
-- [Key Features](#key-features)
-- [Architecture Overview](#architecture-overview)
-- [Class Diagram](#class-diagram)
-- [Sequence Diagrams](#sequence-diagrams)
-  - [1. End-to-End Indexing Pipeline](#1-end-to-end-indexing-pipeline)
-  - [2. Incremental Indexing & Scheduling](#2-incremental-indexing--scheduling)
-- [Building the Project](#building-the-project)
-- [Usage](#usage)
+- [Layout](#layout)
+- [How it is discovered](#how-it-is-discovered)
+- [The worker process](#the-worker-process)
+- [Indexing pipeline](#indexing-pipeline)
+- [Helper mode](#helper-mode)
+- [Building](#building)
 
 ---
 
-## Key Features
+## Layout
 
-- **Modern C++20**: Heavily utilizes Concepts, Ranges, `std::expected`, `std::jthread`, and `std::format`.
-- **Clang `libTooling`**: Direct C++ AST traversal for unmatched accuracy, template support, and type resolution.
-- **Multi-TU Concurrency**: Thread-pool scheduling to index multiple Translation Units in parallel.
-- **Incremental Indexing**: SHA-256 file hashing and dependency graph tracking to only re-index what changed.
-- **Robust Storage**: Optimized SQLite backend with FTS5 for fuzzy symbol searching.
-- **Error Resilient**: Uses `std::expected` for recoverable errors, ensuring one bad TU doesn't crash the indexer.
-
----
-
-## Architecture Overview
-
-The indexer is decoupled into three main layers:
-1. **Project & Scheduling Layer**: Manages `compile_commands.json`, tracks file staleness, and dispatches work to a thread pool.
-2. **AST Extraction Layer**: Uses Clang `FrontendAction` and `RecursiveASTVisitor` to walk the AST, resolving USRs (Unified Symbol Resolution) and source locations.
-3. **Storage Layer**: An RAII SQLite wrapper that batches inserts into an intermediate representation (IR) and commits them transactionally.
-
----
-
-## Class Diagram
-
-```mermaid
-classDiagram
-    direction LR
-    
-    namespace Project {
-        class ProjectManager {
-            -CompilationDatabase db_
-            -std::vector~std::string~ file_paths_
-            +load(path: fs::path) std::expected~void, ProjectError~
-            +getCommands() const std::span~const std::string~
-        }
-    }
-
-    namespace Scheduler {
-        class IndexScheduler {
-            -ThreadPool pool_
-            -StorageManager& storage_
-            -std::mutex db_mutex_
-            +run(ProjectManager& project) void
-            -indexTask(cmd: CompileCommand) void
-        }
-        
-        class ThreadPool {
-            -std::vector~std::jthread~ workers_
-            -ConcurrentQueue~Task~ queue_
-            +enqueue(task: Task) void
-        }
-    }
-
-    namespace AST {
-        class IndexerFrontendAction {
-            +CreateASTConsumer(CompilerInstance&, file) std::unique_ptr~ASTConsumer~
-        }
-        
-        class IndexerASTConsumer {
-            -IntermediateStorage ir_
-            +HandleTranslationUnit(ASTContext&) void
-        }
-        
-        class SymbolVisitor {
-            -ASTContext* ctx_
-            -IntermediateStorage& ir_
-            +VisitCXXRecordDecl(CXXRecordDecl*) bool
-            +VisitFunctionDecl(FunctionDecl*) bool
-            +VisitCallExpr(CallExpr*) bool
-            -extractLocation(SourceLocation loc) Location
-            -generateUSR(const NamedDecl*) std::string
-        }
-    }
-
-    namespace Storage {
-        class StorageManager {
-            -sqlite3* db_
-            +beginTransaction() void
-            +commitTransaction() void
-            +persistIR(IntermediateStorage& ir) void
-        }
-        
-        class IntermediateStorage {
-            +std::vector~Symbol~ symbols
-            +std::vector~Reference~ references
-            +std::vector~Location~ locations
-            +clear() void
-        }
-    }
-
-    namespace Core {
-        class Symbol {
-            +uint64_t id
-            +SymbolKind kind
-            +std::string name
-            +std::string usr
-        }
-        class Reference {
-            +uint64_t source_id
-            +uint64_t target_id
-            +ReferenceKind kind
-            +Location location
-        }
-        class Location {
-            +fs::path file
-            +uint32_t line
-            +uint32_t column
-        }
-    }
-
-    ProjectManager --> IndexScheduler : provides commands
-    IndexScheduler --> ThreadPool : uses
-    IndexScheduler --> StorageManager : owns/coordinates
-    IndexScheduler ..> IndexerFrontendAction : creates via ClangTool
-    
-    IndexerFrontendAction --> IndexerASTConsumer : creates
-    IndexerASTConsumer --> SymbolVisitor : delegates traversal
-    IndexerASTConsumer --> IntermediateStorage : populates
-    
-    SymbolVisitor ..> Symbol : creates
-    SymbolVisitor ..> Reference : creates
-    SymbolVisitor ..> Location : creates
-    
-    StorageManager ..> IntermediateStorage : consumes
-    StorageManager ..> Symbol : persists
+```
+indexers/cxx/
+  CMakeLists.txt      add_subdirectory(lib) then add_subdirectory(indexer)
+  indexer/            Sourcetrail_indexer -- the worker executable
+    main.cpp            argv parsing, logging, package registration, gRPC loop
+    CxxHelperMode.cpp   --helper mode (see below)
+    manifest.xml.in     plugin manifest template
+  lib/                Sourcetrail_lib_cxx -- the language package
+    LanguagePackageCxx.cpp      entry point; hands out IndexerCxx
+    data/indexer/IndexerCxx.cpp the IndexerCommand -> parse -> storage step
+    data/parser/cxx/            Clang frontend: ASTAction, ASTConsumer,
+                                CxxAstVisitor (+ its Component* mixins),
+                                CxxParser, PreprocessorCallbacks,
+                                CanonicalFilePathCache, CxxDiagnosticConsumer
+    data/parser/cxx/name/           Cxx*Name -- structured symbol names
+    data/parser/cxx/name_resolver/  Cxx*NameResolver -- Clang decl/type -> name
+    project/CxxToolchainLocal.cpp   local compiler/toolchain probing
+    tests/                      CompilationDatabaseTestSuite
 ```
 
----
+The heavier Clang-dependent parser suites live outside this tree, in
+`tests/integration/lib_cxx/`.
 
-## Sequence Diagrams
+## How it is discovered
 
-### 1. End-to-End Indexing Pipeline
+There is **no special case for the built-in indexer** anywhere in the engine.
+Like the Java plugin, it is resolved purely through a manifest:
 
-This diagram illustrates the lifecycle of indexing a single Translation Unit (TU) within the thread pool, from dispatch to database persistence.
+`indexer/manifest.xml.in` is `configure_file`d at CMake configure time into
+`<build>/app/plugins/cxx/manifest.xml`. `IndexerPluginRegistry::discover()`
+(`src/lib/lib/app/`) scans `<app>/plugins/*/manifest.xml` at engine startup and
+reads the source-group types each plugin claims. The engine reports those over
+`GetCapabilities`, which is how the GUI decides which project types to offer —
+a build without this package simply shows fewer options in the wizard.
+
+`<indexerExecutable>` is the relative path `../../sourcetrail_indexer`, which
+resolves from `<plugins>/cxx/` to the binary in both the build tree
+(`<build>/app/`) and the install tree (`usr/bin/`).
+
+## The worker process
+
+`Sourcetrail_indexer` (output name `sourcetrail_indexer`) is spawned per
+indexing job by the engine, never by the GUI:
+
+```
+sourcetrail_indexer <processId> --engine-endpoint <endpoint> <appPath> <userDataPath> [logFilePath]
+```
+
+`main.cpp` registers `LanguagePackageCxx` with the `LanguagePackageManager`,
+installs `CxxToolchainLocal` as the `ICxxToolchain`, runs
+`IndexerPluginRegistry::discover()`, then hands control to `GrpcIndexer`, which
+pulls `IndexerCommand`s from the engine over gRPC and pushes back an
+`IntermediateStorage` per translation unit. The engine merges those
+(`TaskMergeStorages`) into the SQLite index.
+
+Note the asymmetry in the process model: the GUI↔engine boundary is HTTP+JSON,
+but the engine↔worker boundary here is still gRPC (`indexer_worker.proto`).
+
+## Indexing pipeline
 
 ```mermaid
 sequenceDiagram
-    participant Sched as IndexScheduler
+    participant Engine as sourcetrail_engine
+    participant Worker as GrpcIndexer (worker)
+    participant Idx as IndexerCxx
     participant Tool as clang::ClangTool
-    participant Action as IndexerFrontendAction
-    participant Visitor as SymbolVisitor
+    participant Action as ASTAction
+    participant Visitor as CxxAstVisitor
     participant IR as IntermediateStorage
-    participant DB as StorageManager
 
-    Sched->>Tool: Run ClangTool on CompileCommand
-    Note over Tool: Parses code, generates AST
-    
+    Engine->>Worker: IndexerCommand (one TU)
+    Worker->>Idx: index(command)
+    Idx->>Tool: run over CxxCompilationDatabaseSingle
     Tool->>Action: CreateASTConsumer()
-    Action->>IR: Initialize empty IR
-    
-    Tool->>Action: HandleTranslationUnit(ASTContext)
-    Action->>Visitor: Traverse AST (RecursiveASTVisitor)
-    
-    loop AST Nodes
-        Visitor->>Visitor: VisitDecl / VisitStmt
-        Visitor->>Visitor: generateUSR(Decl)
-        Visitor->>Visitor: extractLocation(SourceLocation)
-        Visitor->>IR: Add Symbol/Reference
+    Note over Action: PreprocessorCallbacks records includes/macros<br/>CommentHandler records comment locations
+    Action->>Visitor: traverse AST (RecursiveASTVisitor)
+
+    loop AST nodes
+        Visitor->>Visitor: Component* mixins classify ref kind, context, implicit code
+        Visitor->>Visitor: Cxx*NameResolver -> structured CxxName
+        Visitor->>IR: record symbol / reference / source location
     end
-    
-    Visitor-->>Action: Traversal Complete
-    Action-->>Tool: Return ASTConsumer
-    
-    Tool-->>Sched: ClangTool execution finished
-    
-    Sched->>DB: Acquire DB Mutex
-    Sched->>DB: beginTransaction()
-    Sched->>DB: persistIR(IR)
-    
-    Note over DB: Deduplicates by USR<br/>Updates FTS5 index
-    
-    DB-->>Sched: Success
-    Sched->>DB: commitTransaction()
-    Sched->>DB: Release DB Mutex
+
+    Idx-->>Worker: IntermediateStorage
+    Worker-->>Engine: storage for this TU
+    Note over Engine: TaskMergeStorages -> SQLite
 ```
 
-### 2. Incremental Indexing & Scheduling
+`CanonicalFilePathCache` keeps the many `SourceLocation` → canonical path
+lookups from dominating the traversal.
 
-This diagram shows how the indexer decides *not* to index a file if it hasn't changed, and how it manages concurrency across multiple files.
+## Helper mode
 
-```mermaid
-sequenceDiagram
-    participant Main as main()
-    participant Proj as ProjectManager
-    participant Sched as IndexScheduler
-    participant Hasher as FileHasher
-    participant DB as StorageManager
-    participant Pool as ThreadPool
-
-    Main->>Proj: Load compile_commands.json
-    Main->>Sched: run(Project)
-    
-    Sched->>DB: Fetch known file hashes from DB
-    
-    loop For each file in Project
-        Sched->>Hasher: computeSHA256(filePath)
-        Hasher-->>Sched: return hash
-        
-        alt Hash matches DB
-            Note over Sched: Skip file (Incremental win!)
-        else Hash differs or new file
-            Sched->>Pool: enqueue(IndexTask)
-        end
-    end
-    
-    Note over Pool: Multiple std::jthreads active
-    
-    par Parallel Execution
-        Pool->>Pool: Index TU 1 (AST -> IR -> DB)
-    and
-        Pool->>Pool: Index TU 2 (AST -> IR -> DB)
-    and
-        Pool->>Pool: Index TU 3 (AST -> IR -> DB)
-    end
-    
-    Pool-->>Sched: All tasks complete
-    Sched-->>Main: Indexing finished
+```
+sourcetrail_indexer --helper <requestFile> <responseFile>
 ```
 
----
+Answers a single toolchain question (header search paths, target triple, and
+similar) for a process that has no Clang linked into it — the GUI and the engine
+deliberately do not link a language package, so they shell out to this mode
+instead. Implemented in `indexer/CxxHelperMode.cpp`; the request/response pair is
+`indexer_helper.proto`.
 
-## Building the Project
+## Building
 
-### Prerequisites
-- **C++20 Compiler**: Clang 15+ or GCC 12+
-- **CMake**: 3.25+
-- **LLVM/Clang Development Libraries**: 15.0+
-- **SQLite3**: Development headers
+Requires **LLVM/Clang 22 or newer** (developed against 22.1.8), built with
+`-DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RTTI=ON`, plus
+`-DCLANG_LINK_CLANG_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON` on Unix. The version
+floor is checked by hand in `lib/CMakeLists.txt`, because Clang's own package
+config only accepts an exact major.minor.
 
-### Build Instructions
+The supported route builds it through Conan from `.conan/recipes/llvm-clang/`
+and symlinks `<repo>/external` at the result:
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/sourcetrail-cpp20-indexer.git
-cd sourcetrail-cpp20-indexer
-
-# Configure with CMake (LLVM_DIR might be required depending on your setup)
-cmake -B build -DCMAKE_BUILD_TYPE=Release \
-      -DLLVM_DIR=/path/to/llvm/lib/cmake/llvm \
-      -DClang_DIR=/path/to/llvm/lib/cmake/clang
-
-# Build
-cmake --build build -j$(nproc)
-
-# The executable will be at build/bin/indexer
+./scripts/build_llvm_conan.sh          # first run compiles LLVM; hours
+cmake --preset=ci_gnu_release_build_cxx
+cmake --build build-cxx
 ```
 
----
-
-## Usage
-
-To index a project, you must first generate a `compile_commands.json` (usually done via CMake with `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON`).
+To skip that first build, restore the package CI publishes:
 
 ```bash
-# Basic usage
-./indexer --project /path/to/project --db /path/to/output.db
+gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
+conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+./scripts/build_llvm_conan.sh          # now a cache hit; still makes the symlink
+```
 
-# Force full re-index (ignore incremental hashes)
-./indexer --project /path/to/project --db /path/to/output.db --force
+With a hand-built LLVM, point at it instead:
 
-# Limit number of threads
-./indexer --project /path/to/project --db /path/to/output.db --threads 4
+```bash
+cmake --preset=ci_gnu_release_build_cxx -DClang_DIR=<llvm_build>/lib/cmake/clang
+```
+
+The `build_cxx` presets default `Clang_DIR` to
+`<repo>/external/lib/cmake/clang/` and configure into `build-cxx/`, separate
+from the `build/` tree the non-cxx presets use, so both can coexist.
+
+Tests:
+
+```bash
+ctest --test-dir build-cxx -R "CompilationDatabase|integration\.lib_cxx\."
 ```
