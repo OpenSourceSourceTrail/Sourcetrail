@@ -160,24 +160,49 @@ jobs:
               tag: gnu,
               "with_cxx": "",
               "binary_dir": "build",
+              "sr_san": "",
             }
           - {
               name: "Ubuntu Latest GCC with cxx_build",
               tag: gnu,
               "with_cxx": "_build_cxx",
               "binary_dir": "build-cxx",
+              "sr_san": "",
             }
           - {
               name: "Ubuntu Latest CLang",
               tag: "clang",
               "with_cxx": "",
               "binary_dir": "build",
+              "sr_san": "",
             }
           - {
               name: "Ubuntu Latest CLang cxx_build",
               tag: "clang",
               "with_cxx": "_build_cxx",
               "binary_dir": "build-cxx",
+              "sr_san": "",
+            }
+          - {
+              name: "Ubuntu Latest GCC ASan+LSan",
+              tag: gnu,
+              "with_cxx": "",
+              "binary_dir": "build",
+              "sr_san": "address,leak",
+            }
+          - {
+              name: "Ubuntu Latest CLang TSan+UBSan",
+              tag: "clang",
+              "with_cxx": "",
+              "binary_dir": "build",
+              "sr_san": "thread,undefined",
+            }
+          - {
+              name: "Ubuntu Latest CLang MSan",
+              tag: "clang",
+              "with_cxx": "",
+              "binary_dir": "build",
+              "sr_san": "memory",
             }
 
     name: ${{ matrix.config.name }}
@@ -286,7 +311,9 @@ jobs:
           ./scripts/build_llvm_conan.sh
 
       - name: Configure CMake
-        run: cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
+        run: >
+          cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
+          ${{ matrix.config.sr_san != '' && format('-DSR_SAN={0}', matrix.config.sr_san) || '' }}
 
       - name: Build
         run: |
