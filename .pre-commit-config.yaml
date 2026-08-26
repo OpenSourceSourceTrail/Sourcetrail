@@ -1,0 +1,15 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.8 # matches CI's clang-format-18 (1:18.1.8-20ubuntu8)
+    hooks:
+      - id: clang-format
+        types_or: [c++, c] # CI only checks .cpp/.h/.hpp; keep proto/java untouched
+
+  - repo: local
+    hooks:
+      - id: cmake-format
+        name: cmake-format
+        entry: cmake-format -i --config-files .cmake-format.yaml
+        language: python
+        additional_dependencies: ["Cython<3", "cmakelang[YAML]==0.6.13"] # matches CI's cmake-format-lint-action
+        files: '(CMakeLists\.txt|\.cmake)$'
