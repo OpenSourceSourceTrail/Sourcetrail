@@ -1,5 +1,9 @@
 name: Build
 
+# NOTE: `paths` must stay identical for both triggers, and must cover every input that feeds
+# the Conan cache key. If `conanfile.txt` is missing here, a dependency bump never re-runs on
+# `main`, so the new cache key is never written to the default branch -- and pull requests can
+# only read caches from the default branch. That is a silent, permanent cache miss.
 on:
   push:
     branches: ["main"]
@@ -7,7 +11,12 @@ on:
       - "**/*.h"
       - "**/*.hpp"
       - "**/*.cpp"
+      - "**/CMakeLists.txt"
       - "**/*.cmake"
+      - "CMakePresets.json"
+      - "conanfile.txt"
+      - ".conan/**"
+      - "scripts/**"
       - .github/workflows/*.yml
   pull_request:
     branches: ["main"]
@@ -15,8 +24,20 @@ on:
       - "**/*.h"
       - "**/*.hpp"
       - "**/*.cpp"
+      - "**/CMakeLists.txt"
       - "**/*.cmake"
+      - "CMakePresets.json"
+      - "conanfile.txt"
+      - ".conan/**"
+      - "scripts/**"
       - .github/workflows/*.yml
+
+# The Conan client version is pinned rather than resolved at runtime. It is part of the cache
+# key (an upgrade changes package_ids, and a restored archive from another client would look
+# valid while silently forcing a full from-source rebuild), and pinning is what lets the `deps`
+# job compute that key before it has installed anything.
+env:
+  CONAN_VERSION: "2.31.2"
 
 jobs:
   clang-format:
@@ -53,6 +74,93 @@ jobs:
         with:
           args: --config-files .cmake-format.yaml --check
 
+  # Dependencies are built once here and every build leg restores them. Without this job the
+  # matrix legs all miss the same cold key at the same moment and each spend ~28 minutes
+  # building an identical dependency set, three of them then losing the save race.
+  #
+  # It is an optimisation, not a gate: the build legs keep their own restore + `conan install`,
+  # so a failure here costs a cold leg rather than the whole run (see the `if:` on `build`).
+  deps:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    name: Conan dependencies (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # `lookup-only` does not download the archive. On a warm key this job confirms the entry
+      # exists and stops, so the wait it adds to the build matrix is job startup and nothing
+      # more. No `restore-keys` here on purpose -- only an exact hit means "nothing to do".
+      - name: Look up conan archive
+        id: lookup
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
+          lookup-only: true
+
+      # setup-python instead of a venv: pip installs work identically on both runners, so the
+      # rest of this job needs no OS split beyond the `conan install` line itself.
+      - name: Setup python
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install conan
+        id: conan
+        if: steps.lookup.outputs.cache-hit != 'true'
+        run: pip install "conan==${{ env.CONAN_VERSION }}"
+        shell: bash
+
+      # A partial hit restores every unchanged dependency, so a one-package bump rebuilds one
+      # package instead of all of them.
+      - name: Restore conan archive
+        id: restore
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: ${{ steps.lookup.outputs.cache-primary-key }}
+          restore-keys: |
+            conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-
+
+      - name: Unpack conan archive
+        if: steps.restore.outputs.cache-matched-key != ''
+        run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
+
+      - name: Install conan dependencies (Ubuntu)
+        if: steps.lookup.outputs.cache-hit != 'true' && runner.os == 'Linux'
+        run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
+
+      - name: Install conan dependencies (Windows)
+        if: steps.lookup.outputs.cache-hit != 'true' && runner.os == 'Windows'
+        run: |
+          conan profile detect --force
+          conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
+        shell: bash
+
+      # `!cancelled()` banks whatever did build when a later package fails, so the retry is
+      # warmer. The `conan` guard keeps these from running -- and reporting
+      # `conan: command not found` over the real error -- when the client never installed.
+      - name: Pack conan archive
+        if: ${{ !cancelled() && steps.lookup.outputs.cache-hit != 'true' && steps.conan.outcome == 'success' }}
+        run: |
+          conan cache clean "*" --source --build --download --temp
+          conan cache save "*:*" --no-source --file "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
+
+      - name: Save conan archive
+        if: ${{ !cancelled() && steps.lookup.outputs.cache-hit != 'true' && steps.conan.outcome == 'success' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: ${{ steps.lookup.outputs.cache-primary-key }}
+
   build:
     strategy:
       fail-fast: false
@@ -62,55 +170,40 @@ jobs:
               name: "Windows Latest MSVC",
               os: windows-latest,
               tag: msvc,
-              cc: "cl",
-              cxx: "cl",
               environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
               "with_cxx": "",
             }
-          - {
-              name: "Windows Latest MSVC with cxx_build",
-              os: windows-latest,
-              tag: msvc,
-              cc: "cl",
-              cxx: "cl",
-              environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-              "with_cxx": "_build_cxx",
-            }
+          # NOTE: there is deliberately no Windows `_build_cxx` leg. The C/C++ indexer needs
+          # LLVM/Clang 22, and .conan/recipes/llvm-clang/ has only been validated on Linux/GCC.
+          # Re-add this leg once llvm.yml gains a windows-latest job producing the package.
           - {
               name: "Ubuntu Latest GCC",
               os: ubuntu-24.04,
               tag: gnu,
-              cc: "gcc",
-              cxx: "g++",
               "with_cxx": "",
             }
           - {
               name: "Ubuntu Latest GCC with cxx_build",
               os: ubuntu-24.04,
               tag: gnu,
-              cc: "gcc",
-              cxx: "g++",
               "with_cxx": "_build_cxx",
             }
           - {
               name: "Ubuntu Latest CLang",
               os: ubuntu-24.04,
               tag: "clang",
-              cc: "clang",
-              cxx: "clang++",
               "with_cxx": "",
             }
           - {
               name: "Ubuntu Latest CLang cxx_build",
               os: ubuntu-24.04,
               tag: "clang",
-              cc: "clang",
-              cxx: "clang++",
               "with_cxx": "_build_cxx",
             }
 
     name: ${{ matrix.config.name }}
-    needs: [clang-format, cmake-format]
+    needs: [clang-format, cmake-format, deps]
+    if: ${{ !cancelled() && needs.clang-format.result == 'success' && needs.cmake-format.result == 'success' }}
     runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout
@@ -123,16 +216,25 @@ jobs:
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep
+        run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep mold
+
+      # `mvn` is preinstalled on the runner, so BUILD_JAVA_INDEXER defaults ON and the plugin is
+      # always built. pom.xml compiles with release 21; the image's default JDK is older.
+      - name: Install JDK (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
 
       - name: Install Qt (Ubuntu)
         if: runner.os == 'Linux'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: "==3.2.*"
+          aqtversion: "==3.3.*"
           dir: "${{github.workspace}}/Qt/"
           install-deps: "true"
-          version: "6.8.2"
+          version: "6.10.3"
           host: "linux"
           target: "desktop"
           arch: "linux_gcc_64"
@@ -145,10 +247,10 @@ jobs:
         if: runner.os == 'Windows'
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: "==3.2.*"
+          aqtversion: "==3.3.*"
           dir: "${{github.workspace}}/Qt/"
           install-deps: "true"
-          version: "6.8.2"
+          version: "6.10.3"
           host: "windows"
           target: "desktop"
           arch: "win64_msvc2022_64"
@@ -157,66 +259,88 @@ jobs:
           cache: "true"
           cache-key-prefix: "install-qt-action-windows"
 
+      # `venv/bin` goes on PATH so every later step can call `conan` directly and the cache
+      # steps below stay identical on Linux and Windows.
       - name: Install conan & gcovr (Ubuntu)
         if: runner.os == 'Linux'
         run: |
           python3 -m venv venv
-          source venv/bin/activate
-          pip install conan gcovr
+          echo "${{ github.workspace }}/venv/bin" >> "$GITHUB_PATH"
+          ./venv/bin/pip install "conan==${{ env.CONAN_VERSION }}" gcovr
 
       - name: Install conan (Windows)
         if: runner.os == 'Windows'
-        run: python -m pip install conan && conan profile detect
+        run: python -m pip install "conan==${{ env.CONAN_VERSION }}" && conan profile detect
         shell: bash
 
-      - name: Cache Conan packages (Ubuntu)
-        if: runner.os == 'Linux'
-        uses: actions/cache@v4
+      # Restore only -- the `deps` job owns writing this cache. One archive per OS: every Linux
+      # leg installs the same gcc/Release dependency set, so gnu and clang share it and
+      # `matrix.config.tag` is deliberately absent from the key.
+      #
+      # We cache a single `conan cache save` archive, NOT ~/.conan2 itself. The full cache dir
+      # is ~14 GB (build trees, extracted sources, download tarballs) which blows past GitHub's
+      # 10 GB per-repository budget, so the post-job save is dropped and every run starts cold.
+      # The archive holds package binaries only -- a few hundred MB.
+      - name: Restore conan archive
+        id: conan-cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.conan2
-          key: conan-${{ runner.os }}-${{ matrix.config.tag }}-${{ hashFiles('**/conanfile.txt') }}
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
+          # A partial hit still restores every unchanged dependency, so a one-package bump
+          # rebuilds one package instead of all of them.
+          restore-keys: |
+            conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-
 
-      - name: Cache Conan packages (Windows)
-        if: runner.os == 'Windows'
-        uses: actions/cache@v4
-        with:
-          path: "C:\\Users\\runneradmin\\.conan2\\"
-          key: conan-${{ runner.os }}-${{ matrix.config.tag }}-${{ hashFiles('**/conanfile.txt') }}
+      # Paths are quoted throughout: on Windows `runner.temp` expands to `D:\a\_temp`, and bash
+      # would otherwise eat the backslashes.
+      - name: Unpack conan archive
+        if: steps.conan-cache.outputs.cache-matched-key != ''
+        run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
 
+      # Normally a no-op that just writes the generator files: `deps` already built everything
+      # and the restore above brought it in. Kept unconditional so a leg still builds if the
+      # `deps` job failed.
+      #
+      # Linux uses exactly one Conan install: gcc/Release. The clang legs build the application
+      # with clang against these gcc-built dependencies -- both use libstdc++11, so the ABI
+      # matches, and `.conan/clang/profile` (which had no build_type, breaking every tool_require
+      # in the build context) is gone.
       - name: Install conan dependencies (Ubuntu)
         if: runner.os == 'Linux'
-        run: |
-          source venv/bin/activate
-          conan install . -s build_type=Release -of .conan/${{ matrix.config.cc }} --build=missing -pr:a .conan/${{ matrix.config.cc }}/profile
+        run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
 
       - name: Install conan dependencies (Windows)
         if: runner.os == 'Windows'
         run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
         shell: bash
 
-      - name: Download llvm build cache (Ubuntu)
-        if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
+      # LLVM/Clang comes from the release asset published by llvm.yml -- never built here.
+      # Release assets are not subject to the 7-day cache eviction or the 10 GB budget, which
+      # leaves the whole cache budget to the dependency archive above.
+      - name: Download LLVM/Clang
+        if: matrix.config.with_cxx == '_build_cxx'
         uses: robinraju/release-downloader@v1.12
         with:
-          tag: "2.0.0"
-          fileName: "clang-19.1.7-linux.zip"
+          tag: "llvm-clang-22.1.8"
+          fileName: "llvm-clang-22.1.8-linux-x86_64.tgz"
           token: ${{ secrets.GITHUB_TOKEN }}
-          out-file-path: ${{github.workspace}}/external
-          extract: true
+          out-file-path: ${{ runner.temp }}
+          extract: false
 
-      - name: Download llvm build cache (Windows)
-        if: runner.os == 'Windows' && matrix.config.with_cxx == '_build_cxx'
-        uses: robinraju/release-downloader@v1.12
-        with:
-          tag: "2.0.0"
-          fileName: "clang-19.1.7-windows.zip"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          out-file-path: ${{github.workspace}}/external
-          extract: true
-
-      - name: Install llvm (Ubuntu)
-        if: runner.os == 'Linux' && matrix.config.with_cxx == '_build_cxx'
-        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
+      # After the restore, build_llvm_conan.sh's `--build=missing` is a cache hit (seconds), and
+      # it still creates the external/ symlink the `*_build_cxx` presets expect at
+      # ${sourceDir}/external/lib/cmake/clang/.
+      #
+      # The package is built with .conan/gcc/profile and reused by the clang leg: lib_cxx finds
+      # LLVM through find_package(Clang) on the install tree, and clang uses libstdc++ on Linux,
+      # so the ABI matches.
+      - name: Install LLVM/Clang
+        if: matrix.config.with_cxx == '_build_cxx'
+        run: |
+          conan cache restore "${{ runner.temp }}/llvm-clang-22.1.8-linux-x86_64.tgz"
+          ./scripts/build_llvm_conan.sh
 
       - name: Configure CMake (Ubuntu)
         if: runner.os == 'Linux'
@@ -225,7 +349,9 @@ jobs:
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         env:
-          CMAKE_PREFIX_PATH: ${{env.Qt5_DIR}}
+          # install-qt-action exports QT_ROOT_DIR for Qt6; Qt5_DIR was a Qt5 leftover and
+          # expanded to an empty string.
+          CMAKE_PREFIX_PATH: ${{env.QT_ROOT_DIR}}
         run: |
           call "${{ matrix.config.environment_script }}"
           cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
@@ -249,7 +375,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: build-logs-${{ matrix.config.tag }}-${{ matrix.build_type }}
+          name: build-logs-${{ matrix.config.tag }}${{ matrix.config.with_cxx }}
           path: ${{github.workspace}}/build/build.log
           retention-days: 7
 
@@ -270,7 +396,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: ctest-logs-${{ matrix.config.tag }}-${{ matrix.build_type }}
+          name: ctest-logs-${{ matrix.config.tag }}${{ matrix.config.with_cxx }}
           path: ${{github.workspace}}/build/report.xml
           retention-days: 7
 

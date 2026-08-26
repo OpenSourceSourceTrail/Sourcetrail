@@ -6,12 +6,16 @@ on:
     tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
+# Pinned so the cache key matches the archive's package_ids. Keep in step with build.yml.
+env:
+  CONAN_VERSION: "2.31.2"
+
 jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: "true"
 
@@ -19,15 +23,22 @@ jobs:
         run: git fetch --tags origin
 
       - name: Install dependencies
-        run: sudo apt install -y gcc g++ ninja-build python3-pip
+        run: sudo apt install -y gcc g++ ninja-build python3-pip mold
+
+      # pom.xml compiles with release 21; the runner image's default JDK is older.
+      - name: Install JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          aqtversion: '==3.2.*'
+          aqtversion: '==3.3.*'
           dir: '${{github.workspace}}/Qt/'
           install-deps: 'true'
-          version: '6.8.2'
+          version: '6.10.3'
           host: 'linux'
           target: 'desktop'
           arch: 'linux_gcc_64'
@@ -47,32 +58,61 @@ jobs:
           chmod +x ${{github.workspace}}/linuxdeploy*.AppImage
 
       - name: Install conan
+        id: conan
         run: |
           python3 -m venv venv
-          source venv/bin/activate
-          pip install conan
+          echo "${{ github.workspace }}/venv/bin" >> "$GITHUB_PATH"
+          ./venv/bin/pip install "conan==${{ env.CONAN_VERSION }}"
 
-      - name: Cache Conan packages
-        uses: actions/cache@v4
+      # Caching ~/.conan2 wholesale exceeds GitHub's 10 GB per-repository budget (the dir is
+      # ~14 GB with build trees and extracted sources), so the save is dropped and every run
+      # starts cold. Cache a `conan cache save` archive of the package binaries instead.
+      - name: Restore conan archive
+        id: conan-cache
+        uses: actions/cache/restore@v4
         with:
-          path: ~/.conan2
-          key: conan-ubuntu-24.04-gnu-${{ hashFiles('**/conanfile.txt') }}
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: conan5-Linux-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
+          restore-keys: |
+            conan5-Linux-${{ env.CONAN_VERSION }}-
+
+      - name: Unpack conan archive
+        if: steps.conan-cache.outputs.cache-matched-key != ''
+        run: conan cache restore ${{ runner.temp }}/conan-deps.tgz
 
       - name: Install conan dependencies
+        run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
+
+      - name: Pack conan archive
+        if: ${{ !cancelled() && steps.conan.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
         run: |
-          source venv/bin/activate
-          conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
+          conan cache clean "*" --source --build --download --temp
+          conan cache save "*:*" --no-source --file ${{ runner.temp }}/conan-deps.tgz
 
-      - name: Download llvm build cache
-        uses: actions/download-artifact@v4
+      - name: Save conan archive
+        if: ${{ !cancelled() && steps.conan.outcome == 'success' && steps.conan-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
         with:
-          name: clang-19.1.7-linux
-          path: ${{github.workspace}}/external
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: 13795569336 # TODO(Hussein): Need to be fixed
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: ${{ steps.conan-cache.outputs.cache-primary-key }}
 
-      - name: Install llvm
-        run: tar -xvf ${{github.workspace}}/external/clang-19.1.7-linux.tar.gz -C ${{github.workspace}}/external
+      # Published by llvm.yml. Replaces a download-artifact pinned to a hardcoded run-id, which
+      # expired 90 days after that run.
+      - name: Download LLVM/Clang
+        uses: robinraju/release-downloader@v1.12
+        with:
+          tag: "llvm-clang-22.1.8"
+          fileName: "llvm-clang-22.1.8-linux-x86_64.tgz"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          out-file-path: ${{ runner.temp }}
+          extract: false
+
+      # A cache hit after the restore; the script also creates the external/ symlink that
+      # ci_gnu_release_build_cxx expects.
+      - name: Install LLVM/Clang
+        run: |
+          conan cache restore ${{ runner.temp }}/llvm-clang-22.1.8-linux-x86_64.tgz
+          ./scripts/build_llvm_conan.sh
 
       - name: Configure CMake
         run: cmake --preset="ci_gnu_release_build_cxx"

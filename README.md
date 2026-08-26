@@ -90,10 +90,20 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     * __Reason__: Package Manager. Pulls Boost, gRPC/protobuf, spdlog, fmt, SQLite and the rest.
     * __Install__: pip3 install conan
 
-* __Qt 6.10__
+* __Qt 6.10__ (6.11 works too on Linux; aqtinstall 3.3.0 cannot fetch 6.11 for Windows)
     * __Reason__: Used for rendering the GUI and for starting additional (engine/indexer) processes.
     * __Prebuilt Download__: http://download.qt.io/official_releases/qt/
-    * __aqt installer__: https://github.com/miurahr/aqtinstall
+    * __aqt installer__ ([aqtinstall](https://github.com/miurahr/aqtinstall)):
+
+        ```
+        $ pip install aqtinstall
+        $ aqt list-qt linux desktop            # available versions
+        $ aqt install-qt linux desktop 6.10.3 linux_gcc_64 --outputdir ~/Qt
+        ```
+
+        The base package covers every Qt component Sourcetrail uses (Widgets, Sql, Test, Svg).
+        Point CMake at it with `-DQt6_DIR=~/Qt/6.10.3/gcc_64/lib/cmake/Qt6`, or set it once in
+        `CMakeUserPresets.json`. On Windows use `aqt install-qt windows desktop 6.10.3 win64_msvc2022_64`.
 
 ### Optional dependencies
 
@@ -103,7 +113,8 @@ Building Sourcetrail requires several dependencies to be in place on your machin
 ### Building
 
 The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed with
-`_build_cxx` for C/C++ indexing support. They all build into `<repo>/build/`.
+`_build_cxx` for C/C++ indexing support. They all build into `<repo>/build/`. On Linux there
+is also `gnu_debug`, which builds into `<repo>/build-debug/`.
 
 #### On Windows `Faced some problems with Conan2 and Windows`
 * To set up your build environment run:
@@ -127,6 +138,13 @@ The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed
     $ cmake --preset=ci_gnu_release
     $ cmake --build build
     ```
+    That single GCC/Release `conan install` is the only one you need on Linux — do **not** run
+    `conan install -s build_type=Debug`. For a Debug build of Sourcetrail itself, use the
+    `gnu_debug` preset, which links the very same Release-built dependencies:
+    ```
+    $ cmake --preset=gnu_debug
+    $ cmake --build build-debug
+    ```
 
 ### Running
 
@@ -139,19 +157,51 @@ The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed
 
 * __LLVM/Clang 22.1.8__ (22 or newer is required; older releases do not provide the AST APIs the indexer uses)
     * __Reason__: Used for running the preprocessor on the indexed source code, building and traversing an Abstract Syntax Tree and generating error messages.
-    * __Building__: Make sure to check out the correct tag: `git checkout llvmorg-22.1.8`
-    * __Building for Windows__: Follow [these steps](https://clang.llvm.org/get_started.html) to build the project. Run the cmake command exactly as described. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
-    * __Building for Unix__: Follow this [installation guide](http://clang.llvm.org/docs/LibASTMatchersTutorial.html) to build the project. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DCLANG_LINK_CLANG_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
+    * __Remarks__: It must be built with RTTI and the LLVM/clang-cpp dylibs — stock distro packages and the official LLVM release binaries are built with `LLVM_ENABLE_RTTI=OFF` and will not work.
+
+#### Building LLVM with Conan (Linux, recommended)
+
+`.conan/recipes/llvm-clang/` is a Conan 2 recipe that performs exactly the build described
+below. Run:
+
+```
+$ ./scripts/build_llvm_conan.sh
+```
+
+It exports the recipe, builds `llvm-clang/22.1.8` into your Conan cache using the same
+`.conan/gcc/profile` as the rest of the project, and symlinks `<repo>/external` at the
+resulting package — which is where the `_build_cxx` presets already look for `Clang_DIR`.
+The first run compiles LLVM from source and takes hours; afterwards it is a cache hit. This
+is a separate `conan install` (into `.conan/llvm/`) and does not affect the main dependency
+set in `.conan/gcc/`.
+
+To skip the hours-long first build, download the package CI already published and restore it
+into your Conan cache — the script then resolves it as a cache hit in seconds:
+
+```
+$ gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
+$ conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+$ ./scripts/build_llvm_conan.sh          # cache hit; creates the external/ symlink
+```
+
+That asset is produced by `.github/workflows/llvm.yml`, which is also what CI consumes.
+
+#### Building LLVM by hand
+
+* __Building__: Make sure to check out the correct tag: `git checkout llvmorg-22.1.8`
+* __Building for Windows__: Follow [these steps](https://clang.llvm.org/get_started.html) to build the project. Run the cmake command exactly as described. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
+* __Building for Unix__: Follow this [installation guide](http://clang.llvm.org/docs/LibASTMatchersTutorial.html) to build the project. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DCLANG_LINK_CLANG_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`. These are the same flags the Conan recipe uses, so the two paths are interchangeable.
 
 ### Building
 
-* Use the `_build_cxx` preset variant and point it at your LLVM build:
+* Use the `_build_cxx` preset variant:
     ```
-    $ cmake --preset=ci_gnu_release_build_cxx -DClang_DIR=<path/to/llvm_build>/lib/cmake/clang
+    $ cmake --preset=ci_gnu_release_build_cxx
     $ cmake --build build
     ```
-    The preset defaults `Clang_DIR` to `<repo>/external/lib/cmake/clang/`, so you can drop an
-    LLVM install there instead of passing the option. On any other preset, add
+    The preset defaults `Clang_DIR` to `<repo>/external/lib/cmake/clang/`, which
+    `scripts/build_llvm_conan.sh` populates. With a hand-built LLVM elsewhere, pass
+    `-DClang_DIR=<path/to/llvm_build>/lib/cmake/clang`. On any other preset, add
     `-DBUILD_CXX_LANGUAGE_PACKAGE=ON -DClang_DIR=...` by hand.
 
 

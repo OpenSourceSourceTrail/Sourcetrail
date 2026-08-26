@@ -10,6 +10,7 @@
 #define private public
 #include "Project.h"
 #undef private
+#include "DefaultTaskFactory.h"
 #include "IApplicationSettings.hpp"
 #include "IndexerCommandProvider.h"
 #include "MockedApplicationSetting.hpp"
@@ -90,6 +91,110 @@ struct MockedIndexerCommandProvider : IndexerCommandProvider {
   MOCK_METHOD(size_t, size, (), (const, override));
 };
 
+// Project::buildIndex() ends by dispatching the index task graph to the global TabId::app()
+// queue, which runs it on a background thread. A unit test has no way to wait for that graph,
+// so whether it runs at all -- and how far it gets before the fixture tears the mocks, the
+// message queue and the dispatch queue down under it -- is pure timing: it stayed dormant on
+// fast machines and crashed the process on slower CI runners. Feed Project a task factory whose
+// sequences discard their children instead: the graph is still built and dispatched, exercising
+// buildIndex() end to end, but the dispatched task is inert and touches nothing the fixture owns.
+struct InertTaskGroupSequence final : TaskGroupSequence {
+  void addTask(std::shared_ptr<Task> /*task*/) override {}
+};
+
+struct InertTaskFactory final : ITaskFactory {
+  std::shared_ptr<TaskGroupSequence> createSequence() override {
+    return std::make_shared<InertTaskGroupSequence>();
+  }
+
+  std::shared_ptr<TaskGroupSelector> createSelector() override {
+    return mDefault.createSelector();
+  }
+
+  std::shared_ptr<TaskflowGroupParallel> createParallel() override {
+    return mDefault.createParallel();
+  }
+
+  std::shared_ptr<TaskFindKeyOnBlackboard> createFindKeyOnBlackboard(const std::string& valueName) override {
+    return mDefault.createFindKeyOnBlackboard(valueName);
+  }
+
+  std::shared_ptr<TaskLambda> createLambda(std::function<void()> func) override {
+    return mDefault.createLambda(std::move(func));
+  }
+
+  std::shared_ptr<TaskDecoratorRepeat> createRepeat(TaskDecoratorRepeat::ConditionType condition,
+                                                    Task::TaskState exitState,
+                                                    size_t delayMS) override {
+    return mDefault.createRepeat(condition, exitState, delayMS);
+  }
+
+  std::shared_ptr<TaskCleanStorage> createCleanStorage(std::weak_ptr<PersistentStorage> storage,
+                                                       std::shared_ptr<DialogView> dialogView,
+                                                       const std::vector<FilePath>& filePaths,
+                                                       bool clearAllErrors) override {
+    return mDefault.createCleanStorage(std::move(storage), std::move(dialogView), filePaths, clearAllErrors);
+  }
+
+  std::shared_ptr<TaskParseWrapper> createParseWrapper(std::weak_ptr<PersistentStorage> storage,
+                                                       std::shared_ptr<DialogView> dialogView) override {
+    return mDefault.createParseWrapper(std::move(storage), std::move(dialogView));
+  }
+
+  std::shared_ptr<TaskFillIndexerCommandsQueue> createFillIndexerCommandsQueue(
+      std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
+      std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
+      size_t maximumQueueSize) override {
+    return mDefault.createFillIndexerCommandsQueue(
+        std::move(indexerWorkerService), std::move(indexerCommandProvider), maximumQueueSize);
+  }
+
+  std::shared_ptr<TaskBuildIndex> createBuildIndex(size_t processCount,
+                                                   std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
+                                                   std::shared_ptr<StorageProvider> storageProvider,
+                                                   std::shared_ptr<DialogView> dialogView,
+                                                   std::string appUUID,
+                                                   bool multiProcessIndexing,
+                                                   IndexerCommandType commandType) override {
+    return mDefault.createBuildIndex(processCount,
+                                     std::move(indexerWorkerService),
+                                     std::move(storageProvider),
+                                     std::move(dialogView),
+                                     std::move(appUUID),
+                                     multiProcessIndexing,
+                                     commandType);
+  }
+
+  std::shared_ptr<TaskMergeStorages> createMergeStorages(std::shared_ptr<StorageProvider> storageProvider) override {
+    return mDefault.createMergeStorages(std::move(storageProvider));
+  }
+
+  std::shared_ptr<TaskInjectStorage> createInjectStorage(std::shared_ptr<StorageProvider> storageProvider,
+                                                         std::weak_ptr<Storage> target) override {
+    return mDefault.createInjectStorage(std::move(storageProvider), std::move(target));
+  }
+
+  std::shared_ptr<TaskExecuteCustomCommands> createExecuteCustomCommands(std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
+                                                                         std::shared_ptr<PersistentStorage> storage,
+                                                                         std::shared_ptr<DialogView> dialogView,
+                                                                         size_t indexerThreadCount,
+                                                                         FilePath projectDirectory) override {
+    return mDefault.createExecuteCustomCommands(std::move(indexerCommandProvider),
+                                                std::move(storage),
+                                                std::move(dialogView),
+                                                indexerThreadCount,
+                                                std::move(projectDirectory));
+  }
+
+  std::shared_ptr<TaskFinishParsing> createFinishParsing(std::shared_ptr<PersistentStorage> storage,
+                                                         std::shared_ptr<DialogView> dialogView) override {
+    return mDefault.createFinishParsing(std::move(storage), std::move(dialogView));
+  }
+
+private:
+  DefaultTaskFactory mDefault;
+};
+
 struct ProjectFix : Test {
   void SetUp() override {
     mMockedMessageQueue = std::make_shared<StrictMock<MockedMessageQueue>>();
@@ -99,7 +204,7 @@ struct ProjectFix : Test {
 
     mSettings = std::make_shared<StrictMock<MockedProjectSettings>>();
     mStorageCache = std::make_shared<StrictMock<MockedStorageCache>>();
-    mProject = std::make_unique<Project>(mSettings, mStorageCache, "", true);
+    mProject = std::make_unique<Project>(mSettings, mStorageCache, "", true, std::make_shared<InertTaskFactory>());
 
     mDialogView = std::make_shared<StrictMock<MockedDialogView>>();
 

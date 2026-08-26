@@ -1,0 +1,104 @@
+name: LLVM/Clang Package
+
+# Builds LLVM/Clang once from .conan/recipes/llvm-clang/ and publishes the resulting Conan
+# package as a GitHub Release asset. Build jobs then restore it in seconds instead of
+# compiling LLVM (hours) on the pull-request path.
+#
+# To bump the version: edit .conan/recipes/llvm-clang/conandata.yml + conanfile.py, then update
+# LLVM_VERSION below and the matching `tag:`/`fileName:` in build.yml and appimage.yml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: "Rebuild and re-upload even if the release asset already exists"
+        type: boolean
+        default: false
+  push:
+    branches: ["main"]
+    paths:
+      - ".conan/recipes/llvm-clang/**"
+      - "scripts/build_llvm_conan.sh"
+      - ".github/workflows/llvm.yml"
+
+env:
+  LLVM_VERSION: "22.1.8"
+  # Must match build.yml/appimage.yml: they restore this package into a cache managed by that
+  # client, and a different version changes package_ids.
+  CONAN_VERSION: "2.31.2"
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360 # A cold LLVM build takes hours; every other path is a cache hit.
+    permissions:
+      contents: write # Required to create the release and upload the asset.
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set asset names
+        id: names
+        run: |
+          echo "tag=llvm-clang-${LLVM_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "asset=llvm-clang-${LLVM_VERSION}-linux-x86_64.tgz" >> "$GITHUB_OUTPUT"
+
+      # Check the cache (the published release) before building anything.
+      - name: Check for an existing release asset
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ inputs.force_rebuild }}" = "true" ]; then
+            echo "Forced rebuild requested."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if gh release view "${{ steps.names.outputs.tag }}" \
+               --json assets --jq '.assets[].name' 2>/dev/null \
+               | grep -qx "${{ steps.names.outputs.asset }}"; then
+            echo "${{ steps.names.outputs.asset }} is already published; nothing to do."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install build dependencies
+        if: steps.check.outputs.exists != 'true'
+        run: sudo apt-get update && sudo apt-get install -y gcc g++ ninja-build mold python3-pip python3-venv
+
+      - name: Install conan
+        if: steps.check.outputs.exists != 'true'
+        run: |
+          python3 -m venv ~/env
+          echo "$HOME/env/bin" >> "$GITHUB_PATH"
+          ~/env/bin/pip install "conan==${CONAN_VERSION}"
+
+      # `conan install --build=missing` inside the script is itself the cache check: with the
+      # binary already in ~/.conan2 this is a no-op, otherwise it compiles LLVM.
+      - name: Build LLVM/Clang
+        if: steps.check.outputs.exists != 'true'
+        run: ./scripts/build_llvm_conan.sh
+
+      # Drop the extracted LLVM sources (~2.4 GB) and build tree before archiving -- only the
+      # package binaries are needed by consumers.
+      - name: Archive the package
+        if: steps.check.outputs.exists != 'true'
+        run: |
+          conan cache clean "llvm-clang/*" --source --build --download --temp
+          conan cache save "llvm-clang/${LLVM_VERSION}:*" \
+            --no-source --file "${{ runner.temp }}/${{ steps.names.outputs.asset }}"
+          ls -lh "${{ runner.temp }}/${{ steps.names.outputs.asset }}"
+
+      - name: Publish the release asset
+        if: steps.check.outputs.exists != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release view "${{ steps.names.outputs.tag }}" >/dev/null 2>&1 || \
+            gh release create "${{ steps.names.outputs.tag }}" \
+              --title "LLVM/Clang ${LLVM_VERSION}" \
+              --notes "Conan package for Sourcetrail's C/C++ indexer, built from .conan/recipes/llvm-clang/. Restore with \`conan cache restore <asset>\`." \
+              --latest=false
+          gh release upload "${{ steps.names.outputs.tag }}" \
+            "${{ runner.temp }}/${{ steps.names.outputs.asset }}" --clobber

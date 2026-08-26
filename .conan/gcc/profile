@@ -9,7 +9,6 @@ os=Linux
 [buildenv]
 CC=gcc
 CXX=g++
-LD=mold
 [options]
 fmt*:wchar=False
 spdlog*:wchar_support=False
