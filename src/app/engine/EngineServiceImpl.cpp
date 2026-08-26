@@ -3,6 +3,7 @@
 #include <grpcpp/grpcpp.h>
 
 #include "Application.h"
+#include "CompilationDatabase.h"
 #include "ConvertGraph.h"
 #include "ConvertLocations.h"
 #include "ConvertQuery.h"
@@ -11,7 +12,6 @@
 #include "ErrorInfo.h"
 #include "FileInfo.h"
 #include "FilePath.h"
-#include "CompilationDatabase.h"
 #include "IndexerPluginRegistry.h"
 #include "logging.h"
 #include "NameHierarchy.h"
@@ -28,8 +28,8 @@
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageRefresh.h"
-#include "utilityString.h"
 #include "utilitySourceGroupCxx.h"
+#include "utilityString.h"
 #include "Version.h"
 
 EngineServiceImpl::EngineServiceImpl(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}

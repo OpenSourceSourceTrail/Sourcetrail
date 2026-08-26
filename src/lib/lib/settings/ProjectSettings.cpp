@@ -4,16 +4,15 @@
 #include "SettingsMigrationDeleteKey.h"
 #include "SettingsMigrationLambda.h"
 #include "SettingsMigrationMoveKey.h"
+#include "SourceGroupSettingsCEmpty.h"
+#include "SourceGroupSettingsCppEmpty.h"
 #include "SourceGroupSettingsCustomCommand.h"
+#include "SourceGroupSettingsCxxCdb.h"
 #include "SourceGroupSettingsJavaEmpty.h"
 #include "SourceGroupSettingsUnloadable.h"
 #include "utilityFile.h"
 #include "utilityString.h"
 #include "utilityUuid.h"
-
-#include "SourceGroupSettingsCEmpty.h"
-#include "SourceGroupSettingsCppEmpty.h"
-#include "SourceGroupSettingsCxxCdb.h"
 
 // clang-format off
 const std::wstring ProjectSettings::PROJECT_FILE_EXTENSION       = L".srctrlprj";

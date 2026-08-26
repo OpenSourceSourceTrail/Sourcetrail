@@ -16,8 +16,10 @@
 #include "AppPath.h"
 #include "CommandLineParser.h"
 #include "ConsoleApplication.h"
+#include "CxxToolchainRemote.h"
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
+#include "ICxxToolchain.h"
 #include "impls/Factory.hpp"
 #include "IndexerPluginRegistry.h"
 #include "language_packages.h"
@@ -26,15 +28,12 @@
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
+#include "SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
 #include "SourceGroupFactoryModuleJava.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "UserPaths.h"
 #include "Version.h"
-
-#include "CxxToolchainRemote.h"
-#include "ICxxToolchain.h"
-#include "SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
 
 namespace {
 

@@ -1,7 +1,10 @@
 #include "Convert.h"
 
 #include "IndexerCommand.h"
+#include "IndexerCommandCxx.h"
+#include "IndexerCommandJava.h"
 #include "IntermediateStorage.h"
+#include "logging.h"
 #include "StorageComponentAccess.h"
 #include "StorageEdge.h"
 #include "StorageError.h"
@@ -11,11 +14,7 @@
 #include "StorageOccurrence.h"
 #include "StorageSourceLocation.h"
 #include "StorageSymbol.h"
-#include "logging.h"
 #include "utilityString.h"
-
-#include "IndexerCommandCxx.h"
-#include "IndexerCommandJava.h"
 
 namespace proto::convert {
 
@@ -45,10 +44,8 @@ sourcetrail::StorageEdge toProto(const StorageEdge& edge) {
 }
 
 StorageEdge fromProto(const sourcetrail::StorageEdge& msg) {
-  return StorageEdge(static_cast<Id>(msg.id()),
-                     msg.type(),
-                     static_cast<Id>(msg.source_node_id()),
-                     static_cast<Id>(msg.target_node_id()));
+  return StorageEdge(
+      static_cast<Id>(msg.id()), msg.type(), static_cast<Id>(msg.source_node_id()), static_cast<Id>(msg.target_node_id()));
 }
 
 // ---- StorageFile -----------------------------------------------------------

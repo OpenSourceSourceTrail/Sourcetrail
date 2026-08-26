@@ -35,7 +35,6 @@
 #include "utilityUuid.h"
 //
 #include "Application.h"
-
 #include "QtProjectWizardContentCppStandard.h"
 #include "QtProjectWizardContentCrossCompilationOptions.h"
 #include "QtProjectWizardContentCStandard.h"
@@ -293,9 +292,8 @@ void QtProjectWizard::populateWindow(QWidget* widget) {
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
     buttonsLayout->setSpacing(0);
 
-    m_addButton = new QtIconButton(
-        ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_add.png"),
-        ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_add_hover.png"));
+    m_addButton = new QtIconButton(ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_add.png"),
+                                   ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_add_hover.png"));
 
     m_removeButton = new QtIconButton(ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_delete.png"),
                                       ResourcePaths::getGuiDirectoryPath().concatenate(L"window/source_group_delete_hover.png"));
@@ -509,8 +507,7 @@ void QtProjectWizard::selectedSourceGroupChanged(int index) {
     addSourceGroupContents(summary, settingsJavaEmpty, this);
   } else if(auto settingsUnloadable = std::dynamic_pointer_cast<SourceGroupSettingsUnloadable>(group)) {
     addSourceGroupContents(summary, settingsUnloadable, this);
-  }
-  else if(auto settingsCEmpty = std::dynamic_pointer_cast<SourceGroupSettingsCEmpty>(group)) {
+  } else if(auto settingsCEmpty = std::dynamic_pointer_cast<SourceGroupSettingsCEmpty>(group)) {
     addSourceGroupContents(summary, settingsCEmpty, this);
   } else if(auto settingsCppEmpty = std::dynamic_pointer_cast<SourceGroupSettingsCppEmpty>(group)) {
     addSourceGroupContents(summary, settingsCppEmpty, this);

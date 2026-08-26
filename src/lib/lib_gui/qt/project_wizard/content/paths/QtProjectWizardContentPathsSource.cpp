@@ -84,8 +84,8 @@ std::vector<FilePath> QtProjectWizardContentPathsSource::getFilePaths() const {
   FileManager fileManager;
   fileManager.update(pathSettings->getSourcePathsExpandedAndAbsolute(), excludeFilters, extensionSettings->getSourceExtensions());
 
-  return utility::getAsRelativeIfShorter(utility::toVector(fileManager.getAllSourceFilePaths()),
-                                         m_settings->getProjectDirectoryPath());
+  return utility::getAsRelativeIfShorter(
+      utility::toVector(fileManager.getAllSourceFilePaths()), m_settings->getProjectDirectoryPath());
 }
 
 QString QtProjectWizardContentPathsSource::getFileNamesTitle() const {

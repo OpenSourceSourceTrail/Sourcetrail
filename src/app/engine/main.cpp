@@ -13,10 +13,12 @@
 #include "ApplicationSettings.h"
 #include "ApplicationSettingsPrefiller.h"
 #include "AppPath.h"
+#include "CxxToolchainRemote.h"
 #include "EngineEventPublisher.h"
 #include "EngineServiceImpl.h"
 #include "FilePath.h"
 #include "IApplicationSettings.hpp"
+#include "ICxxToolchain.h"
 #include "impls/Factory.hpp"
 #include "IndexerPluginRegistry.h"
 #include "language_packages.h"
@@ -25,14 +27,11 @@
 #include "ScopedFunctor.h"
 #include "SourceGroupFactory.h"
 #include "SourceGroupFactoryModuleCustom.h"
+#include "SourceGroupFactoryModuleCxx.h"
 #include "SourceGroupFactoryModuleJava.h"
 #include "StorageCache.h"
 #include "UserPaths.h"
 #include "Version.h"
-
-#include "CxxToolchainRemote.h"
-#include "ICxxToolchain.h"
-#include "SourceGroupFactoryModuleCxx.h"
 
 namespace {
 

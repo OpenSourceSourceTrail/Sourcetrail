@@ -10,8 +10,8 @@
 #include <QToolButton>
 #include <QVariant>
 
-#include "globalStrings.h"
 #include "Capabilities.h"
+#include "globalStrings.h"
 #include "LanguageType.h"
 #include "QtFlowLayout.h"
 #include "QtProjectWizardWindow.h"

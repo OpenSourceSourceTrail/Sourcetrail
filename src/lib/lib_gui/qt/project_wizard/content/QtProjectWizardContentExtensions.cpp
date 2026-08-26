@@ -7,7 +7,6 @@
 // internal
 #include "QtStringListBox.h"
 #include "SourceGroupSettingsWithSourceExtensions.h"
-
 #include "SourceGroupSettingsWithSourceExtensionsC.h"
 #include "SourceGroupSettingsWithSourceExtensionsCpp.h"
 #include "SourceGroupSettingsWithSourceExtensionsCxx.h"

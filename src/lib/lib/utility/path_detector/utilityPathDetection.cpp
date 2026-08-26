@@ -1,13 +1,12 @@
 #include "utilityPathDetection.h"
 
-#include "logging.h"
-#include "utilityApp.h"
-
 #include "CxxFrameworkPathDetector.h"
 #include "CxxHeaderPathDetector.h"
 #include "CxxVs10To14HeaderPathDetector.h"
 #include "CxxVs15HeaderPathDetector.h"
 #include "CxxVs17HeaderPathDetector.hpp"
+#include "logging.h"
+#include "utilityApp.h"
 
 std::shared_ptr<CombinedPathDetector> utility::getCxxVsHeaderPathDetector() {
   std::shared_ptr<CombinedPathDetector> combinedDetector = std::make_shared<CombinedPathDetector>();
