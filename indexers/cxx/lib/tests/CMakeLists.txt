@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib_cxx/tests/CMakeLists.txt
+# ${CMAKE_SOURCE_DIR}/indexers/cxx/lib/tests/CMakeLists.txt
 add_sourcetrail_test(
   NAME
   CompilationDatabaseTestSuite

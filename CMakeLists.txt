@@ -198,10 +198,10 @@ add_subdirectory(src/lib/messaging)
 add_subdirectory(src/lib/core/utility/utilityApp)
 # Lib Cxx ------------------------------------------------------------------------------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_subdirectory(src/lib/lib_cxx)
+  add_subdirectory(indexers/cxx/lib)
 endif()
 # Indexer App --------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/app/indexer)
+add_subdirectory(indexers/cxx/indexer)
 # Java indexer plugin (Maven-built, pure-JVM gRPC worker) -------------------------------------------------------------------------
 if(BUILD_JAVA_INDEXER)
   add_subdirectory(indexers/java)
@@ -250,7 +250,7 @@ if(ENABLE_UNIT_TEST
     add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib/tests/)
     add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests/)
     if(BUILD_CXX_LANGUAGE_PACKAGE)
-      add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_cxx/tests/)
+      add_subdirectory(${CMAKE_SOURCE_DIR}/indexers/cxx/lib/tests/)
     endif()
   endif()
 

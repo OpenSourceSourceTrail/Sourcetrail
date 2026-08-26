@@ -1,4 +1,4 @@
-#${CMAKE_SOURCE_DIR}/src/app/indexer/CMakeLists.txt
+#${CMAKE_SOURCE_DIR}/indexers/cxx/indexer/CMakeLists.txt
 if(UNIX)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
 else()

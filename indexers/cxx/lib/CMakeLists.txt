@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/lib_cxx/CMakeLists.txt
+# ${CMAKE_SOURCE_DIR}/indexers/cxx/lib/CMakeLists.txt
 find_package(Clang REQUIRED)
 
 # Clang's own version config only accepts an exact major.minor, so the floor is checked by hand here.
