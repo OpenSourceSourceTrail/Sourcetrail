@@ -15,7 +15,7 @@
 
 namespace utility {
 template <typename T>
-std::vector<std::vector<T> > splitToEquallySizedParts(const std::vector<T>& values, const size_t desiredPartCount);
+std::vector<std::vector<T>> splitToEquallySizedParts(const std::vector<T>& values, const size_t desiredPartCount);
 
 template <typename T>
 std::vector<T> concat(const std::vector<T>& a, const std::vector<T>& b);
@@ -120,11 +120,11 @@ bool shareElement(const std::set<T>& a, const std::set<T>& b) {
 size_t digits(size_t n);
 
 template <typename T>
-std::vector<std::vector<T> > splitToEquallySizedParts(const std::vector<T>& values, const size_t desiredPartCount) {
-  const auto value = std::min(desiredPartCount, values.size());
-  const size_t partCount = std::max(size_t(1), value);
+std::vector<std::vector<T>> splitToEquallySizedParts(const std::vector<T>& values, const size_t desiredPartCount) {
+  const auto partCountValue = std::min(desiredPartCount, values.size());
+  const size_t partCount = std::max(size_t(1), partCountValue);
 
-  std::vector<std::vector<T> > parts;
+  std::vector<std::vector<T>> parts;
   for(size_t i = 0; i < partCount; i++) {
     parts.emplace_back(std::vector<T>());
   }
@@ -272,8 +272,7 @@ std::vector<TargetType> convert(const std::vector<SourceType>& sourceContainer) 
 }
 
 template <typename SourceType, typename TargetType>
-std::set<TargetType> convert(const std::set<SourceType>& sourceContainer,
-                             std::function<TargetType(const SourceType&)> conversion) {
+std::set<TargetType> convert(const std::set<SourceType>& sourceContainer, std::function<TargetType(const SourceType&)> conversion) {
   std::set<TargetType> targetContainer;
   for(const SourceType& sourceElement : sourceContainer) {
     targetContainer.insert(conversion(sourceElement));
