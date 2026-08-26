@@ -218,6 +218,15 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep mold
 
+      # `mvn` is preinstalled on the runner, so BUILD_JAVA_INDEXER defaults ON and the plugin is
+      # always built. pom.xml compiles with release 21; the image's default JDK is older.
+      - name: Install JDK (Ubuntu)
+        if: runner.os == 'Linux'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
       - name: Install Qt (Ubuntu)
         if: runner.os == 'Linux'
         uses: jurplel/install-qt-action@v3

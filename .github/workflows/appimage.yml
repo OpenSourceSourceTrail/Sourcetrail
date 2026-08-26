@@ -25,6 +25,13 @@ jobs:
       - name: Install dependencies
         run: sudo apt install -y gcc g++ ninja-build python3-pip mold
 
+      # pom.xml compiles with release 21; the runner image's default JDK is older.
+      - name: Install JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:

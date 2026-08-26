@@ -1,8 +1,8 @@
 ---
 title: CI/CD Workflow Specification - Build & LLVM Packaging
-version: 1.3
+version: 1.4
 date_created: 2026-08-25
-last_updated: 2026-08-25
+last_updated: 2026-08-26
 owner: DevOps Team
 tags: [process, cicd, github-actions, automation, cpp, cmake, conan, llvm, qt]
 ---
@@ -205,7 +205,7 @@ AppImage: file
 
 ### Environmental Constraints
 
-- **Runner Requirements**: `ubuntu-24.04` with apt `gcc g++ clang ninja-build python3-pip grep mold`; `windows-latest` with MSVC 2022 Enterprise (`vcvars64.bat`).
+- **Runner Requirements**: `ubuntu-24.04` with apt `gcc g++ clang ninja-build python3-pip grep mold` plus Temurin JDK 21 via `actions/setup-java`; `windows-latest` with MSVC 2022 Enterprise (`vcvars64.bat`).
 - **Network Access**: PyPI (Conan), Qt mirrors (aqtinstall), GitHub Releases, Conan Center.
 - **Permissions**: read-only by default; `contents: write` only on `llvm.yml`'s `package` job.
 - **Toolchain**: Qt 6.10.3 via aqtinstall 3.3.x; LLVM/Clang 22.1.8; Conan pinned to `env.CONAN_VERSION` in all three workflows — see EDGE-004.
@@ -299,6 +299,7 @@ AppImage: file
 | EDGE-010 | A cold key with no `deps` job would have all four Linux legs build an identical dependency set at once (~28 min each) and three then lose the save race | `deps` builds it once and the matrix restores. On the warm path `deps` is a `lookup-only` probe that adds only its own job startup | Cold run: one `Save conan archive`, and every build leg's `conan install` logs zero `Building from source` |
 | EDGE-011 | A Conan profile naming a linker the machine does not have | `[buildenv] LD=` is not probed the way `set_alternate_linker.cmake` probes with `find_program`. An absent linker makes autotools `configure` report "shared libraries: yes" while producing none, and `libtool/2.4.7` then dies in `package()` on `cannot stat 'libltdl/.libs/libltdl.so.7.3.2'`. The profile therefore names no linker; the application still gets mold via `USE_ALTERNATE_LINKER`, which falls back silently | `conan install --requires=libtool/2.4.7 --build=missing` into an empty `CONAN_HOME` with `LD` set to a nonexistent binary reproduces it |
 | EDGE-012 | Qt 6.11.x on Windows | aqtinstall 3.3.0 (newest) cannot resolve it — the 6.11 Windows repo is split into arch subdirectories (`qt6_6110/qt6_6110_msvc2022_64/`) that aqt looks for at `qt6_6110/qt6_6110/`. CI pins 6.10.3 on every host | `aqt list-qt windows desktop --arch 6.11.0` fails; `--arch 6.10.3` succeeds |
+| EDGE-013 | The Java indexer plugin builds on every Linux leg whether or not it was asked for | `BUILD_JAVA_INDEXER` defaults to `find_program(mvn)` and `mvn` is preinstalled on the runner image, so the plugin is always built. `indexers/java/indexer/pom.xml` sets `maven.compiler.release=21` while the image's default JDK predates 21, which fails the last build target with `error: release version 21 not supported`. Both Linux workflows therefore select Temurin 21 explicitly | `Build (Ubuntu)` reaches `[608/608] Building Java indexer plugin with Maven` and succeeds |
 
 ## Validation Criteria
 
@@ -339,6 +340,7 @@ AppImage: file
 
 | Version | Date | Changes | Author |
 | --- | --- | --- | --- |
+| 1.4 | 2026-08-26 | Select Temurin JDK 21 on the Linux runners; the Java indexer plugin is always built and needs release 21. | DevOps Team |
 | 1.3 | 2026-08-25 | Removed `LD=mold` from `.conan/gcc/profile` (it broke `libtool` on runners without mold) and installed mold on the build runners so `USE_ALTERNATE_LINKER` stops falling back. | DevOps Team |
 | 1.2 | 2026-08-25 | Added the `deps` job so dependencies are built once per OS instead of once per matrix leg; pinned the Conan client via `env.CONAN_VERSION`; cache key prefix `conan4-` → `conan5-`. | DevOps Team |
 | 1.1 | 2026-08-25 | Post-run-#599 fixes: one Linux dependency set (clang presets consume `.conan/gcc`), `tag` dropped from the cache key, `libtool` serialised, Qt pinned to 6.10.3, Pack/Save guards tightened. | DevOps Team |
