@@ -2,14 +2,14 @@
 
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
-#include <clang/Options/Options.h>
 #include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Options/Options.h>
 // this printer writes into a std::string, not to the console
 #include <clang/Frontend/TextDiagnosticPrinter.h>
 #include <clang/Tooling/Tooling.h>
 #include <llvm/Option/ArgList.h>
-#include <llvm/TargetParser/Host.h>
 #include <llvm/Support/TargetSelect.h>
+#include <llvm/TargetParser/Host.h>
 
 #include "CxxCompilationDatabaseSingle.h"
 #include "utilityString.h"

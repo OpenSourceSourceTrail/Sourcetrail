@@ -117,12 +117,12 @@ bool CxxAstVisitor::checkIgnoresTypeLoc(const clang::TypeLoc& tl) const {
 
 // clang::RecursiveASTVisitor's type and type location traversals take a trailing "traverse qualifier" flag that has
 // to be declared and forwarded here, otherwise these methods shadow the base ones instead of overriding them.
-#define DEF_TRAVERSE_CUSTOM_TYPE_LOC(__NAME_TYPE__, __PARAM_TYPE__, CODE_BEFORE, CODE_AFTER)                                      \
-  bool CxxAstVisitor::Traverse##__NAME_TYPE__(clang::__PARAM_TYPE__ v, bool traverseQualifier) {                                  \
+#define DEF_TRAVERSE_CUSTOM_TYPE_LOC(__NAME_TYPE__, __PARAM_TYPE__, CODE_BEFORE, CODE_AFTER)                                     \
+  bool CxxAstVisitor::Traverse##__NAME_TYPE__(clang::__PARAM_TYPE__ v, bool traverseQualifier) {                                 \
     FOREACH_COMPONENT(beginTraverse##__NAME_TYPE__(v));                                                                          \
     bool ret = true;                                                                                                             \
     { CODE_BEFORE; }                                                                                                             \
-    Base::Traverse##__NAME_TYPE__(v, traverseQualifier);                                                                          \
+    Base::Traverse##__NAME_TYPE__(v, traverseQualifier);                                                                         \
     { CODE_AFTER; }                                                                                                              \
     FOREACH_COMPONENT(endTraverse##__NAME_TYPE__(v));                                                                            \
     return ret;                                                                                                                  \

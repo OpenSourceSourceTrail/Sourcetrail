@@ -2,8 +2,8 @@
 // clang
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
-#include <clang/Options/Options.h>
 #include <clang/Frontend/CompilerInvocation.h>
+#include <clang/Options/Options.h>
 #include <clang/Tooling/Tooling.h>
 // llvm
 #include <utility>
