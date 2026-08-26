@@ -117,13 +117,6 @@ function(add_sourcetrail_test)
   # Set standard test dependencies
   set(STANDARD_DEPS Sourcetrail::gtest_main)
 
-  # Add sanitizer dependencies conditionally
-  list(
-    APPEND
-    STANDARD_DEPS
-    $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-    $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
-
   # Link all dependencies
   target_link_libraries(${ARG_NAME} PRIVATE ${STANDARD_DEPS} ${ARG_DEPS})
 

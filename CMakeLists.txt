@@ -28,16 +28,9 @@ set(ENABLE_GUI_TEST
 set(ENABLE_INTEGRATION_TEST
     OFF
     CACHE BOOL "Build integration-tests.")
-set(ENABLE_SANITIZER_ADDRESS
-    OFF
-    CACHE BOOL "Inject address sanitizer.")
-set(ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
-    OFF
-    CACHE BOOL "Inject undefined behavior sanitizer.")
-set(ENABLE_SANITIZER_THREAD CACHE BOOL "Inject thread sanitizer. `not supported`")
-set(ENABLE_SANITIZER_MEMORY
-    OFF
-    CACHE BOOL "Inject memory sanitizer. `not supported`")
+set(SR_SAN
+    ""
+    CACHE STRING "Comma-separated sanitizers to build all code with: address, undefined, thread, memory.")
 set(ENABLE_COVERAGE
     OFF
     CACHE BOOL "Build coverage report run `ninja coverage`.")
@@ -76,12 +69,7 @@ include(cmake/clang-tidy.cmake)
 include(cmake/cppcheck.cmake)
 include(cmake/coverage.cmake)
 #---------------------------------------------------------------------------------------------------------------------------------
-if(ENABLE_SANITIZER_ADDRESS
-   OR ENABLE_SANITIZER_UNDEFINED_BEHAVIOR
-   OR ENABLE_SANITIZER_THREAD
-   OR ENABLE_SANITIZER_MEMORY)
-  include(cmake/sanitizers.cmake)
-endif()
+include(cmake/sanitizers.cmake)
 #---------------------------------------------------------------------------------------------------------------------------------
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
   add_compile_options(-fcolor-diagnostics)

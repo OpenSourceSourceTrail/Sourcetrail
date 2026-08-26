@@ -17,9 +17,7 @@ foreach(test_name IN LISTS test_lib_gui_names)
            GTest::gmock
            Sourcetrail::lib::lib
            Sourcetrail::lib::lib_gui
-           Sourcetrail::lib::proto::convert
-           $<$<BOOL:${ENABLE_SANITIZER_ADDRESS}>:sanitizer::address>
-           $<$<BOOL:${ENABLE_SANITIZER_UNDEFINED_BEHAVIOR}>:sanitizer::undefined>)
+           Sourcetrail::lib::proto::convert)
 
   set_target_properties(
     ${test_name}

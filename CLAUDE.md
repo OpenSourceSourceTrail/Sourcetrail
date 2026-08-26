@@ -73,7 +73,7 @@ Everything lands in `build/app/`, alongside the `data`, `user` and `plugins` dir
 ### Key CMake options (see root `CMakeLists.txt`)
 - `BUILD_CXX_LANGUAGE_PACKAGE`, `BUILD_JAVA_INDEXER` (auto-on when `mvn` is on `PATH`), `BUILD_DOC`
 - `ENABLE_UNIT_TEST` / `ENABLE_GUI_TEST` / `ENABLE_INTEGRATION_TEST`
-- `ENABLE_SANITIZER_ADDRESS` / `ENABLE_SANITIZER_UNDEFINED_BEHAVIOR`
+- `SR_SAN` — comma-separated sanitizers applied build-wide (`address`, `undefined`, `thread`, `memory`; `memory` is Clang-only, GNU+Clang otherwise)
 - `ENABLE_COVERAGE` (run with `ninja coverage`)
 - `SOURCETRAIL_WARNING_AS_ERROR`, `SOURCETRAIL_USE_LIBCPP`, `USE_ALTERNATE_LINKER`
 
@@ -90,7 +90,7 @@ ctest --test-dir build -R "unittests\.lib\."
 ```
 Registered prefixes: `unittests.lib.`, `unittests.lib_gui.`, `unittests.client.`, `unittests.core.`, `integration.lib.`, `integration.lib_cxx.`, `integration.messaging`.
 
-New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sourcetrail_test.cmake`), not raw `add_executable` — it wires up `Sourcetrail::gtest_main`, sanitizers and `gtest_discover_tests`. Copy the calling convention from `src/lib/lib_gui/tests/CMakeLists.txt`.
+New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sourcetrail_test.cmake`), not raw `add_executable` — it wires up `Sourcetrail::gtest_main` and `gtest_discover_tests`; `SR_SAN` applies sanitizer flags build-wide, not per-target. Copy the calling convention from `src/lib/lib_gui/tests/CMakeLists.txt`.
 
 ## Formatting / Linting
 

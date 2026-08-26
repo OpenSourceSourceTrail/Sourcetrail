@@ -51,7 +51,7 @@ cmake --build build-debug
 | `BUILD_CXX_LANGUAGE_PACKAGE` | OFF | Enable C/C++ indexer via LLVM/Clang |
 | `ENABLE_UNIT_TEST` | OFF | Build unit tests |
 | `ENABLE_INTEGRATION_TEST` | OFF | Build integration tests |
-| `ENABLE_SANITIZER_ADDRESS` | OFF | AddressSanitizer |
+| `SR_SAN` | "" | Comma-separated sanitizers applied build-wide: `address`, `undefined`, `thread`, `memory` (GNU+Clang; `memory` is Clang-only) |
 | `SOURCETRAIL_WARNING_AS_ERROR` | OFF | Treat warnings as errors |
 | `USE_ALTERNATE_LINKER` | "" | Use `mold`, `lld`, `gold`, or `bfd` |
 
