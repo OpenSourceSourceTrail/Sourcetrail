@@ -7,17 +7,17 @@ class EngineChannel;
  * StorageAccess backed by the engine daemon rather than by SQLite.
  *
  * This is the whole of the client's read path: install it as the StorageAccessProxy's subject and
- * every controller and view queries the engine over gRPC without knowing it.
+ * every controller and view queries the engine over HTTP without knowing it.
  *
- * A failed RPC never propagates. Each override returns an empty result -- no graph, no locations, no
+ * A failed request never propagates. Each override returns an empty result -- no graph, no locations, no
  * matches -- and marks the channel degraded so the supervisor can restart the engine. Views then
  * render an empty state instead of the process dying, which is what keeps the GUI alive across an
  * engine crash. Callers cannot distinguish "engine is down" from "nothing found" and must not need
  * to; ask EngineChannel::isConnected() if that distinction matters.
  */
-class GrpcStorageAccess final : public StorageAccess {
+class HttpStorageAccess final : public StorageAccess {
 public:
-  explicit GrpcStorageAccess(EngineChannel* channel);
+  explicit HttpStorageAccess(EngineChannel* channel);
 
   Id getNodeIdForFileNode(const FilePath& filePath) const override;
   Id getNodeIdForNameHierarchy(const NameHierarchy& nameHierarchy) const override;
@@ -32,7 +32,7 @@ public:
   StorageEdge getEdgeById(Id edgeId) const override;
 
   std::shared_ptr<SourceLocationCollection> getFullTextSearchLocations(const std::wstring& searchTerm,
-                                                                      bool caseSensitive) const override;
+                                                                       bool caseSensitive) const override;
   std::vector<SearchMatch> getAutocompletionMatches(const std::wstring& query,
                                                     NodeTypeSet acceptedNodeTypes,
                                                     bool acceptCommands) const override;
@@ -59,15 +59,13 @@ public:
   std::vector<Id> getNodeIdsForLocationIds(const std::vector<Id>& locationIds) const override;
 
   std::shared_ptr<SourceLocationCollection> getSourceLocationsForTokenIds(const std::vector<Id>& tokenIds) const override;
-  std::shared_ptr<SourceLocationCollection> getSourceLocationsForLocationIds(
-      const std::vector<Id>& locationIds) const override;
+  std::shared_ptr<SourceLocationCollection> getSourceLocationsForLocationIds(const std::vector<Id>& locationIds) const override;
 
   std::shared_ptr<SourceLocationFile> getSourceLocationsForFile(const FilePath& filePath) const override;
   std::shared_ptr<SourceLocationFile> getSourceLocationsForLinesInFile(const FilePath& filePath,
-                                                                      size_t startLine,
-                                                                      size_t endLine) const override;
-  std::shared_ptr<SourceLocationFile> getSourceLocationsOfTypeInFile(const FilePath& filePath,
-                                                                    LocationType type) const override;
+                                                                       size_t startLine,
+                                                                       size_t endLine) const override;
+  std::shared_ptr<SourceLocationFile> getSourceLocationsOfTypeInFile(const FilePath& filePath, LocationType type) const override;
 
   std::shared_ptr<TextAccess> getFileContent(const FilePath& filePath, bool showsErrors) const override;
 

@@ -2,7 +2,10 @@
 
 #include "logging.h"
 
-Graph::Graph() : m_trailMode(TRAIL_NONE) {}
+// m_hasTrailOrigin must be initialized: it is read straight into a protobuf bool field when a graph
+// crosses to the client, and an indeterminate value there makes the serialized size disagree with
+// the bytes actually written, corrupting the whole message rather than just this flag.
+Graph::Graph() : m_trailMode(TRAIL_NONE), m_hasTrailOrigin(false) {}
 
 Graph::~Graph() {
   m_edges.clear();

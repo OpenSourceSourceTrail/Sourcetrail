@@ -4,94 +4,14 @@ package sourcetrail;
 
 import "sourcetrail_common.proto";
 
-// Boundary A: client (GUI/CLI) <-> engine daemon
-service EngineService {
-  // Project lifecycle
-  rpc LoadProject(LoadProjectRequest) returns (LoadProjectResponse);
-  rpc Refresh(RefreshRequest) returns (RefreshResponse);
-
-  // Refresh is deliberately not a single RPC. Project::refresh interleaves engine-side work (state
-  // machine, settings migration, SourceGroup::prepareIndexing) with questions that only a client
-  // can answer, so the engine returns the question text and the client drives the dialogs:
-  //   PrepareRefresh -> (client confirms) -> GetRefreshInfo -> (client dialog) -> BuildIndex
-  rpc PrepareRefresh(PrepareRefreshRequest) returns (PrepareRefreshResponse);
-  rpc GetRefreshInfo(GetRefreshInfoRequest) returns (GetRefreshInfoResponse);
-  rpc BuildIndex(BuildIndexRequest) returns (BuildIndexResponse);
-  rpc SetStateOutdated(EmptyRequest) returns (EmptyResponse);
-
-  // What this engine can index, derived from the manifest.xml plugins it discovered at startup.
-  // The client uses this to enable/disable New Project, Edit Project and Refresh; it never looks
-  // at indexer binaries or manifests itself.
-  rpc GetCapabilities(EmptyRequest) returns (CapabilitiesResponse);
-  rpc IndexingInterrupted(IndexingInterruptedRequest) returns (IndexingInterruptedResponse);
-
-  // Everything the project wizard needs to know about a compile_commands.json. Parsing one needs a
-  // C/C++ language package, which a client must not link -- so the client asks the engine, and an
-  // engine without that package simply answers "not valid" with a reason to show the user.
-  rpc GetCompilationDatabaseInfo(CompilationDatabaseInfoRequest) returns (CompilationDatabaseInfoResponse);
-
-  // Asks the engine to exit. SIGTERM does not exist on Windows, so a parent process that spawned
-  // the engine cannot portably signal it -- this RPC is the cross-platform shutdown path.
-  rpc Shutdown(EmptyRequest) returns (EmptyResponse);
-
-  // Bookmark mutations
-  rpc AddNodeBookmark(AddNodeBookmarkRequest) returns (BookmarkIdResponse);
-  rpc AddEdgeBookmark(AddEdgeBookmarkRequest) returns (BookmarkIdResponse);
-  rpc AddBookmarkCategory(AddBookmarkCategoryRequest) returns (BookmarkIdResponse);
-  rpc UpdateBookmark(UpdateBookmarkRequest) returns (EmptyResponse);
-  rpc RemoveBookmark(RemoveBookmarkRequest) returns (EmptyResponse);
-  rpc RemoveBookmarkCategory(RemoveBookmarkCategoryRequest) returns (EmptyResponse);
-
-  // Storage queries
-  rpc GetNodeIdForFileNode(FilePathRequest) returns (IdResponse);
-  rpc GetNodeIdForNameHierarchy(NameHierarchyRequest) returns (IdResponse);
-  rpc GetNodeIdsForNameHierarchies(NameHierarchiesRequest) returns (IdsResponse);
-  rpc GetNameHierarchyForNodeId(IdRequest) returns (NameHierarchyResponse);
-  rpc GetNameHierarchiesForNodeIds(IdsRequest) returns (NameHierarchiesResponse);
-  rpc GetNodeIdToParentFileMap(IdsRequest) returns (NodeIdToParentFileMapResponse);
-  rpc GetNodeTypeForNodeWithId(IdRequest) returns (NodeKindResponse);
-  rpc GetEdgeById(IdRequest) returns (StorageEdgeResponse);
-  rpc GetFullTextSearchLocations(FullTextSearchRequest) returns (SourceLocationCollectionResponse);
-  rpc GetAutocompletionMatches(AutocompletionRequest) returns (SearchMatchesResponse);
-  rpc GetSearchMatchesForTokenIds(IdsRequest) returns (SearchMatchesResponse);
-  rpc GetGraphForAll(EmptyRequest) returns (GraphResponse);
-  rpc GetGraphForNodeTypes(NodeKindMaskRequest) returns (GraphResponse);
-  rpc GetGraphForActiveTokenIds(ActiveTokensRequest) returns (ActiveGraphResponse);
-  rpc GetGraphForChildrenOfNodeId(IdRequest) returns (GraphResponse);
-  rpc GetGraphForTrail(TrailRequest) returns (GraphResponse);
-  rpc GetAvailableNodeTypes(EmptyRequest) returns (NodeKindMaskResponse);
-  rpc GetAvailableEdgeTypes(EmptyRequest) returns (EdgeTypeMaskResponse);
-  rpc GetActiveTokenIdsForId(ActiveTokenIdRequest) returns (ActiveTokenIdsResponse);
-  rpc GetNodeIdsForLocationIds(IdsRequest) returns (IdsResponse);
-  rpc GetSourceLocationsForTokenIds(IdsRequest) returns (SourceLocationCollectionResponse);
-  rpc GetSourceLocationsForLocationIds(IdsRequest) returns (SourceLocationCollectionResponse);
-  rpc GetSourceLocationsForFile(FilePathRequest) returns (SourceLocationFileResponse);
-  rpc GetSourceLocationsForLinesInFile(LinesInFileRequest) returns (SourceLocationFileResponse);
-  rpc GetSourceLocationsOfTypeInFile(LocationTypeInFileRequest) returns (SourceLocationFileResponse);
-  rpc GetFileContent(FileContentRequest) returns (FileContentResponse);
-  rpc GetFileInfoForFileId(IdRequest) returns (FileInfoResponse);
-  rpc GetFileInfoForFilePath(FilePathRequest) returns (FileInfoResponse);
-  rpc GetFileInfosForFilePaths(FilePathsRequest) returns (FileInfosResponse);
-  rpc GetStorageStats(EmptyRequest) returns (StorageStatsResponse);
-  rpc GetErrorCount(EmptyRequest) returns (ErrorCountResponse);
-  rpc GetErrorsLimited(ErrorFilterRequest) returns (ErrorInfosResponse);
-  rpc GetErrorsForFileLimited(ErrorFilterFileRequest) returns (ErrorInfosResponse);
-  rpc GetErrorSourceLocations(ErrorInfosRequest) returns (SourceLocationCollectionResponse);
-  rpc GetAllNodeBookmarks(EmptyRequest) returns (NodeBookmarksResponse);
-  rpc GetAllEdgeBookmarks(EmptyRequest) returns (EdgeBookmarksResponse);
-  rpc GetAllBookmarkCategories(EmptyRequest) returns (BookmarkCategoriesResponse);
-  rpc GetTooltipInfoForTokenIds(TooltipTokenIdsRequest) returns (TooltipInfoResponse);
-  rpc GetTooltipInfoForSourceLocationIdsAndLocalSymbolIds(TooltipLocationRequest) returns (TooltipInfoResponse);
-
-  // Status stream: engine pushes events; client re-dispatches to local MessageQueue
-  rpc WatchEvents(WatchEventsRequest) returns (stream EngineEvent);
-
-  // Bidirectional session. Indexing asks the user two synchronous questions -- whether to keep or
-  // discard the database when indexing finishes, and whether to partially clear files -- which a
-  // one-way event stream cannot express. The engine sends DialogRequests and blocks on the
-  // matching DialogResponse, correlated by request_id.
-  rpc Session(stream ClientMessage) returns (stream EngineMessage);
-}
+// Boundary A: client (GUI/web app) <-> engine daemon.
+//
+// This file declares no service. The boundary is HTTP + JSON so that a browser can speak it, and
+// these messages are the payload schema: every one is encoded with protobuf's canonical JSON
+// mapping. The route table lives in src/app/engine/EngineHttpService.cpp.
+//
+// Note for JSON consumers: canonical protobuf JSON renders uint64 as a *string*, because a JSON
+// number cannot hold 64 bits. Node, edge and location ids therefore arrive quoted ("12345").
 
 // ---------- Shared primitives -----------------------------------------------
 
@@ -279,48 +199,6 @@ message LoadProjectResponse {
 }
 
 message RefreshRequest { bool all = 1; }
-message RefreshResponse {}
-
-// RefreshMode, mirroring the RefreshMode enum class.
-enum ProtoRefreshMode {
-  REFRESH_NONE = 0;
-  REFRESH_UPDATED_FILES = 1;
-  REFRESH_UPDATED_AND_INCOMPLETE_FILES = 2;
-  REFRESH_ALL_FILES = 3;
-}
-
-message ProtoRefreshInfo {
-  repeated string files_to_index = 1;
-  repeated string files_to_clear = 2;
-  repeated string non_indexed_files_to_clear = 3;
-  ProtoRefreshMode mode = 4;
-  bool shallow = 5;
-}
-
-message PrepareRefreshRequest {
-  ProtoRefreshMode mode = 1;
-  bool shallow = 2;
-}
-
-message PrepareRefreshResponse {
-  // False when the project is not in a refreshable state; error_message says why.
-  bool ok = 1;
-  string error_message = 2;
-  // Non-empty when the engine needs the user to confirm before indexing can proceed (outdated or
-  // migrated database, corrupted database). The engine asks nothing itself.
-  string question = 3;
-  // Drives the indexing dialog's mode selection.
-  repeated ProtoRefreshMode enabled_modes = 4;
-  ProtoRefreshMode initial_mode = 5;
-  bool allows_shallow_indexing = 6;
-}
-
-message GetRefreshInfoRequest { ProtoRefreshMode mode = 1; }
-message GetRefreshInfoResponse { ProtoRefreshInfo info = 1; }
-
-message BuildIndexRequest { ProtoRefreshInfo info = 1; }
-// Returns as soon as indexing is scheduled; progress arrives on the session stream.
-message BuildIndexResponse { bool started = 1; }
 
 message PluginInfo {
   string id = 1;
@@ -340,9 +218,6 @@ message CapabilitiesResponse {
   bool can_create_project = 4;
   string engine_version = 5;
 }
-message IndexingInterruptedRequest {}
-message IndexingInterruptedResponse {}
-
 message CompilationDatabaseInfoRequest { string cdb_path = 1; }
 message CompilationDatabaseInfoResponse {
   // False when the file is missing, malformed, or this engine has no C/C++ package; `error` says
@@ -380,10 +255,16 @@ message SourceLocationCollectionResponse {
   repeated ProtoSourceLocationFile files = 1;
 }
 message SourceLocationFileResponse { ProtoSourceLocationFile file = 1; }
-message GraphResponse { ProtoGraph graph = 1; }
-message ActiveGraphResponse {
+// GET /api/v1/graph answers every mode with this one shape: the former GetGraphForAll,
+// GetGraphForNodeTypes, GetGraphForActiveTokenIds, GetGraphForChildrenOfNodeId and GetGraphForTrail
+// differed only in how the graph was selected, not in what came back.
+message GraphQueryResponse {
   ProtoGraph graph = 1;
+  // Only meaningful for mode=active.
   bool is_active_namespace = 2;
+  // Filled when the request asks for include=parentFiles, so graph layout does not need a second
+  // round trip to group nodes by file.
+  repeated NodeIdToParentFileMapResponse.Entry parent_files = 3;
 }
 message SearchMatchesResponse { repeated ProtoSearchMatch matches = 1; }
 message FileInfoResponse { ProtoFileInfo file_info = 1; }
@@ -464,8 +345,9 @@ message TooltipLocationRequest {
 }
 
 // Engine event stream -------------------------------------------------------
-
-message WatchEventsRequest {}
+//
+// Delivered as server-sent events on GET /api/v1/events: one SSE frame per event, named by the
+// oneof arm and carrying that arm's JSON as the data line.
 
 message EngineEvent {
   oneof event {
@@ -531,9 +413,11 @@ message ErrorCountEvent {
   uint64 fatal = 2;
 }
 
-// ---------- Bidirectional session -------------------------------------------
+// ---------- Dialogs ---------------------------------------------------------
 
-// A question the engine needs the user to answer before it can continue.
+// A question the engine needs answered before it can continue. It rides the event stream as a
+// `dialog` event; the answer comes back as POST /api/v1/dialogs/{request_id}. The engine blocks the
+// asking thread until it arrives, which is why this cannot simply be another one-way event.
 message DialogRequest {
   uint64 request_id = 1;
   oneof request {
@@ -560,20 +444,105 @@ message DialogResponse {
   int32 selected_option = 2;
 }
 
-message Hello {
-  string client_version = 1;
+// ---------- Merged endpoint payloads ----------------------------------------
+//
+// Each of these answers one endpoint that replaces several former RPCs, because the call sites
+// always fired them together. They compose the existing messages rather than restating them.
+
+// GET /api/v1/stats -- was GetStorageStats + GetErrorCount + GetAvailableNodeTypes +
+// GetAvailableEdgeTypes, four round trips on every status-bar refresh.
+message StatsResponse {
+  ProtoStorageStats stats = 1;
+  uint64 error_total = 2;
+  uint64 error_fatal = 3;
+  int32 available_node_types = 4;
+  int32 available_edge_types = 5;
 }
 
-message ClientMessage {
-  oneof message {
-    Hello hello = 1;
-    DialogResponse dialog_response = 2;
-  }
+// GET /api/v1/bookmarks -- was GetAllNodeBookmarks + GetAllEdgeBookmarks + GetAllBookmarkCategories.
+message BookmarksResponse {
+  repeated ProtoNodeBookmark node_bookmarks = 1;
+  repeated ProtoEdgeBookmark edge_bookmarks = 2;
+  repeated ProtoBookmarkCategory categories = 3;
 }
 
-message EngineMessage {
-  oneof message {
-    EngineEvent event = 1;
-    DialogRequest dialog_request = 2;
-  }
+// POST /api/v1/bookmarks -- node and edge bookmarks share one create route.
+message AddBookmarkRequest {
+  ProtoBookmark base = 1;
+  repeated uint64 node_ids = 2;
+  repeated uint64 edge_ids = 3;
+  uint64 active_node_id = 4;
 }
+
+// GET /api/v1/files/{path} -- was GetFileContent + GetSourceLocationsForFile +
+// GetFileInfoForFilePath + GetErrorsForFileLimited, four round trips to open one file. Each part is
+// filled only when the `include` query names it.
+message FileResponse {
+  string content = 1;
+  ProtoSourceLocationFile locations = 2;
+  ProtoFileInfo info = 3;
+  repeated ProtoErrorInfo errors = 4;
+}
+
+// POST /api/v1/errors/locations.
+//
+// The engine synthesizes these locations from the fields below alone -- it does not look the errors
+// up again -- and then reads the database only to mark each file complete/indexed. So the request
+// carries exactly those four fields instead of whole ErrorInfo rows; the error messages, which are
+// the bulk of an error list, no longer cross the boundary just to be sent straight back.
+message ErrorLocationsRequest {
+  message Entry {
+    uint64 id = 1;
+    string file_path = 2;
+    uint64 line_number = 3;
+    uint64 column_number = 4;
+  }
+  repeated Entry errors = 1;
+}
+
+// POST /api/v1/symbols/resolve -- one batch in place of the per-id lookups that made
+// BookmarkController cost five round trips per active edge. Every list is optional and the matching
+// response list is returned in the same order.
+message SymbolResolveRequest {
+  // Node ids to describe. Answered with the name hierarchy; the node kind costs a second storage
+  // lookup per id, so it is only performed when include_node_kinds asks for it.
+  repeated uint64 node_ids = 1;
+  bool include_node_kinds = 8;
+  // Edges to fetch by id.
+  repeated uint64 edge_ids = 2;
+  // Serialized NameHierarchy values to look up node ids for.
+  repeated string name_hierarchies = 3;
+  // File paths to look up node ids for.
+  repeated string file_paths = 4;
+  // Location ids to map to node ids.
+  repeated uint64 location_ids = 5;
+  // Token ids to turn into search matches (the search-bar breadcrumb).
+  repeated uint64 search_match_token_ids = 6;
+  // Node ids to map to their parent file.
+  repeated uint64 parent_file_node_ids = 7;
+}
+
+message ResolvedNode {
+  uint64 id = 1;
+  string name_hierarchy_serialized = 2;
+  int32 node_kind = 3;
+}
+
+message SymbolResolveResponse {
+  // One per SymbolResolveRequest.node_ids, in order.
+  repeated ResolvedNode nodes = 1;
+  // One per SymbolResolveRequest.edge_ids, in order.
+  repeated StorageEdge edges = 2;
+  // One per SymbolResolveRequest.name_hierarchies, in order.
+  repeated uint64 name_hierarchy_node_ids = 3;
+  // One per SymbolResolveRequest.file_paths, in order.
+  repeated uint64 file_path_node_ids = 4;
+  // Node ids for SymbolResolveRequest.location_ids.
+  repeated uint64 location_node_ids = 5;
+  // Matches for SymbolResolveRequest.search_match_token_ids.
+  repeated ProtoSearchMatch search_matches = 6;
+  // One per SymbolResolveRequest.parent_file_node_ids, in order.
+  repeated NodeIdToParentFileMapResponse.Entry parent_files = 7;
+}
+
+// GET /api/v1/project and PUT /api/v1/project both answer with LoadProjectResponse.

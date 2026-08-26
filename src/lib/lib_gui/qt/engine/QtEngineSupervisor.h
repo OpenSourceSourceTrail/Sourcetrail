@@ -14,7 +14,7 @@ class EngineChannel;
  * The engine is spawned with "--port 0" and reports the port it actually got on the first line of
  * its stdout ("ENGINE_PORT <n>"), so several Sourcetrail instances can run side by side. If the
  * engine dies, it is respawned with an exponential backoff; queries made while it is down do not
- * fail loudly, they return empty results (see GrpcStorageAccess), which is what keeps the GUI alive.
+ * fail loudly, they return empty results (see HttpStorageAccess), which is what keeps the GUI alive.
  */
 class QtEngineSupervisor final : public QObject {
   Q_OBJECT

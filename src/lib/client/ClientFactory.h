@@ -9,7 +9,7 @@ namespace client {
 /**
  * The factory a thin client builds its Application from.
  *
- * Where lib::Factory hands out a Project that owns a database, this hands out a GrpcProject that
+ * Where lib::Factory hands out a Project that owns a database, this hands out a HttpProject that
  * owns nothing and asks the engine, and points the application's StorageCache at the engine-backed
  * StorageAccess. That is the whole of the client/engine substitution: everything above IFactory is
  * identical in both processes.

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Sourcetrail is a free, offline, cross-platform (Windows/Linux) C/C++ source explorer built on Qt6. It indexes source code (via Clang/LibTooling when `BUILD_CXX_LANGUAGE_PACKAGE` is enabled) into a SQLite-backed graph database and lets users interactively explore symbols, references, and call graphs.
 
-It is **not** a single process: a Qt GUI, a headless engine daemon that owns the database, and per-job indexer workers talk to each other over gRPC. See *Process model* below before making any change that crosses those boundaries.
+It is **not** a single process: a Qt GUI, a headless engine daemon that owns the database, and per-job indexer workers. The GUI talks to the engine over **HTTP + JSON** (so a web app can speak it too); the engine talks to indexer workers over gRPC. See *Process model* below before making any change that crosses those boundaries.
 
 ## Build System
 
@@ -97,6 +97,7 @@ New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sour
 - `scripts/run_clang_format.sh` — formats all C/C++ sources in place (`.clang-format`, Google fallback style).
 - `scripts/run_cmake_format.sh` — formats all `CMakeLists.txt`/`*.cmake` (`.cmake-format.yaml`).
 - `.clang-tidy` is enforced via `cmake/clang-tidy.cmake`; `cmake/cppcheck.cmake` wires up cppcheck. Both run in CI (`.github/workflows/clang_tidy.yml`, `cppcheck.yaml`).
+- `.pre-commit-config.yaml` runs clang-format 18.1.8 and cmakelang 0.6.13 (pinned to match CI) on staged files; run `pip install pre-commit && pre-commit install` once per clone to activate it.
 
 ## High-Level Architecture
 
@@ -105,11 +106,17 @@ New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sour
 | Binary (`build/app/`) | Source | Role |
 | --- | --- | --- |
 | `Sourcetrail` | `src/app/gui` | Qt GUI. **Owns no database** — reads everything through the engine. |
-| `sourcetrail_engine` | `src/app/engine` | Headless gRPC daemon. Owns the SQLite index, the project state machine and the indexing task graph. |
+| `sourcetrail_engine` | `src/app/engine` | Headless HTTP daemon (`EngineHttpService`). Owns the SQLite index, the project state machine and the indexing task graph. |
 | `sourcetrail_indexer` | `src/app/indexer` | Indexer worker process, spawned per indexing job. |
 | `Sourcetrail_cli` | `src/app/cli` | Headless, Qt-free front end. |
 
-`QtEngineSupervisor` (`src/lib/lib_gui`) spawns the engine with `--port 0`; the engine prints `ENGINE_PORT <n>` on its first stdout line, so instances can run side by side. A dead engine is respawned with exponential backoff (max 5 attempts); while it is down, `GrpcStorageAccess` returns empty results instead of failing, so the GUI stays alive and read-only.
+`QtEngineSupervisor` (`src/lib/lib_gui`) spawns the engine with `--port 0`; the engine prints
+`ENGINE_PORT <n> <token>` on its first stdout line, so instances can run side by side. The token is a
+per-run bearer credential every request must present: a loopback HTTP port is reachable by any local
+process and by any page the user's browser loads, which the gRPC port it replaced was not. Requests
+carrying an un-allow-listed `Origin` are refused outright. A dead engine is respawned with
+exponential backoff (max 5 attempts); while it is down, `HttpStorageAccess` returns empty results
+instead of failing, so the GUI stays alive and read-only.
 
 The GUI/engine split is enforced at link time: `Sourcetrail_lib` holds the UI-agnostic business logic, `Sourcetrail_lib_engine` holds everything that touches SQLite (`PersistentStorage`, `Sqlite*Storage`, migrations, `Project`, `IndexTaskBuilder`, `RefreshInfoGenerator`). Only the engine and indexer link the latter. **Do not add a SQLite-touching header to `Sourcetrail_lib`.**
 
@@ -120,8 +127,8 @@ The GUI/engine split is enforced at link time: `Sourcetrail_lib` holds the UI-ag
 - **`core`** — foundational utilities: `FilePath`, `FileSystem`, `TextAccess`/`TextCodec`, `ConfigManager`, `Migration`/`Migrator`, logging, commandline parsing. Nearly everything links against it.
 - **`messaging`** — decoupled pub/sub bus. `Message<T>` dispatches through the singleton `IMessageQueue`; `MessageListener<T>` subclasses receive `handleMessage(T*)`. The primary way GUI, `Application` and controllers communicate.
 - **`scheduling`** — `Task`/`TaskGroup` framework (sequence, parallel, selector, delay/repeat decorators) run by `TaskScheduler`/`TaskRunner` over a shared `Blackboard`. Indexing and refresh pipelines are task graphs built from these.
-- **`proto`** — the IPC contract: `engine.proto` (client ↔ engine), `indexer_worker.proto` (engine ↔ worker), `sourcetrail_common.proto`, plus the `Convert*.cpp` helpers that map storage/graph types to and from protobuf.
-- **`client`** — the engine-facing client side: `EngineChannel` (connection), `GrpcStorageAccess` (read path), `GrpcProject`, and `Capabilities` (what the connected engine can index; the GUI greys out controls from this, it never inspects the plugin directory itself).
+- **`proto`** — the IPC contract: `engine.proto` (client ↔ engine), `indexer_worker.proto` (engine ↔ worker), `sourcetrail_common.proto`, plus the `Convert*.cpp` helpers that map storage/graph types to and from protobuf. `engine.proto` declares **no service**: it is the payload schema for the HTTP boundary, encoded with protobuf's canonical JSON mapping via `ProtoJson.{h,cpp}` (note that uint64 ids arrive as JSON *strings*). Only `indexer_worker.proto` still generates gRPC stubs.
+- **`client`** — the engine-facing client side: `EngineChannel` (connection, one keep-alive HTTP connection per calling thread), `HttpStorageAccess` (read path), `HttpProject`, `EngineEventClient` (server-sent events), and `Capabilities` (what the connected engine can index; the GUI greys out controls from this, it never inspects the plugin directory itself).
 - **`lib`** — business logic (see `src/lib/lib/README.md`):
   - `app/Application` — orchestrates `IFactory`, `IProject`, `StorageCache`, `MainView`, IDE communication. `app/IndexerPluginRegistry` discovers indexer plugins.
   - `component` — `Component`/`ComponentFactory`/`ComponentManager`/`Tab`: controller+view pair per UI panel/tab.

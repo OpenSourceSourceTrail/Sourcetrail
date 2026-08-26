@@ -7,8 +7,6 @@
 #include <QProcess>
 #include <QTimer>
 
-#include <grpcpp/grpcpp.h>
-
 #include "Capabilities.h"
 #include "EngineChannel.h"
 #include "logging.h"
@@ -28,15 +26,39 @@ constexpr std::chrono::milliseconds ShutdownRpcTimeout{2000};
 constexpr int ShutdownWaitMs = 1500;
 constexpr int KillWaitMs = 1000;
 
-/** The engine's handshake line: "ENGINE_PORT <n>". Returns 0 if this line is not one. */
-int parseEnginePort(const QString& line) {
+/**
+ * The engine's handshake line: "ENGINE_PORT <n> <token>". Returns port 0 if this line is not one.
+ *
+ * The token is the bearer credential for every later request. It is passed on stdout precisely
+ * because only the process that spawned the engine can read it -- a loopback HTTP port is otherwise
+ * reachable by anything else running as this user.
+ */
+struct EngineHandshake {
+  int port = 0;
+  QString token;
+};
+
+EngineHandshake parseEngineHandshake(const QString& line) {
   static const QString prefix = QStringLiteral("ENGINE_PORT ");
   if(!line.startsWith(prefix)) {
-    return 0;
+    return {};
   }
+
+  const QStringList parts = line.mid(prefix.size()).trimmed().split(QLatin1Char(' '), Qt::SkipEmptyParts);
+  if(parts.isEmpty()) {
+    return {};
+  }
+
   bool parsed = false;
-  const int port = line.mid(prefix.size()).trimmed().toInt(&parsed);
-  return parsed ? port : 0;
+  EngineHandshake handshake;
+  handshake.port = parts.front().toInt(&parsed);
+  if(!parsed) {
+    return {};
+  }
+  if(parts.size() > 1) {
+    handshake.token = parts.at(1);
+  }
+  return handshake;
 }
 
 void status(const std::wstring& text) {
@@ -57,7 +79,7 @@ QtEngineSupervisor::QtEngineSupervisor(QObject* parent)
     , mEnginePath(QDir(QCoreApplication::applicationDirPath()).filePath(QString::fromLatin1(EngineExecutableName)))
     // Port 0 is deliberate: the channel exists before the engine does, so callers can hold it from
     // startup. Until the handshake lands, every call simply fails and reports degraded.
-    , mChannel(std::make_unique<EngineChannel>("127.0.0.1:0")) {}
+    , mChannel(std::make_unique<EngineChannel>("127.0.0.1:0", std::string())) {}
 
 QtEngineSupervisor::~QtEngineSupervisor() {
   stop();
@@ -112,15 +134,15 @@ void QtEngineSupervisor::readStdout() {
     mStdoutBuffer.remove(0, newline + 1);
     newline = mStdoutBuffer.indexOf(QLatin1Char('\n'));
 
-    const int port = parseEnginePort(line);
-    if(port == 0) {
+    const EngineHandshake handshake = parseEngineHandshake(line);
+    if(handshake.port == 0) {
       continue;
     }
 
     // Reaching the handshake is the only evidence the engine is healthy, so the backoff resets here
     // rather than on spawn -- otherwise a binary that crashes right after listening restarts forever.
     mAttempt = 0;
-    mChannel->reconnect("127.0.0.1:" + std::to_string(port));
+    mChannel->reconnect("127.0.0.1:" + std::to_string(handshake.port), handshake.token.toStdString());
     // Also drops the cached capabilities: a restarted engine may have a different plugin set.
     client::Capabilities::instance().setChannel(mChannel.get());
     status(L"Engine connected");
@@ -162,14 +184,8 @@ void QtEngineSupervisor::stop() {
   }
 
   if(mProcess->state() != QProcess::NotRunning) {
-    // Ask first: Shutdown lets the engine close its storage instead of losing it to a signal.
-    if(auto* stub = mChannel->getStub(); stub != nullptr) {
-      grpc::ClientContext context;
-      context.set_deadline(std::chrono::system_clock::now() + ShutdownRpcTimeout);
-      sourcetrail::EmptyRequest request;
-      sourcetrail::EmptyResponse response;
-      std::ignore = stub->Shutdown(&context, request, &response);
-    }
+    // Ask first: this lets the engine close its storage instead of losing it to a signal.
+    std::ignore = mChannel->send("POST", "/api/v1/shutdown", {}, ShutdownRpcTimeout);
 
     // Then insist, in escalating order: SIGTERM is handled by the engine, SIGKILL by the OS.
     if(!mProcess->waitForFinished(ShutdownWaitMs)) {

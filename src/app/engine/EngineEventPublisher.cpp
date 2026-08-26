@@ -1,12 +1,23 @@
 #include "EngineEventPublisher.h"
 
+#include <chrono>
 #include <memory>
+#include <optional>
 
 #include "Application.h"
 #include "ConvertEvents.h"
-#include "EngineServiceImpl.h"
+#include "engine.pb.h"
+#include "EngineHttpService.h"
 
-EngineDialogView::EngineDialogView(UseCase useCase, EngineServiceImpl* service)
+namespace {
+
+// Long enough for a user to read the indexing report and decide; if nobody is there to answer, the
+// engine falls back to keeping the database rather than blocking indefinitely.
+constexpr std::chrono::milliseconds FinishedIndexingTimeout{10 * 60 * 1000};
+
+}    // namespace
+
+EngineDialogView::EngineDialogView(UseCase useCase, EngineHttpService* service)
     : DialogView(useCase, nullptr), mService(service) {}
 
 void EngineDialogView::clearDialogs() {
@@ -53,18 +64,27 @@ DatabasePolicy EngineDialogView::finishedIndexingDialog(size_t indexedFileCount,
                                                         ErrorCountInfo errorInfo,
                                                         bool interrupted,
                                                         bool shallow) {
-  mService->broadcastEvent(proto::convert::toIndexingFinishedEvent(
-      indexedFileCount, totalIndexedFileCount, completedFileCount, totalFileCount, time, errorInfo, interrupted, shallow));
+  const sourcetrail::EngineEvent summary = proto::convert::toIndexingFinishedEvent(
+      indexedFileCount, totalIndexedFileCount, completedFileCount, totalFileCount, time, errorInfo, interrupted, shallow);
+  mService->broadcastEvent(summary);
 
-  // Keeping the freshly indexed database is what the base class does headless, and asking the user
-  // instead needs the Session bidi stream that engine.proto declares but nobody implements yet.
-  return DATABASE_POLICY_KEEP;
+  // The answer decides whether the freshly built temporary database replaces the project's, so it
+  // has to come from the user. Falling back to KEEP -- what the headless base class does -- covers
+  // the cases where nobody can answer: no client attached, or none answered in time.
+  sourcetrail::DialogRequest request;
+  *request.mutable_finished_indexing()->mutable_summary() = summary.indexing_finished();
+
+  const std::optional<int> answer = mService->askDialog(request, FinishedIndexingTimeout);
+  if(!answer.has_value()) {
+    return DATABASE_POLICY_KEEP;
+  }
+  return static_cast<DatabasePolicy>(*answer);
 }
 
-EngineEventPublisher::EngineEventPublisher(EngineServiceImpl* service) : mService(service) {}
+EngineEventPublisher::EngineEventPublisher(EngineHttpService* service) : mService(service) {}
 
 void EngineEventPublisher::installDialogViewFactory() const {
-  EngineServiceImpl* service = mService;
+  EngineHttpService* service = mService;
   Application::getInstance()->setDialogViewFactory(
       [service](DialogView::UseCase useCase) { return std::make_shared<EngineDialogView>(useCase, service); });
 }

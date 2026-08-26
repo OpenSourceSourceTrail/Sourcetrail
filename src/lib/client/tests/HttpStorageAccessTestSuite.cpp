@@ -4,15 +4,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <grpcpp/grpcpp.h>
-
 #include "Capabilities.h"
 #include "EngineChannel.h"
-#include "EngineServiceImpl.h"
-#include "GrpcStorageAccess.h"
-#include "MockedStorageAccess.hpp"
-
+#include "EngineHttpService.h"
 #include "Graph.h"
+#include "HttpServer.h"
+#include "HttpStorageAccess.h"
+#include "MockedStorageAccess.hpp"
 #include "NameHierarchy.h"
 #include "NodeType.h"
 #include "SourceLocationCollection.h"
@@ -24,29 +22,29 @@ using testing::Return;
 
 namespace {
 
+constexpr const char* TestToken = "test-token";
+
 /**
- * A real engine server over a loopback socket, so these tests exercise the actual protos, the actual
- * EngineServiceImpl and the actual client -- the three pieces whose disagreement would be invisible
- * to a test that mocked the stub.
+ * A real engine server over a loopback socket, so these tests exercise the actual routes, the actual
+ * EngineHttpService and the actual client -- the three pieces whose disagreement would be invisible
+ * to a test that mocked the transport.
  */
-class GrpcStorageAccessFix : public testing::Test {
+class HttpStorageAccessFix : public testing::Test {
 protected:
   void SetUp() override {
-    mService = std::make_unique<EngineServiceImpl>(&mStorage);
+    mService = std::make_unique<EngineHttpService>(&mStorage);
 
-    grpc::ServerBuilder builder;
-    int port = 0;
-    builder.AddListeningPort("127.0.0.1:0", grpc::InsecureServerCredentials(), &port);
-    builder.RegisterService(mService.get());
-    mServer = builder.BuildAndStart();
-    ASSERT_NE(mServer, nullptr);
+    mServer = std::make_unique<http::Server>(TestToken);
+    mService->registerRoutes(*mServer);
+    const uint16_t port = mServer->start(0);
+    ASSERT_NE(port, 0);
 
-    mChannel = std::make_unique<EngineChannel>("127.0.0.1:" + std::to_string(port));
+    mChannel = std::make_unique<EngineChannel>("127.0.0.1:" + std::to_string(port), TestToken);
     // Keep the "engine is gone" tests quick; the production default is measured in seconds.
     mChannel->setCallTimeout(std::chrono::milliseconds(500));
     ASSERT_TRUE(mChannel->waitUntilReady(std::chrono::seconds(5)));
 
-    mAccess = std::make_unique<GrpcStorageAccess>(mChannel.get());
+    mAccess = std::make_unique<HttpStorageAccess>(mChannel.get());
   }
 
   void TearDown() override {
@@ -58,28 +56,27 @@ protected:
 
   void stopServer() {
     if(mServer) {
-      mServer->Shutdown();
-      mServer->Wait();
+      mServer->stop();
       mServer.reset();
     }
   }
 
   testing::NiceMock<MockedStorageAccess> mStorage;
-  std::unique_ptr<EngineServiceImpl> mService;
-  std::unique_ptr<grpc::Server> mServer;
+  std::unique_ptr<EngineHttpService> mService;
+  std::unique_ptr<http::Server> mServer;
   std::unique_ptr<EngineChannel> mChannel;
-  std::unique_ptr<GrpcStorageAccess> mAccess;
+  std::unique_ptr<HttpStorageAccess> mAccess;
 };
 
 }    // namespace
 
-TEST_F(GrpcStorageAccessFix, scalarQueryRoundTrips) {
+TEST_F(HttpStorageAccessFix, scalarQueryRoundTrips) {
   EXPECT_CALL(mStorage, getNodeIdForFileNode(_)).WillOnce(Return(42));
 
   EXPECT_EQ(mAccess->getNodeIdForFileNode(FilePath(L"/src/main.cpp")), 42U);
 }
 
-TEST_F(GrpcStorageAccessFix, nameHierarchyRoundTrips) {
+TEST_F(HttpStorageAccessFix, nameHierarchyRoundTrips) {
   NameHierarchy hierarchy(NAME_DELIMITER_CXX);
   hierarchy.push(L"ns");
   hierarchy.push(L"Klass");
@@ -88,12 +85,10 @@ TEST_F(GrpcStorageAccessFix, nameHierarchyRoundTrips) {
   EXPECT_EQ(mAccess->getNameHierarchyForNodeId(7).getQualifiedName(), hierarchy.getQualifiedName());
 }
 
-TEST_F(GrpcStorageAccessFix, graphRoundTrips) {
+TEST_F(HttpStorageAccessFix, graphRoundTrips) {
   auto graph = std::make_shared<Graph>();
-  Node* from = graph->createNode(
-      1, NodeType(NODE_CLASS), NameHierarchy(L"Base", NAME_DELIMITER_CXX), DEFINITION_EXPLICIT);
-  Node* to = graph->createNode(
-      2, NodeType(NODE_CLASS), NameHierarchy(L"Derived", NAME_DELIMITER_CXX), DEFINITION_EXPLICIT);
+  Node* from = graph->createNode(1, NodeType(NODE_CLASS), NameHierarchy(L"Base", NAME_DELIMITER_CXX), DEFINITION_EXPLICIT);
+  Node* to = graph->createNode(2, NodeType(NODE_CLASS), NameHierarchy(L"Derived", NAME_DELIMITER_CXX), DEFINITION_EXPLICIT);
   ASSERT_NE(from, nullptr);
   ASSERT_NE(to, nullptr);
   graph->createEdge(3, Edge::EDGE_INHERITANCE, to, from);
@@ -111,7 +106,7 @@ TEST_F(GrpcStorageAccessFix, graphRoundTrips) {
   EXPECT_EQ(restored->getEdgeById(3)->getType(), Edge::EDGE_INHERITANCE);
 }
 
-TEST_F(GrpcStorageAccessFix, sourceLocationsRoundTrip) {
+TEST_F(HttpStorageAccessFix, sourceLocationsRoundTrip) {
   auto collection = std::make_shared<SourceLocationCollection>();
   collection->addSourceLocation(LOCATION_TOKEN, 11, {5}, FilePath(L"/src/main.cpp"), 2, 3, 2, 9);
 
@@ -127,7 +122,7 @@ TEST_F(GrpcStorageAccessFix, sourceLocationsRoundTrip) {
   EXPECT_EQ(location->getTokenIds(), (std::vector<Id>{5}));
 }
 
-TEST_F(GrpcStorageAccessFix, searchMatchesRoundTrip) {
+TEST_F(HttpStorageAccessFix, searchMatchesRoundTrip) {
   SearchMatch match;
   match.name = L"Klass::method";
   match.text = L"method";
@@ -148,7 +143,7 @@ TEST_F(GrpcStorageAccessFix, searchMatchesRoundTrip) {
   EXPECT_EQ(matches[0].score, -3);
 }
 
-TEST_F(GrpcStorageAccessFix, errorsRoundTrip) {
+TEST_F(HttpStorageAccessFix, errorsRoundTrip) {
   const ErrorInfo error(1, L"boom", L"/src/a.cpp", 4, 5, L"/src/a.cpp", true, false);
   EXPECT_CALL(mStorage, getErrorsLimited(_)).WillOnce(Return(std::vector<ErrorInfo>{error}));
 
@@ -160,7 +155,30 @@ TEST_F(GrpcStorageAccessFix, errorsRoundTrip) {
   EXPECT_FALSE(errors[0].indexed);
 }
 
-TEST_F(GrpcStorageAccessFix, fileContentRoundTrips) {
+// /api/v1/stats merges four former RPCs, so a caller asking for one part must not make the engine run
+// the other three: getErrorCount sits on the status-bar refresh path.
+TEST_F(HttpStorageAccessFix, statsEndpointOnlyDoesTheWorkTheCallerAskedFor) {
+  EXPECT_CALL(mStorage, getErrorCount()).WillOnce(Return(ErrorCountInfo{7, 2}));
+  EXPECT_CALL(mStorage, getStorageStats()).Times(0);
+  EXPECT_CALL(mStorage, getAvailableNodeTypes()).Times(0);
+  EXPECT_CALL(mStorage, getAvailableEdgeTypes()).Times(0);
+
+  const ErrorCountInfo counts = mAccess->getErrorCount();
+
+  EXPECT_EQ(counts.total, 7U);
+  EXPECT_EQ(counts.fatal, 2U);
+}
+
+TEST_F(HttpStorageAccessFix, storageStatsDoesNotFetchErrorCounts) {
+  StorageStats stats;
+  stats.nodeCount = 11;
+  EXPECT_CALL(mStorage, getStorageStats()).WillOnce(Return(stats));
+  EXPECT_CALL(mStorage, getErrorCount()).Times(0);
+
+  EXPECT_EQ(mAccess->getStorageStats().nodeCount, 11U);
+}
+
+TEST_F(HttpStorageAccessFix, fileContentRoundTrips) {
   EXPECT_CALL(mStorage, getFileContent(_, _)).WillOnce(Return(TextAccess::createFromString("int main() {}\n")));
 
   const auto content = mAccess->getFileContent(FilePath(L"/src/main.cpp"), false);
@@ -171,7 +189,7 @@ TEST_F(GrpcStorageAccessFix, fileContentRoundTrips) {
 
 // ---- The point of the whole class: a dead engine must not take the client with it ----------------
 
-TEST_F(GrpcStorageAccessFix, queriesReturnEmptyResultsAfterEngineDies) {
+TEST_F(HttpStorageAccessFix, queriesReturnEmptyResultsAfterEngineDies) {
   // Without these the test would pass vacuously: a NiceMock also answers with empty values, so
   // "empty result" alone cannot distinguish a failed call from a successful empty one. Requiring
   // that storage is never reached proves the calls really died in transport.
@@ -205,7 +223,7 @@ TEST_F(GrpcStorageAccessFix, queriesReturnEmptyResultsAfterEngineDies) {
   EXPECT_FALSE(mChannel->isConnected());
 }
 
-TEST_F(GrpcStorageAccessFix, sourceLocationFileKeepsRequestedPathAfterEngineDies) {
+TEST_F(HttpStorageAccessFix, sourceLocationFileKeepsRequestedPathAfterEngineDies) {
   stopServer();
 
   // The code view titles the file from this path, so an empty result still has to carry it.
@@ -216,7 +234,7 @@ TEST_F(GrpcStorageAccessFix, sourceLocationFileKeepsRequestedPathAfterEngineDies
   EXPECT_EQ(file->getSourceLocationCount(), 0U);
 }
 
-TEST_F(GrpcStorageAccessFix, mutationsAreSilentlyDroppedAfterEngineDies) {
+TEST_F(HttpStorageAccessFix, mutationsAreSilentlyDroppedAfterEngineDies) {
   stopServer();
 
   EXPECT_EQ(mAccess->addBookmarkCategory(L"favourites"), 0U);
@@ -224,7 +242,7 @@ TEST_F(GrpcStorageAccessFix, mutationsAreSilentlyDroppedAfterEngineDies) {
   EXPECT_NO_FATAL_FAILURE(mAccess->updateBookmark(1, L"n", L"c", L"cat"));
 }
 
-TEST_F(GrpcStorageAccessFix, channelIsMarkedDegradedOnFailureAndReportsIt) {
+TEST_F(HttpStorageAccessFix, channelIsMarkedDegradedOnFailureAndReportsIt) {
   bool connected = true;
   int transitions = 0;
   mChannel->setConnectionStateHandler([&](bool state) {
@@ -244,7 +262,7 @@ TEST_F(GrpcStorageAccessFix, channelIsMarkedDegradedOnFailureAndReportsIt) {
   EXPECT_EQ(transitions, 1);
 }
 
-TEST_F(GrpcStorageAccessFix, capabilitiesAreServedAndGoEmptyWithoutAnEngine) {
+TEST_F(HttpStorageAccessFix, capabilitiesAreServedAndGoEmptyWithoutAnEngine) {
   client::Capabilities& capabilities = client::Capabilities::instance();
   capabilities.setChannel(mChannel.get());
 

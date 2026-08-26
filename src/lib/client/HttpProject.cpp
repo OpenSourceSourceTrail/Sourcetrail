@@ -1,12 +1,14 @@
-#include "GrpcProject.h"
+#include "HttpProject.h"
 
 #include <chrono>
 
 #include "Application.h"
+#include "engine.pb.h"
 #include "EngineCall.h"
 #include "EngineChannel.h"
 #include "logging.h"
 #include "ProjectSettings.h"
+#include "ProtoJson.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageStatus.h"
 #include "utilityString.h"
@@ -19,40 +21,41 @@ namespace {
 constexpr std::chrono::milliseconds LoadProjectTimeout{600000};
 }    // namespace
 
-GrpcProject::GrpcProject(EngineChannel* channel, std::shared_ptr<ProjectSettings> settings)
+HttpProject::HttpProject(EngineChannel* channel, std::shared_ptr<ProjectSettings> settings)
     : mChannel(channel), mSettings(std::move(settings)) {}
 
-FilePath GrpcProject::getProjectSettingsFilePath() const {
+FilePath HttpProject::getProjectSettingsFilePath() const {
   return mSettings->getFilePath();
 }
 
-std::string GrpcProject::getDescription() const {
+std::string HttpProject::getDescription() const {
   return mDescription;
 }
 
-bool GrpcProject::isLoaded() const {
+bool HttpProject::isLoaded() const {
   return mLoaded;
 }
 
-bool GrpcProject::isIndexing() const {
+bool HttpProject::isIndexing() const {
   return mIndexing;
 }
 
-bool GrpcProject::isReindexable() const {
+bool HttpProject::isReindexable() const {
   return mReindexable;
 }
 
-bool GrpcProject::settingsEqualExceptNameAndLocation(const ProjectSettings& otherSettings) const {
+bool HttpProject::settingsEqualExceptNameAndLocation(const ProjectSettings& otherSettings) const {
   // Purely a settings comparison; the engine has nothing to add and a round trip would only make
   // the project wizard slower.
   return mSettings->equalsExceptNameAndLocation(otherSettings);
 }
 
-void GrpcProject::load(const std::shared_ptr<DialogView>& /*dialogView*/) {
+void HttpProject::load(const std::shared_ptr<DialogView>& /*dialogView*/) {
   sourcetrail::LoadProjectRequest request;
   request.set_project_file_path(utility::encodeToUtf8(getProjectSettingsFilePath().wstr()));
 
-  const auto response = call(mChannel, "LoadProject", &client::Stub::LoadProject, request, LoadProjectTimeout);
+  const auto response = call<sourcetrail::LoadProjectResponse>(
+      mChannel, "loadProject", "PUT", "/api/v1/project", proto::json::toJson(request), LoadProjectTimeout);
   if(!response) {
     // The supervisor is already restarting the engine; say so rather than claiming the project is
     // broken, and leave the cached state alone so the views keep whatever they were showing.
@@ -77,28 +80,28 @@ void GrpcProject::load(const std::shared_ptr<DialogView>& /*dialogView*/) {
   }
 }
 
-void GrpcProject::setStateOutdated() {
-  std::ignore = call(mChannel, "SetStateOutdated", &client::Stub::SetStateOutdated, sourcetrail::EmptyRequest{});
+void HttpProject::setStateOutdated() {
+  std::ignore = client::callVoid(mChannel, "setStateOutdated", "POST", "/api/v1/project/state/outdated");
 }
 
-void GrpcProject::refresh(std::shared_ptr<DialogView> /*dialogView*/, RefreshMode refreshMode, bool /*shallow*/) {
+void HttpProject::refresh(std::shared_ptr<DialogView> /*dialogView*/, RefreshMode refreshMode, bool /*shallow*/) {
   sourcetrail::RefreshRequest request;
   request.set_all(refreshMode == RefreshMode::AllFiles);
 
-  if(!call(mChannel, "Refresh", &client::Stub::Refresh, request)) {
+  if(!client::callVoid(mChannel, "refresh", "POST", "/api/v1/project/refresh", proto::json::toJson(request))) {
     MessageStatus(L"Cannot refresh the project: the engine is not available.", true).dispatch();
     return;
   }
   mIndexing = true;
 }
 
-RefreshInfo GrpcProject::getRefreshInfo(RefreshMode /*mode*/) const {
+RefreshInfo HttpProject::getRefreshInfo(RefreshMode /*mode*/) const {
   // The refresh plan is computed engine-side from the database, so the client cannot derive it and
-  // an empty one means "index nothing" -- the safe answer while the split-out
-  // PrepareRefresh/GetRefreshInfo/BuildIndex handshake is still unimplemented in the engine.
+  // an empty one means "index nothing" -- the safe answer. Refreshing goes through
+  // POST /api/v1/project/refresh, which lets the engine build and run the plan itself.
   return {};
 }
 
-void GrpcProject::buildIndex(RefreshInfo /*info*/, std::shared_ptr<DialogView> /*dialogView*/) {
+void HttpProject::buildIndex(RefreshInfo /*info*/, std::shared_ptr<DialogView> /*dialogView*/) {
   LOG_WARNING("buildIndex is driven by the engine; the client only asks for a Refresh.");
 }

@@ -3,8 +3,8 @@ add_executable(
   main.cpp
   EngineEventPublisher.cpp
   EngineEventPublisher.h
-  EngineServiceImpl.cpp
-  EngineServiceImpl.h)
+  EngineHttpService.cpp
+  EngineHttpService.h)
 
 set_target_properties(Sourcetrail_engine PROPERTIES OUTPUT_NAME sourcetrail_engine RUNTIME_OUTPUT_DIRECTORY
                                                                                    "${CMAKE_BINARY_DIR}/app/")
@@ -17,11 +17,12 @@ target_link_libraries(
           Sourcetrail::lib::proto::api
           Sourcetrail::lib::proto::convert
           Sourcetrail::lib::messaging
-          gRPC::grpc++
+          Sourcetrail::lib::core::http
           Sourcetrail::lib::core::utility::logging
           Sourcetrail::lib::core::utility::ScopedFunctor
           Sourcetrail::lib::core::utility::TextAccess
-          Sourcetrail::lib::core::utility::utilityApp)
+          Sourcetrail::lib::core::utility::utilityApp
+          Sourcetrail::lib::core::utility::utilityUuid)
 
 target_include_directories(Sourcetrail_engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/src/lib/lib"
                                                       "${CMAKE_BINARY_DIR}/src/lib/lib_gui")

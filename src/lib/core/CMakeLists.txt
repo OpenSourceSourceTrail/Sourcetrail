@@ -1,5 +1,6 @@
 #${CMAKE_SOURCE_DIR}/src/lib/core/CMakeLists.txt
 add_subdirectory(utility)
+add_subdirectory(http)
 
 add_library(Sourcetrail_core INTERFACE)
 add_library(Sourcetrail::lib::core ALIAS Sourcetrail_core)

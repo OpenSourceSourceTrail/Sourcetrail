@@ -1,7 +1,9 @@
 #include "CompilationDatabaseInfo.h"
 
 #include "Capabilities.h"
+#include "engine.pb.h"
 #include "EngineCall.h"
+#include "ProtoJson.h"
 #include "utilityString.h"
 
 namespace client {
@@ -10,8 +12,12 @@ CompilationDatabaseInfo inspectCompilationDatabase(const FilePath& cdbPath) {
   sourcetrail::CompilationDatabaseInfoRequest request;
   request.set_cdb_path(utility::encodeToUtf8(cdbPath.wstr()));
 
-  const std::optional<sourcetrail::CompilationDatabaseInfoResponse> response = call(
-      Capabilities::instance().channel(), "GetCompilationDatabaseInfo", &Stub::GetCompilationDatabaseInfo, request);
+  const std::optional<sourcetrail::CompilationDatabaseInfoResponse> response = call<sourcetrail::CompilationDatabaseInfoResponse>(
+      Capabilities::instance().channel(),
+      "inspectCompilationDatabase",
+      "POST",
+      "/api/v1/compilation-database",
+      proto::json::toJson(request));
 
   CompilationDatabaseInfo info;
   if(!response) {
