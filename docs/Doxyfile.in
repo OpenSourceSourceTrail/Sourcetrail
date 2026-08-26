@@ -909,7 +909,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @CMAKE_SOURCE_DIR@/src/lib         \
-                         @CMAKE_SOURCE_DIR@/src/lib_cxx     \
+                         @CMAKE_SOURCE_DIR@/indexers/cxx    \
                          @CMAKE_SOURCE_DIR@/src/lib_gui     \
                          @CMAKE_SOURCE_DIR@/src/lib_utility \
                          @CMAKE_SOURCE_DIR@/DOCUMENTATION.md
