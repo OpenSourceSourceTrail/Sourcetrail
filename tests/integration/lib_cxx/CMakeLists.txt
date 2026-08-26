@@ -3,8 +3,11 @@ set(test_cxx_names
     CxxIncludeProcessingTestSuite
     CxxParserTestSuite
     CxxTypeNameTestSuite
+    CxxParser11TestSuite
     CxxParser14TestSuite
-    CxxParser17TestSuite)
+    CxxParser17TestSuite
+    CxxParser20TestSuite
+    CxxParser23TestSuite)
 
 foreach(test_name IN LISTS test_cxx_names)
   add_sourcetrail_test(

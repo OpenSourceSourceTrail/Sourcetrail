@@ -1,5 +1,5 @@
 /**
- * @file CxxParser17TestSuite.cpp
+ * @file CxxParser14TestSuite.cpp
  * @author Ahmed Abdelaal (eng.ahmedhussein89@gmail.com)
  * @brief Test the CxxParser with C++14 features
  * @version 0.1
@@ -8,20 +8,15 @@
  * @copyright Copyright (c) 2025
  *
  */
+#include <memory>
 #include <string>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "CxxParser.h"
-#include "IndexerStateInfo.h"
-#include "IntermediateStorage.h"
-#include "MockedApplicationSetting.hpp"
-#include "ParserClientImpl.h"
-#include "TestFileRegister.h"
+#include "CxxParserStdTestHelper.hpp"
 #include "TestStorage.h"
-#include "TextAccess.h"
-#include "utility.h"
 
 namespace {
 
@@ -33,30 +28,10 @@ namespace {
 using namespace std::string_literals;
 
 std::shared_ptr<TestStorage> parseCode(const std::string& code, const std::vector<std::wstring>& compilerFlags = {}) {
-  auto storage = std::make_shared<IntermediateStorage>();
-
-  CxxParser parser(std::make_shared<ParserClientImpl>(storage.get()),
-                   std::make_shared<TestFileRegister>(),
-                   std::make_shared<IndexerStateInfo>());
-
-  parser.buildIndex(L"temp.cpp",
-                    TextAccess::createFromString(code),
-                    utility::concat(compilerFlags, std::vector<std::wstring>(1, L"-std=c++14")));
-
-  return TestStorage::create(storage);
+  return cxx_test::parseCode(code, L"-std=c++14", compilerFlags);
 }
 
-struct CxxParser14TestSuite : testing::Test {
-  void SetUp() override {
-    IApplicationSettings::setInstance(mMocked);
-    EXPECT_CALL(*mMocked, getLoggingEnabled).WillRepeatedly(testing::Return(false));
-  }
-
-  void TearDown() override {
-    IApplicationSettings::setInstance(nullptr);
-  }
-  std::shared_ptr<MockedApplicationSettings> mMocked = std::make_shared<MockedApplicationSettings>();
-};
+struct CxxParser14TestSuite : cxx_test::CxxParserStdTest {};
 
 /**
  * TODO: Add a test for the following feature
