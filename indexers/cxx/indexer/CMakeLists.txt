@@ -8,22 +8,16 @@ else()
   endforeach()
 endif()
 
-add_executable(Sourcetrail_indexer main.cpp)
-
-if(BUILD_CXX_LANGUAGE_PACKAGE)
-  target_sources(Sourcetrail_indexer PRIVATE CxxHelperMode.cpp CxxHelperMode.h)
-endif()
+add_executable(Sourcetrail_indexer main.cpp CxxHelperMode.cpp CxxHelperMode.h)
 
 set_target_properties(Sourcetrail_indexer PROPERTIES OUTPUT_NAME sourcetrail_indexer)
 
 # Advertise the built-in C/C++ indexer as a discoverable plugin. The manifest is the only way its
 # executable is resolved -- no special case in TaskBuildIndex -- so indexerExecutable has to point at
 # the real binary, which sits two levels up from <plugins>/cxx/ in both the build and install layouts.
-if(BUILD_CXX_LANGUAGE_PACKAGE)
-  set(CXX_PLUGIN_DIR "${CMAKE_BINARY_DIR}/app/plugins/cxx")
-  set(CXX_INDEXER_RELATIVE_PATH "../../sourcetrail_indexer${CMAKE_EXECUTABLE_SUFFIX}")
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml.in "${CXX_PLUGIN_DIR}/manifest.xml" @ONLY)
-endif()
+set(CXX_PLUGIN_DIR "${CMAKE_BINARY_DIR}/app/plugins/cxx")
+set(CXX_INDEXER_RELATIVE_PATH "../../sourcetrail_indexer${CMAKE_EXECUTABLE_SUFFIX}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml.in "${CXX_PLUGIN_DIR}/manifest.xml" @ONLY)
 
 if(WIN32)
   # hide the console when running a release build.
@@ -44,7 +38,7 @@ endif()
 
 target_link_libraries(
   Sourcetrail_indexer
-  PRIVATE $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
+  PRIVATE Sourcetrail::lib::lib_cxx
           Sourcetrail::lib::core
           Sourcetrail::lib::lib_engine
           Sourcetrail::lib::proto::convert

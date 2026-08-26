@@ -196,12 +196,10 @@ add_subdirectory(src/lib/core)
 add_subdirectory(src/lib/scheduling)
 add_subdirectory(src/lib/messaging)
 add_subdirectory(src/lib/core/utility/utilityApp)
-# Lib Cxx ------------------------------------------------------------------------------------------------------------------------
+# C/C++ indexer plugin (Clang/LibTooling language package + worker executable) -----------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_subdirectory(indexers/cxx/lib)
+  add_subdirectory(indexers/cxx)
 endif()
-# Indexer App --------------------------------------------------------------------------------------------------------------------
-add_subdirectory(indexers/cxx/indexer)
 # Java indexer plugin (Maven-built, pure-JVM gRPC worker) -------------------------------------------------------------------------
 if(BUILD_JAVA_INDEXER)
   add_subdirectory(indexers/java)
@@ -266,12 +264,12 @@ create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user"
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
 
-install(
-  TARGETS Sourcetrail
-          Sourcetrail_indexer
-          Sourcetrail_cli
-          Sourcetrail_engine
-  RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+install(TARGETS Sourcetrail Sourcetrail_cli Sourcetrail_engine RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+
+# The indexer worker only exists when a language package was built (see indexers/cxx/).
+if(TARGET Sourcetrail_indexer)
+  install(TARGETS Sourcetrail_indexer RUNTIME DESTINATION ${INSTALL_RUNTIME_DIR})
+endif()
 
 # gui/ and fonts/ are compiled into the binary via bin/app/resource.qrc, so they are not installed.
 install(

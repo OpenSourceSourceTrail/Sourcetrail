@@ -24,4 +24,8 @@ if(APPLE)
   target_link_libraries(Sourcetrail_cli PRIVATE ${CORE_FOUNDATION})
 endif()
 
-add_dependencies(Sourcetrail_cli Sourcetrail_indexer versionnumber)
+add_dependencies(Sourcetrail_cli versionnumber)
+
+if(TARGET Sourcetrail_indexer)
+  add_dependencies(Sourcetrail_cli Sourcetrail_indexer)
+endif()
