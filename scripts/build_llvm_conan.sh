@@ -7,6 +7,7 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RECIPE_DIR="${REPO_ROOT}/.conan/recipes/llvm-clang"
 REFERENCE="llvm-clang/22.1.8"
+LLVM_BUILD_JOBS="${LLVM_BUILD_JOBS:-}"
 
 cd "${REPO_ROOT}"
 
@@ -15,6 +16,7 @@ mkdir -p .conan/llvm
 conan export "${RECIPE_DIR}"
 conan install --requires="${REFERENCE}" --build=missing \
   -s build_type=Release -pr:a .conan/gcc/profile -of .conan/llvm \
+  ${LLVM_BUILD_JOBS:+-c tools.build:jobs="${LLVM_BUILD_JOBS}"} \
   --format=json >.conan/llvm/graph.json
 
 # `conan cache path <ref>` resolves the *recipe* folder, so take the binary package folder
