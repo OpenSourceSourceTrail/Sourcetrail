@@ -1,7 +1,7 @@
 package com.sourcetrail.indexer;
 
 /**
- * Argv contract (matches src/app/indexer/main.cpp):
+ * Argv contract (matches indexers/cxx/indexer/main.cpp):
  * {@code <processId> --engine-endpoint <host:port> <sharedDataPath> <userDataPath> [logFilePath]}
  */
 public final class Main {

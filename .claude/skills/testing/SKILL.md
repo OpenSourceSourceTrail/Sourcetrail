@@ -32,7 +32,7 @@ ctest
 
 - `src/lib/lib/tests/` — core business logic
 - `src/lib/lib_gui/tests/` — GUI
-- `src/lib/lib_cxx/tests/` — C/C++ language package
+- `indexers/cxx/lib/tests/` — C/C++ language package
 - `tests/` — integration tests
 
 New test targets use `add_sourcetrail_test()` (see `cmake/add_sourcetrail_test.cmake`).

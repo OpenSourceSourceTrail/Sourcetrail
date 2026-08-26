@@ -64,7 +64,7 @@ With a hand-built LLVM, point at it instead:
 ```
 cmake --preset=ci_gnu_release_build_cxx -DClang_DIR=<path/to/llvm_build>/lib/cmake/clang
 ```
-The `build_cxx` presets default `Clang_DIR` to `<repo>/external/lib/cmake/clang/`. This turns on `src/lib/lib_cxx` and installs the built-in C/C++ indexer plugin manifest.
+The `build_cxx` presets default `Clang_DIR` to `<repo>/external/lib/cmake/clang/`. This turns on `indexers/cxx` (the language package plus the indexer worker) and installs the built-in C/C++ indexer plugin manifest. Without it, no indexer worker binary is built at all.
 
 ### Running
 
@@ -80,7 +80,7 @@ Everything lands in `build/app/`, alongside the `data`, `user` and `plugins` dir
 ## Tests
 
 GTest/GMock through CTest.
-- **Unit tests** (`ENABLE_UNIT_TEST`): `src/lib/lib/tests`, `src/lib/lib_gui/tests`, `src/lib/client/tests`, `src/lib/core/tests`, `src/lib/messaging/tests`, `src/lib/lib_cxx/tests` (only with `BUILD_CXX_LANGUAGE_PACKAGE=ON`).
+- **Unit tests** (`ENABLE_UNIT_TEST`): `src/lib/lib/tests`, `src/lib/lib_gui/tests`, `src/lib/client/tests`, `src/lib/core/tests`, `src/lib/messaging/tests`, `indexers/cxx/lib/tests` (only with `BUILD_CXX_LANGUAGE_PACKAGE=ON`).
 - **Integration tests** (`ENABLE_INTEGRATION_TEST`): `tests/integration/{lib,lib_cxx,messaging}` — real SQLite round-trips, `MessageQueue`.
 - **GUI tests** (`ENABLE_GUI_TEST`): `src/lib/lib_gui/tests/gui`.
 
@@ -107,7 +107,7 @@ New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sour
 | --- | --- | --- |
 | `Sourcetrail` | `src/app/gui` | Qt GUI. **Owns no database** — reads everything through the engine. |
 | `sourcetrail_engine` | `src/app/engine` | Headless HTTP daemon (`EngineHttpService`). Owns the SQLite index, the project state machine and the indexing task graph. |
-| `sourcetrail_indexer` | `src/app/indexer` | Indexer worker process, spawned per indexing job. |
+| `sourcetrail_indexer` | `indexers/cxx/indexer` | Indexer worker process, spawned per indexing job. Built only with `BUILD_CXX_LANGUAGE_PACKAGE`. |
 | `Sourcetrail_cli` | `src/app/cli` | Headless, Qt-free front end. |
 
 `QtEngineSupervisor` (`src/lib/lib_gui`) spawns the engine with `--port 0`; the engine prints
@@ -138,14 +138,13 @@ The GUI/engine split is enforced at link time: `Sourcetrail_lib` holds the UI-ag
   - `data/indexer` — `IndexerCommand`/`IndexerComposite`/`*CommandProvider` describe work; `data/indexer/grpc` (`GrpcIndexer`, `IndexerWorkerServiceImpl`) runs it in worker processes, orchestrated by `TaskBuildIndex`/`TaskFillIndexerCommandQueue`, merged back via `TaskMergeStorages`.
   - `factory` — `IFactory` abstracts construction of GUI-specific objects so `lib` stays toolkit-agnostic.
 - **`lib_gui`** — the Qt6 GUI: `qt/window`, `qt/view`, `qt/element`, `qt/graphics`, `qt/network`, `qt/project_wizard`, plus `QtEngineSupervisor`. Platform quirks live behind `platform_includes/includes{Windows,Linux,Mac}.h`.
-- **`lib_cxx`** (gated by `BUILD_CXX_LANGUAGE_PACKAGE`) — the C/C++ indexer on Clang/LibTooling; provides `LanguagePackageCxx`.
 - **`external`** — vendored third-party code (`sqlite`), wrapped as `CppSQLite::CppSQLite3`.
 
-`indexers/` holds out-of-tree indexer plugins: `indexers/java` (Maven-built JVM gRPC worker), `indexers/cxx` (docs for the built-in one).
+`indexers/` holds the indexer plugins, one directory per plugin: `indexers/java` (Maven-built JVM gRPC worker) and `indexers/cxx` — the built-in C/C++ one, whose `lib/` is the Clang/LibTooling language package (`LanguagePackageCxx`, gated by `BUILD_CXX_LANGUAGE_PACKAGE`) and whose `indexer/` is the `sourcetrail_indexer` worker executable that hosts it.
 
 ### Indexer plugins
 
-Every indexer — including the built-in C/C++ one — is resolved through a manifest at `build/app/plugins/<name>/manifest.xml`, generated from `src/app/indexer/manifest.xml.in`. `IndexerPluginRegistry::discover()` reads them at engine startup; there is **no special case for the built-in indexer** in `TaskBuildIndex`. The engine reports the resulting source-group types over `GetCapabilities`, so a build without the C/C++ package simply offers fewer project types in the wizard.
+Every indexer — including the built-in C/C++ one — is resolved through a manifest at `build/app/plugins/<name>/manifest.xml`, generated from `indexers/cxx/indexer/manifest.xml.in`. `IndexerPluginRegistry::discover()` reads them at engine startup; there is **no special case for the built-in indexer** in `TaskBuildIndex`. The engine reports the resulting source-group types over `GetCapabilities`, so a build without the C/C++ package simply offers fewer project types in the wizard.
 
 ### Versioning
 

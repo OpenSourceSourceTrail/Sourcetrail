@@ -13,7 +13,6 @@ src/
     gui/                Main GUI application binary (Sourcetrail)
     cli/                Headless, Qt-free CLI client (Sourcetrail_cli)
     engine/             HTTP+JSON service impl for the engine daemon (Sourcetrail_engine)
-    indexer/            Separate indexer worker process (Sourcetrail_indexer)
   lib/                  Libraries
     proto/              Payload schema (*.proto) + Convert helpers (storage <-> proto) + ProtoJson
     core/                Fine-grained utility libraries (file system, logging, config,
@@ -27,10 +26,15 @@ src/
       project/           Project lifecycle (load, refresh, build index)
       settings/          ProjectSettings and source group settings
       utility/           Lib-specific helpers
-    lib_cxx/             Optional C/C++ language package (requires LLVM/Clang)
     lib_gui/             Qt 6 GUI implementation (QtApplication, Qt views/windows)
     messaging/           Pub/sub message bus
     scheduling/          Behavior-tree task scheduler
+
+indexers/               Indexer plugins, one directory per plugin
+  cxx/                  Built-in C/C++ indexer (BUILD_CXX_LANGUAGE_PACKAGE)
+    indexer/            Worker process (Sourcetrail_indexer)
+    lib/                Clang/LibTooling language package (LanguagePackageCxx)
+  java/                 Maven-built JVM gRPC worker (BUILD_JAVA_INDEXER)
 ```
 
 ## Messaging (`src/lib/messaging/`)
@@ -51,6 +55,6 @@ Behavior-tree–style task system. `TaskRunner` drives execution; `Blackboard` p
 - Decorators: `TaskDecoratorRepeat`, `TaskDecoratorDelay`
 - Indexing pipelines are assembled as task trees via `ITaskFactory` (`lib/lib/project/ITaskFactory.h`); default implementation `IndexTaskBuilder` (`lib/lib/project/IndexTaskBuilder.{h,cpp}`) — extracted from the former `Project::createIndexTasks()`.
 
-## C/C++ indexing (`src/lib/lib_cxx/`)
+## C/C++ indexing (`indexers/cxx/lib/`)
 
 `LanguagePackageCxx` registers the CXX source groups and indexer. Uses Clang's LibTooling/LibASTMatchers to traverse the AST and populate `IntermediateStorage`. Only compiled when `BUILD_CXX_LANGUAGE_PACKAGE=ON`.

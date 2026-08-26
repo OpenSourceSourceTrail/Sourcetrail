@@ -45,4 +45,4 @@ which is what gRPC is good at. `indexer_worker.proto` is the only file that stil
 
 - `Sourcetrail` (GUI) — the only client of boundary A. `Sourcetrail_cli` is **not** a client: it opens the database in-process via `lib_engine` and links neither `Sourcetrail_client` nor gRPC.
 - `Sourcetrail_engine` — engine daemon (HTTP server for clients, gRPC server for workers; entry point in `src/app/engine/`)
-- `Sourcetrail_indexer` — indexer worker process (entry point in `src/app/indexer/`)
+- `Sourcetrail_indexer` — indexer worker process (entry point in `indexers/cxx/indexer/`)

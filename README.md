@@ -28,7 +28,7 @@ Sourcetrail is split into several processes that talk over gRPC:
 | --- | --- |
 | `Sourcetrail` | Qt GUI. Owns no database; it supervises the engine and reads everything through it. |
 | `Sourcetrail_engine` | Headless daemon. Owns the SQLite index and serves the GUI/CLI over gRPC. |
-| `Sourcetrail_indexer` | Indexer worker process, spawned per indexing job. |
+| `Sourcetrail_indexer` | Indexer worker process, spawned per indexing job. Built from `indexers/cxx/` only when `BUILD_CXX_LANGUAGE_PACKAGE` is on. |
 | `Sourcetrail_cli` | Headless, Qt-free front end. |
 
 Indexers are plugins: each ships a manifest under `<build>/app/plugins/<name>/` and the

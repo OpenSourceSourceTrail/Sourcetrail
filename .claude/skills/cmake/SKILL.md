@@ -48,7 +48,7 @@ cmake --build build-debug
 
 | Option | Default | Description |
 |---|---|---|
-| `BUILD_CXX_LANGUAGE_PACKAGE` | OFF | Enable C/C++ indexer via LLVM/Clang |
+| `BUILD_CXX_LANGUAGE_PACKAGE` | OFF | Build `indexers/cxx` — the C/C++ language package and the `Sourcetrail_indexer` worker. Off means no indexer worker binary at all. |
 | `ENABLE_UNIT_TEST` | OFF | Build unit tests |
 | `ENABLE_INTEGRATION_TEST` | OFF | Build integration tests |
 | `SR_SAN` | "" | Comma-separated sanitizers applied build-wide: `address`, `undefined`, `thread`, `memory` (GNU+Clang; `memory` is Clang-only) |
