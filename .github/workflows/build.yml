@@ -159,21 +159,25 @@ jobs:
               name: "Ubuntu Latest GCC",
               tag: gnu,
               "with_cxx": "",
+              "binary_dir": "build",
             }
           - {
               name: "Ubuntu Latest GCC with cxx_build",
               tag: gnu,
               "with_cxx": "_build_cxx",
+              "binary_dir": "build-cxx",
             }
           - {
               name: "Ubuntu Latest CLang",
               tag: "clang",
               "with_cxx": "",
+              "binary_dir": "build",
             }
           - {
               name: "Ubuntu Latest CLang cxx_build",
               tag: "clang",
               "with_cxx": "_build_cxx",
+              "binary_dir": "build-cxx",
             }
 
     name: ${{ matrix.config.name }}
@@ -287,7 +291,7 @@ jobs:
       - name: Build
         run: |
           set -eo pipefail  # Stop on first error
-          cmake --build ${{github.workspace}}/build | tee ${{github.workspace}}/build/build.log
+          cmake --build ${{github.workspace}}/${{ matrix.config.binary_dir }} | tee ${{github.workspace}}/${{ matrix.config.binary_dir }}/build.log
           exit ${PIPESTATUS[0]}
 
       - name: Upload build logs on failure
@@ -295,27 +299,27 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-logs-${{ matrix.config.tag }}${{ matrix.config.with_cxx }}
-          path: ${{github.workspace}}/build/build.log
+          path: ${{github.workspace}}/${{ matrix.config.binary_dir }}/build.log
           retention-days: 7
 
       - name: Count warnings
-        run: grep -c "warning:" ${{github.workspace}}/build/build.log
+        run: grep -c "warning:" ${{github.workspace}}/${{ matrix.config.binary_dir }}/build.log
 
       - name: Test
-        run: ctest -Q --test-dir ${{github.workspace}}/build --output-junit ${{github.workspace}}/build/report.xml
+        run: ctest -Q --test-dir ${{github.workspace}}/${{ matrix.config.binary_dir }} --output-junit ${{github.workspace}}/${{ matrix.config.binary_dir }}/report.xml
 
       - name: Upload ctest logs on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: ctest-logs-${{ matrix.config.tag }}${{ matrix.config.with_cxx }}
-          path: ${{github.workspace}}/build/report.xml
+          path: ${{github.workspace}}/${{ matrix.config.binary_dir }}/report.xml
           retention-days: 7
 
       - name: Publish Test Report for ${{ matrix.config.name }}
         uses: mikepenz/action-junit-report@v4
         with:
-          report_paths: ${{github.workspace}}/build/report.xml
+          report_paths: ${{github.workspace}}/${{ matrix.config.binary_dir }}/report.xml
           include_passed: true
           detailed_summary: true
 
@@ -325,9 +329,9 @@ jobs:
         with:
           name: build-artifact-${{ github.event.number }}
           path: |
-            ${{ github.workspace }}/build/compile_commands.json
-            ${{ github.workspace }}/build/Sourcetrail_lib_gui_autogen
-            ${{ github.workspace }}/build/src
+            ${{ github.workspace }}/${{ matrix.config.binary_dir }}/compile_commands.json
+            ${{ github.workspace }}/${{ matrix.config.binary_dir }}/Sourcetrail_lib_gui_autogen
+            ${{ github.workspace }}/${{ matrix.config.binary_dir }}/src
 
   clang_tidy:
     needs: build
