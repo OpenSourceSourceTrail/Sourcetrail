@@ -3,6 +3,7 @@
 #include <grpcpp/grpcpp.h>
 
 #include "Application.h"
+#include "CompilationDatabase.h"
 #include "ConvertGraph.h"
 #include "ConvertLocations.h"
 #include "ConvertQuery.h"
@@ -27,6 +28,7 @@
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "type/MessageRefresh.h"
+#include "utilitySourceGroupCxx.h"
 #include "utilityString.h"
 #include "Version.h"
 
@@ -104,6 +106,33 @@ grpc::Status EngineServiceImpl::GetCapabilities(grpc::ServerContext* /*ctx*/,
 
   resp->set_can_create_project(resp->supported_source_group_types_size() > 0);
   resp->set_engine_version(Version::getApplicationVersion().toString());
+  return grpc::Status::OK;
+}
+
+grpc::Status EngineServiceImpl::GetCompilationDatabaseInfo(grpc::ServerContext* /*ctx*/,
+                                                           const sourcetrail::CompilationDatabaseInfoRequest* req,
+                                                           sourcetrail::CompilationDatabaseInfoResponse* resp) {
+  const FilePath cdbPath(utility::decodeFromUtf8(req->cdb_path()));
+  if(cdbPath.empty() || !cdbPath.exists()) {
+    resp->set_error("The provided Compilation Database path does not exist.");
+    return grpc::Status::OK;
+  }
+
+  std::string error;
+  const std::optional<std::vector<CxxCompileCommand>> commands = utility::loadCompilationDatabase(cdbPath, &error);
+  if(!commands) {
+    resp->set_error(error.empty() ? "Unable to open and read the provided compilation database file." : error);
+    return grpc::Status::OK;
+  }
+
+  resp->set_valid(true);
+  for(const FilePath& path : utility::getSourceFilesFromCDB(*commands, cdbPath)) {
+    resp->add_source_files(utility::encodeToUtf8(path.wstr()));
+  }
+  for(const FilePath& path : utility::CompilationDatabase(*commands).getAllHeaderPaths()) {
+    resp->add_header_paths(utility::encodeToUtf8(path.wstr()));
+  }
+  resp->set_contains_include_pch_flags(utility::containsIncludePchFlags(*commands));
   return grpc::Status::OK;
 }
 

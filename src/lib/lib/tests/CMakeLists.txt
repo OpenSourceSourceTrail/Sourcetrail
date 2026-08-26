@@ -21,7 +21,10 @@ set(test_lib_names
     GraphTestSuite
     GraphViewStyleTestSuite # TODO(SOUR-97)
     HierarchyCacheTestSuite
+    IncludeDirectiveTestSuite
+    utilitySourceGroupCxxTestSuite
     IndexerCommandJavaTestSuite
+    IndexerWireEnumsTestSuite
     IndexerCompositeTestSuite
     IndexerPluginRegistryTestSuite
     IntermediateStorageTestSuite
@@ -78,6 +81,8 @@ endforeach()
 target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::lib::core::utility::ScopedFunctor)
 
 target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::lib::core::utility::SingleValueCache)
+
+target_link_libraries(IncludeDirectiveTestSuite PRIVATE Sourcetrail::lib::core::utility::file::ScopedTemporaryFile)
 
 # target_link_libraries(StatusBarControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
 # target_link_libraries(StatusControllerTestSuite PRIVATE Sourcetrail::lib::messaging)

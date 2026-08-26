@@ -224,6 +224,25 @@ add_subdirectory(src/app/gui)
 add_subdirectory(src/app/cli)
 # Engine daemon (Qt-free) ---------------------------------------------------------------------------------------------------------
 add_subdirectory(src/app/engine)
+# Language-package isolation -------------------------------------------------------------------------------------------------------
+# Only the indexer worker may link a language package. If one creeps back into the GUI, the engine or the
+# shared libraries, they stop compiling identically with and without BUILD_CXX_LANGUAGE_PACKAGE and the
+# gRPC enums start depending on the build flag again. Fail the configure instead of finding out at runtime.
+foreach(
+  _target
+  Sourcetrail_lib
+  Sourcetrail_lib_engine
+  Sourcetrail_lib_gui
+  Sourcetrail
+  Sourcetrail_engine
+  Sourcetrail_cli)
+  if(TARGET ${_target})
+    get_target_property(_libs ${_target} LINK_LIBRARIES)
+    if(_libs MATCHES "lib_cxx")
+      message(FATAL_ERROR "${_target} must not link a language package; only Sourcetrail_indexer may.")
+    endif()
+  endif()
+endforeach()
 # Tests --------------------------------------------------------------------------------------------------------------------------
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST

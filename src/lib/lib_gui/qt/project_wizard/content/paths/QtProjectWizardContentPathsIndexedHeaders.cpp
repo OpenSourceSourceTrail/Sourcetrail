@@ -3,10 +3,8 @@
 #include <QGridLayout>
 #include <QMessageBox>
 
-#include "CompilationDatabase.h"
-#include "IndexerCommandCxx.h"
+#include "CompilationDatabaseInfo.h"
 #include "logging.h"
-#include "OrderedCache.h"
 #include "QtPathListDialog.h"
 #include "QtSelectPathsDialog.h"
 #include "QtTextEditDialog.h"
@@ -18,20 +16,19 @@ std::vector<FilePath> QtProjectWizardContentPathsIndexedHeaders::getIndexedPaths
     std::shared_ptr<const SourceGroupSettingsCxxCdb> settings) {
   std::set<FilePath> indexedHeaderPaths;
   {
-    const FilePath cdbPath = settings->getCompilationDatabasePathExpandedAndAbsolute();
-    if(!cdbPath.empty() && cdbPath.exists()) {
-      for(const FilePath& path : IndexerCommandCxx::getSourceFilesFromCDB(cdbPath)) {
+    const client::CompilationDatabaseInfo info = client::inspectCompilationDatabase(
+        settings->getCompilationDatabasePathExpandedAndAbsolute());
+    if(info.valid) {
+      for(const FilePath& path : info.sourceFiles) {
         indexedHeaderPaths.insert(path.getCanonical().getParentDirectory());
       }
-      for(const FilePath& path : utility::CompilationDatabase(cdbPath).getAllHeaderPaths()) {
+      for(const FilePath& path : info.headerPaths) {
         if(path.exists()) {
           indexedHeaderPaths.insert(path.getCanonical());
         }
       }
     } else {
-      LOG_WARNING(
-          "Unable to fetch indexed header paths. The provided Compilation Database path does "
-          "not exist.");
+      LOG_WARNING("Unable to fetch indexed header paths. " + info.error);
     }
   }
 

@@ -25,6 +25,11 @@ service EngineService {
   rpc GetCapabilities(EmptyRequest) returns (CapabilitiesResponse);
   rpc IndexingInterrupted(IndexingInterruptedRequest) returns (IndexingInterruptedResponse);
 
+  // Everything the project wizard needs to know about a compile_commands.json. Parsing one needs a
+  // C/C++ language package, which a client must not link -- so the client asks the engine, and an
+  // engine without that package simply answers "not valid" with a reason to show the user.
+  rpc GetCompilationDatabaseInfo(CompilationDatabaseInfoRequest) returns (CompilationDatabaseInfoResponse);
+
   // Asks the engine to exit. SIGTERM does not exist on Windows, so a parent process that spawned
   // the engine cannot portably signal it -- this RPC is the cross-platform shutdown path.
   rpc Shutdown(EmptyRequest) returns (EmptyResponse);
@@ -337,6 +342,19 @@ message CapabilitiesResponse {
 }
 message IndexingInterruptedRequest {}
 message IndexingInterruptedResponse {}
+
+message CompilationDatabaseInfoRequest { string cdb_path = 1; }
+message CompilationDatabaseInfoResponse {
+  // False when the file is missing, malformed, or this engine has no C/C++ package; `error` says
+  // which, and the remaining fields are empty.
+  bool valid = 1;
+  string error = 2;
+  // Absolute canonical paths, unfiltered: exclude filters are the client's business.
+  repeated string source_files = 3;
+  // Every include path the compile commands mention -- user, system and framework alike.
+  repeated string header_paths = 4;
+  bool contains_include_pch_flags = 5;
+}
 
 message AddNodeBookmarkRequest {
   ProtoBookmark base = 1;

@@ -2,17 +2,14 @@
 
 #include <QMessageBox>
 
-#include "language_packages.h"
-#include "SourceGroupCustomCommand.h"
-#include "SourceGroupSettingsCustomCommand.h"
+#include "FileManager.h"
+#include "FilePathFilter.h"
+#include "SourceGroupSettings.h"
+#include "SourceGroupSettingsWithExcludeFilters.h"
+#include "SourceGroupSettingsWithSourceExtensions.h"
 #include "SourceGroupSettingsWithSourcePaths.h"
 #include "utility.h"
 #include "utilityFile.h"
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "SourceGroupCxxEmpty.h"
-#  include "SourceGroupSettingsWithCxxPathsAndFlags.h"
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 QtProjectWizardContentPathsSource::QtProjectWizardContentPathsSource(std::shared_ptr<SourceGroupSettings> settings,
                                                                      QtProjectWizardWindow* window)
@@ -70,20 +67,25 @@ bool QtProjectWizardContentPathsSource::check() {
 }
 
 std::vector<FilePath> QtProjectWizardContentPathsSource::getFilePaths() const {
-  std::set<FilePath> allSourceFilePaths;
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
-  if(std::dynamic_pointer_cast<SourceGroupSettingsWithCxxPathsAndFlags>(m_settings)) {
-    allSourceFilePaths = SourceGroupCxxEmpty(m_settings).getAllSourceFilePaths();
-  }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-
-  if(std::shared_ptr<SourceGroupSettingsCustomCommand> settings = std::dynamic_pointer_cast<SourceGroupSettingsCustomCommand>(
-         m_settings)) {
-    allSourceFilePaths = SourceGroupCustomCommand(settings).getAllSourceFilePaths();
+  // Every source group whose files come from "scan these paths for these extensions" is listed the
+  // same way, whatever language it indexes. Asking the settings components rather than a concrete
+  // SourceGroup is what keeps this out of the language packages.
+  const auto pathSettings = std::dynamic_pointer_cast<SourceGroupSettingsWithSourcePaths>(m_settings);
+  const auto extensionSettings = std::dynamic_pointer_cast<SourceGroupSettingsWithSourceExtensions>(m_settings);
+  if(!pathSettings || !extensionSettings) {
+    return {};
   }
 
-  return utility::getAsRelativeIfShorter(utility::toVector(allSourceFilePaths), m_settings->getProjectDirectoryPath());
+  std::vector<FilePathFilter> excludeFilters;
+  if(const auto filterSettings = std::dynamic_pointer_cast<SourceGroupSettingsWithExcludeFilters>(m_settings)) {
+    excludeFilters = filterSettings->getExcludeFiltersExpandedAndAbsolute();
+  }
+
+  FileManager fileManager;
+  fileManager.update(pathSettings->getSourcePathsExpandedAndAbsolute(), excludeFilters, extensionSettings->getSourceExtensions());
+
+  return utility::getAsRelativeIfShorter(
+      utility::toVector(fileManager.getAllSourceFilePaths()), m_settings->getProjectDirectoryPath());
 }
 
 QString QtProjectWizardContentPathsSource::getFileNamesTitle() const {

@@ -29,6 +29,11 @@ public:
   /** Drops the cache so the next query re-asks; call after the engine restarts. */
   void invalidate();
 
+  /** The engine connection the client side shares; null while no engine is reachable. */
+  [[nodiscard]] EngineChannel* channel() const {
+    return mChannel;
+  }
+
   [[nodiscard]] bool canCreateProject() const;
   [[nodiscard]] bool supportsSourceGroupType(SourceGroupType type) const;
 

@@ -7,11 +7,9 @@
 // internal
 #include "ProjectWizardModel.hpp"
 #include "QtProjectWizardContentPathsIndexedHeaders.h"
-#include "SourceGroupCxxCdb.h"
 #include "SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
 #include "utilityFile.h"
-#include "utilitySourceGroupCxx.h"
 
 QtProjectWizardContentPathCDB::QtProjectWizardContentPathCDB(std::shared_ptr<ProjectWizardModel> model,
                                                              QtProjectWizardWindow* window)

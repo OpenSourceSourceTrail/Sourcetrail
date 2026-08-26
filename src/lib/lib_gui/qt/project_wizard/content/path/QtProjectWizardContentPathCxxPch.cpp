@@ -2,12 +2,11 @@
 
 #include <QMessageBox>
 
-#include "IndexerCommandCxx.h"
+#include "CompilationDatabaseInfo.h"
 #include "SourceGroupSettingsCxxCdb.h"
 #include "SourceGroupSettingsWithCxxPchOptions.h"
 #include "utility.h"
 #include "utilityFile.h"
-#include "utilitySourceGroupCxx.h"
 
 QtProjectWizardContentPathCxxPch::QtProjectWizardContentPathCxxPch(std::shared_ptr<SourceGroupSettings> settings,
                                                                    std::shared_ptr<SourceGroupSettingsWithCxxPchOptions> settingsCxxPch,
@@ -44,16 +43,16 @@ void QtProjectWizardContentPathCxxPch::save() {
 
 bool QtProjectWizardContentPathCxxPch::check() {
   if(std::shared_ptr<SourceGroupSettingsCxxCdb> cdbSettings = std::dynamic_pointer_cast<SourceGroupSettingsCxxCdb>(m_settings)) {
-    const FilePath cdbPath = cdbSettings->getCompilationDatabasePathExpandedAndAbsolute();
-    std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath);
-    if(!cdb) {
+    const client::CompilationDatabaseInfo info = client::inspectCompilationDatabase(
+        cdbSettings->getCompilationDatabasePathExpandedAndAbsolute());
+    if(!info.valid) {
       QMessageBox msgBox(m_window);
-      msgBox.setText(QStringLiteral("Unable to open and read the provided compilation database file."));
+      msgBox.setText(QString::fromStdString(info.error));
       msgBox.exec();
       return false;
     }
 
-    if(utility::containsIncludePchFlags(cdb)) {
+    if(info.containsIncludePchFlags) {
       if(m_settingsCxxPch->getPchInputFilePath().empty()) {
         QMessageBox msgBox(m_window);
         msgBox.setText(

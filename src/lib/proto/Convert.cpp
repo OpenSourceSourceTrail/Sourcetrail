@@ -1,7 +1,10 @@
 #include "Convert.h"
 
 #include "IndexerCommand.h"
+#include "IndexerCommandCxx.h"
+#include "IndexerCommandJava.h"
 #include "IntermediateStorage.h"
+#include "logging.h"
 #include "StorageComponentAccess.h"
 #include "StorageEdge.h"
 #include "StorageError.h"
@@ -11,15 +14,7 @@
 #include "StorageOccurrence.h"
 #include "StorageSourceLocation.h"
 #include "StorageSymbol.h"
-#include "language_packages.h"
-#include "logging.h"
 #include "utilityString.h"
-
-#include "IndexerCommandJava.h"
-
-#if BUILD_CXX_LANGUAGE_PACKAGE
-#  include "IndexerCommandCxx.h"
-#endif
 
 namespace proto::convert {
 
@@ -49,10 +44,8 @@ sourcetrail::StorageEdge toProto(const StorageEdge& edge) {
 }
 
 StorageEdge fromProto(const sourcetrail::StorageEdge& msg) {
-  return StorageEdge(static_cast<Id>(msg.id()),
-                     msg.type(),
-                     static_cast<Id>(msg.source_node_id()),
-                     static_cast<Id>(msg.target_node_id()));
+  return StorageEdge(
+      static_cast<Id>(msg.id()), msg.type(), static_cast<Id>(msg.source_node_id()), static_cast<Id>(msg.target_node_id()));
 }
 
 // ---- StorageFile -----------------------------------------------------------
@@ -179,7 +172,6 @@ sourcetrail::IndexerCommand toProto(const IndexerCommand* cmd) {
   sourcetrail::IndexerCommand msg;
   msg.set_source_file_path(utility::encodeToUtf8(cmd->getSourceFilePath().wstr()));
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
   if(const auto* cxx = dynamic_cast<const IndexerCommandCxx*>(cmd)) {
     msg.set_type(sourcetrail::IndexerCommand::CXX);
 
@@ -198,7 +190,6 @@ sourcetrail::IndexerCommand toProto(const IndexerCommand* cmd) {
     }
     return msg;
   }
-#endif
 
   if(const auto* java = dynamic_cast<const IndexerCommandJava*>(cmd)) {
     msg.set_type(sourcetrail::IndexerCommand::JAVA);
@@ -217,7 +208,6 @@ sourcetrail::IndexerCommand toProto(const IndexerCommand* cmd) {
 
 std::shared_ptr<IndexerCommand> fromProto(const sourcetrail::IndexerCommand& msg) {
   switch(msg.type()) {
-#if BUILD_CXX_LANGUAGE_PACKAGE
   case sourcetrail::IndexerCommand::CXX: {
     FilePath sourceFilePath(utility::decodeFromUtf8(msg.source_file_path()));
 
@@ -246,7 +236,6 @@ std::shared_ptr<IndexerCommand> fromProto(const sourcetrail::IndexerCommand& msg
     return std::make_shared<IndexerCommandCxx>(
         sourceFilePath, indexedPaths, excludeFilters, includeFilters, workingDir, compilerFlags);
   }
-#endif
 
   case sourcetrail::IndexerCommand::JAVA: {
     FilePath sourceFilePath(utility::decodeFromUtf8(msg.source_file_path()));

@@ -181,6 +181,9 @@ target_sources(
           data/indexer/IndexerCommand.h
           data/indexer/IndexerCommandCustom.cpp
           data/indexer/IndexerCommandCustom.h
+          data/indexer/CxxIndexerCommandProvider.cpp
+          data/indexer/CxxIndexerCommandProvider.h
+          data/indexer/IndexerCommandCxx.cpp
           data/indexer/IndexerCommandJava.cpp
           data/indexer/IndexerCommandJava.h
           data/indexer/IndexerCommandProvider.cpp
@@ -275,6 +278,12 @@ target_sources(
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
           data/TaskMergeStorages.h
+          project/CompilationDatabase.cpp
+          project/CompilationDatabase.h
+          project/CxxToolchainRemote.cpp
+          project/CxxToolchainRemote.h
+          project/ICxxToolchain.cpp
+          project/ICxxToolchain.h
           project/IProject.cpp
           project/IProject.hpp
           project/RefreshInfo.h
@@ -282,16 +291,24 @@ target_sources(
           project/SourceGroup.h
           project/SourceGroupCustomCommand.cpp
           project/SourceGroupCustomCommand.h
+          project/SourceGroupCxxCdb.cpp
+          project/SourceGroupCxxCdb.h
+          project/SourceGroupCxxEmpty.cpp
+          project/SourceGroupCxxEmpty.h
           project/SourceGroupFactory.cpp
           project/SourceGroupFactory.h
           project/SourceGroupFactoryModule.cpp
           project/SourceGroupFactoryModule.h
           project/SourceGroupFactoryModuleCustom.cpp
           project/SourceGroupFactoryModuleCustom.h
+          project/SourceGroupFactoryModuleCxx.cpp
+          project/SourceGroupFactoryModuleCxx.h
           project/SourceGroupFactoryModuleJava.cpp
           project/SourceGroupFactoryModuleJava.h
           project/SourceGroupJavaEmpty.cpp
           project/SourceGroupJavaEmpty.h
+          project/utilitySourceGroupCxx.cpp
+          project/utilitySourceGroupCxx.h
           settings/migration/SettingsMigration.cpp
           settings/migration/SettingsMigration.h
           settings/migration/SettingsMigrationDeleteKey.cpp
@@ -342,36 +359,38 @@ target_sources(
           utility/interprocess/SharedMemory.h
           # Base Factory {
           utility/interprocess/ISharedMemoryGarbageCollector.cpp
+          utility/IncludeDirective.cpp
+          utility/IncludeDirective.h
+          utility/IncludeProcessing.cpp
+          utility/IncludeProcessing.h
           utility/interprocess/ISharedMemoryGarbageCollector.hpp
           utility/interprocess/details/SharedMemoryGarbageCollector.cpp
           utility/interprocess/details/SharedMemoryGarbageCollector.h
           # }
 )
 
-if(BUILD_CXX_LANGUAGE_PACKAGE)
-  target_sources(
-    Sourcetrail_lib
-    PRIVATE settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithIndexedHeaderPaths.cpp
-            settings/source_group/component/cxx/SourceGroupSettingsWithIndexedHeaderPaths.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsC.h
-            settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsCpp.h
-            settings/source_group/type/SourceGroupSettingsCEmpty.h
-            settings/source_group/type/SourceGroupSettingsCppEmpty.h
-            settings/source_group/type/SourceGroupSettingsCustomCommand.h
-            settings/source_group/type/SourceGroupSettingsCxxCdb.h)
-endif()
+target_sources(
+  Sourcetrail_lib
+  PRIVATE settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithIndexedHeaderPaths.cpp
+          settings/source_group/component/cxx/SourceGroupSettingsWithIndexedHeaderPaths.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsC.h
+          settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsCpp.h
+          settings/source_group/type/SourceGroupSettingsCEmpty.h
+          settings/source_group/type/SourceGroupSettingsCppEmpty.h
+          settings/source_group/type/SourceGroupSettingsCustomCommand.h
+          settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 
 get_target_property(_lib_sources Sourcetrail_lib SOURCES)
 foreach(_src ${_lib_sources})
@@ -405,6 +424,7 @@ target_link_libraries(
          gRPC::grpc++
          Sourcetrail::lib::core::utility::ConfigManager
          Sourcetrail::lib::core::utility::LowMemoryStringMap
+         Sourcetrail::lib::core::utility::OrderedCache
          Sourcetrail::lib::core::utility::Status
          Sourcetrail::lib::core::utility::Tree
          Sourcetrail::lib::core::utility::utility
@@ -427,6 +447,7 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::file::FileSystem
           Sourcetrail::lib::core::utility::file::utilityFile
           Sourcetrail::lib::core::utility::file::FileManager
+          Sourcetrail::lib::core::utility::file::FileTree
           Boost::filesystem
           Boost::json
           Boost::program_options
@@ -500,7 +521,6 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::file::FileSystem
           Sourcetrail::lib::core::utility::file::utilityFile
           Sourcetrail::lib::core::utility::file::FileManager
-          $<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:Sourcetrail::lib::lib_cxx>
           Boost::filesystem
           Boost::system
           SQLite::SQLite3)
@@ -514,16 +534,14 @@ target_sources(
   PRIVATE utility/path_detector/utilityPathDetection.cpp utility/path_detector/CombinedPathDetector.cpp
           utility/path_detector/PathDetector.cpp)
 
-if(BUILD_CXX_LANGUAGE_PACKAGE)
-  target_sources(
-    Sourcetrail_lib_path_detection
-    PRIVATE utility/path_detector/cxx_header/CxxFrameworkPathDetector.cpp
-            utility/path_detector/cxx_header/CxxHeaderPathDetector.cpp
-            utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.cpp
-            utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.cpp
-            utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.cpp
-            utility/path_detector/cxx_header/utilityCxxHeaderDetection.cpp)
-endif()
+target_sources(
+  Sourcetrail_lib_path_detection
+  PRIVATE utility/path_detector/cxx_header/CxxFrameworkPathDetector.cpp
+          utility/path_detector/cxx_header/CxxHeaderPathDetector.cpp
+          utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.cpp
+          utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.cpp
+          utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.cpp
+          utility/path_detector/cxx_header/utilityCxxHeaderDetection.cpp)
 
 target_include_directories(
   Sourcetrail_lib_path_detection

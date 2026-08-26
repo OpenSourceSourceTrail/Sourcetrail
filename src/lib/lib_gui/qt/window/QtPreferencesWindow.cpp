@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include "DialogView.h"
-#include "language_packages.h"
 #include "QtProjectWizardContentGroup.h"
 #include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
 #include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
@@ -29,12 +28,10 @@ QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindo
   QtProjectWizardContentGroup* summary = new QtProjectWizardContentGroup(this);
   summary->addContent(new QtProjectWizardContentPreferences(this));
 
-#if BUILD_CXX_LANGUAGE_PACKAGE
   summary->addContent(new QtProjectWizardContentPathsHeaderSearchGlobal(this));
   if(utility::getOsType() == OsType::Mac) {
     summary->addContent(new QtProjectWizardContentPathsFrameworkSearchGlobal(this));
   }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
   setPreferredSize(QSize(750, 500));
   setContent(summary);

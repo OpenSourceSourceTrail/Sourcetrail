@@ -17,7 +17,6 @@
 #include "IApplicationSettings.hpp"
 #include "IndexerWorkerServiceImpl.h"
 #include "ITaskFactory.h"
-#include "language_packages.h"
 #include "LanguageType.h"
 #include "PersistentStorage.h"
 #include "SourceGroup.h"
@@ -51,11 +50,9 @@ IndexerCommandType getStandardCommandType(const std::vector<std::shared_ptr<Sour
     if(sourceGroup->getLanguage() == LANGUAGE_JAVA) {
       return INDEXER_COMMAND_JAVA;
     }
-#if BUILD_CXX_LANGUAGE_PACKAGE
     if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
       return INDEXER_COMMAND_CXX;
     }
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
   }
   return INDEXER_COMMAND_UNKNOWN;
 }
@@ -174,7 +171,7 @@ void IndexTaskBuilder::addIndexerPipeline(const std::shared_ptr<TaskGroupSequenc
   // run multi-process regardless of the multi-process-indexing setting; CXX can still run
   // in-process (compiled-in LanguagePackageManager indexer) when that setting is off.
   const bool multiProcess = m_callbacks.hasJavaSourceGroup() ||
-                            (IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && m_callbacks.hasCxxSourceGroup());
+      (IApplicationSettings::getInstanceRaw()->getMultiProcessIndexingEnabled() && m_callbacks.hasCxxSourceGroup());
   taskParallelIndexing->addChildTasks(m_taskFactory->createSequence()->addChildTasks(
       // block until there are indexer commands to process
       makeBlockUntilTrue("indexer_command_queue_started", 25),
@@ -230,10 +227,10 @@ void IndexTaskBuilder::addCustomCommandTask(const std::shared_ptr<TaskGroupSeque
   const int adjustedIndexerThreadCount = std::min<int>(indexerThreadCount, static_cast<int>(customIndexerCommandProvider->size()));
 
   sequence->addTask(m_taskFactory->createExecuteCustomCommands(std::move(customIndexerCommandProvider),
-                                                                tempStorage,
-                                                                dialogView,
-                                                                static_cast<size_t>(adjustedIndexerThreadCount),
-                                                                projectDirectory));
+                                                               tempStorage,
+                                                               dialogView,
+                                                               static_cast<size_t>(adjustedIndexerThreadCount),
+                                                               projectDirectory));
 }
 
 void IndexTaskBuilder::addFinalizationTasks(const std::shared_ptr<TaskGroupSequence>& sequence,
@@ -245,18 +242,17 @@ void IndexTaskBuilder::addFinalizationTasks(const std::shared_ptr<TaskGroupSeque
       m_taskFactory->createSequence()->addChildTasks(
           m_taskFactory->createFindKeyOnBlackboard("keep_database"),
           makeAppThreadLambda([this, dialogView]() { m_callbacks.onKeepDatabase(dialogView); })),
-      m_taskFactory->createSequence()->addChildTasks(
-          m_taskFactory->createFindKeyOnBlackboard("discard_database"),
-          makeAppThreadLambda([this]() { m_callbacks.onDiscardDatabase(); }))));
+      m_taskFactory->createSequence()->addChildTasks(m_taskFactory->createFindKeyOnBlackboard("discard_database"),
+                                                     makeAppThreadLambda([this]() { m_callbacks.onDiscardDatabase(); }))));
 
   sequence->addTask(m_taskFactory->createLambda([this]() { m_callbacks.onIndexingFinished(); }));
 
   sequence->addTask(m_taskFactory->createSelector()->addChildTasks(
-      m_taskFactory->createSequence()->addChildTasks(m_taskFactory->createFindKeyOnBlackboard("refresh_database"),
-                                                     makeAppThreadLambda([]() {
-                                                       MessageIndexingShowDialog().dispatch();
-                                                       MessageRefresh().refreshAll().dispatch();
-                                                     })),
+      m_taskFactory->createSequence()->addChildTasks(
+          m_taskFactory->createFindKeyOnBlackboard("refresh_database"), makeAppThreadLambda([]() {
+            MessageIndexingShowDialog().dispatch();
+            MessageRefresh().refreshAll().dispatch();
+          })),
       m_taskFactory->createSequence()->addChildTasks(makeAppThreadLambda([]() {}))));
 }
 

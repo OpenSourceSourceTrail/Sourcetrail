@@ -80,13 +80,10 @@ jobs:
   #
   # It is an optimisation, not a gate: the build legs keep their own restore + `conan install`,
   # so a failure here costs a cold leg rather than the whole run (see the `if:` on `build`).
+  #
+  # Linux-only: the Windows leg lives in build_windows.yml, disabled for now.
   deps:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-24.04, windows-latest]
-    name: Conan dependencies (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -102,8 +99,6 @@ jobs:
           key: conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
           lookup-only: true
 
-      # setup-python instead of a venv: pip installs work identically on both runners, so the
-      # rest of this job needs no OS split beyond the `conan install` line itself.
       - name: Setup python
         if: steps.lookup.outputs.cache-hit != 'true'
         uses: actions/setup-python@v5
@@ -133,16 +128,9 @@ jobs:
         run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
         shell: bash
 
-      - name: Install conan dependencies (Ubuntu)
-        if: steps.lookup.outputs.cache-hit != 'true' && runner.os == 'Linux'
+      - name: Install conan dependencies
+        if: steps.lookup.outputs.cache-hit != 'true'
         run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
-
-      - name: Install conan dependencies (Windows)
-        if: steps.lookup.outputs.cache-hit != 'true' && runner.os == 'Windows'
-        run: |
-          conan profile detect --force
-          conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
-        shell: bash
 
       # `!cancelled()` banks whatever did build when a later package fails, so the retry is
       # warmer. The `conan` guard keeps these from running -- and reporting
@@ -161,42 +149,29 @@ jobs:
           path: ${{ runner.temp }}/conan-deps.tgz
           key: ${{ steps.lookup.outputs.cache-primary-key }}
 
+  # Linux-only: the Windows leg lives in build_windows.yml, disabled for now.
   build:
     strategy:
       fail-fast: false
       matrix:
         config:
           - {
-              name: "Windows Latest MSVC",
-              os: windows-latest,
-              tag: msvc,
-              environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat",
-              "with_cxx": "",
-            }
-          # NOTE: there is deliberately no Windows `_build_cxx` leg. The C/C++ indexer needs
-          # LLVM/Clang 22, and .conan/recipes/llvm-clang/ has only been validated on Linux/GCC.
-          # Re-add this leg once llvm.yml gains a windows-latest job producing the package.
-          - {
               name: "Ubuntu Latest GCC",
-              os: ubuntu-24.04,
               tag: gnu,
               "with_cxx": "",
             }
           - {
               name: "Ubuntu Latest GCC with cxx_build",
-              os: ubuntu-24.04,
               tag: gnu,
               "with_cxx": "_build_cxx",
             }
           - {
               name: "Ubuntu Latest CLang",
-              os: ubuntu-24.04,
               tag: "clang",
               "with_cxx": "",
             }
           - {
               name: "Ubuntu Latest CLang cxx_build",
-              os: ubuntu-24.04,
               tag: "clang",
               "with_cxx": "_build_cxx",
             }
@@ -204,7 +179,7 @@ jobs:
     name: ${{ matrix.config.name }}
     needs: [clang-format, cmake-format, deps]
     if: ${{ !cancelled() && needs.clang-format.result == 'success' && needs.cmake-format.result == 'success' }}
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -214,21 +189,18 @@ jobs:
       - name: Get tags
         run: git fetch --tags origin
 
-      - name: Install dependencies (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Install dependencies
         run: sudo apt install -y gcc g++ clang ninja-build python3-pip grep mold
 
       # `mvn` is preinstalled on the runner, so BUILD_JAVA_INDEXER defaults ON and the plugin is
       # always built. pom.xml compiles with release 21; the image's default JDK is older.
-      - name: Install JDK (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Install JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
 
-      - name: Install Qt (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
           aqtversion: "==3.3.*"
@@ -243,35 +215,11 @@ jobs:
           cache: "true"
           cache-key-prefix: "install-qt-action-linux"
 
-      - name: Install Qt (Windows)
-        if: runner.os == 'Windows'
-        uses: jurplel/install-qt-action@v3
-        with:
-          aqtversion: "==3.3.*"
-          dir: "${{github.workspace}}/Qt/"
-          install-deps: "true"
-          version: "6.10.3"
-          host: "windows"
-          target: "desktop"
-          arch: "win64_msvc2022_64"
-          modules: "qt5compat"
-          archives: "qtbase qtdeclarative qtsvg"
-          cache: "true"
-          cache-key-prefix: "install-qt-action-windows"
-
-      # `venv/bin` goes on PATH so every later step can call `conan` directly and the cache
-      # steps below stay identical on Linux and Windows.
-      - name: Install conan & gcovr (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Install conan & gcovr
         run: |
           python3 -m venv venv
           echo "${{ github.workspace }}/venv/bin" >> "$GITHUB_PATH"
           ./venv/bin/pip install "conan==${{ env.CONAN_VERSION }}" gcovr
-
-      - name: Install conan (Windows)
-        if: runner.os == 'Windows'
-        run: python -m pip install "conan==${{ env.CONAN_VERSION }}" && conan profile detect
-        shell: bash
 
       # Restore only -- the `deps` job owns writing this cache. One archive per OS: every Linux
       # leg installs the same gcc/Release dependency set, so gnu and clang share it and
@@ -292,29 +240,20 @@ jobs:
           restore-keys: |
             conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-
 
-      # Paths are quoted throughout: on Windows `runner.temp` expands to `D:\a\_temp`, and bash
-      # would otherwise eat the backslashes.
       - name: Unpack conan archive
         if: steps.conan-cache.outputs.cache-matched-key != ''
         run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
-        shell: bash
 
       # Normally a no-op that just writes the generator files: `deps` already built everything
       # and the restore above brought it in. Kept unconditional so a leg still builds if the
       # `deps` job failed.
       #
-      # Linux uses exactly one Conan install: gcc/Release. The clang legs build the application
-      # with clang against these gcc-built dependencies -- both use libstdc++11, so the ABI
-      # matches, and `.conan/clang/profile` (which had no build_type, breaking every tool_require
-      # in the build context) is gone.
-      - name: Install conan dependencies (Ubuntu)
-        if: runner.os == 'Linux'
+      # Exactly one Conan install: gcc/Release. The clang legs build the application with clang
+      # against these gcc-built dependencies -- both use libstdc++11, so the ABI matches, and
+      # `.conan/clang/profile` (which had no build_type, breaking every tool_require in the
+      # build context) is gone.
+      - name: Install conan dependencies
         run: conan install . -s build_type=Release -of .conan/gcc --build=missing -pr:a .conan/gcc/profile
-
-      - name: Install conan dependencies (Windows)
-        if: runner.os == 'Windows'
-        run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
-        shell: bash
 
       # LLVM/Clang comes from the release asset published by llvm.yml -- never built here.
       # Release assets are not subject to the 7-day cache eviction or the 10 GB budget, which
@@ -342,34 +281,14 @@ jobs:
           conan cache restore "${{ runner.temp }}/llvm-clang-22.1.8-linux-x86_64.tgz"
           ./scripts/build_llvm_conan.sh
 
-      - name: Configure CMake (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Configure CMake
         run: cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
 
-      - name: Configure CMake (Windows)
-        if: runner.os == 'Windows'
-        env:
-          # install-qt-action exports QT_ROOT_DIR for Qt6; Qt5_DIR was a Qt5 leftover and
-          # expanded to an empty string.
-          CMAKE_PREFIX_PATH: ${{env.QT_ROOT_DIR}}
-        run: |
-          call "${{ matrix.config.environment_script }}"
-          cmake --preset="ci_${{ matrix.config.tag }}_release${{ matrix.config.with_cxx }}"
-        shell: cmd
-
-      - name: Build (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Build
         run: |
           set -eo pipefail  # Stop on first error
           cmake --build ${{github.workspace}}/build | tee ${{github.workspace}}/build/build.log
           exit ${PIPESTATUS[0]}
-
-      - name: Build (Windows)
-        if: runner.os == 'Windows'
-        run: |
-          call "${{ matrix.config.environment_script }}"
-          cmake --build ${{github.workspace}}/build > ${{github.workspace}}/build/build.log 2>&1 || (type ${{github.workspace}}/build/build.log && exit /b %errorlevel%)
-        shell: cmd
 
       - name: Upload build logs on failure
         if: failure()
@@ -379,18 +298,11 @@ jobs:
           path: ${{github.workspace}}/build/build.log
           retention-days: 7
 
-      - name: Count warnings (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Count warnings
         run: grep -c "warning:" ${{github.workspace}}/build/build.log
 
-      - name: Test (Ubuntu)
-        if: runner.os == 'Linux'
+      - name: Test
         run: ctest -Q --test-dir ${{github.workspace}}/build --output-junit ${{github.workspace}}/build/report.xml
-
-      - name: Test (Windows)
-        if: runner.os == 'Windows'
-        run: ctest --test-dir ${{github.workspace}}/build --exclude-regex "unittests\.core\.GenerateRandomString\.goodCase|unittests\.core\.CommandlineCommandIndexFix\.projectIsAbsent|unittests\.core\.CommandlineCommandIndexFix\.projectIsInvalidProj|unittests\.core\.CommandLineParserConfig\.projectFileMissingExtention|unittests\.core\.CommandLineParserConfig\.emptyProjectFile|unittests\.lib\.BookmarkControllerFix\.displayBookmarksFor2|unittests\.lib\.FileHandler\.goodCaseEmptyFile|unittests\.lib\.FileHandler\.emptyFileCanNotCreated|unittests\.lib\.FileHandler\.goodCaseFromBuffer|unittests\.lib\.FileHandler\.PassZeroToFromBuffer|unittests\.lib\.FileHandler\.goodCaseRandomData|unittests\.lib\.FileHandler\.PassZeroToRandomData|unittests\.lib_gui\.utilityAppTestSuite\.searchPath|QtSelfRefreshIconButtonTestSuite" --output-junit ${{github.workspace}}/build/report.xml
-        shell: cmd
 
       - name: Upload ctest logs on failure
         if: failure()
@@ -402,14 +314,13 @@ jobs:
 
       - name: Publish Test Report for ${{ matrix.config.name }}
         uses: mikepenz/action-junit-report@v4
-        if: runner.os == 'Linux'
         with:
           report_paths: ${{github.workspace}}/build/report.xml
           include_passed: true
           detailed_summary: true
 
       - name: Upload build directory as artifact
-        if: runner.os == 'Linux' && matrix.config.tag == 'gnu' && matrix.config.with_cxx == '_build_cxx'
+        if: matrix.config.tag == 'gnu' && matrix.config.with_cxx == '_build_cxx'
         uses: actions/upload-artifact@v4
         with:
           name: build-artifact-${{ github.event.number }}

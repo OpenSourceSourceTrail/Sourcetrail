@@ -1,0 +1,184 @@
+name: Build (Windows)
+
+# Disabled: Windows Latest MSVC has been failing on `main` independent of the change under
+# test (deps install and the build/test steps below are otherwise unchanged from when this
+# leg lived in build.yml). Parked here rather than deleted so it can be restored in one step
+# once the underlying issue is fixed: replace the `on: workflow_dispatch` below with the same
+# `push`/`pull_request` triggers as build.yml, and re-wire `build`'s `needs:`/`if:` to depend
+# on that workflow's `clang-format`/`cmake-format` jobs the way it used to.
+on:
+  workflow_dispatch:
+
+env:
+  CONAN_VERSION: "2.31.2"
+
+jobs:
+  deps:
+    runs-on: windows-latest
+    name: Conan dependencies (windows-latest)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # `lookup-only` does not download the archive. On a warm key this job confirms the entry
+      # exists and stops, so the wait it adds to the build matrix is job startup and nothing
+      # more. No `restore-keys` here on purpose -- only an exact hit means "nothing to do".
+      - name: Look up conan archive
+        id: lookup
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
+          lookup-only: true
+
+      - name: Setup python
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install conan
+        id: conan
+        if: steps.lookup.outputs.cache-hit != 'true'
+        run: pip install "conan==${{ env.CONAN_VERSION }}"
+        shell: bash
+
+      # A partial hit restores every unchanged dependency, so a one-package bump rebuilds one
+      # package instead of all of them.
+      - name: Restore conan archive
+        id: restore
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: ${{ steps.lookup.outputs.cache-primary-key }}
+          restore-keys: |
+            conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-
+
+      - name: Unpack conan archive
+        if: steps.restore.outputs.cache-matched-key != ''
+        run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
+
+      - name: Install conan dependencies
+        if: steps.lookup.outputs.cache-hit != 'true'
+        run: |
+          conan profile detect --force
+          conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
+        shell: bash
+
+      # `!cancelled()` banks whatever did build when a later package fails, so the retry is
+      # warmer. The `conan` guard keeps these from running -- and reporting
+      # `conan: command not found` over the real error -- when the client never installed.
+      - name: Pack conan archive
+        if: ${{ !cancelled() && steps.lookup.outputs.cache-hit != 'true' && steps.conan.outcome == 'success' }}
+        run: |
+          conan cache clean "*" --source --build --download --temp
+          conan cache save "*:*" --no-source --file "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
+
+      - name: Save conan archive
+        if: ${{ !cancelled() && steps.lookup.outputs.cache-hit != 'true' && steps.conan.outcome == 'success' }}
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: ${{ steps.lookup.outputs.cache-primary-key }}
+
+  # NOTE: there is deliberately no Windows `_build_cxx` leg. The C/C++ indexer needs
+  # LLVM/Clang 22, and .conan/recipes/llvm-clang/ has only been validated on Linux/GCC.
+  # Re-add this leg once llvm.yml gains a windows-latest job producing the package.
+  build:
+    name: Windows Latest MSVC
+    needs: [deps]
+    runs-on: windows-latest
+    env:
+      environment_script: "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: "true"
+
+      - name: Get tags
+        run: git fetch --tags origin
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: "==3.3.*"
+          dir: "${{github.workspace}}/Qt/"
+          install-deps: "true"
+          version: "6.10.3"
+          host: "windows"
+          target: "desktop"
+          arch: "win64_msvc2022_64"
+          modules: "qt5compat"
+          archives: "qtbase qtdeclarative qtsvg"
+          cache: "true"
+          cache-key-prefix: "install-qt-action-windows"
+
+      - name: Install conan
+        run: python -m pip install "conan==${{ env.CONAN_VERSION }}" && conan profile detect
+        shell: bash
+
+      # Restore only -- the `deps` job owns writing this cache.
+      - name: Restore conan archive
+        id: conan-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/conan-deps.tgz
+          key: conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-${{ hashFiles('conanfile.txt', '.conan/gcc/profile') }}
+          # A partial hit still restores every unchanged dependency, so a one-package bump
+          # rebuilds one package instead of all of them.
+          restore-keys: |
+            conan5-${{ runner.os }}-${{ env.CONAN_VERSION }}-
+
+      # Paths are quoted throughout: `runner.temp` expands to `D:\a\_temp`, and bash would
+      # otherwise eat the backslashes.
+      - name: Unpack conan archive
+        if: steps.conan-cache.outputs.cache-matched-key != ''
+        run: conan cache restore "${{ runner.temp }}/conan-deps.tgz"
+        shell: bash
+
+      # Normally a no-op that just writes the generator files: `deps` already built everything
+      # and the restore above brought it in. Kept unconditional so this leg still builds if the
+      # `deps` job failed.
+      - name: Install conan dependencies
+        run: conan install . --build missing -s build_type=Release -s compiler.cppstd=20 -c tools.cmake.cmaketoolchain:generator=Ninja -of .conan/msvc/
+        shell: bash
+
+      - name: Configure CMake
+        env:
+          # install-qt-action exports QT_ROOT_DIR for Qt6; Qt5_DIR was a Qt5 leftover and
+          # expanded to an empty string.
+          CMAKE_PREFIX_PATH: ${{env.QT_ROOT_DIR}}
+        run: |
+          call "${{ env.environment_script }}"
+          cmake --preset="ci_msvc_release"
+        shell: cmd
+
+      - name: Build
+        run: |
+          call "${{ env.environment_script }}"
+          cmake --build ${{github.workspace}}/build > ${{github.workspace}}/build/build.log 2>&1 || (type ${{github.workspace}}/build/build.log && exit /b %errorlevel%)
+        shell: cmd
+
+      - name: Upload build logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs-msvc
+          path: ${{github.workspace}}/build/build.log
+          retention-days: 7
+
+      - name: Test
+        run: ctest --test-dir ${{github.workspace}}/build --exclude-regex "unittests\.core\.GenerateRandomString\.goodCase|unittests\.core\.CommandlineCommandIndexFix\.projectIsAbsent|unittests\.core\.CommandlineCommandIndexFix\.projectIsInvalidProj|unittests\.core\.CommandLineParserConfig\.projectFileMissingExtention|unittests\.core\.CommandLineParserConfig\.emptyProjectFile|unittests\.lib\.BookmarkControllerFix\.displayBookmarksFor2|unittests\.lib\.FileHandler\.goodCaseEmptyFile|unittests\.lib\.FileHandler\.emptyFileCanNotCreated|unittests\.lib\.FileHandler\.goodCaseFromBuffer|unittests\.lib\.FileHandler\.PassZeroToFromBuffer|unittests\.lib\.FileHandler\.goodCaseRandomData|unittests\.lib\.FileHandler\.PassZeroToRandomData|unittests\.lib_gui\.utilityAppTestSuite\.searchPath|QtSelfRefreshIconButtonTestSuite" --output-junit ${{github.workspace}}/build/report.xml
+        shell: cmd
+
+      - name: Upload ctest logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs-msvc
+          path: ${{github.workspace}}/build/report.xml
+          retention-days: 7

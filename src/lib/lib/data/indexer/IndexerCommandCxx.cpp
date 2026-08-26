@@ -3,53 +3,9 @@
 #include <boost/json/array.hpp>
 #include <boost/json/object.hpp>
 
-#include <clang/Tooling/CompilationDatabase.h>
-#include <clang/Tooling/JSONCompilationDatabase.h>
-
-#include "logging.h"
-#include "OrderedCache.h"
 #include "ResourcePaths.h"
-#include "type/MessageStatus.h"
 #include "utility.h"
-#include "utilitySourceGroupCxx.h"
 #include "utilityString.h"
-
-std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const FilePath& cdbPath) {
-  std::string error;
-  const std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
-
-  if(!error.empty()) {
-    const auto message = fmt::format(
-        L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
-    LOG_ERROR(message);
-    MessageStatus(message, true).dispatch();
-  }
-
-  return getSourceFilesFromCDB(cdb, cdbPath);
-}
-
-std::vector<FilePath> IndexerCommandCxx::getSourceFilesFromCDB(const std::shared_ptr<clang::tooling::JSONCompilationDatabase>& cdb,
-                                                               const FilePath& cdbPath) {
-  std::vector<FilePath> filePaths;
-  if(cdb) {
-    OrderedCache<FilePath, FilePath> canonicalDirectoryPathCache([](const FilePath& path) { return path.getCanonical(); });
-
-    for(const std::string& fileString : cdb->getAllFiles()) {
-      FilePath path = FilePath(utility::decodeFromUtf8(fileString));
-      if(!path.isAbsolute()) {
-        std::vector<clang::tooling::CompileCommand> commands = cdb->getCompileCommands(fileString);
-        if(!commands.empty()) {
-          path = FilePath(utility::decodeFromUtf8(commands.front().Directory + '/' + commands.front().Filename)).makeCanonical();
-        }
-      }
-      if(!path.isAbsolute()) {
-        path = cdbPath.getParentDirectory().getConcatenated(path).makeCanonical();
-      }
-      filePaths.push_back(canonicalDirectoryPathCache.getValue(path.getParentDirectory()).concatenate(path.fileName()));
-    }
-  }
-  return filePaths;
-}
 
 std::wstring IndexerCommandCxx::getCompilerFlagLanguageStandard(const std::wstring& languageStandard) {
   return L"-std=" + languageStandard;

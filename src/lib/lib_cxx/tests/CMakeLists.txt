@@ -12,31 +12,3 @@ add_sourcetrail_test(
   "unittests.core."
   WORKING_DIRECTORY
   "${CMAKE_BINARY_DIR}/test/")
-
-add_sourcetrail_test(
-  NAME
-  IncludeDirectiveTestSuite
-  SOURCES
-  IncludeDirectiveTestSuite.cpp
-  DEPS
-  Sourcetrail::lib::lib
-  Sourcetrail::lib::lib_cxx
-  Sourcetrail::lib::core::utility::file::ScopedTemporaryFile
-  TEST_PREFIX
-  "unittests.core."
-  WORKING_DIRECTORY
-  "${CMAKE_BINARY_DIR}/test/")
-
-add_sourcetrail_test(
-  NAME
-  utilitySourceGroupCxxTestSuite
-  SOURCES
-  utilitySourceGroupCxxTestSuite.cpp
-  DEPS
-  Sourcetrail::lib::lib
-  Sourcetrail::lib::lib_cxx
-  Sourcetrail::lib::core::utility::file::ScopedTemporaryFile
-  TEST_PREFIX
-  "unittests.core."
-  WORKING_DIRECTORY
-  "${CMAKE_BINARY_DIR}/test/")

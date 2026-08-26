@@ -7,11 +7,9 @@
 
 #include "SourceGroup.h"
 
-class FilePath;
-namespace clang { namespace tooling {
-class JSONCompilationDatabase;
-}}    // namespace clang::tooling
+#include "ICxxToolchain.h"
 
+class FilePath;
 class SourceGroupSettingsCxxCdb;
 
 class SourceGroupCxxCdb : public SourceGroup {
@@ -21,7 +19,7 @@ public:
   bool prepareIndexing() override;
   std::set<FilePath> filterToContainedFilePaths(const std::set<FilePath>& filePaths) const override;
   std::set<FilePath> getAllSourceFilePaths() const override;
-  std::set<FilePath> getAllSourceFilePaths(std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb) const;
+  std::set<FilePath> getAllSourceFilePaths(const std::vector<CxxCompileCommand>& commands) const;
   std::shared_ptr<IndexerCommandProvider> getIndexerCommandProvider(const RefreshInfo& info) const override;
   std::vector<std::shared_ptr<IndexerCommand>> getIndexerCommands(const RefreshInfo& info) const override;
   std::shared_ptr<Task> getPreIndexTask(std::shared_ptr<StorageProvider> storageProvider,

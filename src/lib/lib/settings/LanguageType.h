@@ -4,15 +4,7 @@
 // internal
 #include "SourceGroupType.h"
 
-enum LanguageType {
-#if BUILD_CXX_LANGUAGE_PACKAGE
-  LANGUAGE_CPP,
-  LANGUAGE_C,
-#endif    // BUILD_CXX_LANGUAGE_PACKAGE
-  LANGUAGE_JAVA,
-  LANGUAGE_CUSTOM,
-  LANGUAGE_UNKNOWN
-};
+enum LanguageType { LANGUAGE_CPP, LANGUAGE_C, LANGUAGE_JAVA, LANGUAGE_CUSTOM, LANGUAGE_UNKNOWN };
 
 std::string languageTypeToString(LanguageType type);
 

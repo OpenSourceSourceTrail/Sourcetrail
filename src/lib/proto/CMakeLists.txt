@@ -1,6 +1,10 @@
 set(PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-set(PROTO_FILES "${PROTO_DIR}/sourcetrail_common.proto" "${PROTO_DIR}/indexer_worker.proto" "${PROTO_DIR}/engine.proto")
+set(PROTO_FILES
+    "${PROTO_DIR}/sourcetrail_common.proto"
+    "${PROTO_DIR}/indexer_worker.proto"
+    "${PROTO_DIR}/engine.proto"
+    "${PROTO_DIR}/indexer_helper.proto")
 
 set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -64,11 +68,8 @@ target_include_directories(Sourcetrail_proto_convert PUBLIC "${CMAKE_CURRENT_SOU
 # dep on Sourcetrail_lib (that would cause a cycle: lib→convert→lib).
 # Reading INTERFACE_INCLUDE_DIRECTORIES via generator expression gives us the
 # include paths at generation time without registering a link dependency.
-target_include_directories(
-  Sourcetrail_proto_convert
-  PRIVATE
-    "$<TARGET_PROPERTY:Sourcetrail_lib,INTERFACE_INCLUDE_DIRECTORIES>"
-    "$<$<BOOL:${BUILD_CXX_LANGUAGE_PACKAGE}>:$<TARGET_PROPERTY:Sourcetrail_lib_cxx,INTERFACE_INCLUDE_DIRECTORIES>>")
+target_include_directories(Sourcetrail_proto_convert
+                           PRIVATE "$<TARGET_PROPERTY:Sourcetrail_lib,INTERFACE_INCLUDE_DIRECTORIES>")
 
 target_link_libraries(
   Sourcetrail_proto_convert

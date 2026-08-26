@@ -1,5 +1,6 @@
 #include "SourceGroupFactory.h"
 
+#include "logging.h"
 #include "SourceGroup.h"
 #include "SourceGroupFactoryModule.h"
 #include "SourceGroupSettings.h"
@@ -22,6 +23,9 @@ std::vector<std::shared_ptr<SourceGroup>> SourceGroupFactory::createSourceGroups
     std::shared_ptr<SourceGroup> sourceGroup = createSourceGroup(sourceGroupSettings);
     if(sourceGroup) {
       sourceGroups.push_back(sourceGroup);
+    } else {
+      LOG_WARNING("Skipping source group of type \"" + sourceGroupTypeToString(sourceGroupSettings->getType()) +
+                  "\": no factory module supports it.");
     }
   }
   return sourceGroups;

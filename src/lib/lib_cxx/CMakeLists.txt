@@ -13,9 +13,7 @@ add_library(Sourcetrail::lib::lib_cxx ALIAS Sourcetrail_lib_cxx)
 
 target_sources(
   Sourcetrail_lib_cxx
-  PRIVATE data/indexer/CxxIndexerCommandProvider.cpp
-          data/indexer/IndexerCommandCxx.cpp
-          data/indexer/IndexerCxx.cpp
+  PRIVATE data/indexer/IndexerCxx.cpp
           data/parser/cxx/name/CxxDeclName.cpp
           data/parser/cxx/name/CxxFunctionDeclName.cpp
           data/parser/cxx/name/CxxName.cpp
@@ -51,13 +49,7 @@ target_sources(
           data/parser/cxx/PreprocessorCallbacks.cpp
           data/parser/cxx/SingleFrontendActionFactory.cpp
           data/parser/cxx/utilityClang.cpp
-          project/SourceGroupCxxCdb.cpp
-          project/SourceGroupCxxEmpty.cpp
-          project/SourceGroupFactoryModuleCxx.cpp
-          project/utilitySourceGroupCxx.cpp
-          utility/CompilationDatabase.cpp
-          utility/IncludeDirective.cpp
-          utility/IncludeProcessing.cpp
+          project/CxxToolchainLocal.cpp
           LanguagePackageCxx.cpp)
 
 target_include_directories(

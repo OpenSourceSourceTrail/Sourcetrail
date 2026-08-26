@@ -10,6 +10,10 @@ endif()
 
 add_executable(Sourcetrail_indexer main.cpp)
 
+if(BUILD_CXX_LANGUAGE_PACKAGE)
+  target_sources(Sourcetrail_indexer PRIVATE CxxHelperMode.cpp CxxHelperMode.h)
+endif()
+
 set_target_properties(Sourcetrail_indexer PROPERTIES OUTPUT_NAME sourcetrail_indexer)
 
 # Advertise the built-in C/C++ indexer as a discoverable plugin. The manifest is the only way its

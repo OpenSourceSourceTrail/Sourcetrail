@@ -35,6 +35,11 @@ public:
                                const sourcetrail::EmptyRequest* req,
                                sourcetrail::CapabilitiesResponse* resp) override;
 
+  /** Parses a compile_commands.json on the client's behalf; see the RPC comment in engine.proto. */
+  grpc::Status GetCompilationDatabaseInfo(grpc::ServerContext* ctx,
+                                          const sourcetrail::CompilationDatabaseInfoRequest* req,
+                                          sourcetrail::CompilationDatabaseInfoResponse* resp) override;
+
   // Bookmark mutations
   grpc::Status AddNodeBookmark(grpc::ServerContext* ctx,
                                const sourcetrail::AddNodeBookmarkRequest* req,

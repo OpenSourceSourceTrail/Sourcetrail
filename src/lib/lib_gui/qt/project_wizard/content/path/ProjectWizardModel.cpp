@@ -1,17 +1,26 @@
 #include "ProjectWizardModel.hpp"
 
+#include "CompilationDatabaseInfo.h"
+#include "FilePathFilter.h"
 #include "QtProjectWizardContentPathsIndexedHeaders.h"
-#include "SourceGroupCxxCdb.h"
 #include "SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
 #include "utilityFile.h"
-#include "utilitySourceGroupCxx.h"
 
 
 ProjectWizardModel::ProjectWizardModel(std::shared_ptr<SourceGroupSettingsCxxCdb> settings) noexcept
     : m_settings{std::move(settings)}, m_filePaths([&]() {
-      return utility::getAsRelativeIfShorter(
-          utility::toVector(SourceGroupCxxCdb(m_settings).getAllSourceFilePaths()), m_settings->getProjectDirectoryPath());
+      // Same filtering SourceGroupCxxCdb applies before indexing, so the count shown here is the
+      // count that will be indexed. Reading the database itself is the engine's job.
+      const std::vector<FilePathFilter> excludeFilters = m_settings->getExcludeFiltersExpandedAndAbsolute();
+      std::set<FilePath> sourceFilePaths;
+      for(const FilePath& path :
+          client::inspectCompilationDatabase(m_settings->getCompilationDatabasePathExpandedAndAbsolute()).sourceFiles) {
+        if(!FilePathFilter::areMatching(excludeFilters, path) && path.exists()) {
+          sourceFilePaths.insert(path);
+        }
+      }
+      return utility::getAsRelativeIfShorter(utility::toVector(sourceFilePaths), m_settings->getProjectDirectoryPath());
     }) {}
 
 ProjectWizardModel::~ProjectWizardModel() noexcept = default;
@@ -35,9 +44,7 @@ void ProjectWizardModel::onPickerTextChanged(QtProjectWizardWindow* window, cons
   const FilePath cdbPath = utility::getExpandedAndAbsolutePath(
       FilePath(text.toStdWString()), m_settings->getProjectDirectoryPath());
   if(!cdbPath.empty() && cdbPath.exists() && cdbPath != m_settings->getCompilationDatabasePathExpandedAndAbsolute()) {
-    std::string error;
-    std::shared_ptr<clang::tooling::JSONCompilationDatabase> cdb = utility::loadCDB(cdbPath, &error);
-    if(cdb && error.empty()) {
+    if(client::inspectCompilationDatabase(cdbPath).valid) {
       pickedPath(window);
     }
   }

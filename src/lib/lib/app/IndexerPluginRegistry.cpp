@@ -79,8 +79,7 @@ bool IndexerPluginRegistry::supportsSourceGroupType(SourceGroupType type) const 
 }
 
 bool IndexerPluginRegistry::supportsLanguage(LanguageType language) const {
-  return std::any_of(
-      m_plugins.begin(), m_plugins.end(), [language](const Plugin& plugin) { return plugin.language == language; });
+  return std::any_of(m_plugins.begin(), m_plugins.end(), [language](const Plugin& plugin) { return plugin.language == language; });
 }
 
 std::vector<SourceGroupType> IndexerPluginRegistry::availableSourceGroupTypes() const {
@@ -131,8 +130,7 @@ std::optional<IndexerPluginRegistry::Plugin> IndexerPluginRegistry::loadManifest
     return std::nullopt;
   }
 
-  for(const std::string& typeString :
-      config->getValuesOrDefaults<std::string>("source_group_types/source_group_type", {})) {
+  for(const std::string& typeString : config->getValuesOrDefaults<std::string>("source_group_types/source_group_type", {})) {
     const SourceGroupType type = stringToSourceGroupType(typeString);
     if(type != SOURCE_GROUP_UNKNOWN) {
       plugin.sourceGroupTypes.push_back(type);
@@ -143,8 +141,14 @@ std::optional<IndexerPluginRegistry::Plugin> IndexerPluginRegistry::loadManifest
   if(indexerExecutable.empty()) {
     return std::nullopt;
   }
-  plugin.indexerExecutablePath = manifestFilePath.getParentDirectory().getConcatenated(
-      utility::decodeFromUtf8(indexerExecutable));
+  plugin.indexerExecutablePath = manifestFilePath.getParentDirectory().getConcatenated(utility::decodeFromUtf8(indexerExecutable));
+  if(!plugin.indexerExecutablePath.exists()) {
+    // A manifest without its binary is worse than no manifest: the project still looks
+    // reindexable and the failure only surfaces once indexing has already started.
+    LOG_WARNING(L"Ignoring indexer plugin \"" + utility::decodeFromUtf8(plugin.id) + L"\": executable is missing at \"" +
+                plugin.indexerExecutablePath.wstr() + L"\".");
+    return std::nullopt;
+  }
 
   const std::string launcher = config->getValueOrDefault<std::string>("launcher", "");
   if(!launcher.empty()) {
