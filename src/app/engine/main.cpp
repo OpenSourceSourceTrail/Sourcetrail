@@ -5,7 +5,6 @@
 
 #include <fmt/core.h>
 
-#include <grpcpp/server_builder.h>
 #include <spdlog/sinks/sink.h>
 #include <spdlog/spdlog.h>
 
@@ -15,8 +14,9 @@
 #include "AppPath.h"
 #include "CxxToolchainRemote.h"
 #include "EngineEventPublisher.h"
-#include "EngineServiceImpl.h"
+#include "EngineHttpService.h"
 #include "FilePath.h"
+#include "HttpServer.h"
 #include "IApplicationSettings.hpp"
 #include "ICxxToolchain.h"
 #include "impls/Factory.hpp"
@@ -31,6 +31,7 @@
 #include "SourceGroupFactoryModuleJava.h"
 #include "StorageCache.h"
 #include "UserPaths.h"
+#include "utilityUuid.h"
 #include "Version.h"
 
 namespace {
@@ -95,7 +96,7 @@ int main(int argc, char* argv[]) {
   // StorageCache IS the StorageAccess in the engine process — Application owns it.
   StorageCache* storageAccess = Application::getInstance()->getStorageCache();
 
-  EngineServiceImpl engineService(storageAccess);
+  EngineHttpService engineService(storageAccess);
   engineService.setShutdownHandler([]() { gStopRequested = 1; });
 
   // Must come after createInstance: the publisher registers with IMessageQueue, and the dialog-view
@@ -103,26 +104,23 @@ int main(int argc, char* argv[]) {
   const EngineEventPublisher eventPublisher(&engineService);
   eventPublisher.installDialogViewFactory();
 
-  grpc::ServerBuilder builder;
-  // 127.0.0.1 rather than "localhost": on Windows the latter may resolve to ::1 first, leaving a
-  // client that dialed the IPv4 loopback unable to connect.
-  const std::string address = fmt::format("127.0.0.1:{}", port);
-  int assignedPort = 0;
-  builder.AddListeningPort(address, grpc::InsecureServerCredentials(), &assignedPort);
-  builder.RegisterService(&engineService);
-  // Graph and file-content responses routinely exceed gRPC's 4 MB default on real projects.
-  builder.SetMaxReceiveMessageSize(-1);
-  builder.SetMaxSendMessageSize(-1);
-  const std::unique_ptr<grpc::Server> server = builder.BuildAndStart();
+  // A loopback HTTP port is reachable by every process on the machine, and by any page the user's
+  // browser loads -- which the gRPC port it replaces was not. The token is the proof of being the
+  // client this engine was spawned for; it is handed over on the handshake line below, which only
+  // the parent process can read.
+  http::Server server(utility::getUuidString());
+  engineService.registerRoutes(server);
 
-  if(!server) {
-    fmt::println(stderr, "Failed to start gRPC engine server on {}", address);
+  const uint16_t assignedPort = server.start(port);
+  if(assignedPort == 0) {
+    fmt::println(stderr, "Failed to start the HTTP engine server on 127.0.0.1:{}", port);
     return EXIT_FAILURE;
   }
 
   // Machine-readable handshake line, emitted first and flushed, so a parent process that spawned us
-  // with "--port 0" can learn the ephemeral port. Keep this the very first line of stdout.
-  fmt::println("ENGINE_PORT {}", assignedPort);
+  // with "--port 0" can learn the ephemeral port and the token. Keep this the very first line of
+  // stdout.
+  fmt::println("ENGINE_PORT {} {}", assignedPort, server.authToken());
   std::cout.flush();
   fmt::println("Sourcetrail_engine listening on 127.0.0.1:{}", assignedPort);
   std::cout.flush();
@@ -134,7 +132,9 @@ int main(int argc, char* argv[]) {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
   }
 
-  server->Shutdown();
+  // Releases anything blocked waiting for a client to answer a dialog before the threads go away.
+  engineService.abortDialogs();
+  server.stop();
 
   return EXIT_SUCCESS;
 }

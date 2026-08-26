@@ -13,24 +13,25 @@ target_sources(
           ${CMAKE_CURRENT_LIST_DIR}/ClientFactory.h
           ${CMAKE_CURRENT_LIST_DIR}/CompilationDatabaseInfo.cpp
           ${CMAKE_CURRENT_LIST_DIR}/CompilationDatabaseInfo.h
+          ${CMAKE_CURRENT_LIST_DIR}/EngineCall.cpp
           ${CMAKE_CURRENT_LIST_DIR}/EngineCall.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.cpp
           ${CMAKE_CURRENT_LIST_DIR}/EngineChannel.h
           ${CMAKE_CURRENT_LIST_DIR}/EngineEventClient.cpp
           ${CMAKE_CURRENT_LIST_DIR}/EngineEventClient.h
-          ${CMAKE_CURRENT_LIST_DIR}/GrpcProject.cpp
-          ${CMAKE_CURRENT_LIST_DIR}/GrpcProject.h
-          ${CMAKE_CURRENT_LIST_DIR}/GrpcStorageAccess.cpp
-          ${CMAKE_CURRENT_LIST_DIR}/GrpcStorageAccess.h)
+          ${CMAKE_CURRENT_LIST_DIR}/HttpProject.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/HttpProject.h
+          ${CMAKE_CURRENT_LIST_DIR}/HttpStorageAccess.cpp
+          ${CMAKE_CURRENT_LIST_DIR}/HttpStorageAccess.h)
 
 target_include_directories(Sourcetrail_client PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_link_libraries(
   Sourcetrail_client
   PUBLIC Sourcetrail::lib::lib # StorageAccess and the domain types it returns
-         # EngineChannel.h exposes the stub, so its headers reach whoever includes it.
+         # EngineChannel.h exposes the HTTP client, so its headers reach whoever includes it.
          Sourcetrail::lib::proto::api
-         gRPC::grpc++
+         Sourcetrail::lib::core::http
          Sourcetrail::lib::messaging # ClientFactory hands out the concrete MessageQueue
   PRIVATE Sourcetrail::lib::proto::convert
           Sourcetrail::lib::core

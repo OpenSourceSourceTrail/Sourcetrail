@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "engine.pb.h"
 #include "EngineCall.h"
 
 namespace client {
@@ -24,7 +25,7 @@ const sourcetrail::CapabilitiesResponse* Capabilities::get() const {
   if(!mCached) {
     // A failure leaves the cache empty on purpose: the next query retries, so capabilities come back
     // by themselves once the supervisor has the engine running again.
-    mCached = call(mChannel, "GetCapabilities", &Stub::GetCapabilities, sourcetrail::EmptyRequest{});
+    mCached = call<sourcetrail::CapabilitiesResponse>(mChannel, "getCapabilities", "GET", "/api/v1/capabilities");
   }
   return mCached ? &*mCached : nullptr;
 }

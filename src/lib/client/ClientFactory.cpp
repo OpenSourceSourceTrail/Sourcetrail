@@ -1,6 +1,6 @@
 #include "ClientFactory.h"
 
-#include "GrpcProject.h"
+#include "HttpProject.h"
 #include "MessageQueue.h"
 #include "StorageCache.h"
 
@@ -18,7 +18,7 @@ std::shared_ptr<IProject> ClientFactory::createProject(std::shared_ptr<ProjectSe
   if(storageCache) {
     storageCache->setSubject(mStorageAccess);
   }
-  return std::make_shared<GrpcProject>(mChannel, std::move(settings));
+  return std::make_shared<HttpProject>(mChannel, std::move(settings));
 }
 
 IMessageQueue::Ptr ClientFactory::createMessageQueue() noexcept {

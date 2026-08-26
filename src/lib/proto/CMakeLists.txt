@@ -22,6 +22,10 @@ protobuf_generate(
   "${GENERATED_DIR}")
 
 # Generate .grpc.pb.h / .grpc.pb.cc
+#
+# engine.proto is deliberately absent: the client <-> engine boundary is HTTP + JSON, so that file
+# declares messages only and needs no service stubs. gRPC remains the transport for the engine <->
+# indexer boundary, which is what indexer_worker.proto describes.
 protobuf_generate(
   LANGUAGE
   grpc
@@ -34,7 +38,6 @@ protobuf_generate(
   GRPC_SRCS
   PROTOS
   "${PROTO_DIR}/indexer_worker.proto"
-  "${PROTO_DIR}/engine.proto"
   IMPORT_DIRS
   "${PROTO_DIR}"
   PROTOC_OUT_DIR
@@ -59,7 +62,9 @@ add_library(
   ConvertLocations.cpp
   ConvertLocations.h
   ConvertQuery.cpp
-  ConvertQuery.h)
+  ConvertQuery.h
+  ProtoJson.cpp
+  ProtoJson.h)
 add_library(Sourcetrail::lib::proto::convert ALIAS Sourcetrail_proto_convert)
 
 target_include_directories(Sourcetrail_proto_convert PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")

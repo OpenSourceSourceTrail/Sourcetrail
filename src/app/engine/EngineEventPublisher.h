@@ -5,7 +5,7 @@
 #include "type/indexing/MessageIndexingStarted.h"
 #include "type/MessageStatus.h"
 
-class EngineServiceImpl;
+class EngineHttpService;
 
 /**
  * The engine's half of the event stream.
@@ -21,7 +21,7 @@ class EngineServiceImpl;
  */
 class EngineDialogView final : public DialogView {
 public:
-  EngineDialogView(UseCase useCase, EngineServiceImpl* service);
+  EngineDialogView(UseCase useCase, EngineHttpService* service);
 
   void clearDialogs() override;
 
@@ -50,7 +50,7 @@ public:
                                         bool shallow) override;
 
 private:
-  EngineServiceImpl* mService;
+  EngineHttpService* mService;
 };
 
 class EngineEventPublisher final
@@ -58,7 +58,7 @@ class EngineEventPublisher final
     , public MessageListener<MessageStatus>
     , public MessageListener<MessageErrorCountUpdate> {
 public:
-  explicit EngineEventPublisher(EngineServiceImpl* service);
+  explicit EngineEventPublisher(EngineHttpService* service);
 
   /** Installs itself as Application's DialogView source. Call once, after createInstance. */
   void installDialogViewFactory() const;
@@ -68,5 +68,5 @@ private:
   void handleMessage(MessageStatus* message) override;
   void handleMessage(MessageErrorCountUpdate* message) override;
 
-  EngineServiceImpl* mService;
+  EngineHttpService* mService;
 };

@@ -12,10 +12,10 @@ src/
   app/                  Executable entry points
     gui/                Main GUI application binary (Sourcetrail)
     cli/                Headless, Qt-free CLI client (Sourcetrail_cli)
-    engine/             gRPC service impl for the engine daemon (Sourcetrail_engine)
+    engine/             HTTP+JSON service impl for the engine daemon (Sourcetrail_engine)
     indexer/            Separate indexer worker process (Sourcetrail_indexer)
   lib/                  Libraries
-    proto/              Protobuf/gRPC contracts (*.proto) + Convert helpers (storage <-> proto)
+    proto/              Payload schema (*.proto) + Convert helpers (storage <-> proto) + ProtoJson
     core/                Fine-grained utility libraries (file system, logging, config,
                          text codec, migration, string utils, UUIDs, etc.)
     external/            Vendored third-party code (CppSQLite3, etc.)
@@ -35,7 +35,7 @@ src/
 
 ## Messaging (`src/lib/messaging/`)
 
-Decoupled pub/sub bus. `MessageQueue` is the central singleton. Senders call `Message::dispatch()`. Receivers inherit `MessageListener<T>` and implement `handleMessage(T&)`. All message types live under `messaging/type/`. Primary cross-cutting communication mechanism (in-process; cross-process is gRPC — see `grpc-ipc` skill).
+Decoupled pub/sub bus. `MessageQueue` is the central singleton. Senders call `Message::dispatch()`. Receivers inherit `MessageListener<T>` and implement `handleMessage(T&)`. All message types live under `messaging/type/`. Primary cross-cutting communication mechanism (in-process). Cross-process: the GUI <-> engine boundary is HTTP + JSON (`src/lib/core/http`, `EngineHttpService`, server-sent events for engine->client push); the engine <-> indexer boundary is still gRPC — see `grpc-ipc` skill.
 
 ## Storage layer (`src/lib/lib/data/storage/`)
 

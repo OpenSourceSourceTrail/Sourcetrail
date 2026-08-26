@@ -17,7 +17,7 @@
 #include "CommandLineParser.h"
 #include "EngineEventClient.h"
 #include "FilePath.h"
-#include "GrpcStorageAccess.h"
+#include "HttpStorageAccess.h"
 #include "IApplicationSettings.hpp"
 #include "includes.h"
 #include "logging.h"
@@ -48,12 +48,12 @@ void signalHandler(int signum) {
  *
  * The supervisor outlives the returned factory's use, so it is created by the caller; everything
  * here is deliberately non-fatal -- if the engine never comes up the GUI still runs, showing empty
- * views, which is the whole point of routing storage through GrpcStorageAccess.
+ * views, which is the whole point of routing storage through HttpStorageAccess.
  */
 std::shared_ptr<lib::IFactory> startEngineAndMakeFactory(QtEngineSupervisor& supervisor,
-                                                         std::shared_ptr<GrpcStorageAccess>& storageAccess) {
+                                                         std::shared_ptr<HttpStorageAccess>& storageAccess) {
   supervisor.start();
-  storageAccess = std::make_shared<GrpcStorageAccess>(supervisor.getChannel());
+  storageAccess = std::make_shared<HttpStorageAccess>(supervisor.getChannel());
   return std::make_shared<client::ClientFactory>(supervisor.getChannel(), storageAccess);
 }
 
@@ -76,7 +76,7 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
   setupApp(argc, argv);
 
   QtEngineSupervisor supervisor;
-  std::shared_ptr<GrpcStorageAccess> storageAccess;
+  std::shared_ptr<HttpStorageAccess> storageAccess;
   Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), nullptr, nullptr);
   [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
 
@@ -137,7 +137,7 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
   QtNetworkFactory networkFactory;
 
   QtEngineSupervisor supervisor;
-  std::shared_ptr<GrpcStorageAccess> storageAccess;
+  std::shared_ptr<HttpStorageAccess> storageAccess;
   Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), &viewFactory, &networkFactory);
   [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
 

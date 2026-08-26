@@ -13,9 +13,9 @@ class EngineChannel;
  * trip would stall the UI. Commands do go to the engine, and a failed one leaves the cached state
  * untouched rather than throwing.
  */
-class GrpcProject final : public IProject {
+class HttpProject final : public IProject {
 public:
-  GrpcProject(EngineChannel* channel, std::shared_ptr<ProjectSettings> settings);
+  HttpProject(EngineChannel* channel, std::shared_ptr<ProjectSettings> settings);
 
   [[nodiscard]] FilePath getProjectSettingsFilePath() const override;
   [[nodiscard]] std::string getDescription() const override;

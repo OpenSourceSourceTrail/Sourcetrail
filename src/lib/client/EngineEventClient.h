@@ -1,13 +1,17 @@
 #pragma once
 #include <atomic>
+#include <memory>
 #include <mutex>
+#include <string>
 #include <thread>
-
-#include <grpcpp/grpcpp.h>
 
 #include "engine.pb.h"
 
 class EngineChannel;
+
+namespace http {
+class EventSource;
+}
 
 namespace client {
 
@@ -16,8 +20,8 @@ namespace client {
  *
  * Without it a client can only ask questions -- indexing progress, status lines and the "the index
  * is ready" signal all originate on the engine's message bus, which stops at the process boundary.
- * One thread holds a WatchEvents stream open and re-dispatches each event onto the local bus, so
- * controllers and views carry on believing the work happens in-process.
+ * One thread holds a server-sent event stream open and re-dispatches each event onto the local bus,
+ * so controllers and views carry on believing the work happens in-process.
  *
  * The stream dies whenever the engine does; the loop simply reopens it, which is also how it picks
  * up the new port after QtEngineSupervisor respawns the engine.
@@ -40,14 +44,15 @@ public:
 
 private:
   void run();
+  void handleFrame(const std::string& name, const std::string& data);
 
   EngineChannel* mChannel;
   std::atomic<bool> mStopping{true};
   std::thread mThread;
 
-  // Read() blocks; cancelling the context is the only way to get the thread back.
-  std::mutex mContextMutex;
-  grpc::ClientContext* mContext = nullptr;
+  // run() blocks inside the source; cancelling it is the only way to get the thread back.
+  std::mutex mSourceMutex;
+  std::shared_ptr<http::EventSource> mSource;
 };
 
 }    // namespace client
