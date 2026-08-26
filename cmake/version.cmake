@@ -3,7 +3,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
   find_package(Git)
 
   execute_process(
-    COMMAND ${GIT_EXECUTABLE} describe --abbrev=0 --tags
+    COMMAND ${GIT_EXECUTABLE} describe --abbrev=0 --tags --match "[0-9]*"
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     OUTPUT_VARIABLE VERSION_STRING
     OUTPUT_STRIP_TRAILING_WHITESPACE
