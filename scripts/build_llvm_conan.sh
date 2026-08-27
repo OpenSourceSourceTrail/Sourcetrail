@@ -6,7 +6,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RECIPE_DIR="${REPO_ROOT}/.conan/recipes/llvm-clang"
-REFERENCE="llvm-clang/22.1.8"
+REFERENCE="llvm-clang/23.1.0"
 LLVM_BUILD_JOBS="${LLVM_BUILD_JOBS:-}"
 
 cd "${REPO_ROOT}"

@@ -155,7 +155,7 @@ is also `gnu_debug`, which builds into `<repo>/build-debug/`.
 
 ### Required dependencies
 
-* __LLVM/Clang 22.1.8__ (22 or newer is required; older releases do not provide the AST APIs the indexer uses)
+* __LLVM/Clang 23.1.0__ (23 or newer is required; older releases do not provide the AST APIs the indexer uses)
     * __Reason__: Used for running the preprocessor on the indexed source code, building and traversing an Abstract Syntax Tree and generating error messages.
     * __Remarks__: It must be built with RTTI and the LLVM/clang-cpp dylibs — stock distro packages and the official LLVM release binaries are built with `LLVM_ENABLE_RTTI=OFF` and will not work.
 
@@ -168,7 +168,7 @@ below. Run:
 $ ./scripts/build_llvm_conan.sh
 ```
 
-It exports the recipe, builds `llvm-clang/22.1.8` into your Conan cache using the same
+It exports the recipe, builds `llvm-clang/23.1.0` into your Conan cache using the same
 `.conan/gcc/profile` as the rest of the project, and symlinks `<repo>/external` at the
 resulting package — which is where the `_build_cxx` presets already look for `Clang_DIR`.
 The first run compiles LLVM from source and takes hours; afterwards it is a cache hit. This
@@ -179,8 +179,8 @@ To skip the hours-long first build, download the package CI already published an
 into your Conan cache — the script then resolves it as a cache hit in seconds:
 
 ```
-$ gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
-$ conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+$ gh release download llvm-clang-23.1.0 -p 'llvm-clang-23.1.0-linux-x86_64.tgz'
+$ conan cache restore llvm-clang-23.1.0-linux-x86_64.tgz
 $ ./scripts/build_llvm_conan.sh          # cache hit; creates the external/ symlink
 ```
 
@@ -188,7 +188,7 @@ That asset is produced by `.github/workflows/llvm.yml`, which is also what CI co
 
 #### Building LLVM by hand
 
-* __Building__: Make sure to check out the correct tag: `git checkout llvmorg-22.1.8`
+* __Building__: Make sure to check out the correct tag: `git checkout llvmorg-23.1.0`
 * __Building for Windows__: Follow [these steps](https://clang.llvm.org/get_started.html) to build the project. Run the cmake command exactly as described. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
 * __Building for Unix__: Follow this [installation guide](http://clang.llvm.org/docs/LibASTMatchersTutorial.html) to build the project. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DCLANG_LINK_CLANG_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`. These are the same flags the Conan recipe uses, so the two paths are interchangeable.
 

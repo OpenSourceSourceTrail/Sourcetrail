@@ -44,7 +44,7 @@ cmake --build build
 
 ### Enabling C/C++ language support (the indexer)
 
-Requires LLVM/Clang 22 or newer (developed against 22.1.8) built with `-DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RTTI=ON` (plus `-DCLANG_LINK_CLANG_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON` on Unix).
+Requires LLVM/Clang 23 or newer (developed against 23.1.0) built with `-DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RTTI=ON` (plus `-DCLANG_LINK_CLANG_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON` on Unix).
 
 On Linux, `scripts/build_llvm_conan.sh` produces that build through Conan from the recipe in `.conan/recipes/llvm-clang/`, then symlinks `<repo>/external` at the resulting package:
 ```
@@ -53,10 +53,10 @@ cmake --preset=ci_gnu_release_build_cxx
 ```
 That is a **second, separate** `conan install` (into `.conan/llvm/`); it deliberately stays out of the unified GCC/Release graph in `.conan/gcc/` so the main dependency set and its package IDs are unaffected. The first run compiles LLVM from source and takes hours; later runs are cache hits.
 
-To skip that first build, restore the package CI publishes — `.github/workflows/llvm.yml` builds it once and uploads it as a GitHub Release asset on the `llvm-clang-22.1.8` tag:
+To skip that first build, restore the package CI publishes — `.github/workflows/llvm.yml` builds it once and uploads it as a GitHub Release asset on the `llvm-clang-23.1.0` tag:
 ```
-gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
-conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+gh release download llvm-clang-23.1.0 -p 'llvm-clang-23.1.0-linux-x86_64.tgz'
+conan cache restore llvm-clang-23.1.0-linux-x86_64.tgz
 ./scripts/build_llvm_conan.sh   # now a cache hit; still makes the external/ symlink
 ```
 

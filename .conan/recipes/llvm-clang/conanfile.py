@@ -14,7 +14,7 @@ class LlvmClangConan(ConanFile):
     """
 
     name = "llvm-clang"
-    version = "22.1.8"
+    version = "23.1.0"
     license = "Apache-2.0 WITH LLVM-exception"
     homepage = "https://llvm.org"
     url = "https://github.com/llvm/llvm-project"

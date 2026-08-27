@@ -125,7 +125,7 @@ instead. Implemented in `indexer/CxxHelperMode.cpp`; the request/response pair i
 
 ## Building
 
-Requires **LLVM/Clang 22 or newer** (developed against 22.1.8), built with
+Requires **LLVM/Clang 23 or newer** (developed against 23.1.0), built with
 `-DLLVM_ENABLE_PROJECTS=clang -DLLVM_ENABLE_RTTI=ON`, plus
 `-DCLANG_LINK_CLANG_DYLIB=ON -DLLVM_LINK_LLVM_DYLIB=ON` on Unix. The version
 floor is checked by hand in `lib/CMakeLists.txt`, because Clang's own package
@@ -143,8 +143,8 @@ cmake --build build-cxx
 To skip that first build, restore the package CI publishes:
 
 ```bash
-gh release download llvm-clang-22.1.8 -p 'llvm-clang-22.1.8-linux-x86_64.tgz'
-conan cache restore llvm-clang-22.1.8-linux-x86_64.tgz
+gh release download llvm-clang-23.1.0 -p 'llvm-clang-23.1.0-linux-x86_64.tgz'
+conan cache restore llvm-clang-23.1.0-linux-x86_64.tgz
 ./scripts/build_llvm_conan.sh          # now a cache hit; still makes the symlink
 ```
 
