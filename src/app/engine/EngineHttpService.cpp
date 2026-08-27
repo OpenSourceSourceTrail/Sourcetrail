@@ -568,8 +568,16 @@ void EngineHttpService::registerRoutes(http::Server& server) {
       std::shared_ptr<SourceLocationFile> locations;
       if(request.query.contains("lines")) {
         const std::vector<std::string> range = request.getList("lines");
-        const uint64_t startLine = range.empty() ? 0 : std::stoull(range.front());
-        const uint64_t endLine = range.size() > 1 ? std::stoull(range[1]) : startLine;
+        uint64_t startLine = 0;
+        uint64_t endLine = 0;
+        try {
+          startLine = range.empty() ? 0 : std::stoull(range.front());
+          endLine = range.size() > 1 ? std::stoull(range[1]) : startLine;
+        } catch(...) {
+          // Every other malformed parameter on this route answers 400; an unguarded stoull here
+          // would escape the handler and surface as a 500 instead.
+          return badRequest("Malformed line range");
+        }
         locations = mStorageAccess->getSourceLocationsForLinesInFile(filePath, startLine, endLine);
       } else if(request.query.contains("locationType")) {
         locations = mStorageAccess->getSourceLocationsOfTypeInFile(
