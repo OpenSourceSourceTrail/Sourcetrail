@@ -233,6 +233,12 @@ SearchResult SearchIndex::bestScoredResult(SearchResult result,
                                            size_t maxBestScoredResultsLength) {
   const std::wstring text = result.text;
 
+  // An empty query matches every entry while matching no characters within it, so there is
+  // nothing to re-score -- and indices.back() below would be reading an empty vector.
+  if(result.indices.empty()) {
+    return result;
+  }
+
   if(maxBestScoredResultsLength && result.text.size() > maxBestScoredResultsLength) {
     if(result.indices.back() >= maxBestScoredResultsLength) {
       return result;
@@ -389,7 +395,10 @@ int SearchIndex::scoreText(const std::wstring& text, const std::vector<size_t>& 
     }
   }
 
-  int leadingStartScore = std::max(int(indices[0]) * delayedStartBonus, minDelayedStartBonus);
+  // The loop above already handles an empty index list, but this must too: an empty query
+  // matches every entry while matching no character within it, so there is no leading start to
+  // penalise -- and indices[0] would be reading an empty vector.
+  const int leadingStartScore = indices.empty() ? 0 : std::max(int(indices[0]) * delayedStartBonus, minDelayedStartBonus);
 
   int score = unmatchedLetterScore + consecutiveLetterScore + camelCaseScore + noLetterScore + firstLetterScore + leadingStartScore;
 
