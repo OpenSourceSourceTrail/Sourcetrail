@@ -17,8 +17,6 @@ add_sourcetrail_test(
        Sourcetrail::lib::core::http
        Sourcetrail::lib::core::utility::logging
        Sourcetrail::lib::core::utility::TextAccess
-       Sourcetrail::gtest_main
-  TEST_PREFIX "unittests.client."
-  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
+  TEST_PREFIX "unittests.client.")
 
 target_include_directories(HttpStorageAccessTestSuite PRIVATE "${PROJECT_SOURCE_DIR}/src/app/engine")

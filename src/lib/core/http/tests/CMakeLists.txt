@@ -3,5 +3,4 @@ add_sourcetrail_test(
   NAME HttpServerTestSuite
   SOURCES HttpServerTestSuite.cpp
   DEPS Sourcetrail::lib::core::http
-  TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
+  TEST_PREFIX "unittests.core.")

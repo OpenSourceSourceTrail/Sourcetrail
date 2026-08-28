@@ -20,7 +20,6 @@ foreach(test_name IN LISTS test_lib_names)
          Qt6::Gui
          Qt6::Sql
          Sourcetrail::lib::messaging
-         Sourcetrail::gtest_main
          Sourcetrail::lib::core::utility::TextAccess
          Sourcetrail::lib::core::utility::file::FileSystem
          Sourcetrail::lib::core::utility::file::utilityFile
@@ -29,6 +28,5 @@ foreach(test_name IN LISTS test_lib_names)
          Sourcetrail::lib::lib_engine
          Boost::date_time
          spdlog::spdlog
-    TEST_PREFIX "integration.lib."
-    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
+    TEST_PREFIX "integration.lib.")
 endforeach()

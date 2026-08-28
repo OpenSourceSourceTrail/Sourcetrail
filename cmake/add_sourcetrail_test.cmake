@@ -1,76 +1,16 @@
-# Sourcetrail CMake Functions
+# Declares a GTest executable and registers it with CTest.
 #
-# This file contains utility functions for creating Sourcetrail test
-# with standardized configurations.
-
-# Function to add a Sourcetrail test executable with standardized configuration
-#
-# This function creates a test executable with all necessary dependencies, settings,
-# and GTest integration for Sourcetrail tests.
-#
-# Usage:
 #   add_sourcetrail_test(
-#     NAME <test_name>
-#     [SOURCES <source_files...>]
-#     [DEPS <dependencies...>]
-#     [TEST_PREFIX <prefix>]
-#     [WORKING_DIRECTORY <directory>]
-#   )
+#     NAME MyTestSuite                       # required; the target and executable name
+#     SOURCES MyTestSuite.cpp                # required
+#     DEPS Sourcetrail::lib::lib_engine      # on top of the two linked automatically
+#     TEST_PREFIX "unittests.lib."           # required; ctest name prefix, see the registered
+#                                            # prefixes in CLAUDE.md
+#     WORKING_DIRECTORY <dir>)               # defaults to ${PROJECT_BINARY_DIR}/test/
 #
-# Parameters:
-#   NAME (required):
-#     Name of the test executable
-#     Example: NAME my_component_test
-#
-#   SOURCES (optional):
-#     List of source files for the test
-#     If not provided, defaults to ${NAME}.cpp
-#     Example: SOURCES test1.cpp test2.cpp
-#
-#   DEPS (optional):
-#     Additional public dependencies beyond the standard test dependencies
-#     Example: DEPS my_extra_lib another_dependency
-#
-#   TEST_PREFIX (optional):
-#     Prefix for test discovery
-#     Defaults to "unittests.lib."
-#     Example: TEST_PREFIX "custom.tests."
-#
-#   WORKING_DIRECTORY (optional):
-#     Working directory for test execution
-#     Defaults to "${CMAKE_BINARY_DIR}/test/"
-#     Example: WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/custom_tests/"
-#
-# Standard dependencies automatically included:
-#   - lib_test_utilities
-#   - lib::mocks
-#   - GTest::gmock
-#   - GTest::gtest
-#   - Sourcetrail::lib
-#   - Sourcetrail::gtest_main
-#   - Qt6::Gui
-#   - sanitizer::address (if ENABLE_SANITIZER_ADDRESS is ON)
-#   - sanitizer::undefined (if ENABLE_SANITIZER_UNDEFINED_BEHAVIOR is ON)
-#
-# Example usage:
-#   # Basic usage with default settings
-#   add_sourcetrail_test(
-#     NAME my_test
-#   )
-#
-#   # Advanced usage with custom settings
-#   add_sourcetrail_test(
-#     NAME advanced_test
-#     SOURCES
-#       advanced_test.cpp
-#       test_helpers.cpp
-#     DEPS
-#       my_custom_library
-#       internal_test_helpers
-#     TEST_PREFIX "custom.advanced."
-#     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/advanced_tests/"
-#   )
-#
+# Sourcetrail::gtest_main and Sourcetrail::warnings are linked for you. TEST_PREFIX is required
+# rather than defaulted: each test directory registers its own prefix, and a wrong one silently
+# files the tests under the wrong ctest bucket.
 function(add_sourcetrail_test)
   # Define the expected arguments
   set(options "")
@@ -101,7 +41,7 @@ function(add_sourcetrail_test)
   endif()
 
   if(NOT DEFINED ARG_WORKING_DIRECTORY)
-    set(ARG_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+    set(ARG_WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
   endif()
 
   # Add the test executable

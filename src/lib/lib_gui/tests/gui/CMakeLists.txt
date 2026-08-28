@@ -22,8 +22,5 @@ foreach(test_name IN LISTS test_lib_gui_names)
                AUTOMOC ON
                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
-  add_test(
-    NAME ${test_name}
-    COMMAND ${test_name} "-platform" "offscreen"
-    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
+  add_test(NAME ${test_name} COMMAND ${test_name} "-platform" "offscreen")
 endforeach()

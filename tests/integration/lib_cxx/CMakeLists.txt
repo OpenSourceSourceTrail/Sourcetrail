@@ -15,6 +15,5 @@ foreach(test_name IN LISTS test_cxx_names)
     SOURCES ${test_name}.cpp
     DEPS Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess Sourcetrail::helper::TestFileRegister
          Sourcetrail::helper::TestStorage Sourcetrail::lib::lib_cxx lib::mocks
-    TEST_PREFIX "integration.lib_cxx."
-    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
+    TEST_PREFIX "integration.lib_cxx.")
 endforeach()
