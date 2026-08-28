@@ -1,4 +1,4 @@
-#include "TokenComponentBundledEdges.h"
+#include "data/graph/token_component/TokenComponentBundledEdges.h"
 
 TokenComponentBundledEdges::Direction TokenComponentBundledEdges::opposite(Direction direction) {
   if(direction == DIRECTION_FORWARD) {

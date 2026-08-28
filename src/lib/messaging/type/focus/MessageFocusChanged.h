@@ -1,7 +1,7 @@
 #pragma once
 // internal
+#include "component/TabId.h"
 #include "Message.h"
-#include "TabId.h"
 
 class MessageFocusChanged final : public Message<MessageFocusChanged> {
 public:

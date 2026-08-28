@@ -1,10 +1,10 @@
-#include "QtProjectWizardContentCStandard.h"
+#include "qt/project_wizard/content/QtProjectWizardContentCStandard.h"
 
 #include <QComboBox>
 #include <QGridLayout>
 #include <QLabel>
 
-#include "SourceGroupSettingsWithCStandard.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h"
 
 QtProjectWizardContentCStandard::QtProjectWizardContentCStandard(std::shared_ptr<SourceGroupSettingsWithCStandard> sourceGroupSettings,
                                                                  QtProjectWizardWindow* window)

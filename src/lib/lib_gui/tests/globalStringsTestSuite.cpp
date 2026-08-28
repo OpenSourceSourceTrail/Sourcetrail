@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "globalStrings.h"
+#include "utility/globalStrings.h"
 
 using namespace testing;
 

@@ -1,10 +1,10 @@
-#include "QtProjectWizardContentVS.h"
+#include "qt/project_wizard/content/QtProjectWizardContentVS.h"
 
 #include <QGridLayout>
 #include <QLabel>
 
-#include "globalStrings.h"
 #include "type/plugin/MessageIDECreateCDB.h"
+#include "utility/globalStrings.h"
 
 QtProjectWizardContentVS::QtProjectWizardContentVS(QtProjectWizardWindow* window) : QtProjectWizardContent(window) {}
 

@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "FilePath.h"
-#include "SourceGroupSettingsComponent.h"
+#include "settings/source_group/component/SourceGroupSettingsComponent.h"
 
 class SourceGroupSettingsWithSourcePaths : public SourceGroupSettingsComponent {
 public:

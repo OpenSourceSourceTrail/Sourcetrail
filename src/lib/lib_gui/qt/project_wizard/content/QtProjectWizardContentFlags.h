@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtProjectWizardContent.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
 
 class QtStringListBox;
 class SourceGroupSettingsWithCxxPathsAndFlags;

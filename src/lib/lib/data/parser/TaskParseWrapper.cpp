@@ -1,8 +1,8 @@
-#include "TaskParseWrapper.h"
+#include "data/parser/TaskParseWrapper.h"
 
 #include "../../../scheduling/Blackboard.h"
-#include "DialogView.h"
-#include "PersistentStorage.h"
+#include "component/view/DialogView.h"
+#include "data/storage/PersistentStorage.h"
 
 TaskParseWrapper::TaskParseWrapper(std::weak_ptr<PersistentStorage> storage, std::shared_ptr<DialogView> dialogView)
     : m_storage(storage), m_dialogView(dialogView) {}

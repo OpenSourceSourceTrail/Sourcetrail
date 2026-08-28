@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "ComponentManager.h"
-#include "DialogView.h"
-#include "ViewLayout.h"
+#include "component/ComponentManager.h"
+#include "component/view/DialogView.h"
+#include "component/view/ViewLayout.h"
 
 class Bookmark;
 class MessageBase;

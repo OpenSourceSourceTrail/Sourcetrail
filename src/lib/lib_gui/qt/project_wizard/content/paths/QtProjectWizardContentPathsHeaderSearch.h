@@ -2,7 +2,7 @@
 #define QT_PROJECT_WIZARD_CONTENT_PATHS_HEADER_SEARCH_H
 
 #include "FilePathFilter.h"
-#include "QtProjectWizardContentPaths.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPaths.h"
 
 class IncludeDirective;
 class QtPathListDialog;

@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include "ISharedMemoryGarbageCollector.hpp"
 #include "MockedSharedMemoryGarbageCollector.hpp"
-#include "SharedMemory.h"
+#include "utility/interprocess/ISharedMemoryGarbageCollector.hpp"
+#include "utility/interprocess/SharedMemory.h"
 
 using namespace testing;
 

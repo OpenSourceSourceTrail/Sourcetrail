@@ -2,12 +2,12 @@
 
 #include <cmath>
 
-#include "AccessKind.h"
+#include "data/graph/Node.h"
+#include "data/GroupType.h"
+#include "data/name/NameHierarchy.h"
+#include "data/parser/AccessKind.h"
 #include "GlobalId.hpp"
-#include "GroupType.h"
 #include "LayoutRect.h"
-#include "NameHierarchy.h"
-#include "Node.h"
 #include "utility.h"
 #include "utilityString.h"
 #include "Vec2f.h"

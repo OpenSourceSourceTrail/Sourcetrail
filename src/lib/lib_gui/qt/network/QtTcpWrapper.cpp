@@ -1,4 +1,4 @@
-#include "QtTcpWrapper.h"
+#include "qt/network/QtTcpWrapper.h"
 
 #include <qdatastream.h>
 

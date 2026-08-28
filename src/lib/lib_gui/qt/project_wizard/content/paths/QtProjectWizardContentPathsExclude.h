@@ -1,7 +1,7 @@
 #ifndef QT_PROJECT_WIZARD_CONTENT_PATHS_EXCLUDE_H
 #define QT_PROJECT_WIZARD_CONTENT_PATHS_EXCLUDE_H
 
-#include "QtProjectWizardContentPaths.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPaths.h"
 
 class QtProjectWizardContentPathsExclude : public QtProjectWizardContentPaths {
   Q_OBJECT

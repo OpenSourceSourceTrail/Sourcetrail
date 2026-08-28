@@ -3,7 +3,7 @@
 
 #include <QVector2D>
 
-#include "QtGraphNodeComponent.h"
+#include "qt/graphics/component/QtGraphNodeComponent.h"
 
 class QtGraphNodeComponentMoveable : public QtGraphNodeComponent {
 public:

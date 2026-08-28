@@ -2,7 +2,7 @@
 #include <memory>
 #include <set>
 
-#include "SourceGroup.h"
+#include "project/SourceGroup.h"
 
 class SourceGroupSettingsCxx;
 

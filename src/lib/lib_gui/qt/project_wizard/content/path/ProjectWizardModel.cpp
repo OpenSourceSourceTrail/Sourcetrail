@@ -1,9 +1,9 @@
-#include "ProjectWizardModel.hpp"
+#include "qt/project_wizard/content/path/ProjectWizardModel.hpp"
 
 #include "CompilationDatabaseInfo.h"
 #include "FilePathFilter.h"
-#include "QtProjectWizardContentPathsIndexedHeaders.h"
-#include "SourceGroupSettingsCxxCdb.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
 #include "utilityFile.h"
 

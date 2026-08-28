@@ -1,4 +1,4 @@
-#include "QtLineItemBase.h"
+#include "qt/graphics/base/QtLineItemBase.h"
 
 #include <cmath>
 

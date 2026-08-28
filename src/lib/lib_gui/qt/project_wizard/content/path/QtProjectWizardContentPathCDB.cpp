@@ -1,13 +1,13 @@
-#include "QtProjectWizardContentPathCDB.h"
+#include "qt/project_wizard/content/path/QtProjectWizardContentPathCDB.h"
 // Qt5
 #include <utility>
 
 #include <QGridLayout>
 #include <QLabel>
 // internal
-#include "ProjectWizardModel.hpp"
-#include "QtProjectWizardContentPathsIndexedHeaders.h"
-#include "SourceGroupSettingsCxxCdb.h"
+#include "qt/project_wizard/content/path/ProjectWizardModel.hpp"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
 #include "utilityFile.h"
 

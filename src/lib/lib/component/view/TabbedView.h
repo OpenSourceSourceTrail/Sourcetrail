@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "View.h"
-#include "ViewLayout.h"
+#include "component/view/View.h"
+#include "component/view/ViewLayout.h"
 
 class TabbedView
     : public View

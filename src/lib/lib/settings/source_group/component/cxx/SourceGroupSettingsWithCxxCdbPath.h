@@ -2,7 +2,7 @@
 #define SOURCE_GROUP_SETTINGS_WITH_CXX_CDB_PATH_H
 
 #include "FilePath.h"
-#include "SourceGroupSettingsComponent.h"
+#include "settings/source_group/component/SourceGroupSettingsComponent.h"
 
 class SourceGroupSettingsWithCxxCdbPath : public SourceGroupSettingsComponent {
 public:

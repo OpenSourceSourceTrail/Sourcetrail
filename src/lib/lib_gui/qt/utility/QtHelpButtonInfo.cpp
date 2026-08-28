@@ -1,4 +1,4 @@
-#include "QtHelpButtonInfo.h"
+#include "qt/utility/QtHelpButtonInfo.h"
 
 #include <QMessageBox>
 

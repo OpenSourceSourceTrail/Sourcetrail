@@ -1,14 +1,14 @@
-#include "CxxVerboseAstVisitor.h"
+#include "data/parser/cxx/CxxVerboseAstVisitor.h"
 
 #include <sstream>
 
 #include <clang/Basic/SourceLocation.h>
 #include <clang/Basic/SourceManager.h>
 
-#include "CanonicalFilePathCache.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/ParseLocation.h"
+#include "data/parser/ParserClient.h"
 #include "logging.h"
-#include "ParseLocation.h"
-#include "ParserClient.h"
 #include "ScopedSwitcher.h"
 
 namespace {

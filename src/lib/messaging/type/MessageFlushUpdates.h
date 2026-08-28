@@ -1,8 +1,8 @@
 #ifndef MESSAGE_FLUSH_UPDATES_H
 #define MESSAGE_FLUSH_UPDATES_H
 
+#include "component/TabId.h"
 #include "Message.h"
-#include "TabId.h"
 
 class MessageFlushUpdates : public Message<MessageFlushUpdates> {
 public:

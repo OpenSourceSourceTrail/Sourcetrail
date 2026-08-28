@@ -2,7 +2,7 @@
 #include <optional>
 
 #include "engine.pb.h"
-#include "SourceGroupType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 class EngineChannel;
 

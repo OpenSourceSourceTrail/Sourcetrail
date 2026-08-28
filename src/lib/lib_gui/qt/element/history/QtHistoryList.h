@@ -3,7 +3,7 @@
 
 #include <QListWidget>
 
-#include "SearchMatch.h"
+#include "data/search/SearchMatch.h"
 
 class QLabel;
 

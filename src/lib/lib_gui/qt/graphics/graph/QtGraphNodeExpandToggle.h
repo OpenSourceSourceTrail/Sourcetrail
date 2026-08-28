@@ -3,7 +3,7 @@
 
 #include <QGraphicsItem>
 
-#include "QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 class QtGraphNodeExpandToggle : public QtGraphNode {
   Q_OBJECT

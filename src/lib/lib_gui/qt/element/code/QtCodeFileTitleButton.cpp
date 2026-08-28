@@ -1,14 +1,14 @@
-#include "QtCodeFileTitleButton.h"
+#include "qt/element/code/QtCodeFileTitleButton.h"
 
 #include <QMouseEvent>
 
-#include "Application.h"
-#include "ColorScheme.h"
+#include "app/Application.h"
+#include "app/paths/ResourcePaths.h"
 #include "FileSystem.h"
-#include "IApplicationSettings.hpp"
-#include "IProject.hpp"
-#include "QtContextMenu.h"
-#include "ResourcePaths.h"
+#include "project/IProject.hpp"
+#include "qt/utility/QtContextMenu.h"
+#include "settings/ColorScheme.h"
+#include "settings/IApplicationSettings.hpp"
 #include "type/code/MessageActivateFile.h"
 #include "type/MessageProjectEdit.h"
 #include "type/tab/MessageTabOpenWith.h"

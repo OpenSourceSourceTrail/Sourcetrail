@@ -8,9 +8,10 @@
  * @copyright Copyright (c) 2025
  */
 #pragma once
-#include <DialogView.h>
 #include <FilePath.h>
-#include <ProjectSettings.h>
+
+#include "component/view/DialogView.h"
+#include "settings/ProjectSettings.h"
 
 /**
  * @brief The IProject class represents an interface for a project within the application.

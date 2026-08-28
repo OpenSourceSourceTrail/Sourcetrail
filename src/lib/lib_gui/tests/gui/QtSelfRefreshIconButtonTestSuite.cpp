@@ -6,7 +6,7 @@
 #include <gmock/gmock.h>
 
 #include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
-#include "QtSelfRefreshIconButton.h"
+#include "qt/element/button/QtSelfRefreshIconButton.h"
 
 QtSelfRefreshIconButtonTestSuite::QtSelfRefreshIconButtonTestSuite() = default;
 

@@ -4,9 +4,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ActivationController.h"
+#include "component/controller/ActivationController.h"
 #include "ConsoleLogger.h"
-#include "IApplicationSettings.hpp"
+#include "data/name/NameHierarchy.h"
 #include "MessageActivateEdge.h"
 #include "MessageActivateTokenIds.h"
 #include "MessageActivateTokens.h"
@@ -16,7 +16,7 @@
 #include "MessageSearch.h"
 #include "MessageStatus.h"
 #include "mocks/MockedStorageAccess.hpp"
-#include "NameHierarchy.h"
+#include "settings/IApplicationSettings.hpp"
 
 using namespace std::chrono_literals;
 using namespace testing;

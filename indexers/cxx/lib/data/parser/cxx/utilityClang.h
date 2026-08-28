@@ -2,8 +2,8 @@
 // clang
 #include <clang/AST/Decl.h>
 // internal
-#include "AccessKind.h"
-#include "SymbolKind.h"
+#include "data/parser/AccessKind.h"
+#include "data/parser/SymbolKind.h"
 
 struct ParseLocation;
 struct ParseLocation;

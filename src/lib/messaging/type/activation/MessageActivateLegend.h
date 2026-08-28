@@ -1,8 +1,8 @@
 #pragma once
 // internal
+#include "component/TabId.h"
 #include "Message.h"
 #include "MessageActivateBase.h"
-#include "TabId.h"
 
 class MessageActivateLegend
     : public Message<MessageActivateLegend>

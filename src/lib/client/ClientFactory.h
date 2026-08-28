@@ -1,5 +1,5 @@
 #pragma once
-#include "IFactory.hpp"
+#include "factory/IFactory.hpp"
 
 class EngineChannel;
 class StorageAccess;

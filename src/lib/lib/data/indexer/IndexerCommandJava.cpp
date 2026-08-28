@@ -1,4 +1,4 @@
-#include "IndexerCommandJava.h"
+#include "data/indexer/IndexerCommandJava.h"
 
 #include <boost/json/array.hpp>
 #include <boost/json/object.hpp>

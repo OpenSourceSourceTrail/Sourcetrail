@@ -1,25 +1,25 @@
-#include "QtProjectWizardContentPathsHeaderSearch.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.h"
 
 #include <cmath>
 
 #include <QGridLayout>
 #include <QMessageBox>
 
-#include "Application.h"
+#include "app/Application.h"
 #include "FileManager.h"
-#include "IApplicationSettings.hpp"
-#include "IncludeDirective.h"
-#include "IncludeProcessing.h"
-#include "QtDialogView.h"
-#include "QtPathListDialog.h"
-#include "QtTextEditDialog.h"
+#include "qt/view/QtDialogView.h"
+#include "qt/window/QtPathListDialog.h"
+#include "qt/window/QtTextEditDialog.h"
 #include "ScopedFunctor.h"
-#include "SourceGroupSettings.h"
-#include "SourceGroupSettingsWithCxxPathsAndFlags.h"
-#include "SourceGroupSettingsWithExcludeFilters.h"
-#include "SourceGroupSettingsWithSourceExtensions.h"
-#include "SourceGroupSettingsWithSourcePaths.h"
+#include "settings/IApplicationSettings.hpp"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourceExtensions.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourcePaths.h"
+#include "settings/source_group/SourceGroupSettings.h"
 #include "utility.h"
+#include "utility/IncludeDirective.h"
+#include "utility/IncludeProcessing.h"
 #include "utilityFile.h"
 
 QtProjectWizardContentPathsHeaderSearch::QtProjectWizardContentPathsHeaderSearch(std::shared_ptr<SourceGroupSettings> settings,

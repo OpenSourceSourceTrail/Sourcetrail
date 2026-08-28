@@ -1,4 +1,4 @@
-#include "CxxFunctionDeclName.h"
+#include "data/parser/cxx/name/CxxFunctionDeclName.h"
 
 #include <sstream>
 

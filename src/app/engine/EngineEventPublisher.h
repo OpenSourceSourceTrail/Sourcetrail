@@ -1,5 +1,5 @@
 #pragma once
-#include "DialogView.h"
+#include "component/view/DialogView.h"
 #include "MessageListener.h"
 #include "type/error/MessageErrorCountUpdate.h"
 #include "type/indexing/MessageIndexingStarted.h"

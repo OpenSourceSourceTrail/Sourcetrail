@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "SearchView.h"
+#include "component/view/SearchView.h"
 
 struct MockedSearchView final : SearchView {
   MockedSearchView(ViewLayout* viewLayout) : SearchView(viewLayout) {}

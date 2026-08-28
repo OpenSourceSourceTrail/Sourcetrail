@@ -1,3 +1,3 @@
-#include "SourceGroupFactoryModule.h"
+#include "project/SourceGroupFactoryModule.h"
 
 SourceGroupFactoryModule::~SourceGroupFactoryModule() = default;

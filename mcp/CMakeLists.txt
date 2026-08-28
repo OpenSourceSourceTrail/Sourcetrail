@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/mcp/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/mcp/CMakeLists.txt
 #
 # Registers the MCP server's check. Same shape as tests/integration/engine_http: bare add_test()
 # rather than add_sourcetrail_test(), which is hardwired to add_executable() plus
@@ -27,7 +27,7 @@ set_tests_properties(
   integration.mcp
   PROPERTIES
     ENVIRONMENT
-    "SOURCETRAIL_ENGINE=$<TARGET_FILE:Sourcetrail_engine>;SOURCETRAIL_PROJECTS_DIR=${CMAKE_SOURCE_DIR}/bin/app/user/projects"
+    "SOURCETRAIL_ENGINE=$<TARGET_FILE:Sourcetrail_engine>;SOURCETRAIL_PROJECTS_DIR=${PROJECT_SOURCE_DIR}/bin/app/user/projects"
     TIMEOUT
     180
     # Starts an engine on an ephemeral port; serialising keeps a loaded machine from tripping the

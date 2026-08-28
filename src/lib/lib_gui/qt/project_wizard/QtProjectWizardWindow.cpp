@@ -1,12 +1,12 @@
-#include "QtProjectWizardWindow.h"
+#include "qt/project_wizard/QtProjectWizardWindow.h"
 // Qt5
 #include <QFrame>
 #include <QGridLayout>
 #include <QPushButton>
 #include <QScrollArea>
 // internal
-#include "QtProjectWizardContent.h"
-#include "utilityQt.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
+#include "qt/utility/utilityQt.h"
 
 QtProjectWizardWindow::QtProjectWizardWindow(QWidget* pParent, bool showSeparator)
     : QtWindow(false, pParent), m_content(nullptr), m_showSeparator(showSeparator) {}

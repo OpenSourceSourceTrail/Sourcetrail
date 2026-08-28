@@ -1,4 +1,4 @@
-#include "QtIndexingReportDialog.h"
+#include "qt/window/QtIndexingReportDialog.h"
 
 #include <QKeyEvent>
 #include <QLabel>

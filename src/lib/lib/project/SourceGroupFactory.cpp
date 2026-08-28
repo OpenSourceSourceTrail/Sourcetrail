@@ -1,9 +1,9 @@
-#include "SourceGroupFactory.h"
+#include "project/SourceGroupFactory.h"
 
 #include "logging.h"
-#include "SourceGroup.h"
-#include "SourceGroupFactoryModule.h"
-#include "SourceGroupSettings.h"
+#include "project/SourceGroup.h"
+#include "project/SourceGroupFactoryModule.h"
+#include "settings/source_group/SourceGroupSettings.h"
 
 std::shared_ptr<SourceGroupFactory> SourceGroupFactory::getInstance() {
   if(!s_instance) {

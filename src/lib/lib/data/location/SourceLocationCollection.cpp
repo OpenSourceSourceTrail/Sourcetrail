@@ -1,11 +1,11 @@
-#include "SourceLocationCollection.h"
+#include "data/location/SourceLocationCollection.h"
 // STL
 #include <utility>
 // fmt
 #include <fmt/format.h>
 // internal
+#include "data/location/SourceLocationFile.h"
 #include "logging.h"
-#include "SourceLocationFile.h"
 
 SourceLocationCollection::SourceLocationCollection() = default;
 

@@ -4,8 +4,8 @@
 #include <QGraphicsRectItem>
 #include <QVector2D>
 
-#include "NameHierarchy.h"
-#include "QtGraphNode.h"
+#include "data/name/NameHierarchy.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 class QtGraphNodeQualifier : public QtGraphNode {
   Q_OBJECT

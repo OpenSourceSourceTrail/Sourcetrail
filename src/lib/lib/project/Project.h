@@ -14,9 +14,9 @@
 
 #include <TaskGroupSequence.h>
 
-#include "IProject.hpp"
-#include "RefreshInfo.h"
-#include "SourceGroup.h"
+#include "project/IProject.hpp"
+#include "project/RefreshInfo.h"
+#include "project/SourceGroup.h"
 
 class DialogView;
 class FilePath;

@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 #include "ConvertLocations.h"
-#include "SourceLocation.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocation.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
 
 using namespace proto::convert;
 

@@ -1,10 +1,10 @@
-#include "SourceGroupFactoryModuleCxx.h"
+#include "project/SourceGroupFactoryModuleCxx.h"
 
-#include "SourceGroupCxxCdb.h"
-#include "SourceGroupCxxEmpty.h"
-#include "SourceGroupSettingsCEmpty.h"
-#include "SourceGroupSettingsCppEmpty.h"
-#include "SourceGroupSettingsCxxCdb.h"
+#include "project/SourceGroupCxxCdb.h"
+#include "project/SourceGroupCxxEmpty.h"
+#include "settings/source_group/type/SourceGroupSettingsCEmpty.h"
+#include "settings/source_group/type/SourceGroupSettingsCppEmpty.h"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 
 bool SourceGroupFactoryModuleCxx::supports(SourceGroupType type) const {
   switch(type) {

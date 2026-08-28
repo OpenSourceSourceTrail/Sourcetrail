@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "Bookmark.h"
+#include "data/bookmark/Bookmark.h"
 #include "Message.h"
 
 class MessageBookmarkActivate : public Message<MessageBookmarkActivate> {

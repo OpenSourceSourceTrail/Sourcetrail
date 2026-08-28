@@ -7,11 +7,11 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/ResourcePaths.h"
+#include "app/paths/UserPaths.h"
 #include "FilePath.h"
-#include "ResourcePaths.h"
-#include "UserPaths.h"
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 
 
 void setupPlatform(int argc, char* argv[]) {

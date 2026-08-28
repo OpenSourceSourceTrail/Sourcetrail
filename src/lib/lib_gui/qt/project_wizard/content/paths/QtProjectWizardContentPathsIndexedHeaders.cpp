@@ -1,14 +1,14 @@
-#include "QtProjectWizardContentPathsIndexedHeaders.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h"
 
 #include <QGridLayout>
 #include <QMessageBox>
 
 #include "CompilationDatabaseInfo.h"
 #include "logging.h"
-#include "QtPathListDialog.h"
-#include "QtSelectPathsDialog.h"
-#include "QtTextEditDialog.h"
-#include "SourceGroupSettingsCxxCdb.h"
+#include "qt/window/QtPathListDialog.h"
+#include "qt/window/QtSelectPathsDialog.h"
+#include "qt/window/QtTextEditDialog.h"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
 #include "utilityFile.h"
 

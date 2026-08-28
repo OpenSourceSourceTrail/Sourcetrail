@@ -1,10 +1,10 @@
-#${CMAKE_SOURCE_DIR}/indexers/cxx/indexer/CMakeLists.txt
+#${PROJECT_SOURCE_DIR}/indexers/cxx/indexer/CMakeLists.txt
 if(UNIX)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/app/")
 else()
   foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} "${CMAKE_BINARY_DIR}/${OUTPUTCONFIG}/app/")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} "${PROJECT_BINARY_DIR}/${OUTPUTCONFIG}/app/")
   endforeach()
 endif()
 
@@ -15,7 +15,7 @@ set_target_properties(Sourcetrail_indexer PROPERTIES OUTPUT_NAME sourcetrail_ind
 # Advertise the built-in C/C++ indexer as a discoverable plugin. The manifest is the only way its
 # executable is resolved -- no special case in TaskBuildIndex -- so indexerExecutable has to point at
 # the real binary, which sits two levels up from <plugins>/cxx/ in both the build and install layouts.
-set(CXX_PLUGIN_DIR "${CMAKE_BINARY_DIR}/app/plugins/cxx")
+set(CXX_PLUGIN_DIR "${PROJECT_BINARY_DIR}/app/plugins/cxx")
 set(CXX_INDEXER_RELATIVE_PATH "../../sourcetrail_indexer${CMAKE_EXECUTABLE_SUFFIX}")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/manifest.xml.in "${CXX_PLUGIN_DIR}/manifest.xml" @ONLY)
 
@@ -38,17 +38,16 @@ endif()
 
 target_link_libraries(
   Sourcetrail_indexer
-  PRIVATE Sourcetrail::lib::lib_cxx
-          Sourcetrail::lib::core
-          Sourcetrail::lib::lib_engine
-          Sourcetrail::lib::proto::convert
-          Sourcetrail::lib::messaging
-          Sourcetrail::lib::core::utility::logging)
+  PRIVATE Sourcetrail::lib::lib_cxx Sourcetrail::lib::core Sourcetrail::lib::lib_engine
+          Sourcetrail::lib::proto::convert Sourcetrail::lib::messaging Sourcetrail::lib::core::utility::logging)
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)
   target_link_libraries(Sourcetrail_indexer PRIVATE ${CORE_FOUNDATION})
 endif()
 
-target_include_directories(Sourcetrail_indexer PRIVATE "${CMAKE_BINARY_DIR}/src/lib/lib"
-                                                       "${CMAKE_BINARY_DIR}/src/lib/lib_gui")
+target_include_directories(Sourcetrail_indexer PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib"
+                                                       "${PROJECT_BINARY_DIR}/src/lib/lib_gui")
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_indexer PRIVATE Sourcetrail::warnings)

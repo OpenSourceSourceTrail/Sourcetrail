@@ -1,4 +1,4 @@
-#include "QtMainWindow.h"
+#include "qt/window/QtMainWindow.h"
 
 #include <tuple>
 
@@ -16,25 +16,27 @@
 #include <QToolBar>
 #include <QToolTip>
 
-#include "Application.h"
-#include "Bookmark.h"
+#include "app/Application.h"
+#include "app/paths/ResourcePaths.h"
+#include "app/paths/UserPaths.h"
 #include "Capabilities.h"
-#include "CompositeView.h"
+#include "component/view/CompositeView.h"
+#include "component/view/TabbedView.h"
+#include "component/view/View.h"
+#include "data/bookmark/Bookmark.h"
 #include "FileSystem.h"
-#include "globalStrings.h"
-#include "IApplicationSettings.hpp"
 #include "logging.h"
-#include "QtAbout.h"
-#include "QtContextMenu.h"
-#include "QtFileDialog.h"
-#include "QtKeyboardShortcuts.h"
-#include "QtLicenseWindow.h"
-#include "QtPreferencesWindow.h"
-#include "QtProjectWizard.h"
-#include "QtStartScreen.hpp"
-#include "QtViewWidgetWrapper.h"
-#include "ResourcePaths.h"
-#include "TabbedView.h"
+#include "qt/project_wizard/QtProjectWizard.h"
+#include "qt/utility/QtContextMenu.h"
+#include "qt/utility/QtFileDialog.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
+#include "qt/window/QtAbout.h"
+#include "qt/window/QtKeyboardShortcuts.h"
+#include "qt/window/QtLicenseWindow.h"
+#include "qt/window/QtPreferencesWindow.h"
+#include "qt/window/QtStartScreen.hpp"
+#include "settings/IApplicationSettings.hpp"
 #include "type/activation/MessageActivateBase.h"
 #include "type/activation/MessageActivateOverview.h"
 #include "type/bookmark/MessageBookmarkActivate.h"
@@ -59,11 +61,9 @@
 #include "type/tab/MessageTabClose.h"
 #include "type/tab/MessageTabOpen.h"
 #include "type/tab/MessageTabSelect.h"
-#include "UserPaths.h"
+#include "utility/globalStrings.h"
 #include "utilityApp.h"
-#include "utilityQt.h"
 #include "utilityString.h"
-#include "View.h"
 
 QtViewToggle::QtViewToggle(View* view, QWidget* parent) : QWidget(parent), m_view(view) {}
 

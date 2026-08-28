@@ -1,4 +1,4 @@
-#include "LocationType.h"
+#include "data/location/LocationType.h"
 
 int locationTypeToInt(LocationType type) {
   return type;

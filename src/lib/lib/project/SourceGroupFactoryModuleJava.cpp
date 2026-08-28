@@ -1,7 +1,7 @@
-#include "SourceGroupFactoryModuleJava.h"
+#include "project/SourceGroupFactoryModuleJava.h"
 
-#include "SourceGroupJavaEmpty.h"
-#include "SourceGroupSettingsJavaEmpty.h"
+#include "project/SourceGroupJavaEmpty.h"
+#include "settings/source_group/type/SourceGroupSettingsJavaEmpty.h"
 
 bool SourceGroupFactoryModuleJava::supports(SourceGroupType type) const {
   switch(type) {

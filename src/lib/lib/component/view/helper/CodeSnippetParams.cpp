@@ -1,6 +1,6 @@
-#include "CodeSnippetParams.h"
+#include "component/view/helper/CodeSnippetParams.h"
 
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocationFile.h"
 
 CodeSnippetParams CodeSnippetParams::merge(const CodeSnippetParams& a, const CodeSnippetParams& b) {
   const CodeSnippetParams* first = a.startLineNumber < b.startLineNumber ? &a : &b;

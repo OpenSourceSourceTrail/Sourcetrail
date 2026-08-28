@@ -1,11 +1,11 @@
-#include "TabsController.h"
+#include "component/controller/TabsController.h"
 
 #include <thread>
 
 #include "../../../scheduling/TaskLambda.h"
-#include "Application.h"
-#include "ScreenSearchInterfaces.h"
-#include "TabId.h"
+#include "app/Application.h"
+#include "component/controller/helper/ScreenSearchInterfaces.h"
+#include "component/TabId.h"
 #include "TaskDispatchRegistry.h"
 #include "type/code/MessageScrollToLine.h"
 #include "type/indexing/MessageIndexingFinished.h"

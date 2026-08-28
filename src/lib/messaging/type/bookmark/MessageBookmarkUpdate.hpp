@@ -1,5 +1,5 @@
 #pragma once
-#include "Bookmark.h"
+#include "data/bookmark/Bookmark.h"
 #include "Message.h"
 
 class MessageBookmarkUpdate : public Message<MessageBookmarkUpdate> {

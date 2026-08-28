@@ -1,15 +1,15 @@
-#include "QtProjectWizardContentExtensions.h"
+#include "qt/project_wizard/content/QtProjectWizardContentExtensions.h"
 
 // Qt5
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QLabel>
 // internal
-#include "QtStringListBox.h"
-#include "SourceGroupSettingsWithSourceExtensions.h"
-#include "SourceGroupSettingsWithSourceExtensionsC.h"
-#include "SourceGroupSettingsWithSourceExtensionsCpp.h"
-#include "SourceGroupSettingsWithSourceExtensionsCxx.h"
+#include "qt/element/dialog/QtStringListBox.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsC.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsCpp.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithSourceExtensionsCxx.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourceExtensions.h"
 
 QtProjectWizardContentExtensions::QtProjectWizardContentExtensions(std::shared_ptr<SourceGroupSettingsWithSourceExtensions> settings,
                                                                    QtProjectWizardWindow* window)

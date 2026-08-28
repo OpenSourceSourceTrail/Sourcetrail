@@ -3,7 +3,7 @@
 #include <map>
 #include <memory>
 
-#include "IndexerBase.h"
+#include "data/indexer/IndexerBase.h"
 
 class IndexerComposite final : public IndexerBase {
 public:

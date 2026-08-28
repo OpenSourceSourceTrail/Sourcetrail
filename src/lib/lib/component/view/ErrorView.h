@@ -2,10 +2,10 @@
 #include <string>
 #include <vector>
 
-#include "ErrorCountInfo.h"
-#include "ErrorFilter.h"
-#include "ErrorInfo.h"
-#include "View.h"
+#include "component/view/View.h"
+#include "data/ErrorCountInfo.h"
+#include "data/ErrorFilter.h"
+#include "data/ErrorInfo.h"
 
 class ErrorView : public View {
 public:

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "View.h"
+#include "component/view/View.h"
 
 class ScreenSearchView : public View {
 public:

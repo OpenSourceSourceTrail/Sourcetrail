@@ -1,8 +1,8 @@
 #ifndef CUSTOM_TRAIL_VIEW_H
 #define CUSTOM_TRAIL_VIEW_H
 
-#include "SearchMatch.h"
-#include "View.h"
+#include "component/view/View.h"
+#include "data/search/SearchMatch.h"
 
 class CustomTrailView : public View {
 public:

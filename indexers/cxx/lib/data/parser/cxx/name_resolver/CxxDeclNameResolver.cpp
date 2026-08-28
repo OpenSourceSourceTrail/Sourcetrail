@@ -1,18 +1,18 @@
-#include "CxxDeclNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxDeclNameResolver.h"
 
 #include <clang/AST/ASTContext.h>
 #include <clang/Basic/Version.h>
 
-#include "CanonicalFilePathCache.h"
-#include "CxxFunctionDeclName.h"
-#include "CxxSpecifierNameResolver.h"
-#include "CxxStaticFunctionDeclName.h"
-#include "CxxTemplateArgumentNameResolver.h"
-#include "CxxTemplateParameterStringResolver.h"
-#include "CxxTypeNameResolver.h"
-#include "CxxVariableDeclName.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/name/CxxFunctionDeclName.h"
+#include "data/parser/cxx/name/CxxStaticFunctionDeclName.h"
+#include "data/parser/cxx/name/CxxVariableDeclName.h"
+#include "data/parser/cxx/name_resolver/CxxSpecifierNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTemplateArgumentNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTemplateParameterStringResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTypeNameResolver.h"
+#include "data/parser/cxx/utilityClang.h"
 #include "ScopedSwitcher.h"
-#include "utilityClang.h"
 #include "utilityString.h"
 
 CxxDeclNameResolver::CxxDeclNameResolver(CanonicalFilePathCache* canonicalFilePathCache)

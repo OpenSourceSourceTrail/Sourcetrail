@@ -1,9 +1,9 @@
-#include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h"
 
-#include "globalStrings.h"
-#include "IApplicationSettings.hpp"
+#include "settings/IApplicationSettings.hpp"
 #include "utility.h"
-#include "utilityPathDetection.h"
+#include "utility/globalStrings.h"
+#include "utility/path_detector/utilityPathDetection.h"
 
 QtProjectWizardContentPathsFrameworkSearchGlobal::QtProjectWizardContentPathsFrameworkSearchGlobal(QtProjectWizardWindow* window)
     : QtProjectWizardContentPaths(

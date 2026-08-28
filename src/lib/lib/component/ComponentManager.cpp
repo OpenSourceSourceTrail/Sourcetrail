@@ -1,20 +1,20 @@
-#include "ComponentManager.h"
+#include "component/ComponentManager.h"
 
 #include <fmt/format.h>
 
-#include "BookmarkButtonsView.h"
-#include "CodeView.h"
-#include "CompositeView.h"
-#include "Controller.h"
-#include "DialogView.h"
-#include "GraphView.h"
+#include "component/controller/Controller.h"
+#include "component/controller/ScreenSearchController.h"
+#include "component/view/BookmarkButtonsView.h"
+#include "component/view/CodeView.h"
+#include "component/view/CompositeView.h"
+#include "component/view/DialogView.h"
+#include "component/view/GraphView.h"
+#include "component/view/RefreshView.h"
+#include "component/view/SearchView.h"
+#include "component/view/TabbedView.h"
+#include "component/view/UndoRedoView.h"
+#include "component/view/ViewFactory.h"
 #include "logging.h"
-#include "RefreshView.h"
-#include "ScreenSearchController.h"
-#include "SearchView.h"
-#include "TabbedView.h"
-#include "UndoRedoView.h"
-#include "ViewFactory.h"
 
 namespace {
 template <class Container>

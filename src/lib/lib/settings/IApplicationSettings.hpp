@@ -1,9 +1,8 @@
 #pragma once
 #include <cassert>
 
-#include <Settings.h>
-
-#include "GroupType.h"
+#include "data/GroupType.h"
+#include "settings/Settings.h"
 
 struct IApplicationSettings : Settings {
   using Ptr = std::shared_ptr<IApplicationSettings>;

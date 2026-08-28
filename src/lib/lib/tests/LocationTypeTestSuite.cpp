@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 // internal
-#include "LocationType.h"
+#include "data/location/LocationType.h"
 
 using namespace ::testing;
 using namespace std::string_literals;

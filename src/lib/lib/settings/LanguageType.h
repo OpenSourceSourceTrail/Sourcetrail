@@ -2,7 +2,7 @@
 // STL
 #include <string>
 // internal
-#include "SourceGroupType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 enum LanguageType { LANGUAGE_CPP, LANGUAGE_C, LANGUAGE_JAVA, LANGUAGE_CUSTOM, LANGUAGE_UNKNOWN };
 

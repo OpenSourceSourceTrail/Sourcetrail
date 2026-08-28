@@ -1,4 +1,4 @@
-#include "IFactory.hpp"
+#include "factory/IFactory.hpp"
 
 namespace lib {
 

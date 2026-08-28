@@ -1,8 +1,8 @@
 #ifndef TOKEN_COMPONENT_FILE_PATH_H
 #define TOKEN_COMPONENT_FILE_PATH_H
 
+#include "data/graph/token_component/TokenComponent.h"
 #include "FilePath.h"
-#include "TokenComponent.h"
 
 class TokenComponentFilePath : public TokenComponent {
 public:

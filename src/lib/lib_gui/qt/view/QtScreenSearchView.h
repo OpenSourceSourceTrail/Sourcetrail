@@ -1,10 +1,10 @@
 #ifndef QT_SCREEN_SEARCH_VIEW_H
 #define QT_SCREEN_SEARCH_VIEW_H
 
-#include "ControllerProxy.h"
-#include "QtThreadedFunctor.h"
-#include "ScreenSearchController.h"
-#include "ScreenSearchView.h"
+#include "component/controller/helper/ControllerProxy.h"
+#include "component/controller/ScreenSearchController.h"
+#include "component/view/ScreenSearchView.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 class QtScreenSearchBox;
 class QToolBar;

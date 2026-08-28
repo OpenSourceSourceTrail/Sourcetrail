@@ -1,4 +1,4 @@
-#include "TabsView.h"
+#include "component/view/TabsView.h"
 
 TabsView::TabsView(ViewLayout* viewLayout) : View(viewLayout) {}
 

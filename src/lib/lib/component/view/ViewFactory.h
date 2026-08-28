@@ -2,8 +2,8 @@
 // STL
 #include <memory>
 // internal
-#include "CompositeView.h"
-#include "DialogView.h"
+#include "component/view/CompositeView.h"
+#include "component/view/DialogView.h"
 
 class BookmarkButtonsView;
 class BookmarkView;

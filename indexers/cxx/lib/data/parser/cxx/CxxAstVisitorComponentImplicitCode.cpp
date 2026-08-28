@@ -1,4 +1,4 @@
-#include "CxxAstVisitorComponentImplicitCode.h"
+#include "data/parser/cxx/CxxAstVisitorComponentImplicitCode.h"
 
 CxxAstVisitorComponentImplicitCode::CxxAstVisitorComponentImplicitCode(CxxAstVisitor* astVisitor)
     : CxxAstVisitorComponent(astVisitor) {}

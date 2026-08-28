@@ -1,4 +1,4 @@
-#include "UserPaths.h"
+#include "app/paths/UserPaths.h"
 
 FilePath UserPaths::s_userDataDirectoryPath;
 

@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "BookmarkCategory.h"
+#include "data/bookmark/BookmarkCategory.h"
 #include "GlobalId.hpp"
 #include "TimeStamp.h"
 

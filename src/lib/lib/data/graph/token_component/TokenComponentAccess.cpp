@@ -1,4 +1,4 @@
-#include "TokenComponentAccess.h"
+#include "data/graph/token_component/TokenComponentAccess.h"
 
 std::wstring TokenComponentAccess::getAccessString(AccessKind access) {
   switch(access) {

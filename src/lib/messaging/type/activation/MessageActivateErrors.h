@@ -3,8 +3,8 @@
 #include "Message.h"
 #include "MessageActivateBase.h"
 //
-#include "ErrorFilter.h"
-#include "TabId.h"
+#include "component/TabId.h"
+#include "data/ErrorFilter.h"
 
 class MessageActivateErrors
     : public Message<MessageActivateErrors>

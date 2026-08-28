@@ -1,4 +1,4 @@
-#include "QtHoverButton.h"
+#include "qt/element/button/QtHoverButton.h"
 
 QtHoverButton::QtHoverButton(QWidget* parent) : QPushButton(QLatin1String(""), parent) {
   setAttribute(Qt::WA_LayoutUsesWidgetRect);    // fixes layouting on Mac

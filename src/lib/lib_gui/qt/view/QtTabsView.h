@@ -3,9 +3,9 @@
 
 #include <QObject>
 
-#include "QtThreadedFunctor.h"
-#include "TabsController.h"
-#include "TabsView.h"
+#include "component/controller/TabsController.h"
+#include "component/view/TabsView.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 class QtTabBar;
 

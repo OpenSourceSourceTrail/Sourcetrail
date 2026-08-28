@@ -1,11 +1,11 @@
-#include "QtProjectWizardContentPaths.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPaths.h"
 // Qt5
 #include <QComboBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
 // internal
-#include "SourceGroupSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 #include "utility.h"
 
 QtProjectWizardContentPaths::QtProjectWizardContentPaths(std::shared_ptr<SourceGroupSettings> settings,

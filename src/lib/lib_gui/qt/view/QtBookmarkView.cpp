@@ -1,13 +1,13 @@
-#include "QtBookmarkView.h"
+#include "qt/view/QtBookmarkView.h"
 
 #include <string>
 
+#include "component/TabId.h"
 #include "logging.h"
-#include "QtBookmarkBrowser.h"
-#include "QtBookmarkCreator.h"
-#include "QtMainView.h"
-#include "QtMainWindow.h"
-#include "TabId.h"
+#include "qt/view/QtMainView.h"
+#include "qt/window/QtBookmarkBrowser.h"
+#include "qt/window/QtBookmarkCreator.h"
+#include "qt/window/QtMainWindow.h"
 
 namespace {
 QtMainView* getMainView(ViewLayout* viewLayout) {

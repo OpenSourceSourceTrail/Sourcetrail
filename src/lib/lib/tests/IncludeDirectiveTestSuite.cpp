@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "IncludeDirective.h"
+#include "utility/IncludeDirective.h"
 #include "utilityString.h"
 
 using namespace testing;

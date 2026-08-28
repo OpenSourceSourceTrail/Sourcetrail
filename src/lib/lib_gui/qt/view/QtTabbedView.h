@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "QtThreadedFunctor.h"
-#include "TabbedView.h"
+#include "component/view/TabbedView.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 class QTabWidget;
 class QtSelfRefreshIconButton;

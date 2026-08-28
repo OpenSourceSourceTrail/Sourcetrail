@@ -1,7 +1,7 @@
 #ifndef TOKEN_COMPONENT_IS_AMBIGUOUS_H
 #define TOKEN_COMPONENT_IS_AMBIGUOUS_H
 
-#include "TokenComponent.h"
+#include "data/graph/token_component/TokenComponent.h"
 
 class TokenComponentIsAmbiguous : public TokenComponent {
 public:

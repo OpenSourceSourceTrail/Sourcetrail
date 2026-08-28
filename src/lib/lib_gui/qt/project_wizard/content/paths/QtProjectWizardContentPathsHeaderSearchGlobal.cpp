@@ -1,13 +1,13 @@
-#include "QtProjectWizardContentPathsHeaderSearchGlobal.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h"
 
 #include <QMessageBox>
 
-#include "globalStrings.h"
-#include "IApplicationSettings.hpp"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "settings/IApplicationSettings.hpp"
 #include "utility.h"
+#include "utility/globalStrings.h"
+#include "utility/path_detector/utilityPathDetection.h"
 #include "utilityApp.h"
-#include "utilityPathDetection.h"
 
 QtProjectWizardContentPathsHeaderSearchGlobal::QtProjectWizardContentPathsHeaderSearchGlobal(QtProjectWizardWindow* window)
     : QtProjectWizardContentPaths(

@@ -1,6 +1,6 @@
-#include "SourceGroupSettingsWithIndexedHeaderPaths.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithIndexedHeaderPaths.h"
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 #include "utility.h"
 
 std::vector<FilePath> SourceGroupSettingsWithIndexedHeaderPaths::getIndexedHeaderPaths() const {

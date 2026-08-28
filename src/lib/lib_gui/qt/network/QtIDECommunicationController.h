@@ -3,9 +3,9 @@
 
 #include <qobject.h>
 
-#include "IDECommunicationController.h"
-#include "QtTcpWrapper.h"
-#include "QtThreadedFunctor.h"
+#include "component/controller/IDECommunicationController.h"
+#include "qt/network/QtTcpWrapper.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 class StorageAccess;
 

@@ -1,4 +1,4 @@
-#include "QtBookmarkBrowser.h"
+#include "qt/window/QtBookmarkBrowser.h"
 
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -6,9 +6,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "QtBookmark.h"
-#include "QtBookmarkCategory.h"
-#include "utilityQt.h"
+#include "qt/element/bookmark/QtBookmark.h"
+#include "qt/element/bookmark/QtBookmarkCategory.h"
+#include "qt/utility/utilityQt.h"
 
 QtBookmarkBrowser::QtBookmarkBrowser(ControllerProxy<BookmarkController>* controllerProxy, QWidget* parent)
     : QtWindow{false, parent}, mControllerProxy{controllerProxy} {

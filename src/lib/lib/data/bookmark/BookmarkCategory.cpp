@@ -1,4 +1,4 @@
-#include "BookmarkCategory.h"
+#include "data/bookmark/BookmarkCategory.h"
 
 BookmarkCategory::BookmarkCategory() : m_id(static_cast<Id>(-1)) {}
 

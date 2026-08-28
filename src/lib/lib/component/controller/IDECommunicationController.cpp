@@ -1,9 +1,9 @@
-#include "IDECommunicationController.h"
+#include "component/controller/IDECommunicationController.h"
 
+#include "data/location/SourceLocationFile.h"
+#include "data/storage/StorageAccess.h"
 #include "FileSystem.h"
 #include "logging.h"
-#include "SourceLocationFile.h"
-#include "StorageAccess.h"
 #include "type/MessageActivateWindow.h"
 #include "type/MessageProjectNew.h"
 #include "type/MessageStatus.h"

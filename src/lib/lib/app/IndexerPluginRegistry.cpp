@@ -1,10 +1,10 @@
-#include "IndexerPluginRegistry.h"
+#include "app/IndexerPluginRegistry.h"
 
 #include <algorithm>
 
 #include <fmt/format.h>
 
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
 #include "ConfigManager.hpp"
 #include "FileSystem.h"
 #include "logging.h"

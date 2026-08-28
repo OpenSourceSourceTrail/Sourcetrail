@@ -1,7 +1,7 @@
 #ifndef QT_PROJECT_WIZARD_CONTENT_PATH_CXX_PCH_H
 #define QT_PROJECT_WIZARD_CONTENT_PATH_CXX_PCH_H
 
-#include "QtProjectWizardContentPath.h"
+#include "qt/project_wizard/content/path/QtProjectWizardContentPath.h"
 #include "SingleValueCache.h"
 
 class SourceGroupSettingsWithCxxPchOptions;

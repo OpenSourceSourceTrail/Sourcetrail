@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentGroup.h"
+#include "qt/project_wizard/content/QtProjectWizardContentGroup.h"
 
 #include <algorithm>
 

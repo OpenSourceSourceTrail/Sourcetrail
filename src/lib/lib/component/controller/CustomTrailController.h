@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
 #include "MessageListener.h"
 #include "type/activation/MessageActivateTrail.h"
 #include "type/custom_trail/MessageCustomTrailShow.h"

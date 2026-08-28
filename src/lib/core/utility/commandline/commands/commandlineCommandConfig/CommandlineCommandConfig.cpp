@@ -7,8 +7,8 @@
 #include "CommandlineHelper.h"
 #include "CommandLineParser.h"
 #include "FilePath.h"
-#include "IApplicationSettings.hpp"
 #include "logging.h"
+#include "settings/IApplicationSettings.hpp"
 
 namespace commandline {
 // helper functions

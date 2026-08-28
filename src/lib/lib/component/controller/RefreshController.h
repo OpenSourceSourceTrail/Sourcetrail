@@ -1,7 +1,7 @@
 #ifndef REFRESH_CONTROLLER_H
 #define REFRESH_CONTROLLER_H
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
 
 class RefreshView;
 

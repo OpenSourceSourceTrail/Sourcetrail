@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ComponentFactory.h"
+#include "component/ComponentFactory.h"
 #include "MessageQueue.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStatusBarView.hpp"
@@ -11,11 +11,11 @@
 #ifndef _WIN32
 #  define private public    // NOLINT
 #endif
-#include "StatusBarController.h"
+#include "component/controller/StatusBarController.h"
 #ifndef _WIN32
 #  undef private
 #endif
-#include "StatusView.h"
+#include "component/view/StatusView.h"
 
 
 using namespace testing;

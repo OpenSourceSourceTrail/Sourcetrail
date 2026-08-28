@@ -1,4 +1,4 @@
-#include "QtIndexingStartDialog.h"
+#include "qt/window/QtIndexingStartDialog.h"
 
 #include <tuple>
 
@@ -10,7 +10,7 @@
 #include <QRadioButton>
 #include <QVBoxLayout>
 
-#include "QtHelpButton.h"
+#include "qt/element/button/QtHelpButton.h"
 
 QtIndexingStartDialog::QtIndexingStartDialog(const std::vector<RefreshMode>& enabledModes,
                                              const RefreshMode initialMode,

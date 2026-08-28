@@ -4,7 +4,7 @@
 #include <QPushButton>
 
 #include "FilePath.h"
-#include "QtLineEdit.h"
+#include "qt/element/dialog/QtLineEdit.h"
 
 class QtLocationPicker : public QWidget {
   Q_OBJECT

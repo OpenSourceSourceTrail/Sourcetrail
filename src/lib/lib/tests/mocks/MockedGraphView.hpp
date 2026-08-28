@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "GraphView.h"
+#include "component/view/GraphView.h"
 
 struct MockedGraphView final : GraphView {
   explicit MockedGraphView(ViewLayout* viewLayout) : GraphView(viewLayout) {}

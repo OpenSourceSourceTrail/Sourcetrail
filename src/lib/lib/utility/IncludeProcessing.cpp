@@ -1,4 +1,4 @@
-#include "IncludeProcessing.h"
+#include "utility/IncludeProcessing.h"
 
 #include <iterator>
 #include <set>
@@ -7,11 +7,11 @@
 
 #include "FilePath.h"
 #include "FileTree.h"
-#include "IApplicationSettings.hpp"
-#include "IncludeDirective.h"
+#include "settings/IApplicationSettings.hpp"
 #include "TextAccess.h"
 #include "TextCodec.h"
 #include "utility.h"
+#include "utility/IncludeDirective.h"
 #include "utilityString.h"
 
 namespace {

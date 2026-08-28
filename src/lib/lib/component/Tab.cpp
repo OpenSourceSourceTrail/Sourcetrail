@@ -1,7 +1,7 @@
-#include "Tab.h"
+#include "component/Tab.h"
 
-#include "CodeView.h"
-#include "GraphView.h"
+#include "component/view/CodeView.h"
+#include "component/view/GraphView.h"
 #include "logging.h"
 
 Tab::Tab(Id tabId, const ViewFactory* viewFactory, StorageAccess* storageAccess, ScreenSearchSender* screenSearchSender)

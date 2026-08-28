@@ -6,12 +6,12 @@
 #include <QPointF>
 #include <QVector2D>
 // internal
+#include "component/view/GraphView.h"
+#include "data/graph/Graph.h"
 #include "GlobalId.hpp"
-#include "Graph.h"
-#include "GraphFocusHandler.h"
-#include "GraphView.h"
-#include "QtScrollSpeedChangeListener.h"
-#include "QtThreadedFunctor.h"
+#include "qt/graphics/GraphFocusHandler.h"
+#include "qt/utility/QtScrollSpeedChangeListener.h"
+#include "qt/utility/QtThreadedFunctor.h"
 #include "Vec2f.h"
 
 struct DummyEdge;

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "TaskBuildIndex.h"
+#include "data/indexer/TaskBuildIndex.h"
 
 using namespace std::chrono_literals;
 

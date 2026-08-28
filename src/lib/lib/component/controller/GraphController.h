@@ -23,11 +23,11 @@
 #include "type/graph/MessageScrollGraph.h"
 #include "type/MessageFlushUpdates.h"
 //
-#include "Controller.h"
-#include "DummyEdge.h"
-#include "DummyNode.h"
-#include "GraphView.h"
-#include "Node.h"
+#include "component/controller/Controller.h"
+#include "component/controller/helper/DummyEdge.h"
+#include "component/controller/helper/DummyNode.h"
+#include "component/view/GraphView.h"
+#include "data/graph/Node.h"
 
 class Graph;
 class StorageAccess;

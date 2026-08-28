@@ -1,15 +1,15 @@
-#include "QtCodeFileTitleBar.h"
+#include "qt/element/code/QtCodeFileTitleBar.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QStyle>
 #include <QVariant>
 
-#include "Application.h"
-#include "IProject.hpp"
-#include "QtIconStateButton.h"
-#include "QtSelfRefreshIconButton.h"
-#include "ResourcePaths.h"
+#include "app/Application.h"
+#include "app/paths/ResourcePaths.h"
+#include "project/IProject.hpp"
+#include "qt/element/button/QtIconStateButton.h"
+#include "qt/element/button/QtSelfRefreshIconButton.h"
 #include "type/error/MessageErrorsForFile.h"
 
 QtCodeFileTitleBar::QtCodeFileTitleBar(QWidget* parent, bool isHovering, bool isSingle) : QtHoverButton(parent) {

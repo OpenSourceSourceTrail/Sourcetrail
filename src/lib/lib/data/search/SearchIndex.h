@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 
+#include "data/graph/Node.h"
+#include "data/NodeTypeSet.h"
 #include "GlobalId.hpp"
-#include "Node.h"
-#include "NodeTypeSet.h"
 
 // SearchResult is only used as an internal type in the SearchIndex and the PersistentStorage
 struct SearchResult {

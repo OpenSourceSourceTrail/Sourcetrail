@@ -1,7 +1,7 @@
 #ifndef QT_LINE_ITEM_BEZIER_H
 #define QT_LINE_ITEM_BEZIER_H
 
-#include "QtLineItemBase.h"
+#include "qt/graphics/base/QtLineItemBase.h"
 
 class QtLineItemBezier : public QtLineItemBase {
 public:

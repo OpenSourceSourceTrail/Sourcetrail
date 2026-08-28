@@ -1,21 +1,21 @@
-#include "SourceGroupCxxEmpty.h"
+#include "project/SourceGroupCxxEmpty.h"
 
 #include <utility>
 
-#include "CxxIndexerCommandProvider.h"
+#include "data/indexer/CxxIndexerCommandProvider.h"
+#include "data/indexer/IndexerCommandCxx.h"
 #include "FileManager.h"
-#include "IApplicationSettings.hpp"
-#include "IndexerCommandCxx.h"
 #include "logging.h"
-#include "RefreshInfo.h"
-#include "SourceGroupSettingsCEmpty.h"
-#include "SourceGroupSettingsCppEmpty.h"
-#include "SourceGroupSettingsWithCppStandard.h"
-#include "SourceGroupSettingsWithCStandard.h"
-#include "SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "project/RefreshInfo.h"
+#include "project/utilitySourceGroupCxx.h"
+#include "settings/IApplicationSettings.hpp"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "settings/source_group/type/SourceGroupSettingsCEmpty.h"
+#include "settings/source_group/type/SourceGroupSettingsCppEmpty.h"
 #include "TaskLambda.h"
 #include "utility.h"
-#include "utilitySourceGroupCxx.h"
 
 SourceGroupCxxEmpty::SourceGroupCxxEmpty(std::shared_ptr<SourceGroupSettings> settings) : mSettings(std::move(settings)) {}
 

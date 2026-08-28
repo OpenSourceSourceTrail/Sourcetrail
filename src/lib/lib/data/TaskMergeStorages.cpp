@@ -1,8 +1,8 @@
-#include "TaskMergeStorages.h"
+#include "data/TaskMergeStorages.h"
 
 #include <utility>
 
-#include "StorageProvider.h"
+#include "data/storage/StorageProvider.h"
 
 TaskMergeStorages::TaskMergeStorages(std::shared_ptr<StorageProvider> storageProvider)
     : m_storageProvider(std::move(storageProvider)) {}

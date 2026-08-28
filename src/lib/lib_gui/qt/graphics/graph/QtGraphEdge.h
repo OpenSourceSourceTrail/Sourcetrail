@@ -6,7 +6,7 @@
 #include <QVector2D>
 #include <QVector4D>
 
-#include "TokenComponentBundledEdges.h"
+#include "data/graph/token_component/TokenComponentBundledEdges.h"
 
 class Edge;
 class GraphFocusHandler;

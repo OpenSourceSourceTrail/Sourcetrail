@@ -4,10 +4,10 @@
 #include <mutex>
 #include <set>
 
-#include "ActivationListener.h"
-#include "Controller.h"
+#include "component/controller/Controller.h"
+#include "component/controller/helper/ActivationListener.h"
+#include "component/controller/helper/ScreenSearchInterfaces.h"
 #include "MessageListener.h"
-#include "ScreenSearchInterfaces.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageChangeFileView.h"
 #include "type/code/MessageCodeShowDefinition.h"

@@ -1,4 +1,4 @@
-#include "TokenComponentFilePath.h"
+#include "data/graph/token_component/TokenComponentFilePath.h"
 
 TokenComponentFilePath::TokenComponentFilePath(const FilePath& path, bool complete) : m_path(path), m_complete(complete) {}
 

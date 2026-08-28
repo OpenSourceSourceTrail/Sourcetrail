@@ -1,8 +1,8 @@
-#include "StatusBarController.h"
+#include "component/controller/StatusBarController.h"
 
+#include "component/view/StatusBarView.h"
+#include "data/storage/StorageAccess.h"
 #include "logging.h"
-#include "StatusBarView.h"
-#include "StorageAccess.h"
 
 StatusBarController::StatusBarController(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 

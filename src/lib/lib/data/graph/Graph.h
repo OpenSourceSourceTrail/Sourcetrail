@@ -5,8 +5,8 @@
 #include <map>
 #include <memory>
 
-#include "Edge.h"
-#include "Node.h"
+#include "data/graph/Edge.h"
+#include "data/graph/Node.h"
 
 class Graph {
 public:

@@ -2,9 +2,9 @@
 // STL
 #include <set>
 // internal
-#include "CombinedPathDetector.h"
-#include "QtPathListBox.h"
-#include "QtProjectWizardContent.h"
+#include "qt/element/dialog/QtPathListBox.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
+#include "utility/path_detector/CombinedPathDetector.h"
 
 QT_FORWARD_DECLARE_CLASS(QComboBox);
 

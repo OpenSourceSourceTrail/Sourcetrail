@@ -1,8 +1,8 @@
 #pragma once
 // internal
+#include "component/TabId.h"
 #include "FilePath.h"
 #include "Message.h"
-#include "TabId.h"
 
 class MessageScrollToLine final : public Message<MessageScrollToLine> {
 public:

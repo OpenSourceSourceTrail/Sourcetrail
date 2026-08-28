@@ -1,4 +1,4 @@
-#include "SearchIndex.h"
+#include "data/search/SearchIndex.h"
 
 #include <algorithm>
 #include <iterator>

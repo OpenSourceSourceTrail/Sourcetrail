@@ -1,4 +1,4 @@
-#include "NetworkProtocolHelper.h"
+#include "component/controller/helper/NetworkProtocolHelper.h"
 
 #include <sstream>
 #include <string>

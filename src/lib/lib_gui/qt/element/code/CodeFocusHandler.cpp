@@ -1,4 +1,4 @@
-#include "CodeFocusHandler.h"
+#include "qt/element/code/CodeFocusHandler.h"
 
 #include "type/focus/MessageFocusChanged.h"
 #include "type/focus/MessageFocusIn.h"

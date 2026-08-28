@@ -1,4 +1,4 @@
-#include "QtDialogView.h"
+#include "qt/view/QtDialogView.h"
 
 #include <chrono>
 #include <sstream>
@@ -9,17 +9,17 @@
 #include <QTimer>
 
 #include "../../../scheduling/TaskLambda.h"
-#include "IProject.hpp"
-#include "QtIndexingDialog.h"
-#include "QtIndexingProgressDialog.h"
-#include "QtIndexingReportDialog.h"
-#include "QtIndexingStartDialog.h"
-#include "QtKnownProgressDialog.h"
-#include "QtMainWindow.h"
-#include "QtUnknownProgressDialog.h"
-#include "QtWindow.h"
-#include "StorageAccess.h"
-#include "TabId.h"
+#include "component/TabId.h"
+#include "data/storage/StorageAccess.h"
+#include "project/IProject.hpp"
+#include "qt/window/QtIndexingDialog.h"
+#include "qt/window/QtIndexingProgressDialog.h"
+#include "qt/window/QtIndexingReportDialog.h"
+#include "qt/window/QtIndexingStartDialog.h"
+#include "qt/window/QtKnownProgressDialog.h"
+#include "qt/window/QtMainWindow.h"
+#include "qt/window/QtUnknownProgressDialog.h"
+#include "qt/window/QtWindow.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageStatus.h"
 #include "utility.h"

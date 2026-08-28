@@ -15,21 +15,21 @@ if(ENABLE_COVERAGE)
       # Ensure tests are run first
       COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
       # Create coverage output directory
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/coverage
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/coverage
       # Run gcovr with similar exclusions as the original script
       COMMAND
-        ${GCOVR_EXECUTABLE} -r ${CMAKE_SOURCE_DIR} -e ${CMAKE_SOURCE_DIR}/src/app -e
-        ${CMAKE_SOURCE_DIR}/src/lib/core/tests -e ${CMAKE_SOURCE_DIR}/src/lib/external -e
-        ${CMAKE_SOURCE_DIR}/indexers/cxx/indexer -e ${CMAKE_SOURCE_DIR}/src/lib/lib/tests -e
-        ${CMAKE_SOURCE_DIR}/indexers/cxx/lib/tests -e ${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests -e
-        ${CMAKE_SOURCE_DIR}/src/lib_utility/tests -e ${CMAKE_SOURCE_DIR}/src/lib/messaging/tests -e
-        ${CMAKE_SOURCE_DIR}/src/lib/scheduling/tests -e ${CMAKE_SOURCE_DIR}/src/test -e ${CMAKE_SOURCE_DIR}/tests -e
-        ${CMAKE_SOURCE_DIR}/indexers/java --html-nested=${CMAKE_BINARY_DIR}/coverage/index.html --gcov-delete -j
+        ${GCOVR_EXECUTABLE} -r ${PROJECT_SOURCE_DIR} -e ${PROJECT_SOURCE_DIR}/src/app -e
+        ${PROJECT_SOURCE_DIR}/src/lib/core/tests -e ${PROJECT_SOURCE_DIR}/src/lib/external -e
+        ${PROJECT_SOURCE_DIR}/indexers/cxx/indexer -e ${PROJECT_SOURCE_DIR}/src/lib/lib/tests -e
+        ${PROJECT_SOURCE_DIR}/indexers/cxx/lib/tests -e ${PROJECT_SOURCE_DIR}/src/lib/lib_gui/tests -e
+        ${PROJECT_SOURCE_DIR}/src/lib_utility/tests -e ${PROJECT_SOURCE_DIR}/src/lib/messaging/tests -e
+        ${PROJECT_SOURCE_DIR}/src/lib/scheduling/tests -e ${PROJECT_SOURCE_DIR}/src/test -e ${PROJECT_SOURCE_DIR}/tests
+        -e ${PROJECT_SOURCE_DIR}/indexers/java --html-nested=${PROJECT_BINARY_DIR}/coverage/index.html --gcov-delete -j
         ${CORES_COUNT} --gcov-executable ${GCOV_VERSION} --exclude-unreachable-branches --exclude-throw-branches
-        ${CMAKE_BINARY_DIR}
+        ${PROJECT_BINARY_DIR}
       COMMENT "Generate coverage for GNU"
       # Working directory for the command
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+      WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
   else()
     message(FATAL_ERROR "Compiler is not supported")
   endif()

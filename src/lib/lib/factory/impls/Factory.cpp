@@ -1,11 +1,11 @@
-#include "Factory.hpp"
+#include "factory/impls/Factory.hpp"
 
-#include "details/SharedMemoryGarbageCollector.h"
+#include "data/storage/StorageCache.h"
 #include "logging.h"
 #include "MessageQueue.h"
-#include "Project.h"
-#include "ProjectSettings.h"
-#include "StorageCache.h"
+#include "project/Project.h"
+#include "settings/ProjectSettings.h"
+#include "utility/interprocess/details/SharedMemoryGarbageCollector.h"
 #include "utilityApp.h"
 
 namespace {

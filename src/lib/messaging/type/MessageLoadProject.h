@@ -2,7 +2,7 @@
 // internal
 #include "FilePath.h"
 #include "Message.h"
-#include "RefreshInfo.h"
+#include "project/RefreshInfo.h"
 
 class MessageLoadProject : public Message<MessageLoadProject> {
 public:

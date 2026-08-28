@@ -4,13 +4,13 @@
  * @brief SQLite-based storage implementation for bookmarks and bookmark-related data
  */
 
+#include "data/storage/sqlite/SqliteDatabaseIndex.h"
+#include "data/storage/sqlite/SqliteStorage.h"
+#include "data/storage/type/StorageBookmark.h"
+#include "data/storage/type/StorageBookmarkCategory.h"
+#include "data/storage/type/StorageBookmarkedEdge.h"
+#include "data/storage/type/StorageBookmarkedNode.h"
 #include "GlobalId.hpp"
-#include "SqliteDatabaseIndex.h"
-#include "SqliteStorage.h"
-#include "StorageBookmark.h"
-#include "StorageBookmarkCategory.h"
-#include "StorageBookmarkedEdge.h"
-#include "StorageBookmarkedNode.h"
 
 /**
  * @class SqliteBookmarkStorage

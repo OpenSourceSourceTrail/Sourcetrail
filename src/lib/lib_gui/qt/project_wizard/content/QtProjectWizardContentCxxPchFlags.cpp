@@ -1,12 +1,12 @@
-#include "QtProjectWizardContentCxxPchFlags.h"
+#include "qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.h"
 // Qt5
 #include <QCheckBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
 // internal
-#include "QtStringListBox.h"
-#include "SourceGroupSettingsWithCxxPchOptions.h"
+#include "qt/element/dialog/QtStringListBox.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h"
 
 QtProjectWizardContentCxxPchFlags::QtProjectWizardContentCxxPchFlags(std::shared_ptr<SourceGroupSettingsWithCxxPchOptions> settings,
                                                                      QtProjectWizardWindow* window,

@@ -2,13 +2,13 @@
 
 #include <chrono>
 
-#include "Application.h"
+#include "app/Application.h"
 #include "engine.pb.h"
 #include "EngineCall.h"
 #include "EngineChannel.h"
 #include "logging.h"
-#include "ProjectSettings.h"
 #include "ProtoJson.h"
+#include "settings/ProjectSettings.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageStatus.h"
 #include "utilityString.h"

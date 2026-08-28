@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
+#include "component/controller/helper/NetworkProtocolHelper.h"
 #include "MessageListener.h"
-#include "NetworkProtocolHelper.h"
 #include "type/MessageWindowFocus.h"
 #include "type/plugin/MessageIDECreateCDB.h"
 #include "type/plugin/MessageMoveIDECursor.h"

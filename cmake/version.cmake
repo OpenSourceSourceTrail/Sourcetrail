@@ -10,10 +10,7 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
     RESULT_VARIABLE GIT_RESULT)
 
   # Check if the Git command was successful
-  if(NOT
-     GIT_RESULT
-     EQUAL
-     0)
+  if(NOT GIT_RESULT EQUAL 0)
     message(
       WARNING "Failed to run 'git describe' command. Git might not be installed or the repository is not initialized.")
     set(VERSION_MAJOR "1")
@@ -21,24 +18,9 @@ if(EXISTS "${CMAKE_SOURCE_DIR}/.git")
     set(VERSION_PATCH "0")
     set(VERSION_STRING "1.0.0")
   else()
-    string(
-      REGEX
-      REPLACE "^([0-9]+)\\..*"
-              "\\1"
-              VERSION_MAJOR
-              "${VERSION_STRING}")
-    string(
-      REGEX
-      REPLACE "^[0-9]+\\.([0-9]+).*"
-              "\\1"
-              VERSION_MINOR
-              "${VERSION_STRING}")
-    string(
-      REGEX
-      REPLACE "^[0-9]+\\.[0-9]+.([0-9]+)"
-              "\\1"
-              VERSION_PATCH
-              "${VERSION_STRING}")
+    string(REGEX REPLACE "^([0-9]+)\\..*" "\\1" VERSION_MAJOR "${VERSION_STRING}")
+    string(REGEX REPLACE "^[0-9]+\\.([0-9]+).*" "\\1" VERSION_MINOR "${VERSION_STRING}")
+    string(REGEX REPLACE "^[0-9]+\\.[0-9]+.([0-9]+)" "\\1" VERSION_PATCH "${VERSION_STRING}")
   endif()
 endif()
 

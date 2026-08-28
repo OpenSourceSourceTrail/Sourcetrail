@@ -1,6 +1,6 @@
 #include <gmock/gmock.h>
 
-#include "ISharedMemoryGarbageCollector.hpp"
+#include "utility/interprocess/ISharedMemoryGarbageCollector.hpp"
 
 namespace lib {
 struct MockedSharedMemoryGarbageCollector : ISharedMemoryGarbageCollector {

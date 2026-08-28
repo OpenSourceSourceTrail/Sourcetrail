@@ -1,9 +1,9 @@
 #include "ConvertLocations.h"
 
+#include "data/location/SourceLocation.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
 #include "FilePath.h"
-#include "SourceLocation.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
 #include "utilityString.h"
 
 namespace proto::convert {

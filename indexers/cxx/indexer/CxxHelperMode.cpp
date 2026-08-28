@@ -4,10 +4,10 @@
 #include <fstream>
 
 #include "Convert.h"
-#include "CxxToolchainLocal.h"
+#include "data/storage/IntermediateStorage.h"
 #include "indexer_helper.pb.h"
-#include "IntermediateStorage.h"
 #include "logging.h"
+#include "project/CxxToolchainLocal.h"
 #include "utilityString.h"
 
 namespace helper {

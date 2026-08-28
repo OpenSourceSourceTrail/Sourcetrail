@@ -1,4 +1,4 @@
-#include "CxxVs17HeaderPathDetector.hpp"
+#include "utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.hpp"
 
 #include <vector>
 
@@ -6,8 +6,8 @@
 #include "FileSystem.h"
 #include "logging.h"
 #include "utility.h"
+#include "utility/path_detector/cxx_header/utilityCxxHeaderDetection.h"
 #include "utilityApp.h"
-#include "utilityCxxHeaderDetection.h"
 #include "utilityString.h"
 
 

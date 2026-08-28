@@ -1,4 +1,4 @@
-#include "QtStatusView.h"
+#include "qt/view/QtStatusView.h"
 
 #include <tuple>
 
@@ -8,15 +8,15 @@
 #include <QPushButton>
 #include <QStandardItemModel>
 
-#include "ColorScheme.h"
-#include "IApplicationSettings.hpp"
-#include "QtTable.h"
-#include "QtViewWidgetWrapper.h"
+#include "qt/element/QtTable.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
+#include "settings/ColorScheme.h"
+#include "settings/IApplicationSettings.hpp"
 #include "Status.h"
 #include "to_underlying.hpp"
 #include "type/MessageClearStatusView.h"
 #include "type/MessageStatusFilterChanged.h"
-#include "utilityQt.h"
 
 QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame));

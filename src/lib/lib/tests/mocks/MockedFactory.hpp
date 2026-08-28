@@ -1,10 +1,10 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "IFactory.hpp"
-#include "Project.h"
-#include "ProjectSettings.h"
-#include "StorageCache.h"
+#include "data/storage/StorageCache.h"
+#include "factory/IFactory.hpp"
+#include "project/Project.h"
+#include "settings/ProjectSettings.h"
 
 namespace lib {
 

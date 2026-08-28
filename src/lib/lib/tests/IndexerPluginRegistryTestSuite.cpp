@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#include "app/IndexerPluginRegistry.h"
 #include "FilePath.h"
-#include "IndexerPluginRegistry.h"
 
 namespace {
 

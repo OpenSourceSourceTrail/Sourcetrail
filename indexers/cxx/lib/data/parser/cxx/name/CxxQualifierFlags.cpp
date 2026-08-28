@@ -1,4 +1,4 @@
-#include "CxxQualifierFlags.h"
+#include "data/parser/cxx/name/CxxQualifierFlags.h"
 
 CxxQualifierFlags::CxxQualifierFlags() : m_flags(QUALIFIER_NONE) {}
 

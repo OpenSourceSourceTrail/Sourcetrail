@@ -3,9 +3,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "BookmarkController.h"
-#include "BookmarkView.h"
-#include "ComponentFactory.h"
+#include "component/ComponentFactory.h"
+#include "component/controller/BookmarkController.h"
+#include "component/view/BookmarkView.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkView.hpp"
 #include "mocks/MockedStorageAccess.hpp"

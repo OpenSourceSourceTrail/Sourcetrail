@@ -1,4 +1,4 @@
-#include "ColorScheme.h"
+#include "settings/ColorScheme.h"
 // internal
 #include "utilityString.h"
 

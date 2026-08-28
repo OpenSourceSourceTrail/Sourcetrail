@@ -1,4 +1,4 @@
-#include "CombinedIndexerCommandProvider.h"
+#include "data/indexer/CombinedIndexerCommandProvider.h"
 
 #include "logging.h"
 #include "utility.h"

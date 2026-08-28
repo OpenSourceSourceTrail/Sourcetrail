@@ -1,6 +1,6 @@
-#include "RefreshController.h"
+#include "component/controller/RefreshController.h"
 
-#include "RefreshView.h"
+#include "component/view/RefreshView.h"
 
 RefreshController::RefreshController() {}
 

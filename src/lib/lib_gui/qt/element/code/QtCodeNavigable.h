@@ -2,10 +2,10 @@
 
 #include <set>
 
-#include "CodeFocusHandler.h"
-#include "CodeScrollParams.h"
-#include "CodeSnippetParams.h"
+#include "component/view/helper/CodeScrollParams.h"
+#include "component/view/helper/CodeSnippetParams.h"
 #include "GlobalId.hpp"
+#include "qt/element/code/CodeFocusHandler.h"
 
 class FilePath;
 class QRectF;

@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "IntermediateStorage.h"
-#include "LocationType.h"
+#include "data/location/LocationType.h"
+#include "data/storage/IntermediateStorage.h"
 
 namespace {
 

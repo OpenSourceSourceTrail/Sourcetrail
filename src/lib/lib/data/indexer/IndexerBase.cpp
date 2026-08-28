@@ -1,4 +1,4 @@
-#include "IndexerBase.h"
+#include "data/indexer/IndexerBase.h"
 
 IndexerBase::IndexerBase() = default;
 

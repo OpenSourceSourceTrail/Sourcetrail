@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "IProject.hpp"
+#include "project/IProject.hpp"
 
 struct MockedProject : IProject {
   ~MockedProject() override = default;

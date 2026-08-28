@@ -1,82 +1,15 @@
-# Sourcetrail CMake Functions
+# Declares a Sourcetrail static library.
 #
-# This file contains utility functions for creating Sourcetrail libraries and tests
-# with standardized configurations.
-
-#------------------------------------------------------------------------------
-# Function to add a Sourcetrail library with standardized configuration
-#
-# This function creates a library with proper namespacing, dependencies, and
-# warning configurations for Sourcetrail components.
-#
-# Usage:
 #   add_sourcetrail_library(
-#     NAME <library_name>
-#     [SOURCES <source_files...>]
-#     [PUBLIC_HEADERS <header_files...>]
-#     [PRIVATE_HEADERS <header_files...>]
-#     [PUBLIC_DEPS <dependencies...>]
-#     [PRIVATE_DEPS <dependencies...>]
-#     [WARNING_AS_ERROR <ON|OFF>]
-#   )
+#     NAME lib::data::storage::SQLiteStorage   # required, "::"-separated; becomes the target
+#     SOURCES SQLiteStorage.cpp Implementation.cpp
+#     HEADERS SQLiteStorage.hpp                # public API; a HEADERS file set, see target_sources
+#     PRIVATE_HEADERS Implementation.hpp       # internal to the library
+#     PUBLIC_DEPS sqlite3::sqlite3             # reachable through the public headers
+#     PRIVATE_DEPS internal::utils)            # implementation only
 #
-# Parameters:
-#   NAME (required):
-#     Name of the library, including namespace
-#     Example: NAME lib::data::storage::SQLiteStorage
-#
-#   SOURCES (optional):
-#     List of source files
-#     Example: SOURCES SQLiteStorage.cpp Implementation.cpp
-#
-#   PUBLIC_HEADERS (optional):
-#     Header files that are part of the library's public API
-#     Example: PUBLIC_HEADERS SQLiteStorage.hpp
-#
-#   PRIVATE_HEADERS (optional):
-#     Header files that are internal to the library
-#     Example: PRIVATE_HEADERS Implementation.hpp
-#
-#   PUBLIC_DEPS (optional):
-#     Public dependencies required by the library's public API
-#     Example: PUBLIC_DEPS nonstd::expected-lite
-#
-#   PRIVATE_DEPS (optional):
-#     Dependencies used only in the implementation
-#     Example: PRIVATE_DEPS internal::utils
-#
-#   WARNING_AS_ERROR (optional):
-#     Whether to treat warnings as errors
-#     Defaults to project setting
-#     Example: WARNING_AS_ERROR ON
-#
-# Example usage:
-#   # Basic library
-#   add_sourcetrail_library(
-#     NAME lib::data::BasicStorage
-#     SOURCES
-#       BasicStorage.cpp
-#     PUBLIC_HEADERS
-#       BasicStorage.hpp
-#   )
-#
-#   # Complex library with dependencies
-#   add_sourcetrail_library(
-#     NAME lib::data::storage::SQLiteStorage
-#     SOURCES
-#       SQLiteStorage.cpp
-#       Implementation.cpp
-#     PUBLIC_HEADERS
-#       SQLiteStorage.hpp
-#     PRIVATE_HEADERS
-#       Implementation.hpp
-#     PUBLIC_DEPS
-#       sqlite3::sqlite3
-#       nonstd::expected-lite
-#     PRIVATE_DEPS
-#       internal::utils
-#     WARNING_AS_ERROR ON
-#   )
+# NAME lib::data::Foo yields target Sourcetrail_lib_data_Foo and alias Sourcetrail::lib::data::Foo.
+# The project warning set is linked in automatically; see cmake/compiler_warnings.cmake.
 function(add_sourcetrail_library)
   # Define the expected arguments
   set(options "")
@@ -85,70 +18,41 @@ function(add_sourcetrail_library)
   set(multiValueArgs
       SOURCES # Source files
       PRIVATE_HEADERS # Private header files
-      PUBLIC_HEADERS # Public header files
+      HEADERS # Public header files
       PUBLIC_DEPS # Public dependencies
       PRIVATE_DEPS # Private dependencies
   )
 
   # Parse the arguments
-  cmake_parse_arguments(
-    ARG
-    "${options}"
-    "${oneValueArgs}"
-    "${multiValueArgs}"
-    ${ARGN})
+  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   # Validate required arguments
   if(NOT DEFINED ARG_NAME)
     message(FATAL_ERROR "NAME argument is required")
   endif()
 
-  if(NOT
-     ARG_NAME
-     MATCHES
-     "^[a-zA-Z0-9_]+::[a-zA-Z0-9_:]+$")
+  if(NOT ARG_NAME MATCHES "^[a-zA-Z0-9_]+::[a-zA-Z0-9_:]+$")
     message(FATAL_ERROR "Invalid library name format: ${ARG_NAME}")
   endif()
 
-  # 2. Validate source and header files
-  foreach(source ${ARG_SOURCES})
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
-      message(FATAL_ERROR "Source file not found: ${source}")
-    endif()
-  endforeach()
-
-  foreach(header ${ARG_PUBLIC_HEADERS} ${ARG_PRIVATE_HEADERS})
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${header}")
-      message(FATAL_ERROR "Header file not found: ${header}")
-    endif()
-  endforeach()
-
   # Create the actual library name with the full namespace
-  string(
-    REPLACE "::"
-            "_"
-            LIBRARY_NAME
-            "Sourcetrail_${ARG_NAME}")
+  string(REPLACE "::" "_" LIBRARY_NAME "Sourcetrail_${ARG_NAME}")
 
   # Add the library
   add_library(${LIBRARY_NAME})
 
   # Create the aliased target name with proper namespacing
-  string(
-    REPLACE "_"
-            "::"
-            ALIAS_NAME
-            "Sourcetrail::${ARG_NAME}")
+  string(REPLACE "_" "::" ALIAS_NAME "Sourcetrail::${ARG_NAME}")
   add_library(${ALIAS_NAME} ALIAS ${LIBRARY_NAME})
 
-  # Add sources
+  # Add sources. Public headers go in a HEADERS file set rather than being listed as PUBLIC sources:
+  # PUBLIC sources land in INTERFACE_SOURCES, so every consumer would inherit them as sources of its
+  # own target -- which for an AUTOMOC target means moc'ing another library's headers. The file set
+  # also puts BASE_DIRS on consumers' include path, so no separate target_include_directories.
   target_sources(
     ${LIBRARY_NAME}
     PRIVATE ${ARG_SOURCES} ${ARG_PRIVATE_HEADERS}
-    PUBLIC ${ARG_PUBLIC_HEADERS})
-
-  # Set include directories
-  target_include_directories(${LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+    PUBLIC FILE_SET HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ARG_HEADERS})
 
   # Add dependencies
   if(ARG_PUBLIC_DEPS)
@@ -159,11 +63,7 @@ function(add_sourcetrail_library)
     target_link_libraries(${LIBRARY_NAME} PRIVATE ${ARG_PRIVATE_DEPS})
   endif()
 
-  myproject_set_project_warnings(
-    ${LIBRARY_NAME}
-    ${SOURCETRAIL_WARNING_AS_ERROR}
-    ""
-    ""
-    ""
-    "")
+  # PRIVATE: the warnings apply to this library's own sources and are not inflicted on consumers,
+  # which link Sourcetrail::warnings themselves.
+  target_link_libraries(${LIBRARY_NAME} PRIVATE Sourcetrail::warnings)
 endfunction()

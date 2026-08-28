@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "CxxAstVisitorComponent.h"
-#include "ReferenceKind.h"
+#include "data/parser/cxx/CxxAstVisitorComponent.h"
+#include "data/parser/ReferenceKind.h"
 
 // This CxxAstVisitorComponent is responsible for recording and providing the context based
 // ReferenceKind for each reference to a type encountered while traversing the AST. Example: class

@@ -1,6 +1,6 @@
-#include "SourceLocation.h"
+#include "data/location/SourceLocation.h"
 // internal
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocationFile.h"
 
 SourceLocation::SourceLocation(SourceLocationFile* pFile,
                                LocationType type,

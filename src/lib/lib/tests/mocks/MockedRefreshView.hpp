@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "RefreshView.h"
+#include "component/view/RefreshView.h"
 
 struct MockedRefreshView final : RefreshView {
   explicit MockedRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout) {}

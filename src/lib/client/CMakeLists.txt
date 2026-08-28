@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/client/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/client/CMakeLists.txt
 #
 # The client's side of the engine boundary. Deliberately free of storage and SQLite: this is what a
 # GUI links instead of talking to a database itself.
@@ -33,11 +33,12 @@ target_link_libraries(
          Sourcetrail::lib::proto::api
          Sourcetrail::lib::core::http
          Sourcetrail::lib::messaging # ClientFactory hands out the concrete MessageQueue
-  PRIVATE Sourcetrail::lib::proto::convert
-          Sourcetrail::lib::core
-          Sourcetrail::lib::core::utility::logging
+  PRIVATE Sourcetrail::lib::proto::convert Sourcetrail::lib::core Sourcetrail::lib::core::utility::logging
           Sourcetrail::lib::core::utility::TextAccess)
 
 if(ENABLE_UNIT_TEST)
   add_subdirectory(tests)
 endif()
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_client PRIVATE Sourcetrail::warnings)

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "IndexerCommand.h"
+#include "data/indexer/IndexerCommand.h"
 
 class IndexerCommandCustom : public IndexerCommand {
 public:

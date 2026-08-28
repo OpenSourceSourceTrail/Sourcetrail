@@ -1,4 +1,4 @@
-#include "LanguageType.h"
+#include "settings/LanguageType.h"
 
 std::string languageTypeToString(LanguageType type) {
   switch(type) {

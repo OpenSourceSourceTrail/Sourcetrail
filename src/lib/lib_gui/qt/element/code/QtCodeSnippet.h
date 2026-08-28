@@ -4,10 +4,10 @@
 
 #include <QFrame>
 
-#include "CodeFocusHandler.h"
-#include "CodeSnippetParams.h"
+#include "component/view/helper/CodeSnippetParams.h"
 #include "GlobalId.hpp"
-#include "QtCodeArea.h"
+#include "qt/element/code/CodeFocusHandler.h"
+#include "qt/element/code/QtCodeArea.h"
 
 class QBoxLayout;
 class QPushButton;

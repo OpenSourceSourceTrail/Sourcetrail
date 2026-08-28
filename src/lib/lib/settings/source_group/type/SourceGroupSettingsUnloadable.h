@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-#include "SourceGroupSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 
 class SourceGroupSettingsUnloadable : public SourceGroupSettings {
 public:

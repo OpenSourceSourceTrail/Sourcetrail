@@ -1,4 +1,4 @@
-#include "ScreenSearchView.h"
+#include "component/view/ScreenSearchView.h"
 
 ScreenSearchView::ScreenSearchView(ViewLayout* viewLayout) : View(viewLayout) {}
 

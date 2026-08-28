@@ -5,7 +5,7 @@
 
 #include <clang/AST/DeclTemplate.h>
 
-#include "CxxNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxNameResolver.h"
 
 class DataType;
 

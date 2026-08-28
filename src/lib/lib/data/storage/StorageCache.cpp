@@ -1,7 +1,7 @@
-#include "StorageCache.h"
+#include "data/storage/StorageCache.h"
 
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
 #include "TextAccess.h"
 #include "utility.h"
 

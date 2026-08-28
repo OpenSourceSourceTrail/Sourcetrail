@@ -2,8 +2,8 @@
 #include <cassert>
 #include <filesystem>
 
-#include "GroupType.h"
-#include "IApplicationSettings.hpp"
+#include "data/GroupType.h"
+#include "settings/IApplicationSettings.hpp"
 
 class TimeStamp;
 class Version;

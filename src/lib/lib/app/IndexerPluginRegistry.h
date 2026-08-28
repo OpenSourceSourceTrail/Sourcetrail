@@ -4,10 +4,10 @@
 #include <optional>
 #include <vector>
 
+#include "data/indexer/IndexerCommandType.h"
 #include "FilePath.h"
-#include "IndexerCommandType.h"
-#include "LanguageType.h"
-#include "SourceGroupType.h"
+#include "settings/LanguageType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 class IndexerPluginRegistry final {
 public:

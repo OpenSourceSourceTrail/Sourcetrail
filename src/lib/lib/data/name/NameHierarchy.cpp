@@ -1,4 +1,4 @@
-#include "NameHierarchy.h"
+#include "data/name/NameHierarchy.h"
 
 #include <sstream>
 

@@ -1,4 +1,4 @@
-#include "Bookmark.h"
+#include "data/bookmark/Bookmark.h"
 
 Bookmark::Bookmark(
     Id id, const std::wstring& name, const std::wstring& comment, const TimeStamp& timeStamp, const BookmarkCategory& category)

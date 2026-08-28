@@ -2,7 +2,7 @@
 #define CXX_VS_15_HEADER_PATH_DETECTOR_H
 
 #include "ApplicationArchitectureType.h"
-#include "PathDetector.h"
+#include "utility/path_detector/PathDetector.h"
 
 class CxxVs15HeaderPathDetector : public PathDetector {
 public:

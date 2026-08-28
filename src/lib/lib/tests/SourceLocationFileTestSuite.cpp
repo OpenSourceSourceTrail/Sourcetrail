@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 // internal
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocationFile.h"
 
 using namespace std::string_literals;
 using namespace testing;

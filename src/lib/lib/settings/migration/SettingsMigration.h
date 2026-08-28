@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Migration.h"
-#include "Settings.h"
+#include "settings/Settings.h"
 
 class SettingsMigration : public Migration<Settings> {
 public:

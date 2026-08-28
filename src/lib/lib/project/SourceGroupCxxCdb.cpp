@@ -1,22 +1,22 @@
-#include "SourceGroupCxxCdb.h"
+#include "project/SourceGroupCxxCdb.h"
 
 #include <filesystem>
 
 #include <fmt/format.h>
 #include <fmt/xchar.h>
 
-#include "Application.h"
-#include "CxxIndexerCommandProvider.h"
-#include "IApplicationSettings.hpp"
-#include "IndexerCommandCxx.h"
+#include "app/Application.h"
+#include "data/indexer/CxxIndexerCommandProvider.h"
+#include "data/indexer/IndexerCommandCxx.h"
 #include "logging.h"
-#include "RefreshInfo.h"
-#include "SourceGroupSettingsCxxCdb.h"
+#include "project/RefreshInfo.h"
+#include "project/utilitySourceGroupCxx.h"
+#include "settings/IApplicationSettings.hpp"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 #include "TaskLambda.h"
 #include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityFile.h"
-#include "utilitySourceGroupCxx.h"
 #include "utilityString.h"
 
 namespace {

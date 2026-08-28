@@ -1,4 +1,4 @@
-#include "NodeBookmark.h"
+#include "data/bookmark/NodeBookmark.h"
 
 NodeBookmark::NodeBookmark(const Id id,
                            const std::wstring& name,

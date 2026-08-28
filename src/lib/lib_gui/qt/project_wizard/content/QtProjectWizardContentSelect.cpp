@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentSelect.h"
+#include "qt/project_wizard/content/QtProjectWizardContentSelect.h"
 
 #include <regex>
 
@@ -10,13 +10,13 @@
 #include <QToolButton>
 #include <QVariant>
 
+#include "app/paths/ResourcePaths.h"
 #include "Capabilities.h"
-#include "globalStrings.h"
-#include "LanguageType.h"
-#include "QtFlowLayout.h"
-#include "QtProjectWizardWindow.h"
-#include "ResourcePaths.h"
-#include "StorageVersion.h"
+#include "data/storage/StorageVersion.h"
+#include "qt/project_wizard/QtProjectWizardWindow.h"
+#include "qt/utility/QtFlowLayout.h"
+#include "settings/LanguageType.h"
+#include "utility/globalStrings.h"
 #include "utilityString.h"
 
 QtProjectWizardContentSelect::QtProjectWizardContentSelect(QtProjectWizardWindow* window) : QtProjectWizardContent(window) {}

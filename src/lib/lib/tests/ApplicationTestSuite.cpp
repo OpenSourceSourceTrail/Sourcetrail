@@ -11,9 +11,9 @@
 #ifndef D_WINDOWS
 #  define private public
 #endif
-#include "Application.h"
-#include "Project.h"
-#include "ProjectSettings.h"
+#include "app/Application.h"
+#include "project/Project.h"
+#include "settings/ProjectSettings.h"
 #ifndef D_WINDOWS
 #  undef private
 #endif

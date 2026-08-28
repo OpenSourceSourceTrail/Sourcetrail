@@ -1,19 +1,19 @@
-#include "QtGraphEdge.h"
+#include "qt/graphics/graph/QtGraphEdge.h"
 
 #include <QCursor>
 #include <QGraphicsItemGroup>
 #include <QGraphicsSceneEvent>
 
-#include "Edge.h"
-#include "GraphFocusHandler.h"
-#include "GraphViewStyle.h"
-#include "Node.h"
-#include "QtGraphNode.h"
-#include "QtLineItemAngled.h"
-#include "QtLineItemBezier.h"
-#include "QtLineItemStraight.h"
-#include "TokenComponentInheritanceChain.h"
-#include "TokenComponentIsAmbiguous.h"
+#include "component/view/GraphViewStyle.h"
+#include "data/graph/Edge.h"
+#include "data/graph/Node.h"
+#include "data/graph/token_component/TokenComponentInheritanceChain.h"
+#include "data/graph/token_component/TokenComponentIsAmbiguous.h"
+#include "qt/graphics/base/QtLineItemAngled.h"
+#include "qt/graphics/base/QtLineItemBezier.h"
+#include "qt/graphics/base/QtLineItemStraight.h"
+#include "qt/graphics/graph/QtGraphNode.h"
+#include "qt/graphics/GraphFocusHandler.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageActivateEdge.h"

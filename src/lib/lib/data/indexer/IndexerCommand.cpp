@@ -1,4 +1,4 @@
-#include "IndexerCommand.h"
+#include "data/indexer/IndexerCommand.h"
 
 #include <boost/json/object.hpp>
 #include <boost/json/serialize.hpp>

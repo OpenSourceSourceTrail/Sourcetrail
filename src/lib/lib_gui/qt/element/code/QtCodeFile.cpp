@@ -1,12 +1,12 @@
-#include "QtCodeFile.h"
+#include "qt/element/code/QtCodeFile.h"
 
 #include <QStyle>
 #include <QVBoxLayout>
 
-#include "QtCodeFileTitleBar.h"
-#include "QtCodeNavigator.h"
-#include "QtCodeSnippet.h"
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocationFile.h"
+#include "qt/element/code/QtCodeFileTitleBar.h"
+#include "qt/element/code/QtCodeNavigator.h"
+#include "qt/element/code/QtCodeSnippet.h"
 #include "type/code/MessageChangeFileView.h"
 
 QtCodeFile::QtCodeFile(const FilePath& filePath, QtCodeNavigator* navigator, bool isFirst)

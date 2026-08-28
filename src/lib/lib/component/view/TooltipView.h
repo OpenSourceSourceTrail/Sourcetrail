@@ -3,10 +3,10 @@
 
 #include <vector>
 
+#include "component/view/View.h"
+#include "data/name/NameHierarchy.h"
+#include "data/tooltip/TooltipInfo.h"
 #include "GlobalId.hpp"
-#include "NameHierarchy.h"
-#include "TooltipInfo.h"
-#include "View.h"
 
 class TooltipView : public View {
 public:

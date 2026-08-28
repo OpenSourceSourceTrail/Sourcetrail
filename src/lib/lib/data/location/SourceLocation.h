@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 // internal
+#include "data/location/LocationType.h"
 #include "GlobalId.hpp"
-#include "LocationType.h"
 
 class FilePath;
 class SourceLocationFile;

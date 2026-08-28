@@ -1,7 +1,7 @@
 #!/bin/env bash
+# Formats every tracked CMakeLists.txt / *.cmake in place. Tracked only: build/ and .conan/ hold
+# generated files that must not be rewritten.
+set -euo pipefail
 
-src_files=$(find . -type f -name "CMakeLists.txt" -o -iname "*.cmake" -not -path "./.conan/*")
-for file in $src_files; do
-  cmake-format -i $file
-done
-
+cd "$(dirname "$0")/.."
+git ls-files -z '*CMakeLists.txt' '*.cmake' | xargs -0 cmake-format -i

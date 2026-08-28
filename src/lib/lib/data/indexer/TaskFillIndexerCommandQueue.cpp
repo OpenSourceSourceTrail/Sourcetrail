@@ -1,10 +1,10 @@
-#include "TaskFillIndexerCommandQueue.h"
+#include "data/indexer/TaskFillIndexerCommandQueue.h"
 
 #include "../../../scheduling/Blackboard.h"
 #include "Convert.h"
+#include "data/indexer/grpc/IndexerWorkerServiceImpl.h"
+#include "data/indexer/IndexerCommandProvider.h"
 #include "FileSystem.h"
-#include "IndexerCommandProvider.h"
-#include "IndexerWorkerServiceImpl.h"
 #include "logging.h"
 #include "utilityFile.h"
 

@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "IndexerCommandProvider.h"
+#include "data/indexer/IndexerCommandProvider.h"
 
 class CombinedIndexerCommandProvider : public IndexerCommandProvider {
 public:

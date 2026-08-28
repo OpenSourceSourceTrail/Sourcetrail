@@ -1,4 +1,4 @@
-#include "QtGraphNodeText.h"
+#include "qt/graphics/graph/QtGraphNodeText.h"
 
 #include <QCursor>
 

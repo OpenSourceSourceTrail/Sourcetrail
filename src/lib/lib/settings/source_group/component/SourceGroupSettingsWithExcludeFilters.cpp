@@ -1,8 +1,8 @@
-#include "SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
 
 #include "FilePathFilter.h"
 #include "FileSystem.h"
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 #include "utility.h"
 #include "utilityFile.h"
 

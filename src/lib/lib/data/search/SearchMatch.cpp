@@ -1,9 +1,9 @@
-#include "SearchMatch.h"
+#include "data/search/SearchMatch.h"
 // STL
 #include <sstream>
 // internal
+#include "data/NodeTypeSet.h"
 #include "logging.h"
-#include "NodeTypeSet.h"
 
 void SearchMatch::log(const std::vector<SearchMatch>& matches, const std::wstring& query) {
   std::wstringstream sStream;

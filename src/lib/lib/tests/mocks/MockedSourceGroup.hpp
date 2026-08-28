@@ -1,12 +1,12 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "DialogView.h"
-#include "IndexerCommand.h"
-#include "IndexerCommandProvider.h"
-#include "SourceGroup.h"
-#include "SourceGroupSettings.h"
-#include "StorageProvider.h"
+#include "component/view/DialogView.h"
+#include "data/indexer/IndexerCommand.h"
+#include "data/indexer/IndexerCommandProvider.h"
+#include "data/storage/StorageProvider.h"
+#include "project/SourceGroup.h"
+#include "settings/source_group/SourceGroupSettings.h"
 
 struct MockedSourceGroup : SourceGroup {
   MOCK_METHOD(bool, prepareIndexing, (), (override));

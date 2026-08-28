@@ -1,4 +1,4 @@
-#include "QtProjectWizardContent.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
 // STL
 #include <thread>
 // Qt5
@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QToolButton>
 // internal
-#include "QtTextEditDialog.h"
+#include "qt/window/QtTextEditDialog.h"
 #include "utility.h"
 #include "utilityString.h"
 

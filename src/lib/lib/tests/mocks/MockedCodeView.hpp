@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "CodeView.h"
+#include "component/view/CodeView.h"
 
 struct MockedCodeView final : CodeView {
   explicit MockedCodeView(ViewLayout* viewLayout) : CodeView(viewLayout) {}

@@ -1,12 +1,12 @@
-#include "SqliteIndexStorage.h"
+#include "data/storage/sqlite/SqliteIndexStorage.h"
 
+#include "data/location/LocationType.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
+#include "data/storage/StorageVersion.h"
 #include "FileSystem.h"
 #include "GlobalId.hpp"
-#include "LocationType.h"
 #include "logging.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
-#include "StorageVersion.h"
 #include "TextAccess.h"
 #include "utilityString.h"
 

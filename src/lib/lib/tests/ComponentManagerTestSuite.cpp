@@ -3,8 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ComponentManager.h"
-#include "IApplicationSettings.hpp"
+#include "component/ComponentManager.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkButtonsView.hpp"
@@ -18,6 +17,7 @@
 #include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 using namespace testing;
 

@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/indexers/cxx/lib/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/indexers/cxx/lib/CMakeLists.txt
 find_package(Clang REQUIRED)
 
 # Clang's own version config only accepts an exact major.minor, so the floor is checked by hand here.
@@ -52,40 +52,23 @@ target_sources(
           project/CxxToolchainLocal.cpp
           LanguagePackageCxx.cpp)
 
-target_include_directories(
-  Sourcetrail_lib_cxx
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}
-         ${CMAKE_CURRENT_LIST_DIR}/data/indexer/
-         ${CMAKE_CURRENT_LIST_DIR}/data/parser/cxx/name/
-         ${CMAKE_CURRENT_LIST_DIR}/data/parser/cxx/name_resolver/
-         ${CMAKE_CURRENT_LIST_DIR}/data/parser/cxx/
-         ${CMAKE_CURRENT_LIST_DIR}/project/
-         ${CMAKE_CURRENT_LIST_DIR}/utility/
-         ${CMAKE_CURRENT_LIST_DIR}/utility/codeblocks/)
+# One include root, e.g. #include "data/parser/cxx/CxxParser.h".
+target_include_directories(Sourcetrail_lib_cxx PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-target_include_directories(Sourcetrail_lib_cxx PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
+target_include_directories(Sourcetrail_lib_cxx PRIVATE ${PROJECT_BINARY_DIR}/src/lib/lib)
 
 target_include_directories(Sourcetrail_lib_cxx SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 
 if(LLVM_LINK_LLVM_DYLIB)
   set(REQ_LLVM_LIBS LLVM)
 else()
-  llvm_map_components_to_libnames(
-    REQ_LLVM_LIBS
-    support
-    core
-    libdriver
-    passes
-    option)
+  llvm_map_components_to_libnames(REQ_LLVM_LIBS support core libdriver passes option)
   foreach(LLVM_TARGET IN LISTS LLVM_TARGETS_TO_BUILD)
     get_property(lib_deps GLOBAL PROPERTY "LLVMBUILD_LIB_DEPS_LLVM${LLVM_TARGET}CodeGen")
     list(APPEND REQ_LLVM_LIBS "LLVM${LLVM_TARGET}CodeGen")
     list(APPEND REQ_LLVM_LIBS "${lib_deps}")
     get_property(lib_deps GLOBAL PROPERTY "LLVMBUILD_LIB_DEPS_LLVM${LLVM_TARGET}AsmParser")
-    if(NOT
-       "${lib_deps}"
-       STREQUAL
-       "")
+    if(NOT "${lib_deps}" STREQUAL "")
       list(APPEND REQ_LLVM_LIBS "LLVM${LLVM_TARGET}AsmParser")
       list(APPEND REQ_LLVM_LIBS "${lib_deps}")
     endif()
@@ -142,3 +125,6 @@ if(WIN32)
   target_compile_definitions(Sourcetrail_lib_cxx PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS) # Due to Clang
   target_link_libraries(Sourcetrail_lib_cxx PUBLIC version)
 endif()
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_lib_cxx PRIVATE Sourcetrail::warnings)

@@ -1,13 +1,13 @@
-#include "QtGraphNodeExpandToggle.h"
+#include "qt/graphics/graph/QtGraphNodeExpandToggle.h"
 
 #include <QFontMetrics>
 
+#include "app/paths/ResourcePaths.h"
 #include "logging.h"
-#include "QtDeviceScaledPixmap.h"
-#include "QtRoundedRectItem.h"
-#include "ResourcePaths.h"
+#include "qt/graphics/base/QtRoundedRectItem.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "qt/utility/utilityQt.h"
 #include "type/graph/MessageGraphNodeExpand.h"
-#include "utilityQt.h"
 
 QtGraphNodeExpandToggle::QtGraphNodeExpandToggle(bool expanded, int invisibleSubNodeCount)
     : m_invisibleSubNodeCount(invisibleSubNodeCount), m_expanded(expanded) {

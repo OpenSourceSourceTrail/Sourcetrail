@@ -1,8 +1,8 @@
 #ifndef QT_CODE_FILE_TITLE_BAR_H
 #define QT_CODE_FILE_TITLE_BAR_H
 
-#include "QtCodeFileTitleButton.h"
-#include "QtHoverButton.h"
+#include "qt/element/button/QtHoverButton.h"
+#include "qt/element/code/QtCodeFileTitleButton.h"
 
 class QLabel;
 class QtCodeFileTitleButton;

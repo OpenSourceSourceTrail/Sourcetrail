@@ -1,8 +1,8 @@
-#${CMAKE_SOURCE_DIR}/src/app/cli/CMakeLists.txt
+#${PROJECT_SOURCE_DIR}/src/app/cli/CMakeLists.txt
 add_executable(Sourcetrail_cli main.cpp ConsoleApplication.cpp ConsoleApplication.h)
 
 set_target_properties(Sourcetrail_cli PROPERTIES OUTPUT_NAME sourcetrail_cli RUNTIME_OUTPUT_DIRECTORY
-                                                                             "${CMAKE_BINARY_DIR}/app/")
+                                                                             "${PROJECT_BINARY_DIR}/app/")
 
 target_link_libraries(
   Sourcetrail_cli
@@ -16,8 +16,8 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::utilityApp
           Sourcetrail::lib::core::utility::commandline::CommandLineParser)
 
-target_include_directories(Sourcetrail_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/src/lib/lib"
-                                                   "${CMAKE_BINARY_DIR}/src/lib/lib_gui")
+target_include_directories(Sourcetrail_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}/src/lib/lib"
+                                                   "${PROJECT_BINARY_DIR}/src/lib/lib_gui")
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)
@@ -26,6 +26,5 @@ endif()
 
 add_dependencies(Sourcetrail_cli versionnumber)
 
-if(TARGET Sourcetrail_indexer)
-  add_dependencies(Sourcetrail_cli Sourcetrail_indexer)
-endif()
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_cli PRIVATE Sourcetrail::warnings)

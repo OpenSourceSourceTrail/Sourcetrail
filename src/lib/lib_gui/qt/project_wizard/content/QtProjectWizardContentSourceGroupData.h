@@ -1,7 +1,7 @@
 #pragma once
 
-#include "QtProjectWizardContent.h"
-#include "SourceGroupStatusType.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
+#include "settings/source_group/SourceGroupStatusType.h"
 
 QT_FORWARD_DECLARE_CLASS(QCheckBox);
 QT_FORWARD_DECLARE_CLASS(QLineEdit);

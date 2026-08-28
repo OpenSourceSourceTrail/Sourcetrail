@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/scheduling/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/scheduling/CMakeLists.txt
 add_library(Sourcetrail_scheduling)
 add_library(Sourcetrail::lib::scheduling ALIAS Sourcetrail_scheduling)
 
@@ -23,9 +23,9 @@ target_include_directories(Sourcetrail_scheduling PUBLIC ${CMAKE_CURRENT_LIST_DI
 
 target_link_libraries(
   Sourcetrail_scheduling
-  PUBLIC Sourcetrail::lib::core
-         Sourcetrail::lib::core::utility::logging
-         Sourcetrail::lib::core::utility::GlobalId
-         Sourcetrail::lib::core::utility::DispatchQueue
-         Taskflow::Taskflow
+  PUBLIC Sourcetrail::lib::core Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::GlobalId
+         Sourcetrail::lib::core::utility::DispatchQueue Taskflow::Taskflow
   PRIVATE Boost::date_time Sourcetrail::lib::core::utility::ScopedFunctor Sourcetrail::lib::core::utility::TaskExecutor)
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_scheduling PRIVATE Sourcetrail::warnings)

@@ -1,15 +1,15 @@
-#include "CodeController.h"
+#include "component/controller/CodeController.h"
 
 #include <memory>
 
-#include "Application.h"
+#include "app/Application.h"
+#include "data/location/SourceLocation.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
+#include "data/storage/StorageAccess.h"
 #include "FileInfo.h"
-#include "IApplicationSettings.hpp"
 #include "logging.h"
-#include "SourceLocation.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
-#include "StorageAccess.h"
+#include "settings/IApplicationSettings.hpp"
 #include "TextAccess.h"
 #include "type/error/MessageShowError.h"
 #include "type/focus/MessageFocusView.h"

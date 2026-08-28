@@ -1,11 +1,11 @@
-#include "CompilationDatabase.h"
+#include "project/CompilationDatabase.h"
 
 #include <set>
 #include <string>
 
 #include "FilePath.h"
+#include "project/utilitySourceGroupCxx.h"
 #include "utility.h"
-#include "utilitySourceGroupCxx.h"
 #include "utilityString.h"
 
 namespace utility {

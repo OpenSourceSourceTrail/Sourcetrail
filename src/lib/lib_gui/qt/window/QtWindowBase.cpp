@@ -1,12 +1,12 @@
-#include "QtWindowBase.h"
+#include "qt/window/QtWindowBase.h"
 
 #include <QGraphicsDropShadowEffect>
 #include <QMouseEvent>
 #include <QtGlobal>
 #include <QVBoxLayout>
 
-#include "IApplicationSettings.hpp"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "settings/IApplicationSettings.hpp"
 
 QtWindowBase::QtWindowBase(bool isSubWindow, QWidget* parent) : QtWindowStackElement(parent), m_isSubWindow(isSubWindow) {
   if(isSubWindow) {

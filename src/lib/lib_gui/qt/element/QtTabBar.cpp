@@ -1,10 +1,10 @@
-#include "QtTabBar.h"
+#include "qt/element/QtTabBar.h"
 
 #include <QContextMenuEvent>
 
 #include "logging.h"
-#include "QtContextMenu.h"
-#include "QtGraphicsView.h"
+#include "qt/graphics/QtGraphicsView.h"
+#include "qt/utility/QtContextMenu.h"
 
 
 QtTabBar::QtTabBar(QWidget* parent) : QTabBar(parent) {

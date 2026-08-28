@@ -1,4 +1,4 @@
-#include "Token.h"
+#include "data/graph/Token.h"
 
 #include "logging.h"
 

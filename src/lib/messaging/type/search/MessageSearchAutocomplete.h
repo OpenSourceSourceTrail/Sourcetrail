@@ -1,8 +1,8 @@
 #pragma once
 // internal
+#include "component/TabId.h"
+#include "data/NodeTypeSet.h"
 #include "Message.h"
-#include "NodeTypeSet.h"
-#include "TabId.h"
 
 class MessageSearchAutocomplete final : public Message<MessageSearchAutocomplete> {
 public:

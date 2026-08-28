@@ -1,6 +1,6 @@
-#include "SourceGroupSettingsWithJavaClassPath.h"
+#include "settings/source_group/component/java/SourceGroupSettingsWithJavaClassPath.h"
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 #include "utility.h"
 
 std::vector<FilePath> SourceGroupSettingsWithJavaClassPath::getClassPaths() const {

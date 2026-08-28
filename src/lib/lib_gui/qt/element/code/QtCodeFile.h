@@ -8,9 +8,9 @@
 
 #include <QFrame>
 
-#include "CodeFocusHandler.h"
-#include "CodeSnippetParams.h"
+#include "component/view/helper/CodeSnippetParams.h"
 #include "FilePath.h"
+#include "qt/element/code/CodeFocusHandler.h"
 
 class QtCodeArea;
 class QtCodeFileTitleBar;

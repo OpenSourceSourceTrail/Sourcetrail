@@ -1,4 +1,4 @@
-#include "QtCodeNavigator.h"
+#include "qt/element/code/QtCodeNavigator.h"
 
 #include <QApplication>
 #include <QButtonGroup>
@@ -9,18 +9,19 @@
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "CodeFocusHandler.h"
-#include "IApplicationSettings.hpp"
+#include "app/paths/ResourcePaths.h"
+#include "component/TabId.h"
+#include "data/location/SourceLocation.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
 #include "logging.h"
-#include "QtCodeArea.h"
-#include "QtCodeFile.h"
-#include "QtCodeSnippet.h"
-#include "QtSearchBarButton.h"
-#include "ResourcePaths.h"
-#include "SourceLocation.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
-#include "TabId.h"
+#include "qt/element/code/CodeFocusHandler.h"
+#include "qt/element/code/QtCodeArea.h"
+#include "qt/element/code/QtCodeFile.h"
+#include "qt/element/code/QtCodeSnippet.h"
+#include "qt/element/search/QtSearchBarButton.h"
+#include "qt/utility/utilityQt.h"
+#include "settings/IApplicationSettings.hpp"
 #include "type/code/MessageCodeReference.h"
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageToNextCodeReference.h"
@@ -29,7 +30,6 @@
 #include "type/history/MessageHistoryUndo.h"
 #include "type/tab/MessageTabOpenWith.h"
 #include "utility.h"
-#include "utilityQt.h"
 
 QtCodeNavigator::QtCodeNavigator(QWidget* parent)
     : QWidget(parent), m_mode(MODE_NONE), m_oldMode(MODE_NONE), m_schedulerId(TabId::ignore()) {

@@ -4,7 +4,7 @@
 #include "Message.h"
 #include "MessageActivateBase.h"
 //
-#include "SearchMatch.h"
+#include "data/search/SearchMatch.h"
 
 class MessageActivateTokens
     : public Message<MessageActivateTokens>

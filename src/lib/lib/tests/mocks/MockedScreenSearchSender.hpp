@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "ScreenSearchInterfaces.h"
+#include "component/controller/helper/ScreenSearchInterfaces.h"
 
 struct MockedScreenSearchSender final : ScreenSearchSender {
   MOCK_METHOD(void, foundMatches, (ScreenSearchResponder*, size_t), (override));

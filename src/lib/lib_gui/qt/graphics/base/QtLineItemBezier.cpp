@@ -1,4 +1,4 @@
-#include "QtLineItemBezier.h"
+#include "qt/graphics/base/QtLineItemBezier.h"
 
 #include <QPainter>
 

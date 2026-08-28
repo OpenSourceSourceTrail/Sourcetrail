@@ -1,4 +1,4 @@
-#include "CxxNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxNameResolver.h"
 
 CxxNameResolver::CxxNameResolver(CanonicalFilePathCache* canonicalFilePathCache)
     : m_canonicalFilePathCache(canonicalFilePathCache) {}

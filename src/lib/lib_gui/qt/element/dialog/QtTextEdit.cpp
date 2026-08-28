@@ -1,4 +1,4 @@
-#include "QtTextEdit.h"
+#include "qt/element/dialog/QtTextEdit.h"
 
 QtTextEdit::QtTextEdit(QWidget* parent) : QTextBrowser(parent) {
   document()->setDefaultStyleSheet(QStringLiteral("a { color: #007AC2; }"));

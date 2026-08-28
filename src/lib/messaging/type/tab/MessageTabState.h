@@ -1,7 +1,7 @@
 #pragma once
 // internal
+#include "data/search/SearchMatch.h"
 #include "Message.h"
-#include "SearchMatch.h"
 
 class MessageTabState final : public Message<MessageTabState> {
 public:

@@ -1,4 +1,4 @@
-#include "ISharedMemoryGarbageCollector.hpp"
+#include "utility/interprocess/ISharedMemoryGarbageCollector.hpp"
 
 #include <cassert>
 

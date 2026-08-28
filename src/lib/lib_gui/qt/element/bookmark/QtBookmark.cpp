@@ -1,4 +1,4 @@
-#include "QtBookmark.h"
+#include "qt/element/bookmark/QtBookmark.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -9,10 +9,10 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
-#include "Bookmark.h"
-#include "BookmarkController.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "component/controller/BookmarkController.h"
+#include "data/bookmark/Bookmark.h"
+#include "qt/utility/utilityQt.h"
 
 QtBookmark::QtBookmark(ControllerProxy<BookmarkController>* controllerProxy)
     : m_controllerProxy(controllerProxy)

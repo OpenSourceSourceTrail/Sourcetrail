@@ -1,10 +1,10 @@
-#include "Component.h"
+#include "component/Component.h"
 
 #include <utility>
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
+#include "component/view/View.h"
 #include "logging.h"
-#include "View.h"
 
 Component::Component(std::shared_ptr<View> view, std::shared_ptr<Controller> controller)
     : m_controller(std::move(controller)), m_view(std::move(view)) {

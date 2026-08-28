@@ -1,18 +1,34 @@
+# Without these, cmake-format does not know the project's own functions (cmake/add_sourcetrail_*.cmake)
+# and renders every call site one token per line.
 additional_commands:
-  foo:
-    flags:
-    - BAR
-    - BAZ
+  add_sourcetrail_library:
+    pargs: 0
     kwargs:
-      DEPENDS: '*'
-      HEADERS: '*'
+      NAME: 1
       SOURCES: '*'
+      HEADERS: '*'
+      PRIVATE_HEADERS: '*'
+      PUBLIC_DEPS: '*'
+      PRIVATE_DEPS: '*'
+  add_sourcetrail_interface:
+    pargs: 0
+    kwargs:
+      NAME: 1
+      DEPS: '*'
+  add_sourcetrail_test:
+    pargs: 0
+    kwargs:
+      NAME: 1
+      TEST_PREFIX: 1
+      WORKING_DIRECTORY: 1
+      SOURCES: '*'
+      DEPS: '*'
 bullet_char: '*'
 dangle_parens: false
 enum_char: .
 line_ending: unix
 line_width: 120
-max_pargs_hwrap: 3
+max_pargs_hwrap: 6
 separate_ctrl_name_with_space: false
 separate_fn_name_with_space: false
 tab_size: 2

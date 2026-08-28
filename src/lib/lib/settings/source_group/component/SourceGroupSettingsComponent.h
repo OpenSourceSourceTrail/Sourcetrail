@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "SourceGroupSettingsBase.h"
+#include "settings/source_group/SourceGroupSettingsBase.h"
 
 class ConfigManager;
 

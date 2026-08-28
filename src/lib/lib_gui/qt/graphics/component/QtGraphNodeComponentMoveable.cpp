@@ -1,8 +1,8 @@
-#include "QtGraphNodeComponentMoveable.h"
+#include "qt/graphics/component/QtGraphNodeComponentMoveable.h"
 
 #include <QGraphicsSceneEvent>
 
-#include "QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 QtGraphNodeComponentMoveable::QtGraphNodeComponentMoveable(QtGraphNode* graphNode)
     : QtGraphNodeComponent(graphNode), m_mouseOffset{} {}

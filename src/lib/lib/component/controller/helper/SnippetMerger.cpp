@@ -1,8 +1,8 @@
-#include "SnippetMerger.h"
+#include "component/controller/helper/SnippetMerger.h"
 
 #include <algorithm>
 
-#include "IApplicationSettings.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 SnippetMerger::SnippetMerger(int startRow, int endRow) : m_start(startRow), m_end(endRow) {}
 

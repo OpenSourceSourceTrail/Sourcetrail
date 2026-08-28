@@ -1,15 +1,15 @@
-#include "CxxAstVisitor.h"
+#include "data/parser/cxx/CxxAstVisitor.h"
 
 #include <clang/AST/ASTContext.h>
 #include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
 
-#include "CanonicalFilePathCache.h"
-#include "IndexerStateInfo.h"
+#include "data/indexer/IndexerStateInfo.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/utilityClang.h"
+#include "data/parser/ParseLocation.h"
+#include "data/parser/ParserClient.h"
 #include "logging.h"
-#include "ParseLocation.h"
-#include "ParserClient.h"
-#include "utilityClang.h"
 
 CxxAstVisitor::CxxAstVisitor(clang::ASTContext* astContext,
                              clang::Preprocessor* preprocessor,

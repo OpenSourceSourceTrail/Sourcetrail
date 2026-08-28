@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "ViewFactory.h"
+#include "component/view/ViewFactory.h"
 
 class QtViewFactory final : public ViewFactory {
 public:

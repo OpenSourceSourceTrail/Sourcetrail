@@ -1,14 +1,14 @@
-#include "QtStatusBar.h"
+#include "qt/element/QtStatusBar.h"
 
 #include <QHBoxLayout>
 #include <QMovie>
 #include <QProgressBar>
 
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/utility/utilityQt.h"
 #include "type/error/MessageErrorsAll.h"
 #include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageShowStatus.h"
-#include "utilityQt.h"
 
 QtStatusBar::QtStatusBar() : m_text(this), m_ideStatusText(this) {
   addWidget(new QWidget());    // add some space

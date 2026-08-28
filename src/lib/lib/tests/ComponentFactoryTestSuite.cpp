@@ -1,13 +1,13 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ActivationController.h"
-#include "ComponentFactory.h"
-#include "IApplicationSettings.hpp"
+#include "component/ComponentFactory.h"
+#include "component/controller/ActivationController.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 using namespace testing;
 

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "NameHierarchy.h"
-#include "SearchIndex.h"
+#include "data/name/NameHierarchy.h"
+#include "data/search/SearchIndex.h"
 #include "utility.h"
 
 TEST(SearchIndex, searchIndexFindsIdOfElementAdded) {

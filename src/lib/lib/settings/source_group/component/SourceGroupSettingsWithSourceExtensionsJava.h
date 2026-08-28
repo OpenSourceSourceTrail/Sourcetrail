@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SourceGroupSettingsWithSourceExtensions.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourceExtensions.h"
 
 class SourceGroupSettingsWithSourceExtensionsJava : public SourceGroupSettingsWithSourceExtensions {
 private:

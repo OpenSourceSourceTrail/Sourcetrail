@@ -1,9 +1,9 @@
 #pragma once
 #include <gmock/gmock.h>
 
+#include "data/NodeTypeSet.h"
+#include "data/storage/StorageAccess.h"
 #include "FileInfo.h"
-#include "NodeTypeSet.h"
-#include "StorageAccess.h"
 
 class MockedStorageAccess : public StorageAccess {
 public:

@@ -5,9 +5,9 @@
 #include "Vec2f.h"
 
 // internal
+#include "component/TabId.h"
 #include "GlobalId.hpp"
 #include "Message.h"
-#include "TabId.h"
 
 class MessageGraphNodeMove final : public Message<MessageGraphNodeMove> {
 public:

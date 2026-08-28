@@ -1,4 +1,4 @@
-#include "SourceGroupSettingsWithCustomCommand.h"
+#include "settings/source_group/component/SourceGroupSettingsWithCustomCommand.h"
 
 #include "ConfigManager.hpp"
 

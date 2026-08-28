@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/tests/integration/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/tests/integration/CMakeLists.txt
 add_subdirectory(engine_http)
 add_subdirectory(lib)
 add_subdirectory(messaging)

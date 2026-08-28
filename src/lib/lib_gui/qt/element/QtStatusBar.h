@@ -8,7 +8,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 
-#include "ErrorCountInfo.h"
+#include "data/ErrorCountInfo.h"
 
 class QProgressBar;
 

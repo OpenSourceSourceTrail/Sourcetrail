@@ -1,4 +1,4 @@
-#include "QtPathListDialog.h"
+#include "qt/window/QtPathListDialog.h"
 
 #include <utility>
 

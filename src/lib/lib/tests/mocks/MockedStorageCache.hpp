@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "StorageCache.h"
+#include "data/storage/StorageCache.h"
 
 struct MockedStorageCache : StorageCache {
   using GraphPtr = std::shared_ptr<Graph>;

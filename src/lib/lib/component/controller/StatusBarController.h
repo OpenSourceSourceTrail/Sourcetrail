@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
 #include "MessageListener.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"

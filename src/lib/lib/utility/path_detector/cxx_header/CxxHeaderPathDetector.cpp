@@ -1,7 +1,7 @@
-#include "CxxHeaderPathDetector.h"
+#include "utility/path_detector/cxx_header/CxxHeaderPathDetector.h"
 
 #include "FilePath.h"
-#include "utilityCxxHeaderDetection.h"
+#include "utility/path_detector/cxx_header/utilityCxxHeaderDetection.h"
 #include "utilityString.h"
 
 CxxHeaderPathDetector::CxxHeaderPathDetector(const std::string& compilerName)

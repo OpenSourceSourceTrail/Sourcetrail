@@ -1,4 +1,4 @@
-#include "IndexerCommandCustom.h"
+#include "data/indexer/IndexerCommandCustom.h"
 
 #include <boost/json/array.hpp>
 #include <boost/json/object.hpp>

@@ -6,7 +6,7 @@
 #include <boost/program_options.hpp>
 
 #include "FilePath.h"
-#include "RefreshInfo.h"
+#include "project/RefreshInfo.h"
 
 namespace commandline {
 class CommandlineCommand;

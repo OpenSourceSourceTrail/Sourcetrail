@@ -1,4 +1,4 @@
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 
 #include <set>
 
@@ -9,12 +9,12 @@
 #include <QPainter>
 #include <QWidget>
 
-#include "ColorScheme.h"
+#include "app/paths/ResourcePaths.h"
 #include "FilePath.h"
-#include "IApplicationSettings.hpp"
 #include "logging.h"
-#include "QtMainView.h"
-#include "ResourcePaths.h"
+#include "qt/view/QtMainView.h"
+#include "settings/ColorScheme.h"
+#include "settings/IApplicationSettings.hpp"
 #include "utilityApp.h"
 #include "utilityString.h"
 

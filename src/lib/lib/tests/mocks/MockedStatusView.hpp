@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "StatusView.h"
+#include "component/view/StatusView.h"
 
 struct MockedStatusView : StatusView {
   MockedStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {}

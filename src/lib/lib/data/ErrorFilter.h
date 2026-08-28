@@ -2,7 +2,7 @@
 // STL
 #include <vector>
 // internal
-#include "ErrorInfo.h"
+#include "data/ErrorInfo.h"
 
 struct ErrorFilter {
   ErrorFilter() = default;

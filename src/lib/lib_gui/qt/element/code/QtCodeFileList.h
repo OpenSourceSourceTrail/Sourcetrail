@@ -6,9 +6,9 @@
 #include <QFrame>
 #include <QScrollArea>
 
-#include "CodeSnippetParams.h"
-#include "QtCodeNavigable.h"
-#include "QtScrollSpeedChangeListener.h"
+#include "component/view/helper/CodeSnippetParams.h"
+#include "qt/element/code/QtCodeNavigable.h"
+#include "qt/utility/QtScrollSpeedChangeListener.h"
 
 class QtCodeFile;
 class QtCodeFileTitleBar;

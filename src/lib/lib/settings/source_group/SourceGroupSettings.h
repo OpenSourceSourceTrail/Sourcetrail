@@ -4,10 +4,10 @@
 #include <memory>
 #include <vector>
 
-#include "LanguageType.h"
-#include "SourceGroupSettingsBase.h"
-#include "SourceGroupStatusType.h"
-#include "SourceGroupType.h"
+#include "settings/LanguageType.h"
+#include "settings/source_group/SourceGroupSettingsBase.h"
+#include "settings/source_group/SourceGroupStatusType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 class ConfigManager;
 class FilePath;

@@ -4,7 +4,7 @@
 #include <set>
 #include <vector>
 
-#include "SourceGroup.h"
+#include "project/SourceGroup.h"
 
 class SourceGroupSettingsJavaEmpty;
 

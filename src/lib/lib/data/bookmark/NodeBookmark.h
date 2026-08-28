@@ -1,7 +1,7 @@
 #ifndef NODE_BOOKMARK_H
 #define NODE_BOOKMARK_H
 
-#include "Bookmark.h"
+#include "data/bookmark/Bookmark.h"
 
 class NodeBookmark : public Bookmark {
 public:

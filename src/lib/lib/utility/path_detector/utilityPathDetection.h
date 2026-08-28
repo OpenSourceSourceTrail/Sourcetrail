@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CombinedPathDetector.h"
+#include "utility/path_detector/CombinedPathDetector.h"
 
 namespace utility {
 std::shared_ptr<CombinedPathDetector> getCxxVsHeaderPathDetector();

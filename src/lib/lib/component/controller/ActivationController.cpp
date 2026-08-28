@@ -1,7 +1,7 @@
-#include "ActivationController.h"
+#include "component/controller/ActivationController.h"
 
-#include "IApplicationSettings.hpp"
-#include "StorageAccess.h"
+#include "data/storage/StorageAccess.h"
+#include "settings/IApplicationSettings.hpp"
 #include "type/activation/MessageActivateLegend.h"
 #include "type/activation/MessageActivateOverview.h"
 #include "type/activation/MessageActivateTokens.h"

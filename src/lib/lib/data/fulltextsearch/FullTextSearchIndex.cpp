@@ -1,4 +1,4 @@
-#include "FullTextSearchIndex.h"
+#include "data/fulltextsearch/FullTextSearchIndex.h"
 
 #include <limits>
 

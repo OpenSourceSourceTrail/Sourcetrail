@@ -1,4 +1,4 @@
-#include "QtGraphicsView.h"
+#include "qt/graphics/QtGraphicsView.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -10,17 +10,18 @@
 #include <QSvgGenerator>
 #include <QTimer>
 
-#include "GraphFocusHandler.h"
-#include "IApplicationSettings.hpp"
-#include "QtContextMenu.h"
-#include "QtFileDialog.h"
-#include "QtGraphEdge.h"
-#include "QtGraphNode.h"
-#include "QtGraphNodeBundle.h"
-#include "QtGraphNodeData.h"
-#include "QtGraphNodeExpandToggle.h"
-#include "QtSelfRefreshIconButton.h"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/element/button/QtSelfRefreshIconButton.h"
+#include "qt/graphics/graph/QtGraphEdge.h"
+#include "qt/graphics/graph/QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphNodeBundle.h"
+#include "qt/graphics/graph/QtGraphNodeData.h"
+#include "qt/graphics/graph/QtGraphNodeExpandToggle.h"
+#include "qt/graphics/GraphFocusHandler.h"
+#include "qt/utility/QtContextMenu.h"
+#include "qt/utility/QtFileDialog.h"
+#include "qt/utility/utilityQt.h"
+#include "settings/IApplicationSettings.hpp"
 #include "type/activation/MessageActivateLegend.h"
 #include "type/bookmark/MessageBookmarkCreate.h"
 #include "type/code/MessageCodeShowDefinition.h"
@@ -31,7 +32,6 @@
 #include "type/history/MessageHistoryUndo.h"
 #include "type/tab/MessageTabOpenWith.h"
 #include "utilityApp.h"
-#include "utilityQt.h"
 
 QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)
     : QGraphicsView(parent)

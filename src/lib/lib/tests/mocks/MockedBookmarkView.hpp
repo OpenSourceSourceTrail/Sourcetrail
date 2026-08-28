@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "BookmarkView.h"
+#include "component/view/BookmarkView.h"
 
 class ViewLayout;
 

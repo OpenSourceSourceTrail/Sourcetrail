@@ -1,14 +1,14 @@
-#include "CxxToolchainRemote.h"
+#include "project/CxxToolchainRemote.h"
 
 #include <filesystem>
 #include <fstream>
 
 #include <fmt/format.h>
 
+#include "app/IndexerPluginRegistry.h"
 #include "Convert.h"
+#include "data/storage/IntermediateStorage.h"
 #include "indexer_helper.pb.h"
-#include "IndexerPluginRegistry.h"
-#include "IntermediateStorage.h"
 #include "logging.h"
 #include "utilityApp.h"
 #include "utilityString.h"

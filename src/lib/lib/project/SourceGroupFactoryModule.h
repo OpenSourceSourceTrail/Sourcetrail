@@ -2,7 +2,7 @@
 // STL
 #include <memory>
 // internal
-#include "SourceGroupType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 class SourceGroup;
 class SourceGroupSettings;

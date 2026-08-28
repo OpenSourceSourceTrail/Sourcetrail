@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/tests/integration/lib_cxx/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/tests/integration/lib_cxx/CMakeLists.txt
 set(test_cxx_names
     CxxIncludeProcessingTestSuite
     CxxParserTestSuite
@@ -11,19 +11,9 @@ set(test_cxx_names
 
 foreach(test_name IN LISTS test_cxx_names)
   add_sourcetrail_test(
-    NAME
-    ${test_name}
-    SOURCES
-    ${test_name}.cpp
-    DEPS
-    Sourcetrail::lib::lib_engine
-    Sourcetrail::lib::core::utility::TextAccess
-    Sourcetrail::helper::TestFileRegister
-    Sourcetrail::helper::TestStorage
-    Sourcetrail::lib::lib_cxx
-    lib::mocks
-    TEST_PREFIX
-    "integration.lib_cxx."
-    WORKING_DIRECTORY
-    "${CMAKE_BINARY_DIR}/test/")
+    NAME ${test_name}
+    SOURCES ${test_name}.cpp
+    DEPS Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess Sourcetrail::helper::TestFileRegister
+         Sourcetrail::helper::TestStorage Sourcetrail::lib::lib_cxx lib::mocks
+    TEST_PREFIX "integration.lib_cxx.")
 endforeach()

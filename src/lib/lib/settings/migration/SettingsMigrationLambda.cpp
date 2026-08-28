@@ -1,4 +1,4 @@
-#include "SettingsMigrationLambda.h"
+#include "settings/migration/SettingsMigrationLambda.h"
 
 SettingsMigrationLambda::SettingsMigrationLambda(std::function<void(const SettingsMigration*, Settings*)> lambda)
     : m_lambda(lambda) {}

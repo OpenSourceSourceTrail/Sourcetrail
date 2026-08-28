@@ -1,6 +1,6 @@
 #pragma once
-#include "Bookmark.h"
-#include "View.h"
+#include "component/view/View.h"
+#include "data/bookmark/Bookmark.h"
 
 class BookmarkController;
 

@@ -1,13 +1,13 @@
-#include "CxxAstVisitorComponentBraceRecorder.h"
+#include "data/parser/cxx/CxxAstVisitorComponentBraceRecorder.h"
 
 #include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
 
-#include "CanonicalFilePathCache.h"
-#include "CxxAstVisitor.h"
-#include "CxxAstVisitorComponentContext.h"
-#include "ParserClient.h"
-#include "utilityClang.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/CxxAstVisitor.h"
+#include "data/parser/cxx/CxxAstVisitorComponentContext.h"
+#include "data/parser/cxx/utilityClang.h"
+#include "data/parser/ParserClient.h"
 
 CxxAstVisitorComponentBraceRecorder::CxxAstVisitorComponentBraceRecorder(CxxAstVisitor* astVisitor,
                                                                          clang::ASTContext* astContext,

@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "IndexerCommandType.h"
+#include "data/indexer/IndexerCommandType.h"
 
 class IndexerCommand;
 class IntermediateStorage;

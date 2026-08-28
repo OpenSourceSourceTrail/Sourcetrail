@@ -1,4 +1,4 @@
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
 
 #include "utilityApp.h"
 

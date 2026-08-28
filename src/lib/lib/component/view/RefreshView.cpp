@@ -1,6 +1,6 @@
-#include "RefreshView.h"
+#include "component/view/RefreshView.h"
 
-#include "RefreshController.h"
+#include "component/controller/RefreshController.h"
 
 RefreshView::RefreshView(ViewLayout* viewLayout) : View(viewLayout) {}
 

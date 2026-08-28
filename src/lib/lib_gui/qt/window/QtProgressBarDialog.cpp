@@ -1,9 +1,9 @@
-#include "QtProgressBarDialog.h"
+#include "qt/window/QtProgressBarDialog.h"
 
 #include <QLabel>
 #include <QVBoxLayout>
 
-#include "QtProgressBar.h"
+#include "qt/element/dialog/QtProgressBar.h"
 
 QtProgressBarDialog::QtProgressBarDialog(float topRatio, QWidget* parent)
     : QtIndexingDialog(true, parent)

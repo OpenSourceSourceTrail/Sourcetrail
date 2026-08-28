@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "CodeFocusHandler.h"
-#include "QtCodeField.h"
-#include "QtScrollSpeedChangeListener.h"
+#include "qt/element/code/CodeFocusHandler.h"
+#include "qt/element/code/QtCodeField.h"
+#include "qt/utility/QtScrollSpeedChangeListener.h"
 
 class QDragMoveEvent;
 class QPaintEvent;

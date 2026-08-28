@@ -2,12 +2,12 @@
 // STL
 #include <vector>
 // internal
-#include "ComponentManager.h"
+#include "component/ComponentManager.h"
+#include "component/view/View.h"
+#include "component/view/ViewLayout.h"
 #include "MessageListener.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/MessageRefreshUI.h"
-#include "View.h"
-#include "ViewLayout.h"
 
 class Tab final
     : public ViewLayout

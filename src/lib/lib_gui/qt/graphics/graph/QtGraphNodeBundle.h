@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 class QtCountCircleItem;
 

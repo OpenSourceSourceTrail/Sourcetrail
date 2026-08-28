@@ -2,13 +2,13 @@
 // STL
 #include <string>
 // internal
-#include "AccessKind.h"
-#include "DefinitionKind.h"
+#include "data/DefinitionKind.h"
+#include "data/name/NameHierarchy.h"
+#include "data/parser/AccessKind.h"
+#include "data/parser/ParseLocation.h"
+#include "data/parser/ReferenceKind.h"
+#include "data/parser/SymbolKind.h"
 #include "GlobalId.hpp"
-#include "NameHierarchy.h"
-#include "ParseLocation.h"
-#include "ReferenceKind.h"
-#include "SymbolKind.h"
 
 class ParserClient {
 public:

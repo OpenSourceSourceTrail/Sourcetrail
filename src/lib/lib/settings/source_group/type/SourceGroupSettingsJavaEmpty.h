@@ -1,10 +1,10 @@
 #pragma once
 
-#include "SourceGroupSettingsWithComponents.h"
-#include "SourceGroupSettingsWithExcludeFilters.h"
-#include "SourceGroupSettingsWithJavaClassPath.h"
-#include "SourceGroupSettingsWithSourceExtensionsJava.h"
-#include "SourceGroupSettingsWithSourcePaths.h"
+#include "settings/source_group/component/java/SourceGroupSettingsWithJavaClassPath.h"
+#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourceExtensionsJava.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourcePaths.h"
+#include "settings/source_group/SourceGroupSettingsWithComponents.h"
 
 class SourceGroupSettingsJavaEmpty
     : public SourceGroupSettingsWithComponents<SourceGroupSettingsWithExcludeFilters,

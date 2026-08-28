@@ -1,21 +1,21 @@
-#include "CxxToolchainLocal.h"
+#include "project/CxxToolchainLocal.h"
 
 #include <set>
 
 #include <clang/Tooling/JSONCompilationDatabase.h>
 #include <clang/Tooling/Tooling.h>
 
-#include "CanonicalFilePathCache.h"
-#include "CxxCompilationDatabaseSingle.h"
-#include "CxxDiagnosticConsumer.h"
-#include "CxxParser.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/CxxCompilationDatabaseSingle.h"
+#include "data/parser/cxx/CxxDiagnosticConsumer.h"
+#include "data/parser/cxx/CxxParser.h"
+#include "data/parser/cxx/GeneratePCHAction.h"
+#include "data/parser/cxx/SingleFrontendActionFactory.h"
+#include "data/parser/ParserClientImpl.h"
+#include "data/storage/IntermediateStorage.h"
 #include "FilePathFilter.h"
 #include "FileRegister.h"
 #include "FileSystem.h"
-#include "GeneratePCHAction.h"
-#include "IntermediateStorage.h"
-#include "ParserClientImpl.h"
-#include "SingleFrontendActionFactory.h"
 #include "utility.h"
 #include "utilityString.h"
 

@@ -1,4 +1,4 @@
-#include "IndexerCommandType.h"
+#include "data/indexer/IndexerCommandType.h"
 
 std::string indexerCommandTypeToString(IndexerCommandType type) {
   switch(type) {

@@ -1,4 +1,4 @@
-#include "QtIndexingProgressDialog.h"
+#include "qt/window/QtIndexingProgressDialog.h"
 
 #include <QLabel>
 #include <QPushButton>

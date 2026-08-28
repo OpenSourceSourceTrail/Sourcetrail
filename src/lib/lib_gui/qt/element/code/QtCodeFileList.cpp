@@ -1,20 +1,20 @@
-#include "QtCodeFileList.h"
+#include "qt/element/code/QtCodeFileList.h"
 
 #include <QScrollBar>
 #include <QTimer>
 #include <QVBoxLayout>
 
-#include "ColorScheme.h"
+#include "app/paths/ResourcePaths.h"
+#include "data/location/SourceLocationFile.h"
 #include "FilePath.h"
-#include "QtCodeFile.h"
-#include "QtCodeFileTitleBar.h"
-#include "QtCodeNavigator.h"
-#include "QtCodeSnippet.h"
-#include "ResourcePaths.h"
-#include "SourceLocationFile.h"
+#include "qt/element/code/QtCodeFile.h"
+#include "qt/element/code/QtCodeFileTitleBar.h"
+#include "qt/element/code/QtCodeNavigator.h"
+#include "qt/element/code/QtCodeSnippet.h"
+#include "qt/utility/utilityQt.h"
+#include "settings/ColorScheme.h"
 #include "utility.h"
 #include "utilityApp.h"
-#include "utilityQt.h"
 
 void QtCodeFileListScrollArea::keyPressEvent(QKeyEvent* event) {
   switch(event->key()) {

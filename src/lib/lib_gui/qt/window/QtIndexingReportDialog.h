@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtIndexingDialog.h"
+#include "qt/window/QtIndexingDialog.h"
 
 class QtIndexingReportDialog : public QtIndexingDialog {
   Q_OBJECT

@@ -1,4 +1,4 @@
-#include "IApplicationSettings.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 #include "utility.h"
 

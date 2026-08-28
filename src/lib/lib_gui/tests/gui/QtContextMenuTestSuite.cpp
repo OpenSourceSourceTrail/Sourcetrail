@@ -7,7 +7,7 @@
 #include <QContextMenuEvent>
 #include <QTest>
 
-#include "QtContextMenu.h"
+#include "qt/utility/QtContextMenu.h"
 #include "utilities.hpp"
 
 void QtContextMenuTestSuite::testingStructure() {

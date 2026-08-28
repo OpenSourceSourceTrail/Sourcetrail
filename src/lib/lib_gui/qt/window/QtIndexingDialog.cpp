@@ -1,14 +1,14 @@
-#include "QtIndexingDialog.h"
+#include "qt/window/QtIndexingDialog.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QResizeEvent>
 
-#include "QtDeviceScaledPixmap.h"
-#include "QtHelpButton.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/element/button/QtHelpButton.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "qt/utility/utilityQt.h"
 
 QLabel* QtIndexingDialog::createTitleLabel(const QString& title, QBoxLayout* layout) {
   auto* label = new QLabel{title};    // NOLINT(cppcoreguidelines-owning-memory)

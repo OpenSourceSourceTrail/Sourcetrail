@@ -1,4 +1,4 @@
-#include "CxxVariableDeclName.h"
+#include "data/parser/cxx/name/CxxVariableDeclName.h"
 
 CxxVariableDeclName::CxxVariableDeclName(std::wstring name,
                                          std::vector<std::wstring> templateParameterNames,

@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "RefreshInfo.h"
+#include "project/RefreshInfo.h"
 
 class DialogView;
 class FilePath;

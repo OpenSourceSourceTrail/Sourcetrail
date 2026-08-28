@@ -1,8 +1,8 @@
 #pragma once
 
+#include "component/view/View.h"
 #include "MessageListener.h"
 #include "type/bookmark/MessageBookmarkButtonState.h"
-#include "View.h"
 
 class BookmarkButtonsView
     : public View

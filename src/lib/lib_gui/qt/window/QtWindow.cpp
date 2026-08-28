@@ -1,4 +1,4 @@
-#include "QtWindow.h"
+#include "qt/window/QtWindow.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -7,9 +7,9 @@
 #include <QScrollArea>
 #include <QSizeGrip>
 
-#include "QtDeviceScaledPixmap.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "qt/utility/utilityQt.h"
 
 QtWindow::QtWindow(bool isSubWindow, QWidget* parent) : QtWindowBase(isSubWindow, parent) {}
 

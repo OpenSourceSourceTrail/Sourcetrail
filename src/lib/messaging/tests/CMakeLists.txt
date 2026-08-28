@@ -1,1 +1,1 @@
-# ${CMAKE_SOURCE_DIR}/src/messaging/tests/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/messaging/tests/CMakeLists.txt

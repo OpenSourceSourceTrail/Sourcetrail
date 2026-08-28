@@ -1,8 +1,8 @@
 #pragma once
 // internal
-#include "Edge.h"
-#include "Node.h"
-#include "Settings.h"
+#include "data/graph/Edge.h"
+#include "data/graph/Node.h"
+#include "settings/Settings.h"
 
 class ColorScheme : public Settings {
 public:

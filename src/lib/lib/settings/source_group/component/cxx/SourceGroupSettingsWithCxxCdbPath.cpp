@@ -1,6 +1,6 @@
-#include "SourceGroupSettingsWithCxxCdbPath.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.h"
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 #include "utilityFile.h"
 
 FilePath SourceGroupSettingsWithCxxCdbPath::getCompilationDatabasePath() const {

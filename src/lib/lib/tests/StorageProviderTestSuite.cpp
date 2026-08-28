@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "StorageProvider.h"
+#include "data/storage/StorageProvider.h"
 
 TEST(StorageProvider, getStorageCount_empty) {
   // Given:

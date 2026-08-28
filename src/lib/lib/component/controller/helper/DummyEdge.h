@@ -3,9 +3,9 @@
 #include "LayoutRect.h"
 
 // internal
-#include "Edge.h"
+#include "data/graph/Edge.h"
+#include "data/graph/token_component/TokenComponentBundledEdges.h"
 #include "GlobalId.hpp"
-#include "TokenComponentBundledEdges.h"
 
 class Edge;
 

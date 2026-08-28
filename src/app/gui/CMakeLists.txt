@@ -1,13 +1,13 @@
-#${CMAKE_SOURCE_DIR}/src/app/gui/CMakeLists.txt
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
+#${PROJECT_SOURCE_DIR}/src/app/gui/CMakeLists.txt
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/app/")
 
 if(WIN32)
   file(
-    WRITE ${CMAKE_BINARY_DIR}/Sourcetrail.rc
+    WRITE ${PROJECT_BINARY_DIR}/Sourcetrail.rc
     "// Icon with lowest ID value placed first to ensure application icon\n" "// remains consistent on all systems.\n"
-    "IDI_ICON1               ICON                    \"${CMAKE_BINARY_DIR}/Sourcetrail.ico\"\n")
+    "IDI_ICON1               ICON                    \"${PROJECT_BINARY_DIR}/Sourcetrail.ico\"\n")
 
-  add_executable(Sourcetrail main.cpp ${CMAKE_BINARY_DIR}/Sourcetrail.rc)
+  add_executable(Sourcetrail main.cpp ${PROJECT_BINARY_DIR}/Sourcetrail.rc)
 
   target_compile_definitions(Sourcetrail PRIVATE NOMINMAX)
 
@@ -20,48 +20,38 @@ if(WIN32)
                COMPILE_DEFINITIONS_RELWITHDEBINFO "_CONSOLE"
                LINK_FLAGS_RELEASE "/ENTRY:\"mainCRTStartup\" /SUBSYSTEM:CONSOLE /DEBUG"
                LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:CONSOLE"
-               VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/app")
+               VS_DEBUGGER_WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/app")
 
   # generate pdb for release build
-  add_compile_options(Sourcetrail PRIVATE $<$<CONFIG:Release>:/Zi>)
+  target_compile_options(Sourcetrail PRIVATE $<$<CONFIG:Release>:/Zi>)
 else()
   add_executable(Sourcetrail main.cpp)
 endif()
 
 target_link_libraries(
   Sourcetrail
-  PUBLIC Sourcetrail::lib::core
-         Sourcetrail::lib::lib
-         Sourcetrail::lib::lib_gui
-         Sourcetrail::lib::client
-         Qt6::Widgets
+  PUBLIC Sourcetrail::lib::core Sourcetrail::lib::lib Sourcetrail::lib::lib_gui Sourcetrail::lib::client Qt6::Widgets
          Qt6::Network
-  PRIVATE Sourcetrail::lib::core::utility::logging
-          Sourcetrail::lib::core::utility::ScopedFunctor
-          Sourcetrail::lib::core::utility::utilityApp
-          Sourcetrail::lib::core::utility::commandline::CommandLineParser
+  PRIVATE Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::ScopedFunctor
+          Sourcetrail::lib::core::utility::utilityApp Sourcetrail::lib::core::utility::commandline::CommandLineParser
           Sourcetrail::lib::proto::convert)
 
-target_include_directories(Sourcetrail PRIVATE "${CMAKE_BINARY_DIR}/src/lib/lib_gui" "${CMAKE_BINARY_DIR}/src/lib")
+target_include_directories(Sourcetrail PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib_gui" "${PROJECT_BINARY_DIR}/src/lib")
 
-set_target_properties(Sourcetrail PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/app/")
+set_target_properties(Sourcetrail PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/app/")
 # add platform specific libraries
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)
   target_link_libraries(Sourcetrail ${CORE_FOUNDATION})
 endif()
 
-if(TARGET Sourcetrail_indexer)
-  add_dependencies(Sourcetrail Sourcetrail_indexer)
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico)
+  message(FATAL_ERROR "\"sourcetrail.ico\" not found. You may run `git submodule`")
 endif()
-
-if(NOT EXISTS ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico)
-  message(FATAL "\"sourcetrail.ico\" not found. You may run `git submodule`")
-endif()
-file(COPY ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${PROJECT_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico DESTINATION ${PROJECT_BINARY_DIR})
 
 if(WIN32 AND NOT ${SR_IS_CI})
-  copy_qt_binaries("${CMAKE_BINARY_DIR}/app/" TRUE)
+  copy_qt_binaries("${PROJECT_BINARY_DIR}/app/" TRUE)
 endif()
 
 # The regression guard for the whole GUI <-> engine boundary: the GUI must reach the index database
@@ -72,6 +62,9 @@ if((ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST) AND NOT WIN32)
   if(NM_EXECUTABLE)
     add_test(NAME "guard.gui.linksNoSqlite"
              COMMAND ${CMAKE_COMMAND} -DBINARY=$<TARGET_FILE:Sourcetrail> -DNM=${NM_EXECUTABLE} -P
-                     "${CMAKE_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
+                     "${PROJECT_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
   endif()
 endif()
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail PRIVATE Sourcetrail::warnings)

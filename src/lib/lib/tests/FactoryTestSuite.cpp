@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "impls/Factory.hpp"
+#include "factory/impls/Factory.hpp"
 
 TEST(FactoryTestSuite, goodCase) {
   lib::Factory factory;

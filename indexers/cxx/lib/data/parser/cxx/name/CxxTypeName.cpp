@@ -1,4 +1,4 @@
-#include "CxxTypeName.h"
+#include "data/parser/cxx/name/CxxTypeName.h"
 
 #include <sstream>
 

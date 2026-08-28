@@ -4,9 +4,9 @@
 #include <functional>
 #include <memory>
 
-#include "DialogView.h"
+#include "component/view/DialogView.h"
 #include "FilePath.h"
-#include "IProject.hpp"
+#include "project/IProject.hpp"
 // messages
 #include "MessageListener.h"
 #include "type/bookmark/MessageBookmarkUpdate.hpp"

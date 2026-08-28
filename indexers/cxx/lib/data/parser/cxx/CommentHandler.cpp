@@ -1,9 +1,9 @@
-#include "CommentHandler.h"
+#include "data/parser/cxx/CommentHandler.h"
 
-#include "CanonicalFilePathCache.h"
-#include "ParseLocation.h"
-#include "ParserClient.h"
-#include "utilityClang.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/utilityClang.h"
+#include "data/parser/ParseLocation.h"
+#include "data/parser/ParserClient.h"
 
 CommentHandler::CommentHandler(std::shared_ptr<ParserClient> client, std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache)
     : m_client(client), m_canonicalFilePathCache(canonicalFilePathCache) {}

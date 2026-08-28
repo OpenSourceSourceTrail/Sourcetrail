@@ -1,8 +1,8 @@
 #ifndef QT_HELP_BUTTON_H
 #define QT_HELP_BUTTON_H
 
-#include "QtHelpButtonInfo.h"
-#include "QtIconButton.h"
+#include "qt/element/button/QtIconButton.h"
+#include "qt/utility/QtHelpButtonInfo.h"
 
 class QtHelpButton : public QtIconButton {
   Q_OBJECT

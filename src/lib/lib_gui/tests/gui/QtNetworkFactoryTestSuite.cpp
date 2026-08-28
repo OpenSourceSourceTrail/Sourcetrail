@@ -6,7 +6,7 @@
 
 #include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
 #include "MessageQueue.h"
-#include "QtNetworkFactory.h"
+#include "qt/network/QtNetworkFactory.h"
 
 void QtNetworkFactoryTestSuite::initTestCase() {
   testing::InitGoogleMock();

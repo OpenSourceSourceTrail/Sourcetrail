@@ -1,9 +1,9 @@
 #pragma once
 #include <QWidget>
 
-#include "ControllerProxy.h"
-#include "ErrorView.h"
-#include "QtThreadedFunctor.h"
+#include "component/controller/helper/ControllerProxy.h"
+#include "component/view/ErrorView.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 class QBoxLayout;
 class QCheckBox;

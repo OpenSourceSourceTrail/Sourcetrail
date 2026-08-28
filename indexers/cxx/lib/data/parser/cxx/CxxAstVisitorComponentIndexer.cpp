@@ -1,4 +1,4 @@
-#include "CxxAstVisitorComponentIndexer.h"
+#include "data/parser/cxx/CxxAstVisitorComponentIndexer.h"
 
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/Decl.h>
@@ -7,16 +7,16 @@
 #include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
 
-#include "CanonicalFilePathCache.h"
-#include "CxxAstVisitor.h"
-#include "CxxAstVisitorComponentContext.h"
-#include "CxxAstVisitorComponentDeclRefKind.h"
-#include "CxxAstVisitorComponentTypeRefKind.h"
-#include "CxxDeclNameResolver.h"
-#include "CxxFunctionDeclName.h"
-#include "CxxTypeNameResolver.h"
-#include "ParserClient.h"
-#include "utilityClang.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/CxxAstVisitor.h"
+#include "data/parser/cxx/CxxAstVisitorComponentContext.h"
+#include "data/parser/cxx/CxxAstVisitorComponentDeclRefKind.h"
+#include "data/parser/cxx/CxxAstVisitorComponentTypeRefKind.h"
+#include "data/parser/cxx/name/CxxFunctionDeclName.h"
+#include "data/parser/cxx/name_resolver/CxxDeclNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTypeNameResolver.h"
+#include "data/parser/cxx/utilityClang.h"
+#include "data/parser/ParserClient.h"
 
 CxxAstVisitorComponentIndexer::CxxAstVisitorComponentIndexer(CxxAstVisitor* astVisitor,
                                                              clang::ASTContext* astContext,

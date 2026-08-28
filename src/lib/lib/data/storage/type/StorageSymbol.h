@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "DefinitionKind.h"
+#include "data/DefinitionKind.h"
 #include "GlobalId.hpp"
 
 struct StorageSymbol {

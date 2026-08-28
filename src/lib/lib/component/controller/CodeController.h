@@ -4,13 +4,13 @@
 #include <map>
 #include <string>
 
-#include "CodeView.h"
-#include "Controller.h"
+#include "component/controller/Controller.h"
+#include "component/controller/helper/SnippetMerger.h"
+#include "component/view/CodeView.h"
+#include "data/location/LocationType.h"
 #include "FilePath.h"
 #include "GlobalId.hpp"
-#include "LocationType.h"
 #include "MessageListener.h"
-#include "SnippetMerger.h"
 #include "type/activation/MessageActivateErrors.h"
 #include "type/activation/MessageActivateFullTextSearch.h"
 #include "type/activation/MessageActivateLegend.h"

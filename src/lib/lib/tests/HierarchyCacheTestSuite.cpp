@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "HierarchyCache.h"
+#include "data/HierarchyCache.h"
 #include "utility.h"
 
 class TestEdge {

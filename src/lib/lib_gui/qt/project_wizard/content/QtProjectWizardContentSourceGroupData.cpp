@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentSourceGroupData.h"
+#include "qt/project_wizard/content/QtProjectWizardContentSourceGroupData.h"
 // Qt5
 #include <QCheckBox>
 #include <QGridLayout>
@@ -6,7 +6,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 // internal
-#include "SourceGroupSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 
 QtProjectWizardContentSourceGroupData::QtProjectWizardContentSourceGroupData(std::shared_ptr<SourceGroupSettings> settings,
                                                                              QtProjectWizardWindow* window)

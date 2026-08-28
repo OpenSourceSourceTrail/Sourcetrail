@@ -1,4 +1,4 @@
-#include "EdgeBookmark.h"
+#include "data/bookmark/EdgeBookmark.h"
 
 EdgeBookmark::EdgeBookmark(
     Id id, const std::wstring& name, const std::wstring& comment, const TimeStamp& timeStamp, const BookmarkCategory& category)

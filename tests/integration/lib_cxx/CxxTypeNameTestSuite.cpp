@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "CxxTypeName.h"
+#include "data/parser/cxx/name/CxxTypeName.h"
 #include "language_packages.h"
 
 TEST(CxxTypeName, typeNameCreatedWithNameHasNoQualifiersOrModifiers) {

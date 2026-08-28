@@ -1,7 +1,7 @@
 #ifndef QT_ABOUT_H
 #define QT_ABOUT_H
 
-#include "QtWindow.h"
+#include "qt/window/QtWindow.h"
 
 class QtAbout : public QtWindow {
   Q_OBJECT

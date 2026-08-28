@@ -1,6 +1,6 @@
-#include "SourceGroupSettingsWithCxxCrossCompilationOptions.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.h"
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 
 std::vector<std::wstring> SourceGroupSettingsWithCxxCrossCompilationOptions::getAvailableArchTypes() {
   // as defined in llvm/lib/Support/Triple.cpp
