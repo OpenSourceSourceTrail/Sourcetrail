@@ -150,14 +150,7 @@ string(LENGTH "${PROJECT_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
 # Libraries and executables; see src/CMakeLists.txt.
 add_subdirectory(src)
-# C/C++ indexer plugin (Clang/LibTooling language package + worker executable) -----------------------------------------------------
-if(BUILD_CXX_LANGUAGE_PACKAGE)
-  add_subdirectory(indexers/cxx)
-endif()
-# Java indexer plugin (Maven-built, pure-JVM gRPC worker) -------------------------------------------------------------------------
-if(BUILD_JAVA_INDEXER)
-  add_subdirectory(indexers/java)
-endif()
+add_subdirectory(indexers)
 
 # The apps spawn the indexer worker out of build/app, so it has to be built alongside them. Declared
 # here rather than next to each app: if(TARGET) is answered when the line is read, and the indexer
