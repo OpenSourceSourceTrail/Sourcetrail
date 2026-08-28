@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/fileSystem/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/fileSystem/CMakeLists.txt
 add_subdirectory(impls)
 if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST

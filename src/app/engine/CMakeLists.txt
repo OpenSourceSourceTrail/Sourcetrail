@@ -2,7 +2,7 @@ add_executable(Sourcetrail_engine main.cpp EngineEventPublisher.cpp EngineEventP
                                   EngineHttpService.h)
 
 set_target_properties(Sourcetrail_engine PROPERTIES OUTPUT_NAME sourcetrail_engine RUNTIME_OUTPUT_DIRECTORY
-                                                                                   "${CMAKE_BINARY_DIR}/app/")
+                                                                                   "${PROJECT_BINARY_DIR}/app/")
 
 target_link_libraries(
   Sourcetrail_engine
@@ -19,8 +19,8 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::utilityApp
           Sourcetrail::lib::core::utility::utilityUuid)
 
-target_include_directories(Sourcetrail_engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/src/lib/lib"
-                                                      "${CMAKE_BINARY_DIR}/src/lib/lib_gui")
+target_include_directories(Sourcetrail_engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}/src/lib/lib"
+                                                      "${PROJECT_BINARY_DIR}/src/lib/lib_gui")
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)

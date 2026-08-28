@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/file/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/file/CMakeLists.txt
 add_subdirectory(fileInfo)
 add_subdirectory(fileManager)
 add_subdirectory(filePath)

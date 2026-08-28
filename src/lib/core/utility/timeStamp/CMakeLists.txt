@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/timeStamp/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/timeStamp/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::TimeStamp
   SOURCES TimeStamp.cpp

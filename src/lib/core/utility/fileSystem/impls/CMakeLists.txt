@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/fileSystem/impls/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/fileSystem/impls/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::FileSystem
   SOURCES FileSystem.cpp

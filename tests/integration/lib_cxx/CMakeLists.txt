@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/tests/integration/lib_cxx/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/tests/integration/lib_cxx/CMakeLists.txt
 set(test_cxx_names
     CxxIncludeProcessingTestSuite
     CxxParserTestSuite
@@ -16,5 +16,5 @@ foreach(test_name IN LISTS test_cxx_names)
     DEPS Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess Sourcetrail::helper::TestFileRegister
          Sourcetrail::helper::TestStorage Sourcetrail::lib::lib_cxx lib::mocks
     TEST_PREFIX "integration.lib_cxx."
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 endforeach()

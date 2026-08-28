@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/commandline/commandLineParser/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/commandline/commandLineParser/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::commandline::CommandLineParser
   SOURCES CommandLineParser.cpp

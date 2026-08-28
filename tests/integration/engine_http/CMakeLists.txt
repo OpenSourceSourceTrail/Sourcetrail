@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/tests/integration/engine_http/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/tests/integration/engine_http/CMakeLists.txt
 #
 # Black-box tests that spawn the real sourcetrail_engine and drive its HTTP API. Python rather
 # than GTest on purpose: an independent client shares no code with what it is testing.
@@ -38,7 +38,7 @@ foreach(module IN LISTS engine_http_modules)
     ${test_name}
     PROPERTIES
       ENVIRONMENT
-      "SOURCETRAIL_ENGINE=$<TARGET_FILE:Sourcetrail_engine>;SOURCETRAIL_PROJECTS_DIR=${CMAKE_SOURCE_DIR}/bin/app/user/projects"
+      "SOURCETRAIL_ENGINE=$<TARGET_FILE:Sourcetrail_engine>;SOURCETRAIL_PROJECTS_DIR=${PROJECT_SOURCE_DIR}/bin/app/user/projects"
       TIMEOUT
       180
       # Each module starts engines on ephemeral ports and several spawn more than one;

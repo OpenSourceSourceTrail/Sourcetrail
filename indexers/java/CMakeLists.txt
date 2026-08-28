@@ -1,7 +1,7 @@
-#${CMAKE_SOURCE_DIR}/java/CMakeLists.txt
+#${PROJECT_SOURCE_DIR}/java/CMakeLists.txt
 # Builds the Java indexer plugin with Maven and stages the shaded jar + manifest under
 # <build>/app/plugins/java/, where IndexerPluginRegistry::discover() finds it at runtime.
-set(SR_JAVA_PLUGIN_DIR "${CMAKE_BINARY_DIR}/app/plugins/java")
+set(SR_JAVA_PLUGIN_DIR "${PROJECT_BINARY_DIR}/app/plugins/java")
 set(SR_JAVA_INDEXER_JAR "${CMAKE_CURRENT_SOURCE_DIR}/indexer/target/sourcetrail_java_indexer.jar")
 
 add_custom_target(

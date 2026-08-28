@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib_utility/ConfigManager/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib_utility/ConfigManager/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::ConfigManager
   SOURCES ConfigManager.cpp

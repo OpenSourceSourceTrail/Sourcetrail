@@ -1,8 +1,8 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/lib_gui/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/lib_gui/CMakeLists.txt
 add_custom_target(versionnumber ALL)
 
-add_library(Sourcetrail_lib_gui ${CMAKE_SOURCE_DIR}/bin/app/resource.qrc
-                                ${CMAKE_BINARY_DIR}/src/lib/lib_gui/productVersion.h)
+add_library(Sourcetrail_lib_gui ${PROJECT_SOURCE_DIR}/bin/app/resource.qrc
+                                ${PROJECT_BINARY_DIR}/src/lib/lib_gui/productVersion.h)
 add_library(Sourcetrail::lib::lib_gui ALIAS Sourcetrail_lib_gui)
 
 target_sources(
@@ -347,22 +347,23 @@ target_link_libraries(
 add_custom_command(
   TARGET versionnumber
   PRE_BUILD
-  COMMAND ${CMAKE_COMMAND} -DBINARY_DIR=${CMAKE_BINARY_DIR} -P ${CMAKE_SOURCE_DIR}/cmake/version.cmake
-  BYPRODUCTS ${CMAKE_BINARY_DIR}/src/lib/lib_gui/productVersion.h
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  COMMAND ${CMAKE_COMMAND} -DBINARY_DIR=${PROJECT_BINARY_DIR} -P ${PROJECT_SOURCE_DIR}/cmake/version.cmake
+  BYPRODUCTS ${PROJECT_BINARY_DIR}/src/lib/lib_gui/productVersion.h
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
   COMMENT "check/update version number")
 
 add_dependencies(Sourcetrail_lib_gui versionnumber)
 
 # One include root, e.g. #include "qt/view/QtCodeView.h". The binary dirs carry the generated
 # includes.h / productVersion.h and language_packages.h.
-target_include_directories(Sourcetrail_lib_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/src/lib/lib_gui
-                                                      ${CMAKE_BINARY_DIR}/src/lib/lib)
+target_include_directories(Sourcetrail_lib_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/src/lib/lib_gui
+                                                      ${PROJECT_BINARY_DIR}/src/lib/lib)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/platform_includes/includes.h.in"
-               "${CMAKE_BINARY_DIR}/src/lib/lib_gui/includes.h")
+               "${PROJECT_BINARY_DIR}/src/lib/lib_gui/includes.h")
 
-configure_file("${CMAKE_SOURCE_DIR}/cmake/productVersion.h.in" "${CMAKE_BINARY_DIR}/src/lib/lib_gui/productVersion.h")
+configure_file("${PROJECT_SOURCE_DIR}/cmake/productVersion.h.in"
+               "${PROJECT_BINARY_DIR}/src/lib/lib_gui/productVersion.h")
 
 set_target_properties(
   Sourcetrail_lib_gui
@@ -371,11 +372,11 @@ set_target_properties(
              INCLUDE_CURRENT_DIR ON)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-  set_source_files_properties(${CMAKE_BINARY_DIR}/Sourcetrail_lib_gui_autogen/mocs_compilation.cpp
+  set_source_files_properties(${PROJECT_BINARY_DIR}/Sourcetrail_lib_gui_autogen/mocs_compilation.cpp
                               PROPERTIES COMPILE_FLAGS "-Wno-useless-cast")
 endif()
 
-set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ${PROJECT_BINARY_DIR}/src/lib/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
 
 # Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
 target_link_libraries(Sourcetrail_lib_gui PRIVATE Sourcetrail::warnings)

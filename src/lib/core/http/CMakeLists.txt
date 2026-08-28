@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/core/http/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/core/http/CMakeLists.txt
 #
 # Loopback HTTP transport for the client <-> engine boundary. Qt-free and storage-free on purpose:
 # both the engine daemon and the GUI's client library link it.

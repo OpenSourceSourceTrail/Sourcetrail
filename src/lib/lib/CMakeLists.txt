@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/lib/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/lib/CMakeLists.txt
 add_library(Sourcetrail_lib)
 add_library(Sourcetrail::lib::lib ALIAS Sourcetrail_lib)
 
@@ -395,7 +395,7 @@ target_sources(
 # One include root. Headers are spelled by their path below it, e.g.
 # #include "data/graph/Graph.h". The binary dir carries the generated language_packages.h; the proto
 # headers arrive through the Sourcetrail::lib::proto::api link below.
-target_include_directories(Sourcetrail_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/src/lib/lib)
+target_include_directories(Sourcetrail_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/src/lib/lib)
 
 target_link_libraries(
   Sourcetrail_lib
@@ -436,7 +436,8 @@ target_link_libraries(
           Boost::system
           $<$<PLATFORM_ID:Windows>:bcrypt>)
 
-configure_file("${CMAKE_SOURCE_DIR}/cmake/language_packages.h.in" "${CMAKE_BINARY_DIR}/src/lib/lib/language_packages.h")
+configure_file("${PROJECT_SOURCE_DIR}/cmake/language_packages.h.in"
+               "${PROJECT_BINARY_DIR}/src/lib/lib/language_packages.h")
 
 # The engine-only half: everything that opens, migrates or drives the index database, plus the task
 # graph that fills it. Kept out of Sourcetrail_lib so the GUI physically cannot reach SQLite --
@@ -521,7 +522,7 @@ target_sources(
 target_include_directories(
   Sourcetrail_lib_path_detection
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
+  PRIVATE ${PROJECT_BINARY_DIR}/src/lib/lib)
 
 target_link_libraries(
   Sourcetrail_lib_path_detection

@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/commandline/commands/commandlineCommandConfig/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/commandline/commands/commandlineCommandConfig/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::commandline::CommandlineCommandConfig
   SOURCES CommandlineCommandConfig.cpp

@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/messaging/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/messaging/CMakeLists.txt
 add_library(Sourcetrail_messaging)
 add_library(Sourcetrail::lib::messaging ALIAS Sourcetrail_messaging)
 

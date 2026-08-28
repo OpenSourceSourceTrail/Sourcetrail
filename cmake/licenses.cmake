@@ -4,7 +4,7 @@
 
 set(LICENSES "")
 set(LICENSE_ARRAY "")
-set(LICENSEFOLDER "${CMAKE_SOURCE_DIR}/bin/app/data/license/3rd_party_licenses")
+set(LICENSEFOLDER "${PROJECT_SOURCE_DIR}/bin/app/data/license/3rd_party_licenses")
 
 function(ReadLicense licenseFile licenseVariable)
   file(READ ${licenseFile} tempVariable)
@@ -26,7 +26,7 @@ function(AddLicense softwareName softwareVersion softwareURL licenseFile)
       PARENT_SCOPE)
 endfunction(AddLicense)
 
-readlicense(${CMAKE_SOURCE_DIR}/LICENSE.txt Sourcetrail_license)
+readlicense(${PROJECT_SOURCE_DIR}/LICENSE.txt Sourcetrail_license)
 set(LICENSE_APP
     "LicenseInfo(\"Sourcetrail\", \"${VERSION_STRING}\", \"https://github.com/OpenSourceSourceTrail/Sourcetrail\", Sourcetrail_license)"
 )
@@ -41,4 +41,4 @@ addlicense("Qt" "5.15" "http://qt.io" "${LICENSEFOLDER}/license_qt.txt")
 
 set(LICENSE_ARRAY "${LICENSE_ARRAY}\n")
 
-configure_file(${CMAKE_SOURCE_DIR}/cmake/licenses.h.in ${CMAKE_BINARY_DIR}/src/lib/lib_gui/licenses.h)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/licenses.h.in ${PROJECT_BINARY_DIR}/src/lib/lib_gui/licenses.h)

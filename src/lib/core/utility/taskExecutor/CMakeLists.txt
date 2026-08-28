@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/taskExecutor/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/taskExecutor/CMakeLists.txt
 find_package(Taskflow REQUIRED)
 
 add_sourcetrail_library(

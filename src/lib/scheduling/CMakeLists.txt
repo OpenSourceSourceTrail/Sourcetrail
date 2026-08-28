@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/scheduling/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/scheduling/CMakeLists.txt
 add_library(Sourcetrail_scheduling)
 add_library(Sourcetrail::lib::scheduling ALIAS Sourcetrail_scheduling)
 

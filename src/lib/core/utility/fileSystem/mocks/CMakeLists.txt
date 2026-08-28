@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/fileSystem/mocks/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/fileSystem/mocks/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::MockedFileSystem
   SOURCES MockedFileSystem.cpp

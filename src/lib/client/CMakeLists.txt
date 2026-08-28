@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/lib/client/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/lib/client/CMakeLists.txt
 #
 # The client's side of the engine boundary. Deliberately free of storage and SQLite: this is what a
 # GUI links instead of talking to a database itself.

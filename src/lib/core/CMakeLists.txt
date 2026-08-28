@@ -1,4 +1,4 @@
-#${CMAKE_SOURCE_DIR}/src/lib/core/CMakeLists.txt
+#${PROJECT_SOURCE_DIR}/src/lib/core/CMakeLists.txt
 add_subdirectory(utility)
 add_subdirectory(http)
 

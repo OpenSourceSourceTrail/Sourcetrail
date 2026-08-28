@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/utilityString/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/utilityString/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::utilityString
   SOURCES utilityString.cpp

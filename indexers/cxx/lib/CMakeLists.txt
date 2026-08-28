@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/indexers/cxx/lib/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/indexers/cxx/lib/CMakeLists.txt
 find_package(Clang REQUIRED)
 
 # Clang's own version config only accepts an exact major.minor, so the floor is checked by hand here.
@@ -55,7 +55,7 @@ target_sources(
 # One include root, e.g. #include "data/parser/cxx/CxxParser.h".
 target_include_directories(Sourcetrail_lib_cxx PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
-target_include_directories(Sourcetrail_lib_cxx PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
+target_include_directories(Sourcetrail_lib_cxx PRIVATE ${PROJECT_BINARY_DIR}/src/lib/lib)
 
 target_include_directories(Sourcetrail_lib_cxx SYSTEM PRIVATE ${LLVM_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS})
 

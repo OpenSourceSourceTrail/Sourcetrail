@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/src/core/utility/TextAccess/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/utility/TextAccess/CMakeLists.txt
 add_sourcetrail_library(
   NAME lib::core::utility::TextAccess
   SOURCES TextAccess.cpp

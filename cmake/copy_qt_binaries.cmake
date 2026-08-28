@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/cmake/copy_qt_binaries.cmake
+# ${PROJECT_SOURCE_DIR}/cmake/copy_qt_binaries.cmake
 
 function(copy_qt_binaries DESTINATION IS_APP)
   if(NOT EXISTS ${DESTINATION})

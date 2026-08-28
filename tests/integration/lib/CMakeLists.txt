@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/tests/integration/lib/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/tests/integration/lib/CMakeLists.txt
 
 set(test_lib_names
     RefreshInfoGeneratorTestSuite
@@ -30,5 +30,5 @@ foreach(test_name IN LISTS test_lib_names)
          Boost::date_time
          spdlog::spdlog
     TEST_PREFIX "integration.lib."
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 endforeach()

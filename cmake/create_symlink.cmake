@@ -1,4 +1,4 @@
-# ${CMAKE_SOURCE_DIR}/cmake/create_symlink.cmake
+# ${PROJECT_SOURCE_DIR}/cmake/create_symlink.cmake
 
 function(create_symlink SOURCE DESTINATION)
   if(WIN32)

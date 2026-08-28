@@ -1,59 +1,59 @@
-# ${CMAKE_SOURCE_DIR}/src/core/tests/CMakeLists.txt
+# ${PROJECT_SOURCE_DIR}/src/core/tests/CMakeLists.txt
 add_sourcetrail_test(
   NAME ConfigManagerTestSuite
   SOURCES ConfigManagerTestSuite.cpp
   DEPS Sourcetrail::lib::core Sourcetrail::lib::core::utility::ConfigManager Sourcetrail::lib::core::utility::TextAccess
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME UtilityStringTestSuite
   SOURCES UtilityStringTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::utilityString
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME TextAccessTestSuite
   SOURCES TextAccessTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::TextAccess
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME TextCodecTestSuite
   SOURCES TextCodecTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::TextCodec
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME VersionTestSuite
   SOURCES VersionTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::Version
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME UnorderedCacheTestSuite
   SOURCES UnorderedCacheTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::UnorderedCache
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME ScopedFunctorTestSuite
   SOURCES ScopedFunctorTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::ScopedFunctor
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME StatusTestSuite
   SOURCES StatusTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::Status
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME FileManagerTestSuite
@@ -62,7 +62,7 @@ add_sourcetrail_test(
        Sourcetrail::lib::core::utility::file::FileManager Sourcetrail::lib::core::utility::file::FilePath
        Sourcetrail::lib::core::utility::file::FilePathFilter Sourcetrail::lib::core::utility::file::FileSystem
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME LowMemoryStringMapTestSuite
@@ -70,7 +70,7 @@ add_sourcetrail_test(
   DEPS Sourcetrail::lib::core Sourcetrail::lib::core::utility::GlobalId
        Sourcetrail::lib::core::utility::LowMemoryStringMap Sourcetrail::lib::core::utility::TextAccess
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME CommandlineCommandConfigTestSuite
@@ -78,7 +78,7 @@ add_sourcetrail_test(
   DEPS lib_test_utilities lib::mocks Sourcetrail::lib::core::utility::commandline::CommandlineCommandConfig
        Sourcetrail::lib::core::utility::commandline::CommandLineParser Sourcetrail::lib::lib
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME CommandlineCommandIndexTestSuite
@@ -87,7 +87,7 @@ add_sourcetrail_test(
        Sourcetrail::lib::core::utility::commandline::CommandlineCommandIndex
        Sourcetrail::lib::core::utility::commandline::CommandLineParser Sourcetrail::lib::lib
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME CommandlineCommandTestSuite
@@ -95,7 +95,7 @@ add_sourcetrail_test(
   DEPS lib::mocks Sourcetrail::lib::core::utility::commandline::commands::CommandlineCommand
        Sourcetrail::lib::core::utility::commandline::CommandLineParser lib_test_utilities
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME CommandlineHelperTestSuite
@@ -104,7 +104,7 @@ add_sourcetrail_test(
        Sourcetrail::lib::core::utility::commandline::CommandlineHelper Sourcetrail::lib::core::utility::file::FilePath
        lib_test_utilities
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 if(TARGET CommandlineHelperTestSuite AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_options(CommandlineHelperTestSuite PRIVATE -Wno-write-strings)
@@ -115,38 +115,38 @@ add_sourcetrail_test(
   DEPS Sourcetrail::lib::core::utility::commandline::CommandLineParser lib_test_utilities
        Sourcetrail::lib::core::utility::utilityString
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME CommandlineTestSuite
   SOURCES CommandlineTestSuite.cpp
   DEPS lib::mocks Sourcetrail::lib::lib Sourcetrail::lib::core::utility::commandline::CommandLineParser
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME UtilityTestSuite
   SOURCES UtilityTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::utility
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME FilePathFilterTestSuite
   SOURCES FilePathFilterTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::file::FilePathFilter
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME FilePathTestSuite
   SOURCES FilePathTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::file::FilePath
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 target_compile_definitions(
-  FilePathTestSuite PRIVATE LIB_TEST_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\" ROOT_DIR=\"${CMAKE_SOURCE_DIR}\"
+  FilePathTestSuite PRIVATE LIB_TEST_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\" ROOT_DIR=\"${PROJECT_SOURCE_DIR}\"
                             SOURCE_PATH_PREFIX_LEN=${SOURCE_PATH_PREFIX_LEN})
 
 add_sourcetrail_test(
@@ -156,21 +156,21 @@ add_sourcetrail_test(
        Sourcetrail::lib::core::utility::file::FilePathFilter Sourcetrail::lib::core::utility::utility
        Sourcetrail::lib::core::utility::file::ScopedTemporaryFile
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 target_compile_definitions(UtilityFileFileSystemTestSuite PRIVATE LIB_TEST_ROOT_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"
-                                                                  ROOT_DIR=\"${CMAKE_SOURCE_DIR}\")
+                                                                  ROOT_DIR=\"${PROJECT_SOURCE_DIR}\")
 
 add_sourcetrail_test(
   NAME ScopedTemporaryFileTestSuite
   SOURCES ScopedTemporaryFileTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::file::ScopedTemporaryFile
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
 
 add_sourcetrail_test(
   NAME FileSystemTestSuite
   SOURCES FileSystemTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::FileSystem
   TEST_PREFIX "unittests.core."
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/test/")
+  WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/test/")
