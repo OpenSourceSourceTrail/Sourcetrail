@@ -1,5 +1,6 @@
 #include "ConfigManager.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <set>
 #include <sstream>
@@ -8,8 +9,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
-
-#include <range/v3/algorithm/replace.hpp>
 
 #include "logging.h"
 #include "TextAccess.h"
@@ -26,7 +25,7 @@ void createXmlDocumentToString(const std::multimap<std::string, std::string>& va
       continue;
     }
     auto newKey = "config/" + key;
-    ranges::cpp20::replace(newKey, '/', '.');
+    std::ranges::replace(newKey, '/', '.');
     tree.add(newKey, value);
   }
   pt::write_xml(outStream, tree);

@@ -1,8 +1,5 @@
 #include "QtProjectWizardContentPathsFrameworkSearchGlobal.h"
 
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/transform.hpp>
-
 #include "globalStrings.h"
 #include "IApplicationSettings.hpp"
 #include "utility.h"

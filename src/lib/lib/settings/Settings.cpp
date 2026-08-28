@@ -1,9 +1,9 @@
 #include "Settings.h"
 
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/transform.hpp>
+#include <ranges>
 
 #include "logging.h"
+#include "RangesTo.hpp"
 #include "TextAccess.h"
 
 Settings::Settings() {
@@ -96,24 +96,25 @@ void Settings::setFilePath(const FilePath& filePath) {
 
 std::vector<FilePath> Settings::getPathValues(const std::string& key) const {
   auto values = getValues<std::wstring>(key, {});
-  return values | ranges::cpp20::views::transform([](const auto& value) { return FilePath{value}; }) | ranges::to<std::vector>();
+  return values | std::views::transform([](const auto& value) { return FilePath{value}; }) |
+      utility::toContainer<std::vector<FilePath>>();
 }
 
 std::vector<std::filesystem::path> Settings::getPathValuesStl(const std::string& key) const noexcept {
   auto values = getValues<std::wstring>(key, {});
-  return values | ranges::cpp20::views::transform([](const auto& value) -> std::filesystem::path { return value; }) |
-      ranges::to<std::vector>();
+  return values | std::views::transform([](const auto& value) -> std::filesystem::path { return value; }) |
+      utility::toContainer<std::vector<std::filesystem::path>>();
 }
 
 bool Settings::setPathValues(const std::string& key, const std::vector<FilePath>& paths) {
-  const std::vector<std::wstring> values = paths |
-      ranges::cpp20::views::transform([](const auto& value) { return value.wstr(); }) | ranges::to<std::vector>();
+  const std::vector<std::wstring> values = paths | std::views::transform([](const auto& value) { return value.wstr(); }) |
+      utility::toContainer<std::vector<std::wstring>>();
   return setValues(key, values);
 }
 
 bool Settings::setPathValues(const std::string& key, const std::vector<std::filesystem::path>& paths) noexcept {
-  const std::vector<std::wstring> values = paths |
-      ranges::cpp20::views::transform([](const auto& value) { return value.wstring(); }) | ranges::to<std::vector>();
+  const std::vector<std::wstring> values = paths | std::views::transform([](const auto& value) { return value.wstring(); }) |
+      utility::toContainer<std::vector<std::wstring>>();
   return setValues(key, values);
 }
 

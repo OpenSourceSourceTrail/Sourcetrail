@@ -1,7 +1,8 @@
 #include "utility.h"
 
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/transform.hpp>
+#include <ranges>
+
+#include "RangesTo.hpp"
 
 size_t utility::digits(size_t n) {
   constexpr int DigitCount = 10;
@@ -17,13 +18,12 @@ size_t utility::digits(size_t n) {
 
 namespace utility {
 std::vector<std::filesystem::path> toStlPath(const std::vector<FilePath>& oldPaths) {
-  return oldPaths | ranges::cpp20::views::transform([](const FilePath& file) -> std::filesystem::path { return file.wstr(); }) |
-      ranges::to<std::vector>();
+  return oldPaths | std::views::transform([](const FilePath& file) -> std::filesystem::path { return file.wstr(); }) |
+      utility::toContainer<std::vector<std::filesystem::path>>();
 }
 
 std::vector<FilePath> toFilePath(const std::vector<std::filesystem::path>& oldPaths) {
-  return oldPaths |
-      ranges::cpp20::views::transform([](const std::filesystem::path& file) -> FilePath { return FilePath{file.wstring()}; }) |
-      ranges::to<std::vector>();
+  return oldPaths | std::views::transform([](const std::filesystem::path& file) -> FilePath { return FilePath{file.wstring()}; }) |
+      utility::toContainer<std::vector<FilePath>>();
 }
 }    // namespace utility

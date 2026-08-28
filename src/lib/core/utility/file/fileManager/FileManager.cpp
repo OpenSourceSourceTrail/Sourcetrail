@@ -1,12 +1,12 @@
 #include "FileManager.h"
 
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/filter.hpp>
-#include <range/v3/view/transform.hpp>
+#include <ranges>
+#include <set>
 
 #include "FilePath.h"
 #include "FilePathFilter.h"
 #include "FileSystem.h"
+#include "RangesTo.hpp"
 
 FileManager::FileManager() = default;
 
@@ -28,8 +28,8 @@ void FileManager::update(std::vector<FilePath> sourcePaths,
   const auto transformFunc = [](const FileInfo& fileInfo) -> FilePath { return fileInfo.path; };
 
   const auto files = FileSystem::getFileInfosFromPaths(m_sourcePaths, m_sourceExtensions);
-  m_allSourceFilePaths = files | ranges::cpp20::views::filter(filterFunc) | ranges::cpp20::views::transform(transformFunc) |
-      ranges::to<std::set>();
+  m_allSourceFilePaths = files | std::views::filter(filterFunc) | std::views::transform(transformFunc) |
+      utility::toContainer<std::set<FilePath>>();
 }
 
 std::vector<FilePath> FileManager::getSourcePaths() const {

@@ -1,6 +1,6 @@
 #include "TaskGroupSequence.h"
 
-#include <range/v3/algorithm/for_each.hpp>
+#include <algorithm>
 
 TaskGroupSequence::TaskGroupSequence() = default;
 
@@ -35,9 +35,9 @@ Task::TaskState TaskGroupSequence::doUpdate(std::shared_ptr<Blackboard> blackboa
 void TaskGroupSequence::doExit(std::shared_ptr<Blackboard> /*blackboard*/) {}
 
 void TaskGroupSequence::doReset(std::shared_ptr<Blackboard> /*blackboard*/) {
-  ranges::for_each(m_taskRunners, [](auto& taskRunner) { taskRunner->reset(); });
+  std::ranges::for_each(m_taskRunners, [](auto& taskRunner) { taskRunner->reset(); });
 }
 
 void TaskGroupSequence::doTerminate() {
-  ranges::for_each(m_taskRunners, [](auto& taskRunner) { taskRunner->terminate(); });
+  std::ranges::for_each(m_taskRunners, [](auto& taskRunner) { taskRunner->terminate(); });
 }

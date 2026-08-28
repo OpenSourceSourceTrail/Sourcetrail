@@ -1,12 +1,9 @@
 #include "MessageQueue.h"
 
+#include <algorithm>
 #include <chrono>
 #include <mutex>
 #include <thread>
-
-#include <range/v3/algorithm/find.hpp>
-#include <range/v3/algorithm/find_if.hpp>
-#include <range/v3/algorithm/for_each.hpp>
 
 #include "../../../scheduling/TaskflowGroupParallel.h"
 #include "../../../scheduling/TaskGroupSequence.h"
@@ -24,13 +21,13 @@ MessageQueue::MessageQueue() noexcept = default;
 
 MessageQueue::~MessageQueue() noexcept {
   const std::scoped_lock<std::mutex> lock(mListenersMutex);
-  ranges::for_each(mListeners, [](auto& listener) { listener->removedListener(); });
+  std::ranges::for_each(mListeners, [](auto& listener) { listener->removedListener(); });
   mListeners.clear();
 }
 
 void MessageQueue::registerListener(MessageListenerBase* listener) noexcept {
   const std::scoped_lock<std::mutex> lock(mListenersMutex);
-  if(ranges::find(mListeners, listener) != mListeners.end()) {
+  if(std::ranges::find(mListeners, listener) != mListeners.end()) {
     return;
   }
   mListeners.push_back(listener);
@@ -38,7 +35,7 @@ void MessageQueue::registerListener(MessageListenerBase* listener) noexcept {
 
 void MessageQueue::unregisterListener(MessageListenerBase* listener) noexcept {
   const std::scoped_lock<std::mutex> lock(mListenersMutex);
-  auto found = ranges::find(mListeners, listener);
+  auto found = std::ranges::find(mListeners, listener);
   if(found == mListeners.end()) {
     LOG_ERROR("Listener was not found");
     return;
@@ -60,12 +57,12 @@ void MessageQueue::unregisterListener(MessageListenerBase* listener) noexcept {
 
 MessageListenerBase* MessageQueue::getListenerById(Id listenerId) const noexcept {
   const std::scoped_lock<std::mutex> lock(mListenersMutex);
-  auto found = ranges::find_if(mListeners, [listenerId](auto* listener) { return listener->getId() == listenerId; });
+  auto found = std::ranges::find_if(mListeners, [listenerId](auto* listener) { return listener->getId() == listenerId; });
   return found == mListeners.end() ? nullptr : *found;
 }
 
 void MessageQueue::addMessageFilter(std::shared_ptr<MessageFilter> filter) noexcept {
-  if(ranges::find(mFilters, filter) != mFilters.end()) {
+  if(std::ranges::find(mFilters, filter) != mFilters.end()) {
     return;
   }
   mFilters.push_back(std::move(filter));
@@ -73,7 +70,7 @@ void MessageQueue::addMessageFilter(std::shared_ptr<MessageFilter> filter) noexc
 
 void MessageQueue::pushMessage(std::shared_ptr<MessageBase> message) noexcept {
   const std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
-  if(ranges::find(mMessageBuffer, message) != mMessageBuffer.end()) {
+  if(std::ranges::find(mMessageBuffer, message) != mMessageBuffer.end()) {
     return;
   }
   mMessageBuffer.push_back(std::move(message));
@@ -157,7 +154,7 @@ void MessageQueue::processMessages() {
     {
       const std::scoped_lock<std::mutex> lock(mMessageBufferMutex);
 
-      ranges::for_each(mFilters, [this](const auto& filter) {
+      std::ranges::for_each(mFilters, [this](const auto& filter) {
         if(mMessageBuffer.empty()) {
           return;
         }

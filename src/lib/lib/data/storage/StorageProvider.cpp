@@ -1,6 +1,6 @@
 #include "StorageProvider.h"
 
-#include <range/v3/algorithm/find_if.hpp>
+#include <algorithm>
 
 int StorageProvider::getStorageCount() const noexcept {
   const std::lock_guard lock(mStoragesMutex);
@@ -19,7 +19,7 @@ nonstd::expected<void, std::string> StorageProvider::insert(std::shared_ptr<Inte
   const std::size_t storageSize = storage->getSourceLocationCount();
 
   const std::lock_guard lock(mStoragesMutex);
-  const auto iterator = ranges::find_if(
+  const auto iterator = std::ranges::find_if(
       mStorages, [storageSize](const auto& currentStorage) { return currentStorage->getSourceLocationCount() < storageSize; });
   std::ignore = mStorages.insert(iterator, std::move(storage));
   return {};

@@ -1,12 +1,11 @@
 #include "Project.h"
 
+#include <algorithm>
 #include <cassert>
 #include <tuple>
 #include <utility>
 
 #include <fmt/format.h>
-
-#include <range/v3/algorithm/any_of.hpp>
 
 #include "../../scheduling/Task.h"
 #include "../../scheduling/TaskGroupSequence.h"
@@ -557,10 +556,11 @@ bool Project::checkIfFilesToClear(RefreshInfo& info, std::shared_ptr<DialogView>
   if(RefreshMode::AllFiles != info.mode && (!info.filesToClear.empty() || !info.nonIndexedFilesToClear.empty())) {
     for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
       if(SOURCE_GROUP_STATUS_ENABLED == sourceGroup->getStatus() && !sourceGroup->allowsPartialClearing()) {
-        if(ranges::any_of(info.filesToClear,
-                          [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); }) ||
-           ranges::any_of(info.nonIndexedFilesToClear,
-                          [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); })) {
+        if(std::ranges::any_of(info.filesToClear,
+                               [&sourceGroup](const auto& sourcePath) { return sourceGroup->containsSourceFilePath(sourcePath); }) ||
+           std::ranges::any_of(info.nonIndexedFilesToClear, [&sourceGroup](const auto& sourcePath) {
+             return sourceGroup->containsSourceFilePath(sourcePath);
+           })) {
           if(m_hasGUI &&
              dialogView->confirm(fmt::format(L"<p>This project contains a source group of type \"{}\" that cannot be partially "
                                              L"cleared. Do you want to re-index the whole project instead?</p>",

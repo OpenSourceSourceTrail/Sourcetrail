@@ -1,6 +1,6 @@
 #include "QtProjectWizardContentGroup.h"
 
-#include <range/v3/algorithm/any_of.hpp>
+#include <algorithm>
 
 #include <QGridLayout>
 
@@ -15,7 +15,7 @@ void QtProjectWizardContentGroup::addSpace() {
 }
 
 bool QtProjectWizardContentGroup::hasContents() const {
-  return ranges::cpp20::any_of(m_contents, [](QtProjectWizardContent* content) { return content != nullptr; });
+  return std::ranges::any_of(m_contents, [](QtProjectWizardContent* content) { return content != nullptr; });
 }
 
 void QtProjectWizardContentGroup::populate(QGridLayout* layout, int& row) {

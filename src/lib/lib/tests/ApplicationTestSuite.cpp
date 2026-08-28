@@ -1,8 +1,7 @@
+#include <algorithm>
 #include <memory>
 #include <regex>
 #include <thread>
-
-#include <range/v3/algorithm/any_of.hpp>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -98,7 +97,7 @@ TEST_F(SingletonApplicationFix, singleton) {
   ASSERT_THAT(Application::getInstance(), testing::NotNull());
 
   auto apps = {Application::getInstance(), Application::getInstance(), Application::getInstance()};
-  EXPECT_TRUE(ranges::cpp20::any_of(apps, [ptr = baseApp.get()](const auto& a) { return ptr == a.get(); }));
+  EXPECT_TRUE(std::ranges::any_of(apps, [ptr = baseApp.get()](const auto& a) { return ptr == a.get(); }));
 
   // HACK: destroy before start the event-loop will start inf-loop
   std::this_thread::sleep_for(100ms);

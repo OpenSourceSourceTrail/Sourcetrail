@@ -1,11 +1,10 @@
 #include "IntermediateStorage.h"
 
-#include <range/v3/algorithm/any_of.hpp>
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/enumerate.hpp>
-#include <range/v3/view/transform.hpp>
+#include <algorithm>
+#include <ranges>
 
 #include "LocationType.h"
+#include "RangesTo.hpp"
 #include "utility.h"
 
 IntermediateStorage::IntermediateStorage() = default;
@@ -72,7 +71,7 @@ size_t IntermediateStorage::getByteSize(size_t stringSize) const {
 }
 
 bool IntermediateStorage::hasFatalErrors() const {
-  return ranges::any_of(mErrors, [](const StorageErrorData& error) { return error.fatal; });
+  return std::ranges::any_of(mErrors, [](const StorageErrorData& error) { return error.fatal; });
 }
 
 void IntermediateStorage::setAllFilesIncomplete() {
@@ -113,8 +112,8 @@ std::pair<Id, bool> IntermediateStorage::addNode(const StorageNodeData& nodeData
 }
 
 std::vector<Id> IntermediateStorage::addNodes(const std::vector<StorageNode>& nodes) {
-  return nodes | ranges::views::transform([this](const StorageNode& node) -> Id { return addNode(node).first; }) |
-      ranges::to<std::vector>();
+  return nodes | std::views::transform([this](const StorageNode& node) -> Id { return addNode(node).first; }) |
+      utility::toContainer<std::vector<Id>>();
 }
 
 void IntermediateStorage::setNodeType(Id nodeId, int nodeType) {
@@ -163,8 +162,8 @@ Id IntermediateStorage::addEdge(const StorageEdgeData& edgeData) {
 }
 
 std::vector<Id> IntermediateStorage::addEdges(const std::vector<StorageEdge>& edges) {
-  return edges | ranges::views::transform([this](const StorageEdge& edge) -> Id { return addEdge(edge); }) |
-      ranges::to<std::vector>();
+  return edges | std::views::transform([this](const StorageEdge& edge) -> Id { return addEdge(edge); }) |
+      utility::toContainer<std::vector<Id>>();
 }
 
 Id IntermediateStorage::addLocalSymbol(const StorageLocalSymbolData& localSymbolData) {
@@ -178,8 +177,8 @@ Id IntermediateStorage::addLocalSymbol(const StorageLocalSymbolData& localSymbol
 }
 
 std::vector<Id> IntermediateStorage::addLocalSymbols(const std::set<StorageLocalSymbol>& symbols) {
-  return symbols | ranges::views::transform([this](const StorageLocalSymbol& symbol) -> Id { return addLocalSymbol(symbol); }) |
-      ranges::to<std::vector>();
+  return symbols | std::views::transform([this](const StorageLocalSymbol& symbol) -> Id { return addLocalSymbol(symbol); }) |
+      utility::toContainer<std::vector<Id>>();
 }
 
 Id IntermediateStorage::addSourceLocation(const StorageSourceLocationData& sourceLocationData) {
@@ -194,8 +193,8 @@ Id IntermediateStorage::addSourceLocation(const StorageSourceLocationData& sourc
 
 std::vector<Id> IntermediateStorage::addSourceLocations(const std::vector<StorageSourceLocation>& locations) {
   return locations |
-      ranges::views::transform([this](const StorageSourceLocation& location) -> Id { return addSourceLocation(location); }) |
-      ranges::to<std::vector>();
+      std::views::transform([this](const StorageSourceLocation& location) -> Id { return addSourceLocation(location); }) |
+      utility::toContainer<std::vector<Id>>();
 }
 
 Id IntermediateStorage::addError(const StorageErrorData& errorData) {
@@ -214,7 +213,8 @@ void IntermediateStorage::setStorageNodes(std::vector<StorageNode> storageNodes)
 
   mNodesIndex.clear();
   mNodeIdIndex.clear();
-  for(const auto& [index, node] : ranges::views::enumerate(mNodes)) {
+  for(size_t index = 0; index < mNodes.size(); ++index) {
+    const StorageNode& node = mNodes[index];
     mNodesIndex.emplace(node, index);
     mNodeIdIndex.emplace(node.id, index);
   }
@@ -225,7 +225,8 @@ void IntermediateStorage::setStorageFiles(std::vector<StorageFile> storageFiles)
 
   mFilesIndex.clear();
   mFilesIdIndex.clear();
-  for(const auto& [index, file] : ranges::views::enumerate(mFiles)) {
+  for(size_t index = 0; index < mFiles.size(); ++index) {
+    const StorageFile& file = mFiles[index];
     mFilesIndex.emplace(file, index);
     mFilesIdIndex.emplace(file.id, index);
   }
@@ -234,15 +235,17 @@ void IntermediateStorage::setStorageFiles(std::vector<StorageFile> storageFiles)
 void IntermediateStorage::setStorageEdges(std::vector<StorageEdge> storageEdges) {
   mEdges = std::move(storageEdges);
 
-  mEdgesIndex = mEdges | ranges::views::enumerate |
-      ranges::views::transform([](const auto& item) -> std::pair<StorageEdgeData, size_t> { return {item.second, item.first}; }) |
-      ranges::to<std::map>();
+  mEdgesIndex.clear();
+  for(size_t index = 0; index < mEdges.size(); ++index) {
+    mEdgesIndex.emplace(mEdges[index], index);
+  }
 }
 
 void IntermediateStorage::setErrors(std::vector<StorageError> errors) {
   mErrors = std::move(errors);
 
-  mErrorsIndex = mErrors | ranges::views::enumerate |
-      ranges::views::transform([](const auto& item) -> std::pair<StorageErrorData, size_t> { return {item.second, item.first}; }) |
-      ranges::to<std::map>();
+  mErrorsIndex.clear();
+  for(size_t index = 0; index < mErrors.size(); ++index) {
+    mErrorsIndex.emplace(mErrors[index], index);
+  }
 }

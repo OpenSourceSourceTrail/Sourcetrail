@@ -14,5 +14,4 @@ add_sourcetrail_library(
   Sourcetrail::lib::core::utility::utility
   Sourcetrail::lib::core::utility::TextAccess
   Boost::system
-  range-v3::range-v3
   Sourcetrail::lib::core)

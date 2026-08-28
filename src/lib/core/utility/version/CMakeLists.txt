@@ -8,6 +8,5 @@ add_sourcetrail_library(
   Version.h
   PRIVATE_DEPS
   fmt::fmt
-  range-v3::range-v3
   Sourcetrail::lib::core::utility::utilityString
   Sourcetrail::lib::core::utility::logging)

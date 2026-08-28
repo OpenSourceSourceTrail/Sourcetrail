@@ -1,5 +1,3 @@
-#include <range/v3/algorithm/copy.hpp>
-
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 

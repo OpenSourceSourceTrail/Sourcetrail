@@ -1,13 +1,11 @@
 #include "Version.h"
 
+#include <algorithm>
 #include <cstdint>
-#include <utility>
+#include <iterator>
 #include <vector>
 
 #include <fmt/format.h>
-
-#include <range/v3/view/split.hpp>
-#include <range/v3/view/transform.hpp>
 
 #include "logging.h"
 #include "utilityString.h"
@@ -15,9 +13,11 @@
 Version Version::sVersion;
 
 Version Version::fromString(const std::string& versionString) {
-  auto partView = versionString | ranges::views::split('.') |
-      ranges::views::transform([](auto&& value) { return static_cast<uint32_t>(std::stoi(&*value.begin())); });
-  std::vector<uint32_t> parts(partView.begin(), partView.end());
+  const auto partStrings = utility::splitToVector(versionString, '.');
+  std::vector<uint32_t> parts;
+  parts.reserve(partStrings.size());
+  std::ranges::transform(
+      partStrings, std::back_inserter(parts), [](const std::string& part) { return static_cast<uint32_t>(std::stoi(part)); });
   if(parts.empty() || parts.size() != 3) {
     LOG_WARNING(fmt::format("Version string is invalid: {}", versionString));
     return Version{};

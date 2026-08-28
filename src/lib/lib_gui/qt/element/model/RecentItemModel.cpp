@@ -1,11 +1,14 @@
 #include "RecentItemModel.hpp"
 
+#include <ranges>
+
 #include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
 
 #include "IApplicationSettings.hpp"
 #include "ProjectSettings.h"
+#include "RangesTo.hpp"
 #include "type/MessageLoadProject.h"
 
 
@@ -47,7 +50,7 @@ namespace qt::element::model {
 
 RecentItemModel::RecentItemModel(const std::vector<std::filesystem::path>& recentProjects, size_t maxRecentProjects, QObject* parent)
     : QAbstractListModel(parent), mMaxRecentProjects(maxRecentProjects) {
-  mRecentProjects = recentProjects | ranges::views::transform([](const std::filesystem::path& recentProject) -> RecentItem {
+  mRecentProjects = recentProjects | std::views::transform([](const std::filesystem::path& recentProject) -> RecentItem {
                       const auto recentProjectPath = FilePath{recentProject.wstring()};
                       const auto lang = ProjectSettings::getLanguageOfProject(recentProjectPath);
                       std::error_code errorCode;
@@ -56,7 +59,7 @@ RecentItemModel::RecentItemModel(const std::vector<std::filesystem::path>& recen
                               getProjectIcon(lang),
                               recentProject};
                     }) |
-      ranges::to<std::vector>;
+      utility::toContainer<std::vector<RecentItem>>();
 }
 
 QStringList RecentItemModel::mimeTypes() const {
@@ -213,8 +216,8 @@ void RecentItemModel::clicked(const QModelIndex& index) {
 
 void RecentItemModel::updateRecentProjects() {
   const auto recentProjects = mRecentProjects |
-      ranges::views::transform([](const RecentItem& item) -> std::filesystem::path { return item.path; }) |
-      ranges::to<std::vector>;
+      std::views::transform([](const RecentItem& item) -> std::filesystem::path { return item.path; }) |
+      utility::toContainer<std::vector<std::filesystem::path>>();
   IApplicationSettings::getInstanceRaw()->setRecentProjects(recentProjects);
   IApplicationSettings::getInstanceRaw()->save();
 }

@@ -1,8 +1,6 @@
 #include <algorithm>
 #include <iterator>
 
-#include <range/v3/algorithm/transform.hpp>
-
 #include <gtest/gtest.h>
 
 #include "FileManager.h"
@@ -17,7 +15,7 @@ struct FileManagerFix : testing::Test {
     ASSERT_EQ(3, filePaths.size());
 
     sourceExtensions.resize(filePaths.size());
-    ranges::cpp20::transform(
+    std::ranges::transform(
         filePaths, sourceExtensions.begin(), [](const auto& filePath) -> std::wstring { return filePath.extension(); });
     ASSERT_EQ(3, sourceExtensions.size());
   }

@@ -10,4 +10,4 @@ add_sourcetrail_library(
   Sourcetrail::lib::core::utility::file::FilePath
   Sourcetrail::lib::core::utility::utilityString
   PRIVATE_DEPS
-  range-v3::range-v3)
+  Sourcetrail::lib::core::utility::rangesTo)

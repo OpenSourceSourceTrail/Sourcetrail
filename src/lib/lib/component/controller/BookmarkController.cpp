@@ -1,10 +1,7 @@
 #include "BookmarkController.h"
 
 #include <algorithm>
-
-#include <range/v3/algorithm/any_of.hpp>
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/transform.hpp>
+#include <ranges>
 
 #include "Bookmark.h"
 #include "BookmarkCategory.h"
@@ -12,6 +9,7 @@
 #include "EdgeBookmark.h"
 #include "logging.h"
 #include "NodeBookmark.h"
+#include "RangesTo.hpp"
 #include "StorageAccess.h"
 #include "StorageEdge.h"
 #include "TabId.h"
@@ -374,18 +372,16 @@ std::vector<std::shared_ptr<Bookmark>> BookmarkController::getAllBookmarks() con
 
 std::vector<std::shared_ptr<NodeBookmark>> BookmarkController::getAllNodeBookmarks() const {
   const auto nodeBookmarks = mBookmarkCache.getAllNodeBookmarks();
-  return nodeBookmarks | ranges::cpp20::views::transform([](const NodeBookmark& nodeBookmark) {
-           return std::make_shared<NodeBookmark>(nodeBookmark);
-         }) |
-      ranges::to<std::vector<std::shared_ptr<NodeBookmark>>>();
+  return nodeBookmarks |
+      std::views::transform([](const NodeBookmark& nodeBookmark) { return std::make_shared<NodeBookmark>(nodeBookmark); }) |
+      utility::toContainer<std::vector<std::shared_ptr<NodeBookmark>>>();
 }
 
 std::vector<std::shared_ptr<EdgeBookmark>> BookmarkController::getAllEdgeBookmarks() const {
   const auto edgeBookmarks = mBookmarkCache.getAllEdgeBookmarks();
-  return edgeBookmarks | ranges::cpp20::views::transform([](const EdgeBookmark& edgeBookmark) {
-           return std::make_shared<EdgeBookmark>(edgeBookmark);
-         }) |
-      ranges::to<std::vector<std::shared_ptr<EdgeBookmark>>>();
+  return edgeBookmarks |
+      std::views::transform([](const EdgeBookmark& edgeBookmark) { return std::make_shared<EdgeBookmark>(edgeBookmark); }) |
+      utility::toContainer<std::vector<std::shared_ptr<EdgeBookmark>>>();
 }
 
 std::vector<std::shared_ptr<Bookmark>> BookmarkController::getBookmarks(Bookmark::Filter filter, Bookmark::Order order) const {
@@ -400,8 +396,8 @@ std::vector<std::shared_ptr<Bookmark>> BookmarkController::getBookmarks(Bookmark
 
 std::vector<std::wstring> BookmarkController::getActiveNodeDisplayNames() const {
   const auto activeNodeIds = mActiveNodeIds[TabId::currentTab()];
-  return activeNodeIds | ranges::cpp20::views::transform([this](Id nodeId) { return getNodeDisplayName(nodeId); }) |
-      ranges::to<std::vector>();
+  return activeNodeIds | std::views::transform([this](Id nodeId) { return getNodeDisplayName(nodeId); }) |
+      utility::toContainer<std::vector<std::wstring>>();
 }
 
 std::vector<std::wstring> BookmarkController::getActiveEdgeDisplayNames() const {
@@ -501,7 +497,7 @@ void BookmarkController::cleanBookmarkCategories() {
   const std::vector<std::shared_ptr<Bookmark>>& bookmarks = getAllBookmarks();
 
   for(const BookmarkCategory& category : getAllBookmarkCategories()) {
-    const bool used = ranges::any_of(
+    const bool used = std::ranges::any_of(
         bookmarks, [category](const auto& bookmark) { return bookmark->getCategory().getName() == category.getName(); });
 
     if(!used) {

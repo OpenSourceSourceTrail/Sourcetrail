@@ -1,8 +1,5 @@
 #include "ApplicationSettingsPrefiller.h"
 
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/transform.hpp>
-
 #include "IApplicationSettings.hpp"
 #include "logging.h"
 #include "type/MessageStatus.h"

@@ -2,8 +2,6 @@
 
 #include <algorithm>
 
-#include <range/v3/algorithm/sort.hpp>
-
 #include "IApplicationSettings.hpp"
 
 SnippetMerger::SnippetMerger(int startRow, int endRow) : m_start(startRow), m_end(endRow) {}
@@ -27,7 +25,7 @@ std::deque<SnippetMerger::Range> SnippetMerger::merge(const std::vector<SnippetM
                        return getExpandedRegardingAtomicRanges(mergeChild, snippetExpandRange, atomicRanges);
                      });
     }
-    ranges::sort(merged, [](const Range& item0, const Range& item1) { return item0.start.row < item1.start.row; });
+    std::ranges::sort(merged, [](const Range& item0, const Range& item1) { return item0.start.row < item1.start.row; });
 
     // merge children
     const int snippetMergeRange = 2 * snippetExpandRange + 1;    // +1 since snippets that end/start with consecutive

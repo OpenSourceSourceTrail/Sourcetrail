@@ -436,6 +436,7 @@ target_link_libraries(
          Sourcetrail::lib::scheduling
          nonstd::expected-lite
   PRIVATE Sourcetrail::lib::core
+          Sourcetrail::lib::core::utility::rangesTo
           Sourcetrail::lib::core::utility::ConfigManager
           Sourcetrail::lib::core::utility::logging
           Sourcetrail::lib::core::utility::ScopedFunctor

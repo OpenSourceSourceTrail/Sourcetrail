@@ -326,6 +326,7 @@ target_link_libraries(
          Sourcetrail::lib::core::utility::file::FileSystem
          Sourcetrail::lib::core::utility::utilityApp
   PRIVATE Sourcetrail::lib::core
+          Sourcetrail::lib::core::utility::rangesTo
           Sourcetrail::lib::core::utility::logging
           Sourcetrail::lib::core::utility::OrderedCache
           Sourcetrail::lib::core::utility::ScopedFunctor

@@ -1,11 +1,9 @@
 #include "QtStartScreen.hpp"
 
+#include <ranges>
 #include <utility>
 
 #include <fmt/format.h>
-
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/view/transform.hpp>
 
 #include <QDebug>
 #include <QDesktopServices>
@@ -19,6 +17,7 @@
 
 #include "globalStrings.h"
 #include "IApplicationSettings.hpp"
+#include "RangesTo.hpp"
 #include "RecentItemModel.hpp"
 #include "UserPaths.h"
 #include "utilityQt.h"
@@ -77,8 +76,8 @@ void QtStartScreen::setupStartScreen() {
 void QtStartScreen::hideEvent(QHideEvent* hideEvent) {
   if(mRecentModel->isDirty()) {
     auto updatedRecentProjects = mRecentModel->getRecentProjects() |
-        ranges::views::transform([](auto item) -> std::filesystem::path { return item.path.wstring(); }) |
-        ranges::to<std::vector>();
+        std::views::transform([](auto item) -> std::filesystem::path { return item.path.wstring(); }) |
+        utility::toContainer<std::vector<std::filesystem::path>>();
 
     IApplicationSettings::getInstanceRaw()->setRecentProjects(updatedRecentProjects);
     if(IApplicationSettings::getInstanceRaw()->save(UserPaths::getAppSettingsFilePath())) {
