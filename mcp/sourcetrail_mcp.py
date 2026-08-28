@@ -205,6 +205,10 @@ def search_symbols(query: str, limit: int = 20) -> list[dict]:
     Returns the matches with their `id`, readable `name` and `kind` (CLASS, METHOD, FIELD, FILE,
     ...), best match first. Pass an id to describe_symbol for the signature and definition, or to
     find_references for the use sites.
+
+    A fuzzy match can expand to several ids -- distinct symbols in different scopes that share the
+    same indexed text, e.g. one `main` per translation unit -- so this can return more than `limit`
+    entries; `limit` bounds distinct fuzzy matches, not result rows.
     """
     body = ENGINE.get(f"{API}/search", q=query,
                       types=ENGINE.node_mask(), commands=False)
@@ -215,12 +219,15 @@ def search_symbols(query: str, limit: int = 20) -> list[dict]:
             continue
         # `name` is the display name -- the full path for a FILE node, the qualified name
         # otherwise. The signature is not here; it comes from the tooltip in describe_symbol.
-        results.append({
-            "id": token_ids[0],
-            "name": match.get("name", ""),
-            "kind": node_kind(match.get("node_kind", 0)),
-            "score": match.get("score", 0),
-        })
+        # token_names_serialized is index-aligned with token_ids (ConvertQuery.cpp) and
+        # disambiguates ids that collapsed under the same match text, e.g. same-named symbols
+        # in different scopes/files; fall back to the match's own name if it's missing.
+        token_names = match.get("token_names_serialized") or []
+        kind = node_kind(match.get("node_kind", 0))
+        score = match.get("score", 0)
+        for i, token_id in enumerate(token_ids):
+            name = parse_name(token_names[i]) if i < len(token_names) else match.get("name", "")
+            results.append({"id": token_id, "name": name, "kind": kind, "score": score})
     return results
 
 

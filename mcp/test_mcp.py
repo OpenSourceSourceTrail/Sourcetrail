@@ -19,6 +19,20 @@ import sourcetrail_mcp    # noqa: E402
 from engine_harness import copy_project, engine_binary, require_engine, require_projects    # noqa: E402
 
 
+class _StubEngine:
+    """Fakes just enough of Engine for a search_symbols call, no process spawned."""
+
+    def __init__(self, search_response):
+        self._search_response = search_response
+
+    def node_mask(self):
+        return 0
+
+    def get(self, path, **params):
+        assert path.endswith("/search"), path
+        return self._search_response
+
+
 class ToolsTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -37,6 +51,27 @@ class ToolsTest(unittest.TestCase):
         self.assertEqual(sourcetrail_mcp.parse_name("::\tmPlayer\ts\tp"), "Player")
         self.assertEqual(
             sourcetrail_mcp.parse_name("::\tmGame\ts\tp\tnrun\tsvoid \tp()"), "Game::run")
+
+    def test_search_expands_a_multi_id_match(self):
+        # A single fuzzy match can carry several ids that share the same indexed text (e.g. one
+        # `main` per translation unit) -- search_symbols must expand each into its own result
+        # instead of keeping only token_ids[0]. No real engine needed: stub ENGINE.get.
+        real_engine, sourcetrail_mcp.ENGINE = sourcetrail_mcp.ENGINE, _StubEngine({
+            "matches": [{
+                "name": "main",
+                "node_kind": 1 << 12,    # FUNCTION
+                "score": 50,
+                "token_ids": ["1", "2"],
+                "token_names_serialized": ["::\tmmain\ts\tp", "::\tmgui\ts\tp\tnmain\ts\tp"],
+            }]
+        })
+        try:
+            matches = sourcetrail_mcp.search_symbols("main")
+        finally:
+            sourcetrail_mcp.ENGINE = real_engine
+        self.assertEqual([m["id"] for m in matches], ["1", "2"])
+        self.assertEqual([m["name"] for m in matches], ["main", "gui::main"])
+        self.assertEqual({m["kind"] for m in matches}, {"FUNCTION"})
 
     def test_search_finds_a_symbol(self):
         matches = sourcetrail_mcp.search_symbols("Player")
