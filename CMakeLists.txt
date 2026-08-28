@@ -253,6 +253,8 @@ if(ENABLE_UNIT_TEST
 
   if(ENABLE_INTEGRATION_TEST)
     add_subdirectory(tests)
+    # The MCP server is not built, only tested: it is a Python client of the engine's HTTP API.
+    add_subdirectory(mcp)
   endif()
 endif()
 # Assets -------------------------------------------------------------------------------------------------------------------------
