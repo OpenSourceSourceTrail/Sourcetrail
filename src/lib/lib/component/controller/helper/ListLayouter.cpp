@@ -138,7 +138,8 @@ void ListLayouter::layoutSquare(std::vector<std::shared_ptr<DummyNode>>* nodes, 
                             {static_cast<float>(gapX), static_cast<float>(gapY)})) {
       LayoutRect rect = boundingRect(visibleNodes);
 
-      int newDiff = static_cast<int>(rect.width() * rect.height() + (rect.width() - rect.height()) * (rect.width() - rect.height()) / 4);
+      int newDiff = static_cast<int>(rect.width() * rect.height() +
+                                     (rect.width() - rect.height()) * (rect.width() - rect.height()) / 4);
       if(maxWidth >= 0) {
         newDiff = static_cast<int>(rect.height());
       }
@@ -250,14 +251,14 @@ LayoutRect ListLayouter::boundingRect(const std::vector<std::shared_ptr<DummyNod
     }
 
     if(std::fabs(rect.right - rect.left) < std::numeric_limits<float>::epsilon()) {
-      rect.left   = node->position.x;
-      rect.top    = node->position.y;
-      rect.right  = node->position.x + node->size.x;
+      rect.left = node->position.x;
+      rect.top = node->position.y;
+      rect.right = node->position.x + node->size.x;
       rect.bottom = node->position.y + node->size.y;
     } else {
-      rect.left   = static_cast<float>(std::min(static_cast<int>(rect.left),   static_cast<int>(node->position.x)));
-      rect.top    = static_cast<float>(std::min(static_cast<int>(rect.top),    static_cast<int>(node->position.y)));
-      rect.right  = static_cast<float>(std::max(static_cast<int>(rect.right),  static_cast<int>(node->position.x + node->size.x)));
+      rect.left = static_cast<float>(std::min(static_cast<int>(rect.left), static_cast<int>(node->position.x)));
+      rect.top = static_cast<float>(std::min(static_cast<int>(rect.top), static_cast<int>(node->position.y)));
+      rect.right = static_cast<float>(std::max(static_cast<int>(rect.right), static_cast<int>(node->position.x + node->size.x)));
       rect.bottom = static_cast<float>(std::max(static_cast<int>(rect.bottom), static_cast<int>(node->position.y + node->size.y)));
     }
   }

@@ -5,9 +5,8 @@
 #include <set>
 #include <vector>
 
-#include "SourceGroup.h"
-
 #include "ICxxToolchain.h"
+#include "SourceGroup.h"
 
 class FilePath;
 class SourceGroupSettingsCxxCdb;

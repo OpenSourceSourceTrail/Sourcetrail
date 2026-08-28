@@ -89,7 +89,8 @@ void QtBookmarkCreator::setupBookmarkCreator() {
 }
 
 void QtBookmarkCreator::refreshStyle() {
-  setStyleSheet(utility::getStyleSheet(":/data/gui/window/window.css") + utility::getStyleSheet(":/data/gui/bookmark_view/bookmark_view.css"));
+  setStyleSheet(utility::getStyleSheet(":/data/gui/window/window.css") +
+                utility::getStyleSheet(":/data/gui/bookmark_view/bookmark_view.css"));
 }
 
 void QtBookmarkCreator::setDisplayName(const std::wstring& name) {

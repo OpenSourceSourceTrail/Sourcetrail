@@ -77,7 +77,8 @@ QtIndexingDialog::QtIndexingDialog(bool isSubWindow, QWidget* parent)
                                          "border: none;"
                                          "}"));
 
-  setStyleSheet(utility::getStyleSheet(":/data/gui/window/window.css") + utility::getStyleSheet(":/data/gui/indexing_dialog/indexing_dialog.css"));
+  setStyleSheet(utility::getStyleSheet(":/data/gui/window/window.css") +
+                utility::getStyleSheet(":/data/gui/indexing_dialog/indexing_dialog.css"));
 
   m_layout->setContentsMargins(20, 20, 20, 0);
   m_layout->setSpacing(3);

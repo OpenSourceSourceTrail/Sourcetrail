@@ -4,12 +4,13 @@
 #include <array>
 #include <iterator>
 #include <string>
-#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include <fmt/format.h>
 #include <fmt/xchar.h>
+
+#include <unordered_map>
 
 #include "DialogView.h"
 #include "FilePath.h"
@@ -93,8 +94,8 @@ std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath) {
   const std::optional<std::vector<CxxCompileCommand>> commands = loadCompilationDatabase(cdbPath, &error);
 
   if(!error.empty()) {
-    const auto message = fmt::format(L"Loading Clang compilation database failed with error: \"{}\"",
-                                     utility::decodeFromUtf8(error));
+    const auto message = fmt::format(
+        L"Loading Clang compilation database failed with error: \"{}\"", utility::decodeFromUtf8(error));
     LOG_ERROR(message);
     MessageStatus(message, true).dispatch();
   }

@@ -49,29 +49,29 @@ public:
   virtual std::shared_ptr<TaskFindKeyOnBlackboard> createFindKeyOnBlackboard(const std::string& valueName) = 0;
   virtual std::shared_ptr<TaskLambda> createLambda(std::function<void()> func) = 0;
   virtual std::shared_ptr<TaskDecoratorRepeat> createRepeat(TaskDecoratorRepeat::ConditionType condition,
-                                                             Task::TaskState exitState,
-                                                             size_t delayMS) = 0;
+                                                            Task::TaskState exitState,
+                                                            size_t delayMS) = 0;
 
   virtual std::shared_ptr<TaskCleanStorage> createCleanStorage(std::weak_ptr<PersistentStorage> storage,
-                                                                std::shared_ptr<DialogView> dialogView,
-                                                                const std::vector<FilePath>& filePaths,
-                                                                bool clearAllErrors) = 0;
+                                                               std::shared_ptr<DialogView> dialogView,
+                                                               const std::vector<FilePath>& filePaths,
+                                                               bool clearAllErrors) = 0;
   virtual std::shared_ptr<TaskParseWrapper> createParseWrapper(std::weak_ptr<PersistentStorage> storage,
-                                                                std::shared_ptr<DialogView> dialogView) = 0;
+                                                               std::shared_ptr<DialogView> dialogView) = 0;
   virtual std::shared_ptr<TaskFillIndexerCommandsQueue> createFillIndexerCommandsQueue(
       std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
       std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
       size_t maximumQueueSize) = 0;
   virtual std::shared_ptr<TaskBuildIndex> createBuildIndex(size_t processCount,
-                                                            std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
-                                                            std::shared_ptr<StorageProvider> storageProvider,
-                                                            std::shared_ptr<DialogView> dialogView,
-                                                            std::string appUUID,
-                                                            bool multiProcessIndexing,
-                                                            IndexerCommandType commandType) = 0;
+                                                           std::shared_ptr<IndexerWorkerServiceImpl> indexerWorkerService,
+                                                           std::shared_ptr<StorageProvider> storageProvider,
+                                                           std::shared_ptr<DialogView> dialogView,
+                                                           std::string appUUID,
+                                                           bool multiProcessIndexing,
+                                                           IndexerCommandType commandType) = 0;
   virtual std::shared_ptr<TaskMergeStorages> createMergeStorages(std::shared_ptr<StorageProvider> storageProvider) = 0;
   virtual std::shared_ptr<TaskInjectStorage> createInjectStorage(std::shared_ptr<StorageProvider> storageProvider,
-                                                                  std::weak_ptr<Storage> target) = 0;
+                                                                 std::weak_ptr<Storage> target) = 0;
   virtual std::shared_ptr<TaskExecuteCustomCommands> createExecuteCustomCommands(
       std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
       std::shared_ptr<PersistentStorage> storage,
@@ -79,7 +79,7 @@ public:
       size_t indexerThreadCount,
       FilePath projectDirectory) = 0;
   virtual std::shared_ptr<TaskFinishParsing> createFinishParsing(std::shared_ptr<PersistentStorage> storage,
-                                                                  std::shared_ptr<DialogView> dialogView) = 0;
+                                                                 std::shared_ptr<DialogView> dialogView) = 0;
 
   // Template primitives cannot be virtual; these are simple non-polymorphic
   // factory methods kept on the interface for a single, consistent call site.

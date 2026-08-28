@@ -1,6 +1,7 @@
 #pragma once
-#include <condition_variable>
 #include <mutex>
+
+#include <condition_variable>
 
 #include "MessageListener.h"
 #include "type/indexing/MessageIndexingStatus.h"

@@ -5,8 +5,8 @@
 #include "Convert.h"
 #include "FilePath.h"
 #include "IntermediateStorage.h"
-#include "StorageProvider.h"
 #include "logging.h"
+#include "StorageProvider.h"
 #include "utilityString.h"
 
 IndexerWorkerServiceImpl::IndexerWorkerServiceImpl(std::shared_ptr<StorageProvider> storageProvider)
@@ -165,8 +165,8 @@ grpc::Status IndexerWorkerServiceImpl::WatchInterrupt(grpc::ServerContext* ctx,
 
   {
     const std::lock_guard<std::mutex> lock(mInterruptListenersMutex);
-    mInterruptListeners.erase(std::remove(mInterruptListeners.begin(), mInterruptListeners.end(), writer),
-                              mInterruptListeners.end());
+    mInterruptListeners.erase(
+        std::remove(mInterruptListeners.begin(), mInterruptListeners.end(), writer), mInterruptListeners.end());
   }
 
   return grpc::Status::OK;

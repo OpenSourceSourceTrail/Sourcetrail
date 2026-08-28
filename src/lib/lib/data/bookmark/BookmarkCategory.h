@@ -2,6 +2,7 @@
 #define BOOKMARK_CATEGORY_H
 
 #include <string>
+
 #include <string_view>
 
 #include "GlobalId.hpp"

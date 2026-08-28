@@ -3,14 +3,15 @@
 #include <thread>
 
 #include <fmt/format.h>
+
 #include <grpcpp/grpcpp.h>
 
 #include "Convert.h"
+#include "indexer_worker.grpc.pb.h"
 #include "IndexerComposite.h"
 #include "LanguagePackageManager.h"
-#include "ScopedFunctor.h"
-#include "indexer_worker.grpc.pb.h"
 #include "logging.h"
+#include "ScopedFunctor.h"
 #include "utilityString.h"
 
 GrpcIndexer::GrpcIndexer(std::string engineEndpoint, Id processId)

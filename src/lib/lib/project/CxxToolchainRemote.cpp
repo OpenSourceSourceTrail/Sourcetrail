@@ -6,8 +6,8 @@
 #include <fmt/format.h>
 
 #include "Convert.h"
-#include "IndexerPluginRegistry.h"
 #include "indexer_helper.pb.h"
+#include "IndexerPluginRegistry.h"
 #include "IntermediateStorage.h"
 #include "logging.h"
 #include "utilityApp.h"
@@ -19,10 +19,8 @@ namespace {
 /** A precompiled header is a real compile; it must not share the short default process timeout. */
 constexpr int NoTimeout = -1;
 
-std::optional<sourcetrail::CxxToolchainResponse> runHelper(const sourcetrail::CxxToolchainRequest& request,
-                                                           std::string* error) {
-  const std::optional<IndexerPluginRegistry::Plugin> plugin = IndexerPluginRegistry::getInstance()->pluginFor(
-      INDEXER_COMMAND_CXX);
+std::optional<sourcetrail::CxxToolchainResponse> runHelper(const sourcetrail::CxxToolchainRequest& request, std::string* error) {
+  const std::optional<IndexerPluginRegistry::Plugin> plugin = IndexerPluginRegistry::getInstance()->pluginFor(INDEXER_COMMAND_CXX);
   if(!plugin || !plugin->indexerExecutablePath.exists()) {
     if(error != nullptr) {
       *error = "No C/C++ indexer is installed, so compilation databases cannot be read.";
@@ -30,8 +28,7 @@ std::optional<sourcetrail::CxxToolchainResponse> runHelper(const sourcetrail::Cx
     return std::nullopt;
   }
 
-  const std::filesystem::path scratch = std::filesystem::temp_directory_path() /
-      ("sourcetrail_helper_" + utility::getUuidString());
+  const std::filesystem::path scratch = std::filesystem::temp_directory_path() / ("sourcetrail_helper_" + utility::getUuidString());
   const std::filesystem::path requestPath = scratch.string() + ".req";
   const std::filesystem::path responsePath = scratch.string() + ".res";
 
@@ -64,8 +61,8 @@ std::optional<sourcetrail::CxxToolchainResponse> runHelper(const sourcetrail::Cx
   arguments.push_back(utility::decodeFromUtf8(requestPath.string()));
   arguments.push_back(utility::decodeFromUtf8(responsePath.string()));
 
-  const std::wstring processPath = plugin->launcherPath.empty() ? plugin->indexerExecutablePath.wstr()
-                                                                : plugin->launcherPath.wstr();
+  const std::wstring processPath = plugin->launcherPath.empty() ? plugin->indexerExecutablePath.wstr() :
+                                                                  plugin->launcherPath.wstr();
 
   const utility::ProcessOutput result = utility::executeProcess(processPath, arguments, FilePath(), false, NoTimeout);
   if(result.exitCode != 0) {
@@ -109,9 +106,8 @@ std::optional<std::vector<CxxCompileCommand>> CxxToolchainRemote::loadCompilatio
   std::vector<CxxCompileCommand> commands;
   commands.reserve(static_cast<size_t>(response->compile_commands_size()));
   for(const sourcetrail::CxxCompileCommandProto& command : response->compile_commands()) {
-    commands.emplace_back(CxxCompileCommand{command.directory(),
-                                            command.file(),
-                                            {command.arguments().begin(), command.arguments().end()}});
+    commands.emplace_back(
+        CxxCompileCommand{command.directory(), command.file(), {command.arguments().begin(), command.arguments().end()}});
   }
   return commands;
 }

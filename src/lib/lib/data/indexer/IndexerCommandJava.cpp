@@ -9,12 +9,8 @@ IndexerCommandType IndexerCommandJava::getStaticIndexerCommandType() {
   return INDEXER_COMMAND_JAVA;
 }
 
-IndexerCommandJava::IndexerCommandJava(const FilePath& sourceFilePath,
-                                       std::set<FilePath> classPaths,
-                                       std::wstring languageStandard)
-    : IndexerCommand(sourceFilePath)
-    , m_classPaths(std::move(classPaths))
-    , m_languageStandard(std::move(languageStandard)) {}
+IndexerCommandJava::IndexerCommandJava(const FilePath& sourceFilePath, std::set<FilePath> classPaths, std::wstring languageStandard)
+    : IndexerCommand(sourceFilePath), m_classPaths(std::move(classPaths)), m_languageStandard(std::move(languageStandard)) {}
 
 IndexerCommandType IndexerCommandJava::getIndexerCommandType() const {
   return getStaticIndexerCommandType();

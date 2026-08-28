@@ -18,6 +18,7 @@
 
 #include "Application.h"
 #include "Bookmark.h"
+#include "Capabilities.h"
 #include "CompositeView.h"
 #include "FileSystem.h"
 #include "globalStrings.h"
@@ -49,7 +50,6 @@
 #include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageCloseProject.h"
 #include "type/MessageLoadProject.h"
-#include "Capabilities.h"
 #include "type/MessageRefresh.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageResetZoom.h"
@@ -526,8 +526,7 @@ void QtMainWindow::editProject() {
   if(currentProject) {
     auto* wizard = createWindow<QtProjectWizard>();
 
-    wizard->editProject(currentProject->getProjectSettingsFilePath(),
-                        !Application::getInstance()->isCurrentProjectReindexable());
+    wizard->editProject(currentProject->getProjectSettingsFilePath(), !Application::getInstance()->isCurrentProjectReindexable());
   }
 }
 

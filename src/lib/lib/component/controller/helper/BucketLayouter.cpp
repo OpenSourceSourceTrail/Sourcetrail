@@ -137,8 +137,7 @@ void Bucket::preLayout(Vec2f viewSize, bool addVerticalSplit, bool forceVertical
         }
         hasOffset = true;
       } else if(node->position.y + node->size.y < static_cast<float>(mid) &&
-                static_cast<float>(mid) <
-                    node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding)) {
+                static_cast<float>(mid) < node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding)) {
         offset = static_cast<int>(static_cast<float>(mid) -
                                   (node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2));
         hasOffset = true;
@@ -170,8 +169,7 @@ void Bucket::layout(int x, int y, int width, int height) {
     return;
   }
 
-  Vec2f offset{.x = static_cast<float>(x + (width - m_width) / 2),
-               .y = static_cast<float>(y + (height - m_height) / 2)};
+  Vec2f offset{.x = static_cast<float>(x + (width - m_width) / 2), .y = static_cast<float>(y + (height - m_height) / 2)};
   offset = GraphViewStyle::alignOnRaster((*m_nodes.begin())->position + offset) - (*m_nodes.begin())->position;
 
   for(const std::shared_ptr<DummyNode>& node : m_nodes) {

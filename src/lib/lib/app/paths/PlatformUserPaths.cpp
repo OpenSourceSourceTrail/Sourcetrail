@@ -6,8 +6,9 @@
 #if defined(_WIN32)
 #  include <windows.h>
 #elif defined(__APPLE__)
-#  include <mach-o/dyld.h>
 #  include <vector>
+
+#  include <mach-o/dyld.h>
 #endif
 
 #include "AppPath.h"

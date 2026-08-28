@@ -1,7 +1,7 @@
 #include "utilityCxxHeaderDetection.h"
 
 #ifdef _WIN32
-#include <windows.h>
+#  include <windows.h>
 #endif
 
 #include "FileSystem.h"
@@ -86,13 +86,8 @@ FilePath getWindowsSdkRootPathUsingRegistry([[maybe_unused]] ApplicationArchitec
 
   char installationFolder[MAX_PATH] = {};
   DWORD installationFolderSize = sizeof(installationFolder);
-  const LSTATUS status = RegGetValueA(HKEY_LOCAL_MACHINE,
-                                      subKey.c_str(),
-                                      "InstallationFolder",
-                                      RRF_RT_REG_SZ,
-                                      nullptr,
-                                      installationFolder,
-                                      &installationFolderSize);
+  const LSTATUS status = RegGetValueA(
+      HKEY_LOCAL_MACHINE, subKey.c_str(), "InstallationFolder", RRF_RT_REG_SZ, nullptr, installationFolder, &installationFolderSize);
 
   if(status == ERROR_SUCCESS) {
     FilePath path(utility::decodeFromUtf8(installationFolder));

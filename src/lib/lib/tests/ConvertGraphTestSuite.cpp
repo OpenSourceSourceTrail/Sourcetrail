@@ -93,8 +93,7 @@ TEST(ConvertGraph, accessComponentRoundTrips) {
 
 TEST(ConvertGraph, filePathComponentRoundTrips) {
   Graph graph;
-  addNode(graph, 1, L"complete")
-      ->addComponent(std::make_shared<TokenComponentFilePath>(FilePath(L"/src/main.cpp"), true));
+  addNode(graph, 1, L"complete")->addComponent(std::make_shared<TokenComponentFilePath>(FilePath(L"/src/main.cpp"), true));
   addNode(graph, 2, L"incomplete")->addComponent(std::make_shared<TokenComponentFilePath>(FilePath(L"/src/other.cpp"), false));
 
   const auto restored = fromProto(toProto(graph));
@@ -142,8 +141,7 @@ TEST(ConvertGraph, emptyBundledEdgesComponentStaysPresent) {
   Graph graph;
   Node* nodeA = addNode(graph, 1, L"A");
   Node* nodeB = addNode(graph, 2, L"B");
-  graph.createEdge(10, Edge::EDGE_BUNDLED_EDGES, nodeA, nodeB)
-      ->addComponent(std::make_shared<TokenComponentBundledEdges>());
+  graph.createEdge(10, Edge::EDGE_BUNDLED_EDGES, nodeA, nodeB)->addComponent(std::make_shared<TokenComponentBundledEdges>());
 
   const auto restored = fromProto(toProto(graph));
 

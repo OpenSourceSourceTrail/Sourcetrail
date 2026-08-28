@@ -2,11 +2,10 @@
 
 #include <vector>
 
-#include "Vec2f.h"
-
 #include "GlobalId.hpp"
 #include "GroupType.h"
 #include "ScreenSearchInterfaces.h"
+#include "Vec2f.h"
 #include "View.h"
 
 struct DummyEdge;

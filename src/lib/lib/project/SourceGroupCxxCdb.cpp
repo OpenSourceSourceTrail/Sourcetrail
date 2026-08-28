@@ -68,8 +68,7 @@ std::set<FilePath> SourceGroupCxxCdb::getAllSourceFilePaths(const std::vector<Cx
   const std::vector<FilePathFilter> excludeFilters = m_settings->getExcludeFiltersExpandedAndAbsolute();
 
   std::set<FilePath> sourceFilePaths;
-  for(const FilePath& path :
-      utility::getSourceFilesFromCDB(commands, m_settings->getCompilationDatabasePathExpandedAndAbsolute())) {
+  for(const FilePath& path : utility::getSourceFilesFromCDB(commands, m_settings->getCompilationDatabasePathExpandedAndAbsolute())) {
     if(!FilePathFilter::areMatching(excludeFilters, path) && path.exists()) {
       sourceFilePaths.insert(path);
     }

@@ -69,9 +69,8 @@ void DispatchQueue::run() {
           continue;
         }
 
-        auto readyIt = std::min_element(mEntries.begin(), mEntries.end(), [](const Entry& lhs, const Entry& rhs) {
-          return lhs.readyAt < rhs.readyAt;
-        });
+        auto readyIt = std::min_element(
+            mEntries.begin(), mEntries.end(), [](const Entry& lhs, const Entry& rhs) { return lhs.readyAt < rhs.readyAt; });
 
         const auto now = std::chrono::steady_clock::now();
         if(readyIt->readyAt <= now) {

@@ -1,6 +1,5 @@
 #pragma once
 #include "engine.pb.h"
-
 #include "NodeKind.h"
 
 class BookmarkCategory;

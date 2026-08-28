@@ -34,7 +34,7 @@ public:
 
   /** Parses a compilation database. nullopt means unreadable; `error` then says why. */
   [[nodiscard]] virtual std::optional<std::vector<CxxCompileCommand>> loadCompilationDatabase(const FilePath& cdbPath,
-                                                                                             std::string* error) const = 0;
+                                                                                              std::string* error) const = 0;
 
   /** Compiles `pchInputFilePath` into `pchOutputFilePath`, returning what it indexed on the way. */
   [[nodiscard]] virtual std::shared_ptr<IntermediateStorage> buildPrecompiledHeader(

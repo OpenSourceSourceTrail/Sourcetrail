@@ -3,7 +3,7 @@
 #include <string>
 
 #ifdef _WIN32
-#include <windows.h>
+#  include <windows.h>
 #endif
 
 #include "FilePath.h"

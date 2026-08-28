@@ -72,12 +72,11 @@ std::shared_ptr<SourceLocationFile> fromProto(const sourcetrail::ProtoSourceLoca
 sourcetrail::SourceLocationCollectionResponse toProto(const SourceLocationCollection& collection) {
   sourcetrail::SourceLocationCollectionResponse msg;
 
-  collection.forEachSourceLocationFile(
-      [&msg](const std::shared_ptr<SourceLocationFile>& file) {
-        if(file != nullptr) {
-          *msg.add_files() = toProto(*file);
-        }
-      });
+  collection.forEachSourceLocationFile([&msg](const std::shared_ptr<SourceLocationFile>& file) {
+    if(file != nullptr) {
+      *msg.add_files() = toProto(*file);
+    }
+  });
 
   return msg;
 }

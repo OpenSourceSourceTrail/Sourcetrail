@@ -32,11 +32,11 @@ public:
   IndexTaskBuilder(std::shared_ptr<ITaskFactory> taskFactory, std::string appUUID, Callbacks callbacks);
 
   std::shared_ptr<TaskGroupSequence> createIndexTasks(RefreshInfo info,
-                                                       std::shared_ptr<DialogView> dialogView,
-                                                       std::shared_ptr<PersistentStorage> tempStorage,
-                                                       const std::vector<std::shared_ptr<SourceGroup>>& sourceGroups,
-                                                       const FilePath& projectDirectory,
-                                                       size_t& sourceFileCount);
+                                                      std::shared_ptr<DialogView> dialogView,
+                                                      std::shared_ptr<PersistentStorage> tempStorage,
+                                                      const std::vector<std::shared_ptr<SourceGroup>>& sourceGroups,
+                                                      const FilePath& projectDirectory,
+                                                      size_t& sourceFileCount);
 
 private:
   // Holds the two IndexerCommandProviders (standard + custom-command source groups)
@@ -48,7 +48,7 @@ private:
   };
 
   static IndexerCommandProviders buildIndexerCommandProviders(const RefreshInfo& info,
-                                                               const std::vector<std::shared_ptr<SourceGroup>>& sourceGroups);
+                                                              const std::vector<std::shared_ptr<SourceGroup>>& sourceGroups);
 
   void addCleanStorageTask(const std::shared_ptr<TaskGroupSequence>& sequence,
                            const RefreshInfo& info,

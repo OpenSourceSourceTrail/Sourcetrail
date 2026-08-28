@@ -3,9 +3,8 @@
 
 #include <memory>
 
-#include "Vec2f.h"
-
 #include "GlobalId.hpp"
+#include "Vec2f.h"
 
 class SourceLocationFile;
 

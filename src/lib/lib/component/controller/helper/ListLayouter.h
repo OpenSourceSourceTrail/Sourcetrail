@@ -23,9 +23,7 @@ public:
 
 private:
   static void layoutSimple(std::vector<std::shared_ptr<DummyNode>>* nodes, int gapX, int gapY, bool horizontal);
-  static bool layoutSquareInternal(std::vector<std::shared_ptr<DummyNode>>& visibleNodes,
-                                   const Vec2f& maxSize,
-                                   const Vec2f& gap);
+  static bool layoutSquareInternal(std::vector<std::shared_ptr<DummyNode>>& visibleNodes, const Vec2f& maxSize, const Vec2f& gap);
 };
 
 #endif    // LIST_LAYOUTER_H

@@ -1643,7 +1643,7 @@ LayoutRect GraphController::layoutNestingRecursive(DummyNode* node, int relayout
 
   node->size.x = static_cast<float>(margins.left + width + margins.right);
   node->size.y = static_cast<float>(margins.top) + margins.charHeight + static_cast<float>(margins.spacingA) +
-                 static_cast<float>(height) + static_cast<float>(margins.bottom);
+      static_cast<float>(height) + static_cast<float>(margins.bottom);
 
   for(const std::shared_ptr<DummyNode>& subNode : node->subNodes) {
     if(!subNode->visible) {

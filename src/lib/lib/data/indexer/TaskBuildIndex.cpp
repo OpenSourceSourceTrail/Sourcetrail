@@ -1,6 +1,7 @@
 #include "TaskBuildIndex.h"
 
 #include <fmt/format.h>
+
 #include <grpcpp/server_builder.h>
 #include <spdlog/spdlog.h>
 
@@ -13,8 +14,8 @@
 #include "ParserClientImpl.h"
 #include "StorageProvider.h"
 #include "TimeStamp.h"
-#include "UserPaths.h"
 #include "type/indexing/MessageIndexingStatus.h"
+#include "UserPaths.h"
 #include "utilityApp.h"
 #include "utilityString.h"
 
@@ -75,8 +76,7 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
     const int processId = static_cast<int>(index + 1);
 
     if(mMultiProcessIndexing) {
-      mProcessThreads.push_back(
-          std::make_unique<std::thread>(&TaskBuildIndex::runIndexerProcess, this, processId, std::wstring{}));
+      mProcessThreads.push_back(std::make_unique<std::thread>(&TaskBuildIndex::runIndexerProcess, this, processId, std::wstring{}));
     } else {
       mProcessThreads.push_back(std::make_unique<std::thread>(&TaskBuildIndex::runIndexerThread, this, processId));
     }
@@ -102,9 +102,7 @@ Task::TaskState TaskBuildIndex::doUpdate(std::shared_ptr<Blackboard> blackboard)
     if(indexedCount > mLastReportedIndexedCount) {
       const size_t delta = indexedCount - mLastReportedIndexedCount;
       mLastReportedIndexedCount = indexedCount;
-      blackboard->update<int>("indexed_source_file_count", [delta](int count) {
-        return count + static_cast<int>(delta);
-      });
+      blackboard->update<int>("indexed_source_file_count", [delta](int count) { return count + static_cast<int>(delta); });
     }
 
     const std::vector<FilePath> indexingFiles = mIndexerWorkerService->getCurrentlyIndexedSourceFilePaths();

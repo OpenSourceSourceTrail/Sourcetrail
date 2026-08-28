@@ -1,15 +1,15 @@
 #include <array>
 #include <chrono>
-#include <memory>
 #include <functional>
-
-#include <gtest/gtest.h>
+#include <memory>
 
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QSignalSpy>
 #include <QTemporaryDir>
+
+#include <gtest/gtest.h>
 
 #include "EngineChannel.h"
 #include "MessageQueue.h"

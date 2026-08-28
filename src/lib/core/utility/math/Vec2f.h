@@ -20,15 +20,29 @@ struct Vec2f {
     y -= o.y;
     return *this;
   }
-  [[nodiscard]] Vec2f operator+(const Vec2f& o) const noexcept { return {x + o.x, y + o.y}; }
-  [[nodiscard]] Vec2f operator-(const Vec2f& o) const noexcept { return {x - o.x, y - o.y}; }
-  [[nodiscard]] Vec2f operator*(float s) const noexcept { return {x * s, y * s}; }
-  [[nodiscard]] Vec2f operator/(float s) const noexcept { return {x / s, y / s}; }
-  [[nodiscard]] Vec2f operator-() const noexcept { return {-x, -y}; }
+  [[nodiscard]] Vec2f operator+(const Vec2f& o) const noexcept {
+    return {x + o.x, y + o.y};
+  }
+  [[nodiscard]] Vec2f operator-(const Vec2f& o) const noexcept {
+    return {x - o.x, y - o.y};
+  }
+  [[nodiscard]] Vec2f operator*(float s) const noexcept {
+    return {x * s, y * s};
+  }
+  [[nodiscard]] Vec2f operator/(float s) const noexcept {
+    return {x / s, y / s};
+  }
+  [[nodiscard]] Vec2f operator-() const noexcept {
+    return {-x, -y};
+  }
 
   // Indexed access: 0 → x, 1 → y (mirrors QVector2D for layout code that uses xIdx/yIdx)
-  [[nodiscard]] float  operator[](int i) const noexcept { return i == 0 ? x : y; }
-  float& operator[](int i) noexcept { return i == 0 ? x : y; }
+  [[nodiscard]] float operator[](int i) const noexcept {
+    return i == 0 ? x : y;
+  }
+  float& operator[](int i) noexcept {
+    return i == 0 ? x : y;
+  }
 
   [[nodiscard]] bool operator==(const Vec2f&) const noexcept = default;
 };

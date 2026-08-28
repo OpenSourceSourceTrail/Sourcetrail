@@ -18,9 +18,9 @@ void nodeToProto(Node* node, sourcetrail::ProtoGraph::ProtoNode* msg) {
   msg->set_id(node->getId());
   msg->set_node_kind(nodeKindToInt(node->getType().getKind()));
   msg->set_name_hierarchy_serialized(utility::encodeToUtf8(NameHierarchy::serialize(node->getNameHierarchy())));
-  msg->set_definition_kind(definitionKindToInt(node->isImplicit()      ? DEFINITION_IMPLICIT
-                                                   : node->isExplicit() ? DEFINITION_EXPLICIT
-                                                                        : DEFINITION_NONE));
+  msg->set_definition_kind(definitionKindToInt(node->isImplicit()     ? DEFINITION_IMPLICIT :
+                                                   node->isExplicit() ? DEFINITION_EXPLICIT :
+                                                                        DEFINITION_NONE));
   msg->set_child_count(node->getChildCount());
 
   if(const auto* access = node->getComponent<TokenComponentAccess>(); access != nullptr) {
@@ -92,8 +92,8 @@ std::shared_ptr<Graph> fromProto(const sourcetrail::ProtoGraph& msg) {
       node->addComponent(std::make_shared<TokenComponentAccess>(intToAccessKind(nodeMsg.access_kind())));
     }
     if(nodeMsg.has_file_path()) {
-      node->addComponent(std::make_shared<TokenComponentFilePath>(FilePath(utility::decodeFromUtf8(nodeMsg.file_path())),
-                                                                 nodeMsg.file_path_complete()));
+      node->addComponent(std::make_shared<TokenComponentFilePath>(
+          FilePath(utility::decodeFromUtf8(nodeMsg.file_path())), nodeMsg.file_path_complete()));
     }
   }
 

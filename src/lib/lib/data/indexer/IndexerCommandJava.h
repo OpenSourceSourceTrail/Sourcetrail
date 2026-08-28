@@ -8,9 +8,7 @@ class IndexerCommandJava : public IndexerCommand {
 public:
   static IndexerCommandType getStaticIndexerCommandType();
 
-  IndexerCommandJava(const FilePath& sourceFilePath,
-                     std::set<FilePath> classPaths,
-                     std::wstring languageStandard);
+  IndexerCommandJava(const FilePath& sourceFilePath, std::set<FilePath> classPaths, std::wstring languageStandard);
 
   [[nodiscard]] IndexerCommandType getIndexerCommandType() const override;
   [[nodiscard]] size_t getByteSize(size_t stringSize) const override;

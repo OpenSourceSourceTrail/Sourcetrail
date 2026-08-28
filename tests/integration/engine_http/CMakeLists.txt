@@ -41,12 +41,13 @@ foreach(module IN LISTS engine_http_modules)
   # because loading a project rewrites its .srctrldb and .srctrlbm in place.
   set_tests_properties(
     ${test_name}
-    PROPERTIES ENVIRONMENT
-               "SOURCETRAIL_ENGINE=$<TARGET_FILE:Sourcetrail_engine>;SOURCETRAIL_PROJECTS_DIR=${CMAKE_SOURCE_DIR}/bin/app/user/projects"
-               TIMEOUT
-               180
-               # Each module starts engines on ephemeral ports and several spawn more than one;
-               # serialising them keeps a loaded machine from tripping the startup timeouts.
-               RUN_SERIAL
-               TRUE)
+    PROPERTIES
+      ENVIRONMENT
+      "SOURCETRAIL_ENGINE=$<TARGET_FILE:Sourcetrail_engine>;SOURCETRAIL_PROJECTS_DIR=${CMAKE_SOURCE_DIR}/bin/app/user/projects"
+      TIMEOUT
+      180
+      # Each module starts engines on ephemeral ports and several spawn more than one;
+      # serialising them keeps a loaded machine from tripping the startup timeouts.
+      RUN_SERIAL
+      TRUE)
 endforeach()

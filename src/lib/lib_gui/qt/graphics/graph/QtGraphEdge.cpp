@@ -186,8 +186,7 @@ void QtGraphEdge::updateLine() {
       child->setEarlyBend(true);
 
       if(ownerNonGroupParent == targetNonGroupParent ||
-         (type == Edge::EDGE_OVERRIDE &&
-          targetParentRect.z() + style.targetOffset.x + style.originOffset.x > ownerParentRect.x())) {
+         (type == Edge::EDGE_OVERRIDE && targetParentRect.z() + style.targetOffset.x + style.originOffset.x > ownerParentRect.x())) {
         child->setOnFront(true);
       } else {
         child->setOnFront(false);

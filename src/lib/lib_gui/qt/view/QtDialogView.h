@@ -79,7 +79,7 @@ private:
   DialogType* createWindow(ParamTypes... params);
 
   QtMainWindow* m_mainWindow = nullptr;
-  QtWindow* m_parentWindow= nullptr;
+  QtWindow* m_parentWindow = nullptr;
 
   QtWindowStack m_windowStack;
 

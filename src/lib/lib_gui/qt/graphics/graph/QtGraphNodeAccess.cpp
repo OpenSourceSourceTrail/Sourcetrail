@@ -82,9 +82,9 @@ void QtGraphNodeAccess::updateStyle() {
 
     m_accessIcon->setPixmap(utility::colorizePixmap(m_accessIcon->pixmap(), style.color.icon.c_str()));
   } else {
-    m_text->setPos(static_cast<qreal>(style.textOffset.x),
-                   static_cast<qreal>(style.textOffset.y + static_cast<float>(m_accessIconSize) + 2.0f -
-                                      static_cast<float>(style.fontSize)));
+    m_text->setPos(
+        static_cast<qreal>(style.textOffset.x),
+        static_cast<qreal>(style.textOffset.y + static_cast<float>(m_accessIconSize) + 2.0f - static_cast<float>(style.fontSize)));
   }
 }
 

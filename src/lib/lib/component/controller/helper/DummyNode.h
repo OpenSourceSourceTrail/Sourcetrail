@@ -2,16 +2,15 @@
 
 #include <cmath>
 
-#include "LayoutRect.h"
-#include "Vec2f.h"
-
 #include "AccessKind.h"
 #include "GlobalId.hpp"
 #include "GroupType.h"
+#include "LayoutRect.h"
 #include "NameHierarchy.h"
 #include "Node.h"
 #include "utility.h"
 #include "utilityString.h"
+#include "Vec2f.h"
 
 // temporary data structure for (visual) graph creation process
 struct DummyNode {

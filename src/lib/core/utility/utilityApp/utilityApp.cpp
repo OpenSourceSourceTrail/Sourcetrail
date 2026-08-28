@@ -3,6 +3,7 @@
 #include <chrono>
 #include <mutex>
 #include <set>
+#include <thread>
 
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_service.hpp>
@@ -11,8 +12,6 @@
 #include <boost/process/io.hpp>
 #include <boost/process/search_path.hpp>
 #include <boost/process/start_dir.hpp>
-
-#include <thread>
 
 #include "logging.h"
 #include "ScopedFunctor.h"

@@ -490,10 +490,8 @@ void TrailLayouter::retrievePositions(const std::map<Id, Id>& topLevelAncestorId
         bool forward = edge->target->id == topLevelAncestorIds.find(dummyEdge->targetId)->second;
         for(size_t i = 0; i < edge->virtualNodes.size(); i++) {
           TrailNode* node = edge->virtualNodes[forward ? i : edge->virtualNodes.size() - 1 - i];
-          dummyEdge->path.push_back({.left  = node->pos.x,
-                                      .top   = node->pos.y,
-                                      .right = node->pos.x + node->size.x,
-                                      .bottom= node->pos.y + node->size.y});
+          dummyEdge->path.push_back(
+              {.left = node->pos.x, .top = node->pos.y, .right = node->pos.x + node->size.x, .bottom = node->pos.y + node->size.y});
         }
       }
     }
