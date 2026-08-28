@@ -6,9 +6,7 @@ grpc/1.54.3
 range-v3/0.12.0
 spdlog/1.17.0
 sqlite3/3.36.0 # It should be replaced with qt or orm
-sentry-native/0.12.2
 taskflow/3.7.0
-tracy/0.13.1
 
 [test_requires]
 gtest/1.13.0
@@ -21,17 +19,45 @@ CMakeToolchain
 cmake_layout
 
 [options]
-# Boost
-boost/*:without_python=True
+# Boost: only build the sub-libraries we actually link against
+# (filesystem, program_options, system, date_time, json, locale, process).
+# Everything else in the recipe's CONFIGURE_OPTIONS list is unused, so keep it off.
+boost/*:without_charconv=True
+boost/*:without_cobalt=True
+boost/*:without_context=True
+boost/*:without_contract=True
+boost/*:without_coroutine=True
+boost/*:without_fiber=True
 boost/*:without_graph=True
-boost/*:without_test=True
-boost/*:without_wave=True
+boost/*:without_graph_parallel=True
+boost/*:without_iostreams=True
 boost/*:without_log=True
+boost/*:without_math=True
+boost/*:without_mpi=True
+boost/*:without_nowide=True
+boost/*:without_python=True
+boost/*:without_random=True
+boost/*:without_regex=True
+boost/*:without_serialization=True
+boost/*:without_stacktrace=True
+boost/*:without_test=True
+boost/*:without_timer=True
+boost/*:without_type_erasure=True
+boost/*:without_url=True
+boost/*:without_wave=True
 # Ensure your required ones are NOT excluded
+boost/*:without_atomic=False # required transitively by filesystem, thread
+boost/*:without_chrono=False # required transitively by thread
+boost/*:without_container=False # required transitively by json, thread
 boost/*:without_date_time=False
+boost/*:without_exception=False # required transitively by thread
 boost/*:without_filesystem=False
+boost/*:without_json=False
+boost/*:without_locale=False
+boost/*:without_process=False
 boost/*:without_program_options=False
 boost/*:without_system=False
+boost/*:without_thread=False # required transitively by locale
 # fmt
 fmt*:header_only=False
 fmt*:shared=False
@@ -42,7 +68,14 @@ fmt*:with_wchar=True
 spdlog*:header_only=False
 spdlog*:shared=False
 spdlog*:wchar_support=True
-# gRPC
+# gRPC: only the C++ plugin is used (engine <-> indexer worker IPC), skip the
+# other language plugins the recipe builds by default.
 grpc/*:codegen=True
 grpc/*:cpp_plugin=True
+grpc/*:csharp_plugin=False
+grpc/*:node_plugin=False
+grpc/*:objective_c_plugin=False
+grpc/*:php_plugin=False
+grpc/*:python_plugin=False
+grpc/*:ruby_plugin=False
 grpc/*:shared=False
