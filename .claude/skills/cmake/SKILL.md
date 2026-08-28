@@ -11,7 +11,7 @@ description: Build Sourcetrail — Conan 2 setup, CMake presets, key options, ad
 - Conan 2 (`pip install conan`)
 - Qt 6.8.2
 - gRPC 1.54.3 + Protobuf (Conan; used for cross-process IPC)
-- Optional: LLVM/Clang 22.1.8 (for C/C++ indexing support; `scripts/build_llvm_conan.sh`)
+- Optional: LLVM/Clang 23.1.0 (for C/C++ indexing support; `scripts/build_llvm_conan.sh`)
 
 ## Conan setup (first time, Linux/GCC)
 

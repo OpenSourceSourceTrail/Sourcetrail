@@ -22,7 +22,7 @@ on:
       - ".github/workflows/llvm.yml"
 
 env:
-  LLVM_VERSION: "22.1.8"
+  LLVM_VERSION: "23.1.0"
   # Must match build.yml/appimage.yml: they restore this package into a cache managed by that
   # client, and a different version changes package_ids.
   CONAN_VERSION: "2.31.2"

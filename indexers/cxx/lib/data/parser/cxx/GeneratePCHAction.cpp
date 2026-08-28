@@ -39,8 +39,7 @@ std::unique_ptr<clang::ASTConsumer> GeneratePCHAction::CreateASTConsumer(clang::
                                                             CI.getCodeGenOpts(),
                                                             FrontendOpts.ModuleFileExtensions,
                                                             true,    // always allow errors in the PCH
-                                                            FrontendOpts.IncludeTimestamps,
-                                                            +CI.getLangOpts().CacheGeneratedPCH));
+                                                            FrontendOpts.IncludeTimestamps));
   Consumers.push_back(CI.getPCHContainerWriter().CreatePCHContainerGenerator(CI, InFile.str(), OutputFile, std::move(OS), Buffer));
 
   return std::make_unique<clang::MultiplexConsumer>(std::move(Consumers));

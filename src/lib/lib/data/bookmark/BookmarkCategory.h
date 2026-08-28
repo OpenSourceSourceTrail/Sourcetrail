@@ -2,8 +2,17 @@
 #define BOOKMARK_CATEGORY_H
 
 #include <string>
+#include <string_view>
 
 #include "GlobalId.hpp"
+
+/**
+ * Category a bookmark falls into when its creator names none.
+ *
+ * A bookmark row's category_id is a foreign key, so leaving the category empty makes the insert
+ * fail outright -- every path that creates a bookmark has to substitute this.
+ */
+inline constexpr std::wstring_view BookmarkDefaultCategoryName = L"default";
 
 class BookmarkCategory {
 public:

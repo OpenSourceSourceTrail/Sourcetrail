@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Application.h"
+#include "BookmarkCategory.h"
 #include "CompilationDatabase.h"
 #include "ConvertGraph.h"
 #include "ConvertLocations.h"
@@ -29,6 +30,7 @@
 #include "SourceLocationFile.h"
 #include "StorageAccess.h"
 #include "TextAccess.h"
+#include "TimeStamp.h"
 #include "TooltipInfo.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
@@ -568,8 +570,16 @@ void EngineHttpService::registerRoutes(http::Server& server) {
       std::shared_ptr<SourceLocationFile> locations;
       if(request.query.contains("lines")) {
         const std::vector<std::string> range = request.getList("lines");
-        const uint64_t startLine = range.empty() ? 0 : std::stoull(range.front());
-        const uint64_t endLine = range.size() > 1 ? std::stoull(range[1]) : startLine;
+        uint64_t startLine = 0;
+        uint64_t endLine = 0;
+        try {
+          startLine = range.empty() ? 0 : std::stoull(range.front());
+          endLine = range.size() > 1 ? std::stoull(range[1]) : startLine;
+        } catch(...) {
+          // Every other malformed parameter on this route answers 400; an unguarded stoull here
+          // would escape the handler and surface as a 500 instead.
+          return badRequest("Malformed line range");
+        }
         locations = mStorageAccess->getSourceLocationsForLinesInFile(filePath, startLine, endLine);
       } else if(request.query.contains("locationType")) {
         locations = mStorageAccess->getSourceLocationsOfTypeInFile(
@@ -707,16 +717,30 @@ void EngineHttpService::registerRoutes(http::Server& server) {
       return badRequest("Malformed bookmark");
     }
 
+    // The same two defaults BookmarkController::createBookmark applies, which a client of this
+    // route would otherwise have to know to send itself. Without the category, category_id
+    // stays 0 and the row violates the bookmark table's foreign key, so the insert is rolled
+    // back and the caller is handed an id for a bookmark that does not exist. Without the
+    // timestamp, the row stores "not-a-date-time", which then throws on every later read --
+    // poisoning the whole bookmark list for that project.
+    sourcetrail::ProtoBookmark base = body.base();
+    if(base.category().name().empty()) {
+      base.mutable_category()->set_name(toUtf8(std::wstring{BookmarkDefaultCategoryName}));
+    }
+    if(base.timestamp().empty()) {
+      base.set_timestamp(TimeStamp::now().toString());
+    }
+
     sourcetrail::BookmarkIdResponse response;
     if(body.edge_ids_size() > 0) {
       sourcetrail::ProtoEdgeBookmark bookmark;
-      *bookmark.mutable_base() = body.base();
+      *bookmark.mutable_base() = base;
       *bookmark.mutable_edge_ids() = body.edge_ids();
       bookmark.set_active_node_id(body.active_node_id());
       response.set_id(mStorageAccess->addEdgeBookmark(proto::convert::fromProto(bookmark)));
     } else {
       sourcetrail::ProtoNodeBookmark bookmark;
-      *bookmark.mutable_base() = body.base();
+      *bookmark.mutable_base() = base;
       *bookmark.mutable_node_ids() = body.node_ids();
       response.set_id(mStorageAccess->addNodeBookmark(proto::convert::fromProto(bookmark)));
     }
@@ -736,7 +760,11 @@ void EngineHttpService::registerRoutes(http::Server& server) {
         return badRequest("Missing bookmark id");
       }
     }
-    mStorageAccess->updateBookmark(bookmarkId, fromUtf8(body.name()), fromUtf8(body.comment()), fromUtf8(body.category_name()));
+    // Same substitution as the create route above: an empty category name would leave the row
+    // pointing at no category at all.
+    const std::wstring categoryName = body.category_name().empty() ? std::wstring{BookmarkDefaultCategoryName} :
+                                                                     fromUtf8(body.category_name());
+    mStorageAccess->updateBookmark(bookmarkId, fromUtf8(body.name()), fromUtf8(body.comment()), categoryName);
     return okEmpty();
   });
 

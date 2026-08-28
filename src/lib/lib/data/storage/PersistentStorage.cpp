@@ -604,7 +604,9 @@ std::vector<SearchMatch> PersistentStorage::getAutocompletionMatches(const std::
   const SearchMatch* lastMatch = nullptr;
   std::set<SearchMatch> matchesSet;
 
-  for(SearchMatch match : rescoredMatches) {
+  // By reference, not by value: lastMatch keeps pointing at the previous element across
+  // iterations, and a loop-local copy would be destroyed before that read.
+  for(SearchMatch& match : rescoredMatches) {
     if(lastMatch == nullptr || !utility::isPrefix(lastMatch->name, match.name)) {
       lastMatch = &match;
     } else if(lastMatch->score == match.score && match.tokenNames.size()) {

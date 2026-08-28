@@ -85,7 +85,7 @@ jobs:
           key: ${{ steps.lookup.outputs.cache-primary-key }}
 
   # NOTE: there is deliberately no Windows `_build_cxx` leg. The C/C++ indexer needs
-  # LLVM/Clang 22, and .conan/recipes/llvm-clang/ has only been validated on Linux/GCC.
+  # LLVM/Clang 23, and .conan/recipes/llvm-clang/ has only been validated on Linux/GCC.
   # Re-add this leg once llvm.yml gains a windows-latest job producing the package.
   build:
     name: Windows Latest MSVC

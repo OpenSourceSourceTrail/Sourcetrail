@@ -7,6 +7,7 @@
 #include <range/v3/view/transform.hpp>
 
 #include "Bookmark.h"
+#include "BookmarkCategory.h"
 #include "BookmarkView.h"
 #include "EdgeBookmark.h"
 #include "logging.h"
@@ -23,7 +24,6 @@
 
 namespace {
 constexpr std::wstring_view EdgeSeparatorToken = L" => ";
-constexpr std::wstring_view DefaultCategoryName = L"default";
 }    // namespace
 
 BookmarkController::BookmarkController(StorageAccess* storageAccess)
@@ -67,7 +67,7 @@ void BookmarkController::createBookmark(const std::wstring& name,
 
   const GlobalId tabId = TabId::currentTab();
 
-  const BookmarkCategory bookmarkCategory(0, category.empty() ? std::wstring{DefaultCategoryName} : category);
+  const BookmarkCategory bookmarkCategory(0, category.empty() ? std::wstring{BookmarkDefaultCategoryName} : category);
 
   if(const auto activeEdgeIds = mActiveEdgeIds[tabId]; activeEdgeIds.empty()) {
     LOG_INFO("Creating Node Bookmark");
@@ -110,7 +110,8 @@ void BookmarkController::editBookmark(Id bookmarkId,
                                       const std::wstring& category) {
   LOG_INFO("Attempting to update Bookmark {}", bookmarkId);
 
-  mStorageAccess->updateBookmark(bookmarkId, name, comment, category.empty() ? std::wstring{DefaultCategoryName} : category);
+  mStorageAccess->updateBookmark(
+      bookmarkId, name, comment, category.empty() ? std::wstring{BookmarkDefaultCategoryName} : category);
 
   cleanBookmarkCategories();
 

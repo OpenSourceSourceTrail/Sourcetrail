@@ -101,8 +101,8 @@ jobs:
       - name: Download LLVM/Clang
         uses: robinraju/release-downloader@v1.12
         with:
-          tag: "llvm-clang-22.1.8"
-          fileName: "llvm-clang-22.1.8-linux-x86_64.tgz"
+          tag: "llvm-clang-23.1.0"
+          fileName: "llvm-clang-23.1.0-linux-x86_64.tgz"
           token: ${{ secrets.GITHUB_TOKEN }}
           out-file-path: ${{ runner.temp }}
           extract: false
@@ -111,7 +111,7 @@ jobs:
       # ci_gnu_release_build_cxx expects.
       - name: Install LLVM/Clang
         run: |
-          conan cache restore ${{ runner.temp }}/llvm-clang-22.1.8-linux-x86_64.tgz
+          conan cache restore ${{ runner.temp }}/llvm-clang-23.1.0-linux-x86_64.tgz
           ./scripts/build_llvm_conan.sh
 
       - name: Configure CMake

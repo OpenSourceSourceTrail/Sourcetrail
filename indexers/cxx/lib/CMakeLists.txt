@@ -2,9 +2,9 @@
 find_package(Clang REQUIRED)
 
 # Clang's own version config only accepts an exact major.minor, so the floor is checked by hand here.
-if(Clang_VERSION_MAJOR LESS 22)
+if(Clang_VERSION_MAJOR LESS 23)
   message(
-    FATAL_ERROR "Sourcetrail's C/C++ indexer requires LLVM/Clang 22 or newer, found ${Clang_VERSION} at ${Clang_DIR}. "
+    FATAL_ERROR "Sourcetrail's C/C++ indexer requires LLVM/Clang 23 or newer, found ${Clang_VERSION} at ${Clang_DIR}. "
                 "Point Clang_DIR at a matching <llvm_build>/lib/cmake/clang.")
 endif()
 
