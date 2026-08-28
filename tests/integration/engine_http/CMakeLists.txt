@@ -22,12 +22,7 @@ endif()
 # One CTest entry per module rather than per test case: unittest has no equivalent of
 # gtest_discover_tests, and a handful of entries keeps failures attributable without a
 # discovery step.
-set(engine_http_modules
-    transport
-    lifecycle
-    queries
-    bookmarks
-    events)
+set(engine_http_modules transport lifecycle queries bookmarks events)
 
 foreach(module IN LISTS engine_http_modules)
   set(test_name "integration.engine_http.${module}")

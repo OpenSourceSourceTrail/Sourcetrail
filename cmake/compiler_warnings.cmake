@@ -94,13 +94,8 @@ function(
   endif()
 
   if("${CUDA_WARNINGS}" STREQUAL "")
-    set(CUDA_WARNINGS
-        -Wall
-        -Wextra
-        -Wunused
-        -Wconversion
-        -Wshadow
-        # TODO add more Cuda warnings
+    set(CUDA_WARNINGS -Wall -Wextra -Wunused -Wconversion -Wshadow
+                      # TODO add more Cuda warnings
     )
   endif()
 

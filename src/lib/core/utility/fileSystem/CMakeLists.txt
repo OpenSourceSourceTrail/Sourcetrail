@@ -7,11 +7,7 @@ if(ENABLE_UNIT_TEST
 endif()
 
 add_sourcetrail_library(
-  NAME
-  lib::core::utility::IFileSystem
-  SOURCES
-  IFileSystem.cpp
-  PUBLIC_HEADERS
-  IFileSystem.hpp
-  PUBLIC_DEPS
-  nonstd::expected-lite)
+  NAME lib::core::utility::IFileSystem
+  SOURCES IFileSystem.cpp
+  PUBLIC_HEADERS IFileSystem.hpp
+  PUBLIC_DEPS nonstd::expected-lite)

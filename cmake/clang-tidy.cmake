@@ -3,13 +3,7 @@ find_program(CLANG_TIDY_EXECUTABLE clang-tidy)
 
 # Check if clang-tidy is available
 if(CLANG_TIDY_EXECUTABLE)
-  file(
-    GLOB_RECURSE
-    SOURCE_FILES
-    ${CMAKE_SOURCE_DIR}/src
-    "*.h"
-    "*.hpp"
-    "*.cpp")
+  file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src "*.h" "*.hpp" "*.cpp")
   # Create a custom target for clang-tidy
   add_custom_target(
     clang-tidy

@@ -33,9 +33,7 @@ target_link_libraries(
          Sourcetrail::lib::proto::api
          Sourcetrail::lib::core::http
          Sourcetrail::lib::messaging # ClientFactory hands out the concrete MessageQueue
-  PRIVATE Sourcetrail::lib::proto::convert
-          Sourcetrail::lib::core
-          Sourcetrail::lib::core::utility::logging
+  PRIVATE Sourcetrail::lib::proto::convert Sourcetrail::lib::core Sourcetrail::lib::core::utility::logging
           Sourcetrail::lib::core::utility::TextAccess)
 
 if(ENABLE_UNIT_TEST)

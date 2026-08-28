@@ -10,12 +10,7 @@ if(DOXYGEN_FOUND)
          ${CMAKE_BINARY_DIR}/docs/v2.1.0.tar.gz)
   endif()
   if(NOT EXISTS ${CMAKE_BINARY_DIR}/docs/doxygen-awesome-css-2.1.0)
-    file(
-      ARCHIVE_EXTRACT
-      INPUT
-      ${CMAKE_BINARY_DIR}/docs/v2.1.0.tar.gz
-      DESTINATION
-      ${CMAKE_BINARY_DIR}/docs/html)
+    file(ARCHIVE_EXTRACT INPUT ${CMAKE_BINARY_DIR}/docs/v2.1.0.tar.gz DESTINATION ${CMAKE_BINARY_DIR}/docs/html)
   endif()
 
   configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)

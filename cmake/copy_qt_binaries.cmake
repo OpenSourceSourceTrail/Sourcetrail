@@ -2,12 +2,7 @@
 
 function(copy_qt_binaries DESTINATION IS_APP)
   if(NOT EXISTS ${DESTINATION})
-    file(
-      MAKE_DIRECTORY
-      ${DESTINATION}
-      ${DESTINATION}/platforms
-      ${DESTINATION}/styles
-      ${DESTINATION}/imageformats)
+    file(MAKE_DIRECTORY ${DESTINATION} ${DESTINATION}/platforms ${DESTINATION}/styles ${DESTINATION}/imageformats)
   endif()
 
   get_filename_component(QT_BINARY_DIR "${QT_MOC_EXECUTABLE}" PATH)
@@ -20,23 +15,13 @@ function(copy_qt_binaries DESTINATION IS_APP)
     set(CONFIGURATION "Debug")
   endif()
 
-  set(GUI_LIBRARIES
-      Qt5Core
-      Qt5Gui
-      Qt5Network
-      Qt5Svg
-      Qt5Widgets)
+  set(GUI_LIBRARIES Qt5Core Qt5Gui Qt5Network Qt5Svg Qt5Widgets)
 
   if(IS_APP)
     set(SETUP_URL "https://codeload.github.com/OpenSourceSourceTrail/setup/zip/refs/heads/main")
     set(TEMP_DIR $ENV{TMP})
     file(DOWNLOAD ${SETUP_URL} ${TEMP_DIR}/setup.zip EXPECTED_HASH MD5=f9d2c22a6bba3daac09f2e1f8b237bcf)
-    file(
-      ARCHIVE_EXTRACT
-      INPUT
-      ${TEMP_DIR}/setup.zip
-      DESTINATION
-      ${TEMP_DIR}/)
+    file(ARCHIVE_EXTRACT INPUT ${TEMP_DIR}/setup.zip DESTINATION ${TEMP_DIR}/)
     file(GLOB MY_PUBLIC_HEADERS "${TEMP_DIR}/setup-main/dynamic_libraries/win64/app/${CONFIGURATION}/*")
     file(COPY ${MY_PUBLIC_HEADERS} DESTINATION "${DESTINATION}")
   else()

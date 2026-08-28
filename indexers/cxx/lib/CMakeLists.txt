@@ -70,22 +70,13 @@ target_include_directories(Sourcetrail_lib_cxx SYSTEM PRIVATE ${LLVM_INCLUDE_DIR
 if(LLVM_LINK_LLVM_DYLIB)
   set(REQ_LLVM_LIBS LLVM)
 else()
-  llvm_map_components_to_libnames(
-    REQ_LLVM_LIBS
-    support
-    core
-    libdriver
-    passes
-    option)
+  llvm_map_components_to_libnames(REQ_LLVM_LIBS support core libdriver passes option)
   foreach(LLVM_TARGET IN LISTS LLVM_TARGETS_TO_BUILD)
     get_property(lib_deps GLOBAL PROPERTY "LLVMBUILD_LIB_DEPS_LLVM${LLVM_TARGET}CodeGen")
     list(APPEND REQ_LLVM_LIBS "LLVM${LLVM_TARGET}CodeGen")
     list(APPEND REQ_LLVM_LIBS "${lib_deps}")
     get_property(lib_deps GLOBAL PROPERTY "LLVMBUILD_LIB_DEPS_LLVM${LLVM_TARGET}AsmParser")
-    if(NOT
-       "${lib_deps}"
-       STREQUAL
-       "")
+    if(NOT "${lib_deps}" STREQUAL "")
       list(APPEND REQ_LLVM_LIBS "LLVM${LLVM_TARGET}AsmParser")
       list(APPEND REQ_LLVM_LIBS "${lib_deps}")
     endif()

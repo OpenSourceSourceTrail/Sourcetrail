@@ -91,10 +91,7 @@ include(cmake/set_alternate_linker.cmake)
 set(USE_ALTERNATE_LINKER
     ""
     CACHE STRING "Use alternate linker. Leave empty for system default; alternatives are 'gold', 'lld', 'bfd', 'mold'")
-if(NOT
-   "${USE_ALTERNATE_LINKER}"
-   STREQUAL
-   "")
+if(NOT "${USE_ALTERNATE_LINKER}" STREQUAL "")
   set_alternate_linker(${USE_ALTERNATE_LINKER})
 endif()
 #---------------------------------------------------------------------------------------------------------------------------------
@@ -115,12 +112,7 @@ endif()
 set(BASH "")
 if(WIN32)
   execute_process(COMMAND CMD /c where bash OUTPUT_VARIABLE BASH)
-  string(
-    REGEX
-    REPLACE "\n$"
-            ""
-            BASH
-            "${BASH}")
+  string(REGEX REPLACE "\n$" "" BASH "${BASH}")
   if(SOURCETRAIL_CMAKE_VERBOSE)
     message("bash: '${BASH}'")
   endif()
@@ -150,19 +142,10 @@ set(Boost_USE_STATIC_LIBS
 set(Boost_USE_STATIC_RUNTIME OFF)
 find_package(
   Boost 1.83
-  COMPONENTS date_time
-             filesystem
-             locale
-             program_options
-             system
+  COMPONENTS date_time filesystem locale program_options system
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
-find_package(
-  Qt6 6.10 REQUIRED
-  COMPONENTS Widgets
-             PrintSupport
-             Network
-             Svg)
+find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(cmake/copy_qt_binaries.cmake)
@@ -175,12 +158,8 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
   add_library(gtest_main ./tests/gtest_main.cpp)
   add_library(Sourcetrail::gtest_main ALIAS gtest_main)
   target_link_libraries(
-    gtest_main
-    PUBLIC GTest::gmock
-           GTest::gtest
-           spdlog::spdlog
-           Sourcetrail::lib::core::utility::utilityString
-           Sourcetrail::lib::core::utility::TextCodec)
+    gtest_main PUBLIC GTest::gmock GTest::gtest spdlog::spdlog Sourcetrail::lib::core::utility::utilityString
+                      Sourcetrail::lib::core::utility::TextCodec)
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
@@ -213,14 +192,8 @@ add_subdirectory(src/app/engine)
 # Only the indexer worker may link a language package. If one creeps back into the GUI, the engine or the
 # shared libraries, they stop compiling identically with and without BUILD_CXX_LANGUAGE_PACKAGE and the
 # gRPC enums start depending on the build flag again. Fail the configure instead of finding out at runtime.
-foreach(
-  _target
-  Sourcetrail_lib
-  Sourcetrail_lib_engine
-  Sourcetrail_lib_gui
-  Sourcetrail
-  Sourcetrail_engine
-  Sourcetrail_cli)
+foreach(_target Sourcetrail_lib Sourcetrail_lib_engine Sourcetrail_lib_gui Sourcetrail Sourcetrail_engine
+                Sourcetrail_cli)
   if(TARGET ${_target})
     get_target_property(_libs ${_target} LINK_LIBRARIES)
     if(_libs MATCHES "lib_cxx")

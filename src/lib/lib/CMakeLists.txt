@@ -397,12 +397,7 @@ foreach(_src ${_lib_sources})
   if(NOT IS_ABSOLUTE "${_src}")
     set(_src "${CMAKE_CURRENT_SOURCE_DIR}/${_src}")
   endif()
-  cmake_path(
-    IS_PREFIX
-    CMAKE_CURRENT_SOURCE_DIR
-    "${_src}"
-    NORMALIZE
-    _under_src)
+  cmake_path(IS_PREFIX CMAKE_CURRENT_SOURCE_DIR "${_src}" NORMALIZE _under_src)
   if(_under_src)
     get_filename_component(_dir "${_src}" DIRECTORY)
     list(APPEND _lib_include_dirs "${_dir}")
@@ -502,12 +497,9 @@ target_sources(
 
 target_include_directories(
   Sourcetrail_lib_engine
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/factory/impls
-         ${CMAKE_CURRENT_SOURCE_DIR}/data
-         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage
-         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/migration
-         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/sqlite
-         ${CMAKE_CURRENT_SOURCE_DIR}/project)
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/factory/impls ${CMAKE_CURRENT_SOURCE_DIR}/data
+         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/migration
+         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/sqlite ${CMAKE_CURRENT_SOURCE_DIR}/project)
 
 target_link_libraries(
   Sourcetrail_lib_engine

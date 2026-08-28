@@ -91,22 +91,14 @@ function(add_sourcetrail_library)
   )
 
   # Parse the arguments
-  cmake_parse_arguments(
-    ARG
-    "${options}"
-    "${oneValueArgs}"
-    "${multiValueArgs}"
-    ${ARGN})
+  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   # Validate required arguments
   if(NOT DEFINED ARG_NAME)
     message(FATAL_ERROR "NAME argument is required")
   endif()
 
-  if(NOT
-     ARG_NAME
-     MATCHES
-     "^[a-zA-Z0-9_]+::[a-zA-Z0-9_:]+$")
+  if(NOT ARG_NAME MATCHES "^[a-zA-Z0-9_]+::[a-zA-Z0-9_:]+$")
     message(FATAL_ERROR "Invalid library name format: ${ARG_NAME}")
   endif()
 
@@ -124,21 +116,13 @@ function(add_sourcetrail_library)
   endforeach()
 
   # Create the actual library name with the full namespace
-  string(
-    REPLACE "::"
-            "_"
-            LIBRARY_NAME
-            "Sourcetrail_${ARG_NAME}")
+  string(REPLACE "::" "_" LIBRARY_NAME "Sourcetrail_${ARG_NAME}")
 
   # Add the library
   add_library(${LIBRARY_NAME})
 
   # Create the aliased target name with proper namespacing
-  string(
-    REPLACE "_"
-            "::"
-            ALIAS_NAME
-            "Sourcetrail::${ARG_NAME}")
+  string(REPLACE "_" "::" ALIAS_NAME "Sourcetrail::${ARG_NAME}")
   add_library(${ALIAS_NAME} ALIAS ${LIBRARY_NAME})
 
   # Add sources
@@ -159,11 +143,5 @@ function(add_sourcetrail_library)
     target_link_libraries(${LIBRARY_NAME} PRIVATE ${ARG_PRIVATE_DEPS})
   endif()
 
-  myproject_set_project_warnings(
-    ${LIBRARY_NAME}
-    ${SOURCETRAIL_WARNING_AS_ERROR}
-    ""
-    ""
-    ""
-    "")
+  myproject_set_project_warnings(${LIBRARY_NAME} ${SOURCETRAIL_WARNING_AS_ERROR} "" "" "" "")
 endfunction()

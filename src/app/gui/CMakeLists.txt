@@ -30,16 +30,10 @@ endif()
 
 target_link_libraries(
   Sourcetrail
-  PUBLIC Sourcetrail::lib::core
-         Sourcetrail::lib::lib
-         Sourcetrail::lib::lib_gui
-         Sourcetrail::lib::client
-         Qt6::Widgets
+  PUBLIC Sourcetrail::lib::core Sourcetrail::lib::lib Sourcetrail::lib::lib_gui Sourcetrail::lib::client Qt6::Widgets
          Qt6::Network
-  PRIVATE Sourcetrail::lib::core::utility::logging
-          Sourcetrail::lib::core::utility::ScopedFunctor
-          Sourcetrail::lib::core::utility::utilityApp
-          Sourcetrail::lib::core::utility::commandline::CommandLineParser
+  PRIVATE Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::ScopedFunctor
+          Sourcetrail::lib::core::utility::utilityApp Sourcetrail::lib::core::utility::commandline::CommandLineParser
           Sourcetrail::lib::proto::convert)
 
 target_include_directories(Sourcetrail PRIVATE "${CMAKE_BINARY_DIR}/src/lib/lib_gui" "${CMAKE_BINARY_DIR}/src/lib")

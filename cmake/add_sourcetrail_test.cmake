@@ -84,12 +84,7 @@ function(add_sourcetrail_test)
   )
 
   # Parse the arguments
-  cmake_parse_arguments(
-    ARG
-    "${options}"
-    "${oneValueArgs}"
-    "${multiValueArgs}"
-    ${ARGN})
+  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   # Validate required arguments
   if(NOT DEFINED ARG_NAME)

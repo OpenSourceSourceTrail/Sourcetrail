@@ -359,12 +359,7 @@ foreach(_src ${_lib_gui_sources})
   if(NOT IS_ABSOLUTE "${_src}")
     set(_src "${CMAKE_CURRENT_SOURCE_DIR}/${_src}")
   endif()
-  cmake_path(
-    IS_PREFIX
-    CMAKE_CURRENT_SOURCE_DIR
-    "${_src}"
-    NORMALIZE
-    _under_src)
+  cmake_path(IS_PREFIX CMAKE_CURRENT_SOURCE_DIR "${_src}" NORMALIZE _under_src)
   if(_under_src)
     get_filename_component(_dir "${_src}" DIRECTORY)
     list(APPEND _lib_gui_include_dirs "${_dir}")

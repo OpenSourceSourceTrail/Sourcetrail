@@ -38,12 +38,8 @@ endif()
 
 target_link_libraries(
   Sourcetrail_indexer
-  PRIVATE Sourcetrail::lib::lib_cxx
-          Sourcetrail::lib::core
-          Sourcetrail::lib::lib_engine
-          Sourcetrail::lib::proto::convert
-          Sourcetrail::lib::messaging
-          Sourcetrail::lib::core::utility::logging)
+  PRIVATE Sourcetrail::lib::lib_cxx Sourcetrail::lib::core Sourcetrail::lib::lib_engine
+          Sourcetrail::lib::proto::convert Sourcetrail::lib::messaging Sourcetrail::lib::core::utility::logging)
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)
