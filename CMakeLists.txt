@@ -59,7 +59,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 17)
 #---------------------------------------------------------------------------------------------------------------------------------
-include(cmake/version_setup.cmake)
 include(cmake/licenses.cmake)
 include(cmake/create_symlink.cmake)
 include(cmake/add_sourcetrail_library.cmake)

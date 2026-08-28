@@ -56,19 +56,6 @@ function(add_sourcetrail_interface)
     message(FATAL_ERROR "Invalid library name format: ${ARG_NAME}")
   endif()
 
-  # 2. Validate source and header files
-  foreach(source ${ARG_SOURCES})
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${source}")
-      message(FATAL_ERROR "Source file not found: ${source}")
-    endif()
-  endforeach()
-
-  foreach(header ${ARG_PUBLIC_HEADERS} ${ARG_PRIVATE_HEADERS})
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${header}")
-      message(FATAL_ERROR "Header file not found: ${header}")
-    endif()
-  endforeach()
-
   # Create the actual library name with the full namespace
   string(REPLACE "::" "_" LIBRARY_NAME "Sourcetrail_${ARG_NAME}")
 
