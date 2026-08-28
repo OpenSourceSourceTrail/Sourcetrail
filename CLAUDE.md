@@ -97,7 +97,7 @@ New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sour
 - `scripts/run_clang_format.sh` — formats all C/C++ sources in place (`.clang-format`, Google fallback style).
 - `scripts/run_cmake_format.sh` — formats all `CMakeLists.txt`/`*.cmake` (`.cmake-format.yaml`).
 - `.clang-tidy` is enforced via `cmake/clang-tidy.cmake`; `cmake/cppcheck.cmake` wires up cppcheck. Both run in CI (`.github/workflows/clang_tidy.yml`, `cppcheck.yaml`).
-- `.pre-commit-config.yaml` runs clang-format 18.1.8 and cmakelang 0.6.13 (pinned to match CI) on staged files; run `pip install pre-commit && pre-commit install` once per clone to activate it.
+- `.pre-commit-config.yaml` runs clang-format 22.1.8 and cmakelang 0.6.13 (pinned to match CI) on staged files; run `pip install pre-commit && pre-commit install` once per clone to activate it.
 
 ## High-Level Architecture
 

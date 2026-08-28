@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v18.1.8 # matches CI's clang-format-18 (1:18.1.8-20ubuntu8)
+    rev: v22.1.8 # matches CI's clang-format-22 (apt.llvm.org)
     hooks:
       - id: clang-format
         types_or: [c++, c] # CI only checks .cpp/.h/.hpp; keep proto/java untouched
