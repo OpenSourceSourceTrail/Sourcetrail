@@ -23,7 +23,7 @@ if(WIN32)
                VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/bin/app")
 
   # generate pdb for release build
-  add_compile_options(Sourcetrail PRIVATE $<$<CONFIG:Release>:/Zi>)
+  target_compile_options(Sourcetrail PRIVATE $<$<CONFIG:Release>:/Zi>)
 else()
   add_executable(Sourcetrail main.cpp)
 endif()
@@ -50,7 +50,7 @@ if(TARGET Sourcetrail_indexer)
 endif()
 
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico)
-  message(FATAL "\"sourcetrail.ico\" not found. You may run `git submodule`")
+  message(FATAL_ERROR "\"sourcetrail.ico\" not found. You may run `git submodule`")
 endif()
 file(COPY ${CMAKE_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico DESTINATION ${CMAKE_BINARY_DIR})
 
