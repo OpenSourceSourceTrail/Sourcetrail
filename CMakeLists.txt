@@ -148,16 +148,8 @@ endif()
 
 string(LENGTH "${PROJECT_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
-add_subdirectory(src/lib/external)
-add_subdirectory(src/lib/proto)
-add_subdirectory(src/lib/lib)
-add_subdirectory(src/lib/client)
-add_subdirectory(src/lib/lib_gui)
-#---------------------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/lib/core)
-add_subdirectory(src/lib/scheduling)
-add_subdirectory(src/lib/messaging)
-add_subdirectory(src/lib/core/utility/utilityApp)
+# Libraries and executables; see src/CMakeLists.txt.
+add_subdirectory(src)
 # C/C++ indexer plugin (Clang/LibTooling language package + worker executable) -----------------------------------------------------
 if(BUILD_CXX_LANGUAGE_PACKAGE)
   add_subdirectory(indexers/cxx)
@@ -166,12 +158,15 @@ endif()
 if(BUILD_JAVA_INDEXER)
   add_subdirectory(indexers/java)
 endif()
-# App ----------------------------------------------------------------------------------------------------------------------------
-add_subdirectory(src/app/gui)
-# CLI (headless, Qt-free) ---------------------------------------------------------------------------------------------------------
-add_subdirectory(src/app/cli)
-# Engine daemon (Qt-free) ---------------------------------------------------------------------------------------------------------
-add_subdirectory(src/app/engine)
+
+# The apps spawn the indexer worker out of build/app, so it has to be built alongside them. Declared
+# here rather than next to each app: if(TARGET) is answered when the line is read, and the indexer
+# plugins are configured after src/.
+if(TARGET Sourcetrail_indexer)
+  foreach(_app Sourcetrail Sourcetrail_cli)
+    add_dependencies(${_app} Sourcetrail_indexer)
+  endforeach()
+endif()
 # Language-package isolation -------------------------------------------------------------------------------------------------------
 # Only the indexer worker may link a language package. If one creeps back into the GUI, the engine or the
 # shared libraries, they stop compiling identically with and without BUILD_CXX_LANGUAGE_PACKAGE and the

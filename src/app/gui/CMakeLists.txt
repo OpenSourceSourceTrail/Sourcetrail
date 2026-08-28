@@ -45,10 +45,6 @@ if(APPLE)
   target_link_libraries(Sourcetrail ${CORE_FOUNDATION})
 endif()
 
-if(TARGET Sourcetrail_indexer)
-  add_dependencies(Sourcetrail Sourcetrail_indexer)
-endif()
-
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico)
   message(FATAL_ERROR "\"sourcetrail.ico\" not found. You may run `git submodule`")
 endif()

@@ -26,9 +26,5 @@ endif()
 
 add_dependencies(Sourcetrail_cli versionnumber)
 
-if(TARGET Sourcetrail_indexer)
-  add_dependencies(Sourcetrail_cli Sourcetrail_indexer)
-endif()
-
 # Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
 target_link_libraries(Sourcetrail_cli PRIVATE Sourcetrail::warnings)
