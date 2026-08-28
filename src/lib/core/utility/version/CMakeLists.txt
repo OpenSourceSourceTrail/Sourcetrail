@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::Version
   SOURCES Version.cpp
-  PUBLIC_HEADERS Version.h
+  HEADERS Version.h
   PRIVATE_DEPS fmt::fmt Sourcetrail::lib::core::utility::utilityString Sourcetrail::lib::core::utility::logging)

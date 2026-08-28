@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::file::FilePath
   SOURCES FilePath.cpp
-  PUBLIC_HEADERS FilePath.h
+  HEADERS FilePath.h
   PRIVATE_DEPS Boost::filesystem Sourcetrail::lib::core::utility::logging)

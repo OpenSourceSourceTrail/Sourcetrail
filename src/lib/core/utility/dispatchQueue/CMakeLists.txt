@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::DispatchQueue
   SOURCES DispatchQueue.cpp DispatchRegistry.cpp
-  PUBLIC_HEADERS DispatchQueue.h DispatchRegistry.h
+  HEADERS DispatchQueue.h DispatchRegistry.h
   PUBLIC_DEPS Sourcetrail::lib::core::utility::GlobalId)

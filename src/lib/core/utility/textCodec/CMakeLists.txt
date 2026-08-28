@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::TextCodec
   SOURCES TextCodec.cpp
-  PUBLIC_HEADERS TextCodec.h
+  HEADERS TextCodec.h
   PRIVATE_DEPS Boost::locale)

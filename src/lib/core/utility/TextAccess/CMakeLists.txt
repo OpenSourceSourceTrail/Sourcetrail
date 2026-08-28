@@ -2,6 +2,6 @@
 add_sourcetrail_library(
   NAME lib::core::utility::TextAccess
   SOURCES TextAccess.cpp
-  PUBLIC_HEADERS TextAccess.h
+  HEADERS TextAccess.h
   PUBLIC_DEPS Sourcetrail::lib::core::utility::file::FilePath
   PRIVATE_DEPS Sourcetrail::lib::core::utility::logging)

@@ -7,7 +7,6 @@ additional_commands:
       NAME: 1
       SOURCES: '*'
       HEADERS: '*'
-      PUBLIC_HEADERS: '*'
       PRIVATE_HEADERS: '*'
       PUBLIC_DEPS: '*'
       PRIVATE_DEPS: '*'

@@ -2,6 +2,6 @@
 add_sourcetrail_library(
   NAME lib::core::utility::FileSystem
   SOURCES FileSystem.cpp
-  PUBLIC_HEADERS FileSystem.hpp
+  HEADERS FileSystem.hpp
   PUBLIC_DEPS Sourcetrail::lib::core::utility::IFileSystem
   PRIVATE_DEPS fmt::fmt)

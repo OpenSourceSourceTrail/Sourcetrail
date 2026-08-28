@@ -5,7 +5,7 @@
 add_sourcetrail_library(
   NAME lib::core::http
   SOURCES HttpServer.cpp HttpClient.cpp
-  PUBLIC_HEADERS HttpServer.h HttpClient.h
+  HEADERS HttpServer.h HttpClient.h
   PUBLIC_DEPS Boost::boost
   PRIVATE_DEPS Boost::system Sourcetrail::lib::core::utility::logging)
 

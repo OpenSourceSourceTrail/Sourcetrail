@@ -9,5 +9,5 @@ endif()
 add_sourcetrail_library(
   NAME lib::core::utility::IFileSystem
   SOURCES IFileSystem.cpp
-  PUBLIC_HEADERS IFileSystem.hpp
+  HEADERS IFileSystem.hpp
   PUBLIC_DEPS nonstd::expected-lite)

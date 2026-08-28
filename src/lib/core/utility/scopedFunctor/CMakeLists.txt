@@ -2,4 +2,4 @@
 add_sourcetrail_library(
   NAME lib::core::utility::ScopedFunctor
   SOURCES ScopedFunctor.cpp
-  PUBLIC_HEADERS ScopedFunctor.h)
+  HEADERS ScopedFunctor.h)

@@ -4,5 +4,5 @@ find_package(Taskflow REQUIRED)
 add_sourcetrail_library(
   NAME lib::core::utility::TaskExecutor
   SOURCES TaskExecutor.cpp
-  PUBLIC_HEADERS TaskExecutor.h
+  HEADERS TaskExecutor.h
   PUBLIC_DEPS Taskflow::Taskflow)

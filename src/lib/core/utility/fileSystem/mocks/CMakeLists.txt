@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::MockedFileSystem
   SOURCES MockedFileSystem.cpp
-  PUBLIC_HEADERS MockedFileSystem.hpp
+  HEADERS MockedFileSystem.hpp
   PUBLIC_DEPS Sourcetrail::lib::core::utility::IFileSystem GTest::gmock)

@@ -2,6 +2,6 @@
 add_sourcetrail_library(
   NAME lib::core::utility::file::FileRegister
   SOURCES FileRegister.cpp
-  PUBLIC_HEADERS FileRegister.h
+  HEADERS FileRegister.h
   PUBLIC_DEPS Sourcetrail::lib::core::utility::UnorderedCache
   PRIVATE_DEPS Sourcetrail::lib::core::utility::file::FilePath Sourcetrail::lib::core::utility::file::FilePathFilter)

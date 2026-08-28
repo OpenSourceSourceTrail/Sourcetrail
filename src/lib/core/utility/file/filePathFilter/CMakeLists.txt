@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::file::FilePathFilter
   SOURCES FilePathFilter.cpp
-  PUBLIC_HEADERS FilePathFilter.h
+  HEADERS FilePathFilter.h
   PUBLIC_DEPS Sourcetrail::lib::core::utility::file::FilePath)

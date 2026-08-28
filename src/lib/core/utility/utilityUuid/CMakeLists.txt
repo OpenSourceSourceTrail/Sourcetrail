@@ -2,5 +2,5 @@
 add_sourcetrail_library(
   NAME lib::core::utility::utilityUuid
   SOURCES utilityUuid.cpp
-  PUBLIC_HEADERS utilityUuid.h
+  HEADERS utilityUuid.h
   PRIVATE_DEPS Boost::system)

@@ -2,4 +2,4 @@
 add_sourcetrail_library(
   NAME lib::core::utility::Status
   SOURCES Status.cpp
-  PUBLIC_HEADERS Status.h)
+  HEADERS Status.h)
