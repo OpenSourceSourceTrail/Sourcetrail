@@ -1,4 +1,3 @@
-#${CMAKE_SOURCE_DIR}/CMakeLists.txt
 cmake_minimum_required(VERSION 3.23)
 include(cmake/version.cmake)
 
@@ -8,48 +7,38 @@ project(
   VERSION ${VERSION_STRING}
   HOMEPAGE_URL "opensourcesourcetrail.github.io"
   LANGUAGES C CXX)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 #---------------------------------------------------------------------------------------------------------------------------------
-set(BUILD_CXX_LANGUAGE_PACKAGE
-    OFF
-    CACHE BOOL "Add C and C++ support to the Sourcetrail indexer.")
+option(BUILD_CXX_LANGUAGE_PACKAGE "Add C and C++ support to the Sourcetrail indexer." OFF)
+option(BUILD_DOC "Build documentation." OFF)
+option(ENABLE_UNIT_TEST "Build unit-tests." OFF)
+option(ENABLE_GUI_TEST "Build gui-tests." OFF)
+option(ENABLE_INTEGRATION_TEST "Build integration-tests." OFF)
+option(ENABLE_COVERAGE "Build coverage report, run `ninja coverage`." OFF)
+option(ENABLE_BUILD_WITH_TIME_TRACE "Trace building time." OFF)
+option(SOURCETRAIL_CMAKE_VERBOSE "CMake verbose" OFF)
+option(SOURCETRAIL_WARNING_AS_ERROR "Treat warnings as errors" OFF)
+option(SOURCETRAIL_USE_LIBCPP "Use libc++ instead of libstdc++" OFF)
+
+# The Java indexer needs Maven; default it on only when mvn is actually on PATH.
 find_program(SR_MAVEN_EXECUTABLE mvn)
-set(BUILD_JAVA_INDEXER
-    ${SR_MAVEN_EXECUTABLE}
-    CACHE BOOL "Add the Java indexer plugin (requires Maven + JDK 21).")
-set(BUILD_DOC
-    OFF
-    CACHE BOOL "Build documentation.")
-set(ENABLE_UNIT_TEST
-    OFF
-    CACHE BOOL "Build unit-tests.")
-set(ENABLE_GUI_TEST
-    OFF
-    CACHE BOOL "Build gui-tests.")
-set(ENABLE_INTEGRATION_TEST
-    OFF
-    CACHE BOOL "Build integration-tests.")
+if(SR_MAVEN_EXECUTABLE)
+  set(_sr_java_default ON)
+else()
+  set(_sr_java_default OFF)
+endif()
+option(BUILD_JAVA_INDEXER "Add the Java indexer plugin (requires Maven + JDK 21)." ${_sr_java_default})
+
 set(SR_SAN
     ""
     CACHE STRING "Comma-separated sanitizers to build all code with: address, undefined, thread, memory.")
-set(ENABLE_COVERAGE
-    OFF
-    CACHE BOOL "Build coverage report run `ninja coverage`.")
-set(ENABLE_BUILD_WITH_TIME_TRACE
-    OFF
-    CACHE BOOL "Trace building time.")
-set(SOURCETRAIL_CMAKE_VERBOSE
-    OFF
-    CACHE BOOL "CMake verbose")
-set(SOURCETRAIL_WARNING_AS_ERROR
-    OFF
-    CACHE BOOL "Treat warnings as errors")
-set(SOURCETRAIL_USE_LIBCPP
-    OFF
-    CACHE BOOL "Use libc++ instead of libstdc++")
-
 set(GCOV_VERSION
     "gcov-12"
     CACHE STRING "Version of gcov")
+set(USE_ALTERNATE_LINKER
+    ""
+    CACHE STRING "Use alternate linker. Leave empty for system default; alternatives are 'gold', 'lld', 'bfd', 'mold'")
 #---------------------------------------------------------------------------------------------------------------------------------
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -59,16 +48,16 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_C_STANDARD 17)
 #---------------------------------------------------------------------------------------------------------------------------------
-include(cmake/licenses.cmake)
-include(cmake/create_symlink.cmake)
-include(cmake/add_sourcetrail_library.cmake)
-include(cmake/add_sourcetrail_interface.cmake)
-include(cmake/add_sourcetrail_test.cmake)
-include(cmake/clang-tidy.cmake)
-include(cmake/cppcheck.cmake)
-include(cmake/coverage.cmake)
+include(licenses)
+include(create_symlink)
+include(add_sourcetrail_library)
+include(add_sourcetrail_interface)
+include(add_sourcetrail_test)
+include(clang-tidy)
+include(cppcheck)
+include(coverage)
 #---------------------------------------------------------------------------------------------------------------------------------
-include(cmake/sanitizers.cmake)
+include(sanitizers)
 #---------------------------------------------------------------------------------------------------------------------------------
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
   add_compile_options(-fcolor-diagnostics)
@@ -86,18 +75,15 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 endif()
 
 #---------------------------------------------------------------------------------------------------------------------------------
-include(cmake/set_alternate_linker.cmake)
-set(USE_ALTERNATE_LINKER
-    ""
-    CACHE STRING "Use alternate linker. Leave empty for system default; alternatives are 'gold', 'lld', 'bfd', 'mold'")
+include(set_alternate_linker)
 if(NOT "${USE_ALTERNATE_LINKER}" STREQUAL "")
   set_alternate_linker(${USE_ALTERNATE_LINKER})
 endif()
 #---------------------------------------------------------------------------------------------------------------------------------
-include(cmake/compiler_warnings.cmake)
+include(compiler_warnings)
 #---------------------------------------------------------------------------------------------------------------------------------
 if(BUILD_DOC)
-  include(cmake/doxygen.cmake)
+  include(doxygen)
 endif()
 # Variables ----------------------------------------------------------------------------------------------------------------------
 if(WIN32)
@@ -116,9 +102,6 @@ if(WIN32)
     message("bash: '${BASH}'")
   endif()
 endif()
-# Project ------------------------------------------------------------------------------------------------------------------------
-set(PROJECT_NAME Sourcetrail)
-
 #RPATH
 if(UNIX AND NOT APPLE)
   set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -147,7 +130,7 @@ find_package(
 find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
-  include(cmake/copy_qt_binaries.cmake)
+  include(copy_qt_binaries)
 endif()
 
 if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
@@ -163,7 +146,7 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
     PRIVATE Sourcetrail::warnings)
 endif()
 
-string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
+string(LENGTH "${PROJECT_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)
 
 add_subdirectory(src/lib/external)
 add_subdirectory(src/lib/proto)
@@ -207,10 +190,10 @@ if(ENABLE_UNIT_TEST
    OR ENABLE_GUI_TEST
    OR ENABLE_INTEGRATION_TEST)
   if(WIN32 AND NOT ${SR_IS_CI})
-    copy_qt_binaries("${CMAKE_BINARY_DIR}/test" FALSE)
+    copy_qt_binaries("${PROJECT_BINARY_DIR}/test" FALSE)
   endif()
-  execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" "${CMAKE_BINARY_DIR}/test")
-  create_symlink("${CMAKE_SOURCE_DIR}/bin/test/data" "${CMAKE_BINARY_DIR}/test/data")
+  file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/test")
+  create_symlink("${PROJECT_SOURCE_DIR}/bin/test/data" "${PROJECT_BINARY_DIR}/test/data")
 
   find_package(
     Qt6 6.10
@@ -218,10 +201,10 @@ if(ENABLE_UNIT_TEST
     REQUIRED)
 
   if(ENABLE_UNIT_TEST)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib/tests/)
-    add_subdirectory(${CMAKE_SOURCE_DIR}/src/lib/lib_gui/tests/)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/src/lib/lib/tests/)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/src/lib/lib_gui/tests/)
     if(BUILD_CXX_LANGUAGE_PACKAGE)
-      add_subdirectory(${CMAKE_SOURCE_DIR}/indexers/cxx/lib/tests/)
+      add_subdirectory(${PROJECT_SOURCE_DIR}/indexers/cxx/lib/tests/)
     endif()
   endif()
 
@@ -232,9 +215,9 @@ if(ENABLE_UNIT_TEST
   endif()
 endif()
 # Assets -------------------------------------------------------------------------------------------------------------------------
-execute_process(COMMAND "${CMAKE_COMMAND}" "-E" "make_directory" "${CMAKE_BINARY_DIR}/app")
-create_symlink("${CMAKE_SOURCE_DIR}/bin/app/data" "${CMAKE_BINARY_DIR}/app/data")
-create_symlink("${CMAKE_SOURCE_DIR}/bin/app/user" "${CMAKE_BINARY_DIR}/app/user")
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/app")
+create_symlink("${PROJECT_SOURCE_DIR}/bin/app/data" "${PROJECT_BINARY_DIR}/app/data")
+create_symlink("${PROJECT_SOURCE_DIR}/bin/app/user" "${PROJECT_BINARY_DIR}/app/user")
 # Install Executables ------------------------------------------------------------------------------------------------------------
 set(APPIMAGE_ROOT "usr")
 set(INSTALL_RUNTIME_DIR "${APPIMAGE_ROOT}/bin")
@@ -248,25 +231,25 @@ endif()
 
 # gui/ and fonts/ are compiled into the binary via bin/app/resource.qrc, so they are not installed.
 install(
-  DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/data/
+  DIRECTORY ${PROJECT_SOURCE_DIR}/bin/app/data/
   DESTINATION ${INSTALL_RUNTIME_DIR}/data/
   PATTERN "gui" EXCLUDE
   PATTERN "fonts" EXCLUDE)
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/bin/app/user/ DESTINATION ${INSTALL_RUNTIME_DIR}/user/)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/bin/app/user/ DESTINATION ${INSTALL_RUNTIME_DIR}/user/)
 
 # Indexer plugin manifests. Without these the installed build discovers no indexer at all and comes up
 # read-only, so they ship next to the binaries the manifests point at.
 install(
-  DIRECTORY ${CMAKE_BINARY_DIR}/app/plugins/
+  DIRECTORY ${PROJECT_BINARY_DIR}/app/plugins/
   DESTINATION ${INSTALL_RUNTIME_DIR}/plugins/
   OPTIONAL)
 
 # Install desktop file for application
-install(FILES "${CMAKE_SOURCE_DIR}/cmake/Sourcetrail.desktop" DESTINATION "${APPIMAGE_ROOT}/share/applications")
+install(FILES "${PROJECT_SOURCE_DIR}/cmake/Sourcetrail.desktop" DESTINATION "${APPIMAGE_ROOT}/share/applications")
 
 # Install application icon for desktop
-install(FILES "${CMAKE_SOURCE_DIR}/bin/app/data/gui/installer/Sourcetrail.png"
+install(FILES "${PROJECT_SOURCE_DIR}/bin/app/data/gui/installer/Sourcetrail.png"
         DESTINATION "${APPIMAGE_ROOT}/share/icons/hicolor/256x256/apps")
 # Packaging ----------------------------------------------------------------------------------------------------------------------
 # TODO(SOUR-104)

@@ -1,53 +1,16 @@
-# Sourcetrail CMake Functions
+# Declares a Sourcetrail header-only library.
 #
-# This file contains utility functions for creating Sourcetrail libraries and tests
-# with standardized configurations.
-
-#------------------------------------------------------------------------------
-# Function to add a Sourcetrail library with standardized configuration
-#
-# This function creates a library with proper namespacing, dependencies, and
-# warning configurations for Sourcetrail components.
-#
-# Usage:
 #   add_sourcetrail_interface(
-#     NAME <library_name>
-#     [DEPS <dependencies...>]
-#   )
+#     NAME lib::core::utility::Tree    # required, "::"-separated; becomes the target
+#     DEPS nonstd::expected-lite)      # propagated to consumers
 #
-# Parameters:
-#   NAME (required):
-#     Name of the library, including namespace
-#     Example: NAME lib::data::storage::SQLiteStorage
-#
-#   DEPS (optional):
-#     Public dependencies required by the library's public API
-#     Example: PUBLIC_DEPS nonstd::expected-lite
-#
-# Example usage:
-#   # Basic library
-#   add_sourcetrail_interface(
-#     NAME lib::data::BasicStorage
-#   )
-#
-#   # Complex library with dependencies
-#   add_sourcetrail_interface(
-#     NAME lib::data::storage::SQLiteStorage
-#     DEPS
-#       sqlite3::sqlite3
-#   )
+# NAME lib::core::Foo yields target Sourcetrail_lib_core_Foo and alias Sourcetrail::lib::core::Foo.
+# No warning flags are attached: an INTERFACE library compiles nothing of its own, and adding them
+# would only push this project's flags onto every consumer, which link Sourcetrail::warnings
+# themselves.
 function(add_sourcetrail_interface)
-  # Define the expected arguments
-  set(options "")
-  # Base name of the library
-  set(oneValueArgs NAME)
-  set(multiValueArgs DEPS # dependencies
-  )
+  cmake_parse_arguments(ARG "" "NAME" "DEPS" ${ARGN})
 
-  # Parse the arguments
-  cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
-  # Validate required arguments
   if(NOT DEFINED ARG_NAME)
     message(FATAL_ERROR "NAME argument is required")
   endif()
@@ -56,24 +19,15 @@ function(add_sourcetrail_interface)
     message(FATAL_ERROR "Invalid library name format: ${ARG_NAME}")
   endif()
 
-  # Create the actual library name with the full namespace
   string(REPLACE "::" "_" LIBRARY_NAME "Sourcetrail_${ARG_NAME}")
-
-  # Add the library
   add_library(${LIBRARY_NAME} INTERFACE)
 
-  # Create the aliased target name with proper namespacing
   string(REPLACE "_" "::" ALIAS_NAME "Sourcetrail::${ARG_NAME}")
   add_library(${ALIAS_NAME} ALIAS ${LIBRARY_NAME})
 
-  # Set include directories
   target_include_directories(${LIBRARY_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})
 
-  # Add dependencies
   if(ARG_DEPS)
     target_link_libraries(${LIBRARY_NAME} INTERFACE ${ARG_DEPS})
   endif()
-
-  # No warnings here: an INTERFACE library compiles nothing of its own, and attaching them would
-  # only push this project's flags onto every consumer. Consumers link Sourcetrail::warnings.
 endfunction()

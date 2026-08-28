@@ -1,33 +1,32 @@
-# Find clang-tidy executable
+# Developer convenience targets for running clang-tidy over the tree. CI gates clang-tidy
+# separately, on the changed files of a pull request (.github/workflows/clang_tidy.yml).
 find_program(CLANG_TIDY_EXECUTABLE clang-tidy)
 
-# Check if clang-tidy is available
-if(CLANG_TIDY_EXECUTABLE)
-  file(GLOB_RECURSE SOURCE_FILES ${CMAKE_SOURCE_DIR}/src "*.h" "*.hpp" "*.cpp")
-  # Create a custom target for clang-tidy
-  add_custom_target(
-    clang-tidy
-    COMMAND
-      ${CLANG_TIDY_EXECUTABLE}
-      # Use default .clang-tidy from project root
-      -p ${CMAKE_BINARY_DIR}
-      # Optionally specify files or use glob
-      # [src/*.cpp include/*.hpp]
-      ${SOURCE_FILES}
-    COMMAND # Optional: Convert fixes to patch file
-            clang-apply-replacements ${CMAKE_BINARY_DIR}/clang-tidy-fixes.yml -format=yaml -style=file ||
-            true # Continue even if no fixes found
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Running clang-tidy static analysis"
-    VERBATIM)
-
-  # Optional: Add a fix target to automatically apply suggested fixes
-  add_custom_target(
-    clang-tidy-fix
-    COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} -fix ${SOURCE_FILES}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Applying clang-tidy fixes"
-    VERBATIM)
-else()
-  message(WARNING "Clang-Tidy not found. Static analysis will be skipped.")
+if(NOT CLANG_TIDY_EXECUTABLE)
+  message(STATUS "clang-tidy not found; the clang-tidy targets are not available.")
+  return()
 endif()
+
+# Only the project's own translation units. The previous glob passed the src directory as the first
+# globbing expression and the patterns relative to the source root, so it recursed over build/ and
+# .conan/ as well.
+file(GLOB_RECURSE SOURCETRAIL_TIDY_SOURCES CONFIGURE_DEPENDS "${PROJECT_SOURCE_DIR}/src/*.cpp"
+     "${PROJECT_SOURCE_DIR}/indexers/*.cpp")
+
+# clang-tidy reads flags per file from compile_commands.json, which CMAKE_EXPORT_COMPILE_COMMANDS
+# writes into the build directory.
+add_custom_target(
+  clang-tidy
+  COMMAND ${CLANG_TIDY_EXECUTABLE} --config-file=${PROJECT_SOURCE_DIR}/.clang-tidy -p ${PROJECT_BINARY_DIR}
+          ${SOURCETRAIL_TIDY_SOURCES}
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMENT "Running clang-tidy static analysis"
+  VERBATIM)
+
+add_custom_target(
+  clang-tidy-fix
+  COMMAND ${CLANG_TIDY_EXECUTABLE} --config-file=${PROJECT_SOURCE_DIR}/.clang-tidy -p ${PROJECT_BINARY_DIR} -fix
+          ${SOURCETRAIL_TIDY_SOURCES}
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMENT "Applying clang-tidy fixes"
+  VERBATIM)
