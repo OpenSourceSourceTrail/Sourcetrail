@@ -26,8 +26,6 @@ target_compile_definitions(
   Sourcetrail_core INTERFACE $<$<PLATFORM_ID:Windows>:D_WINDOWS> $<$<PLATFORM_ID:Linux>:D_LINUX>
                              $<$<PLATFORM_ID:Darwin>:D_Darwin> $<$<PLATFORM_ID:Windows>:SPDLOG_WCHAR_TO_UTF8_SUPPORT>)
 
-myproject_set_project_warnings(Sourcetrail_core ${SOURCETRAIL_WARNING_AS_ERROR} "" "" "" "")
-
 if(ENABLE_UNIT_TEST)
   add_subdirectory(tests)
 endif()

@@ -143,5 +143,7 @@ function(add_sourcetrail_library)
     target_link_libraries(${LIBRARY_NAME} PRIVATE ${ARG_PRIVATE_DEPS})
   endif()
 
-  myproject_set_project_warnings(${LIBRARY_NAME} ${SOURCETRAIL_WARNING_AS_ERROR} "" "" "" "")
+  # PRIVATE: the warnings apply to this library's own sources and are not inflicted on consumers,
+  # which link Sourcetrail::warnings themselves.
+  target_link_libraries(${LIBRARY_NAME} PRIVATE Sourcetrail::warnings)
 endfunction()

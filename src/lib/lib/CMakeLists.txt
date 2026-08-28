@@ -554,3 +554,8 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::utilityString
           Sourcetrail::lib::core::utility::utilityApp
           $<$<PLATFORM_ID:Windows>:Advapi32>)
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_lib PRIVATE Sourcetrail::warnings)
+target_link_libraries(Sourcetrail_lib_engine PRIVATE Sourcetrail::warnings)
+target_link_libraries(Sourcetrail_lib_path_detection PRIVATE Sourcetrail::warnings)

@@ -69,3 +69,6 @@ if((ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST) AND NOT WIN32)
                      "${CMAKE_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
   endif()
 endif()
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail PRIVATE Sourcetrail::warnings)

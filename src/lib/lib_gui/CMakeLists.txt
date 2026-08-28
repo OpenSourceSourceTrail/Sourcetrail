@@ -387,3 +387,6 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 endif()
 
 set_property(SOURCE ${CMAKE_BINARY_DIR}/src/lib/lib_gui/productVersion.h PROPERTY SKIP_AUTOMOC ON)
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_lib_gui PRIVATE Sourcetrail::warnings)

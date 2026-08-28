@@ -77,3 +77,6 @@ target_link_libraries(
   Sourcetrail_proto_convert
   PUBLIC Sourcetrail_proto_api
   PRIVATE Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::utilityString)
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_proto_convert PRIVATE Sourcetrail::warnings)

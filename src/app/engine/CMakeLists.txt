@@ -28,3 +28,6 @@ if(APPLE)
 endif()
 
 add_dependencies(Sourcetrail_engine versionnumber)
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_engine PRIVATE Sourcetrail::warnings)

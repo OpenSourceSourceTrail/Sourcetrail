@@ -48,3 +48,6 @@ endif()
 
 target_include_directories(Sourcetrail_indexer PRIVATE "${CMAKE_BINARY_DIR}/src/lib/lib"
                                                        "${CMAKE_BINARY_DIR}/src/lib/lib_gui")
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_indexer PRIVATE Sourcetrail::warnings)

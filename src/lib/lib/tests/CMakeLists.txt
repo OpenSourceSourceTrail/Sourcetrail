@@ -6,6 +6,8 @@ add_library(lib_test_utilities utilities/FileHandler.cpp)
 
 target_include_directories(lib_test_utilities PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
+target_link_libraries(lib_test_utilities PRIVATE Sourcetrail::warnings)
+
 set(test_lib_names
     AppPathTestSuite
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests

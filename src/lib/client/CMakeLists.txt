@@ -39,3 +39,6 @@ target_link_libraries(
 if(ENABLE_UNIT_TEST)
   add_subdirectory(tests)
 endif()
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_client PRIVATE Sourcetrail::warnings)

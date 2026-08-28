@@ -74,5 +74,6 @@ function(add_sourcetrail_interface)
     target_link_libraries(${LIBRARY_NAME} INTERFACE ${ARG_DEPS})
   endif()
 
-  myproject_set_project_warnings(${LIBRARY_NAME} ${SOURCETRAIL_WARNING_AS_ERROR} "" "" "" "")
+  # No warnings here: an INTERFACE library compiles nothing of its own, and attaching them would
+  # only push this project's flags onto every consumer. Consumers link Sourcetrail::warnings.
 endfunction()

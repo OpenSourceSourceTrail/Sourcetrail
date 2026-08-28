@@ -157,8 +157,10 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
   add_library(gtest_main ./tests/gtest_main.cpp)
   add_library(Sourcetrail::gtest_main ALIAS gtest_main)
   target_link_libraries(
-    gtest_main PUBLIC GTest::gmock GTest::gtest spdlog::spdlog Sourcetrail::lib::core::utility::utilityString
-                      Sourcetrail::lib::core::utility::TextCodec)
+    gtest_main
+    PUBLIC GTest::gmock GTest::gtest spdlog::spdlog Sourcetrail::lib::core::utility::utilityString
+           Sourcetrail::lib::core::utility::TextCodec
+    PRIVATE Sourcetrail::warnings)
 endif()
 
 string(LENGTH "${CMAKE_SOURCE_DIR}/" SOURCE_PATH_PREFIX_LEN)

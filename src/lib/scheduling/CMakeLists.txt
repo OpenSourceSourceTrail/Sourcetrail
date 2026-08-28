@@ -26,3 +26,6 @@ target_link_libraries(
   PUBLIC Sourcetrail::lib::core Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::GlobalId
          Sourcetrail::lib::core::utility::DispatchQueue Taskflow::Taskflow
   PRIVATE Boost::date_time Sourcetrail::lib::core::utility::ScopedFunctor Sourcetrail::lib::core::utility::TaskExecutor)
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_scheduling PRIVATE Sourcetrail::warnings)

@@ -133,3 +133,6 @@ if(WIN32)
   target_compile_definitions(Sourcetrail_lib_cxx PRIVATE _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS) # Due to Clang
   target_link_libraries(Sourcetrail_lib_cxx PUBLIC version)
 endif()
+
+# Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
+target_link_libraries(Sourcetrail_lib_cxx PRIVATE Sourcetrail::warnings)

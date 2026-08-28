@@ -110,7 +110,7 @@ function(add_sourcetrail_test)
   target_sources(${ARG_NAME} PRIVATE ${ARG_SOURCES})
 
   # Set standard test dependencies
-  set(STANDARD_DEPS Sourcetrail::gtest_main)
+  set(STANDARD_DEPS Sourcetrail::gtest_main Sourcetrail::warnings)
 
   # Link all dependencies
   target_link_libraries(${ARG_NAME} PRIVATE ${STANDARD_DEPS} ${ARG_DEPS})

@@ -11,8 +11,10 @@ set(test_lib_gui_names
 foreach(test_name IN LISTS test_lib_gui_names)
   add_executable(${test_name} ${test_name}.cpp)
 
-  target_link_libraries(${test_name} PUBLIC Qt6::Test GTest::gmock Sourcetrail::lib::lib Sourcetrail::lib::lib_gui
-                                            Sourcetrail::lib::proto::convert)
+  target_link_libraries(
+    ${test_name}
+    PUBLIC Qt6::Test GTest::gmock Sourcetrail::lib::lib Sourcetrail::lib::lib_gui Sourcetrail::lib::proto::convert
+    PRIVATE Sourcetrail::warnings)
 
   set_target_properties(
     ${test_name}
