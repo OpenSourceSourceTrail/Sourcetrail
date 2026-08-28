@@ -1,4 +1,4 @@
-#include "RecentItemModel.hpp"
+#include "qt/element/model/RecentItemModel.hpp"
 
 #include <ranges>
 
@@ -6,9 +6,9 @@
 #include <QMessageBox>
 #include <QMimeData>
 
-#include "IApplicationSettings.hpp"
-#include "ProjectSettings.h"
 #include "RangesTo.hpp"
+#include "settings/IApplicationSettings.hpp"
+#include "settings/ProjectSettings.h"
 #include "type/MessageLoadProject.h"
 
 

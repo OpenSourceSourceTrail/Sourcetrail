@@ -1,4 +1,4 @@
-#include "Graph.h"
+#include "data/graph/Graph.h"
 
 #include "logging.h"
 

@@ -7,8 +7,8 @@
 
 #include <unordered_map>
 
+#include "data/indexer/IndexerCommandProvider.h"
 #include "GlobalId.hpp"
-#include "IndexerCommandProvider.h"
 
 class IndexerCommandCxx;
 

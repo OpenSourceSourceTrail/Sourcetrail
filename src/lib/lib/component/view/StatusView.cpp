@@ -1,4 +1,4 @@
-#include "StatusView.h"
+#include "component/view/StatusView.h"
 
 StatusView::StatusView(ViewLayout* viewLayout) : View(viewLayout) {}
 

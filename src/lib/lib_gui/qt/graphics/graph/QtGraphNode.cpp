@@ -1,4 +1,4 @@
-#include "QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 #include <cmath>
 #include <limits>
@@ -10,17 +10,17 @@
 #include <QGraphicsSceneEvent>
 #include <QPen>
 
-#include "GraphFocusHandler.h"
-#include "QtDeviceScaledPixmap.h"
-#include "QtGraphEdge.h"
-#include "QtGraphNodeComponent.h"
-#include "QtGraphNodeExpandToggle.h"
-#include "QtRoundedRectItem.h"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/graphics/base/QtRoundedRectItem.h"
+#include "qt/graphics/component/QtGraphNodeComponent.h"
+#include "qt/graphics/graph/QtGraphEdge.h"
+#include "qt/graphics/graph/QtGraphNodeExpandToggle.h"
+#include "qt/graphics/GraphFocusHandler.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "qt/utility/utilityQt.h"
 #include "type/code/MessageCodeShowDefinition.h"
 #include "type/graph/MessageGraphNodeHide.h"
 #include "type/graph/MessageGraphNodeMove.h"
-#include "utilityQt.h"
 #include "utilityString.h"
 
 void QtGraphNode::blendIn() {

@@ -1,7 +1,7 @@
 #ifndef SOURCE_GROUP_SETTINGS_WITH_CUSTOM_COMMAND_H
 #define SOURCE_GROUP_SETTINGS_WITH_CUSTOM_COMMAND_H
 
-#include "SourceGroupSettingsComponent.h"
+#include "settings/source_group/component/SourceGroupSettingsComponent.h"
 
 class SourceGroupSettingsWithCustomCommand : public SourceGroupSettingsComponent {
 public:

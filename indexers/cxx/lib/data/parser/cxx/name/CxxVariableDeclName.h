@@ -4,8 +4,8 @@
 #include <memory>
 #include <vector>
 
-#include "CxxDeclName.h"
-#include "CxxTypeName.h"
+#include "data/parser/cxx/name/CxxDeclName.h"
+#include "data/parser/cxx/name/CxxTypeName.h"
 
 class CxxVariableDeclName : public CxxDeclName {
 public:

@@ -1,4 +1,4 @@
-#include "QtLocationPicker.h"
+#include "qt/element/dialog/QtLocationPicker.h"
 
 #include <QEvent>
 #include <QHBoxLayout>
@@ -6,9 +6,9 @@
 #include <QPainter>
 #include <QStyleOption>
 
-#include "QtFileDialog.h"
-#include "QtIconButton.h"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/element/button/QtIconButton.h"
+#include "qt/utility/QtFileDialog.h"
 #include "utilityFile.h"
 
 QtLocationPicker::QtLocationPicker(QWidget* parent) : QWidget(parent), m_pickDirectory(false) {

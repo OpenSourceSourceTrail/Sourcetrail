@@ -1,5 +1,5 @@
 #pragma once
-#include "QtWindow.h"
+#include "qt/window/QtWindow.h"
 
 class QtLicenseWindow : public QtWindow {
   Q_OBJECT

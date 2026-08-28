@@ -1,6 +1,6 @@
 #include <gmock/gmock.h>
 
-#include "IndexerBase.h"
+#include "data/indexer/IndexerBase.h"
 
 struct MockedIndexer : public IndexerBase {
   MOCK_METHOD(IndexerCommandType, getSupportedIndexerCommandType, (), (const, override));

@@ -5,8 +5,8 @@
 #include <gtest/gtest.h>
 
 #include "CommandLineParser.h"
-#include "IApplicationSettings.hpp"
 #include "MockedApplicationSetting.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 struct CommandlineFix : testing::Test {
   void SetUp() override {

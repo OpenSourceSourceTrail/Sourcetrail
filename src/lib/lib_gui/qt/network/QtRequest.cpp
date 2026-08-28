@@ -1,4 +1,4 @@
-#include "QtRequest.h"
+#include "qt/network/QtRequest.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>

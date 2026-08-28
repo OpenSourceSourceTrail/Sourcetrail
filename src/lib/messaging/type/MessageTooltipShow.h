@@ -2,8 +2,8 @@
 // internal
 #include "Message.h"
 //
-#include "TooltipInfo.h"
-#include "TooltipOrigin.h"
+#include "data/tooltip/TooltipInfo.h"
+#include "data/tooltip/TooltipOrigin.h"
 
 class MessageTooltipShow final : public Message<MessageTooltipShow> {
 public:

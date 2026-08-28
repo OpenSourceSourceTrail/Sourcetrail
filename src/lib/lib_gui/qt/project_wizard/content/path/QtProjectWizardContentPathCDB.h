@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtProjectWizardContentPath.h"
+#include "qt/project_wizard/content/path/QtProjectWizardContentPath.h"
 
 class ProjectWizardModel;
 

@@ -1,9 +1,9 @@
-#include "QtViewWidgetWrapper.h"
+#include "qt/view/QtViewWidgetWrapper.h"
 
 #include <QWidget>
 
+#include "component/view/View.h"
 #include "logging.h"
-#include "View.h"
 
 QWidget* QtViewWidgetWrapper::getWidgetOfView(const View* view) {
   if(view == nullptr) {

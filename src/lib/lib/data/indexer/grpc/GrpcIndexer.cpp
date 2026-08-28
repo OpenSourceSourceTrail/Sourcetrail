@@ -1,4 +1,4 @@
-#include "GrpcIndexer.h"
+#include "data/indexer/grpc/GrpcIndexer.h"
 
 #include <thread>
 
@@ -6,10 +6,10 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "app/LanguagePackageManager.h"
 #include "Convert.h"
+#include "data/indexer/IndexerComposite.h"
 #include "indexer_worker.grpc.pb.h"
-#include "IndexerComposite.h"
-#include "LanguagePackageManager.h"
 #include "logging.h"
 #include "ScopedFunctor.h"
 #include "utilityString.h"

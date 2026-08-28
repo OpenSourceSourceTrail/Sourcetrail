@@ -6,9 +6,9 @@
 #include <utility>
 #include <vector>
 
+#include "data/NodeKind.h"
 #include "FilePath.h"
 #include "GlobalId.hpp"
-#include "NodeKind.h"
 #include "Tree.h"
 
 class NodeType {

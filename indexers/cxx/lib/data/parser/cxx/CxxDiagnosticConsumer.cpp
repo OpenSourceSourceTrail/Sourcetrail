@@ -1,12 +1,12 @@
-#include "CxxDiagnosticConsumer.h"
+#include "data/parser/cxx/CxxDiagnosticConsumer.h"
 
 #include <clang/Basic/SourceManager.h>
 #include <clang/Tooling/Tooling.h>
 
-#include "CanonicalFilePathCache.h"
-#include "ParseLocation.h"
-#include "ParserClient.h"
-#include "utilityClang.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/cxx/utilityClang.h"
+#include "data/parser/ParseLocation.h"
+#include "data/parser/ParserClient.h"
 #include "utilityString.h"
 
 CxxDiagnosticConsumer::CxxDiagnosticConsumer(std::shared_ptr<ParserClient> client,

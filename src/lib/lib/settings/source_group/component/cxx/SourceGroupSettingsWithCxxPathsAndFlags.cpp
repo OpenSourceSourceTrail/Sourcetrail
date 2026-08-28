@@ -1,6 +1,6 @@
-#include "SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 #include "utility.h"
 
 std::vector<FilePath> SourceGroupSettingsWithCxxPathsAndFlags::getHeaderSearchPaths() const {

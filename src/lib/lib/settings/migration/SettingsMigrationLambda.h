@@ -2,7 +2,7 @@
 // STL
 #include <functional>
 // internal
-#include "SettingsMigration.h"
+#include "settings/migration/SettingsMigration.h"
 
 class SettingsMigrationLambda final : public SettingsMigration {
 public:

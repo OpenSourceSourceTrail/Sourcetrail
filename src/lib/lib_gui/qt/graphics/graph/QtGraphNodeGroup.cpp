@@ -1,4 +1,4 @@
-#include "QtGraphNodeGroup.h"
+#include "qt/graphics/graph/QtGraphNodeGroup.h"
 
 #include <QBrush>
 #include <QGraphicsPolygonItem>
@@ -6,7 +6,7 @@
 #include <QPainterPath>
 #include <QPen>
 
-#include "QtRoundedRectItem.h"
+#include "qt/graphics/base/QtRoundedRectItem.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageActivateNodes.h"

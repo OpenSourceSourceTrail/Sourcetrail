@@ -1,5 +1,5 @@
 #pragma once
-#include "ViewWidgetWrapper.h"
+#include "component/view/ViewWidgetWrapper.h"
 
 class QWidget;
 class View;

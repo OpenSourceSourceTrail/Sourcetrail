@@ -1,4 +1,4 @@
-#include "ParseLocation.h"
+#include "data/parser/ParseLocation.h"
 
 ParseLocation::ParseLocation() : fileId(0), startLineNumber(0), startColumnNumber(0), endLineNumber(0), endColumnNumber(0) {}
 

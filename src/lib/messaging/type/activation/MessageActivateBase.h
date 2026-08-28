@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "SearchMatch.h"
+#include "data/search/SearchMatch.h"
 
 class MessageActivateBase {
 public:

@@ -4,9 +4,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 // internal
+#include "data/location/SourceLocation.h"
+#include "data/location/SourceLocationFile.h"
 #include "FilePath.h"
-#include "SourceLocation.h"
-#include "SourceLocationFile.h"
 
 using namespace ::testing;
 using namespace std::string_literals;

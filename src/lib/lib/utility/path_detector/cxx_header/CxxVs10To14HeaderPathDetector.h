@@ -1,6 +1,6 @@
 #pragma once
 #include "ApplicationArchitectureType.h"
-#include "PathDetector.h"
+#include "utility/path_detector/PathDetector.h"
 
 class CxxVs10To14HeaderPathDetector : public PathDetector {
 public:

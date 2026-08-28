@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "View.h"
+#include "component/view/View.h"
 
 struct SearchMatch;
 

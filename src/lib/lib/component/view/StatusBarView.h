@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ErrorCountInfo.h"
-#include "View.h"
+#include "component/view/View.h"
+#include "data/ErrorCountInfo.h"
 
 class StatusBarController;
 

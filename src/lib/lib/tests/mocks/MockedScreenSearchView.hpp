@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "ScreenSearchView.h"
+#include "component/view/ScreenSearchView.h"
 
 struct MockedScreenSearchView final : ScreenSearchView {
   explicit MockedScreenSearchView(ViewLayout* viewLayout) : ScreenSearchView(viewLayout) {}

@@ -1,7 +1,7 @@
 #ifndef QT_PROJECT_WIZARD_CONTENT_PATHS_HEADER_SEARCH_GLOBAL_H
 #define QT_PROJECT_WIZARD_CONTENT_PATHS_HEADER_SEARCH_GLOBAL_H
 
-#include "QtProjectWizardContentPaths.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPaths.h"
 
 class QtProjectWizardContentPathsHeaderSearchGlobal : public QtProjectWizardContentPaths {
   Q_OBJECT

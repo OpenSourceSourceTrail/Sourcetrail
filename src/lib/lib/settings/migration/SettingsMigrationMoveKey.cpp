@@ -1,4 +1,4 @@
-#include "SettingsMigrationMoveKey.h"
+#include "settings/migration/SettingsMigrationMoveKey.h"
 
 SettingsMigrationMoveKey::SettingsMigrationMoveKey(const std::string& oldKey, const std::string& newKey)
     : m_oldKey(oldKey), m_newKey(newKey) {}

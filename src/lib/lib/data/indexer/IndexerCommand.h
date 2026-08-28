@@ -4,9 +4,9 @@
 #include <set>
 #include <string>
 
+#include "data/indexer/IndexerCommandType.h"
 #include "FilePath.h"
 #include "FilePathFilter.h"
-#include "IndexerCommandType.h"
 
 namespace boost::json {
 class object;

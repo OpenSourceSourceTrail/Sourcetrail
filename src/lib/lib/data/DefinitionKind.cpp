@@ -1,4 +1,4 @@
-#include "DefinitionKind.h"
+#include "data/DefinitionKind.h"
 
 int definitionKindToInt(DefinitionKind definitionKind) {
   return definitionKind;

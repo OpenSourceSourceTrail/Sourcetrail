@@ -2,7 +2,7 @@
 // STL
 #include <string>
 // internal
-#include "SettingsMigration.h"
+#include "settings/migration/SettingsMigration.h"
 
 class SettingsMigrationDeleteKey : public SettingsMigration {
 public:

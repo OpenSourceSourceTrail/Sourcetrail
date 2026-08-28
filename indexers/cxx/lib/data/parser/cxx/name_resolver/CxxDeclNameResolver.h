@@ -4,10 +4,10 @@
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/Expr.h>
 
-#include "CxxDeclName.h"
-#include "CxxNameResolver.h"
-#include "CxxTypeName.h"
-#include "CxxTypeNameResolver.h"
+#include "data/parser/cxx/name/CxxDeclName.h"
+#include "data/parser/cxx/name/CxxTypeName.h"
+#include "data/parser/cxx/name_resolver/CxxNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTypeNameResolver.h"
 #include "utilityString.h"
 
 class CanonicalFilePathCache;

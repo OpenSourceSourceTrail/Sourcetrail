@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include "CodeScrollParams.h"
-#include "CodeSnippetParams.h"
-#include "ErrorInfo.h"
-#include "LocationType.h"
-#include "ScreenSearchInterfaces.h"
-#include "View.h"
+#include "component/controller/helper/ScreenSearchInterfaces.h"
+#include "component/view/helper/CodeScrollParams.h"
+#include "component/view/helper/CodeSnippetParams.h"
+#include "component/view/View.h"
+#include "data/ErrorInfo.h"
+#include "data/location/LocationType.h"
 
 class CodeController;
 class FilePath;

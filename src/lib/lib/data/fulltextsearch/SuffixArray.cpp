@@ -1,4 +1,4 @@
-#include "SuffixArray.h"
+#include "data/fulltextsearch/SuffixArray.h"
 
 #include <algorithm>
 #include <iostream>

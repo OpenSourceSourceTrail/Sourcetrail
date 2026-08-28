@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "SqliteStorageMigration.h"
+#include "data/storage/migration/SqliteStorageMigration.h"
 
 class SqliteStorageMigrationLambda : public SqliteStorageMigration {
 public:

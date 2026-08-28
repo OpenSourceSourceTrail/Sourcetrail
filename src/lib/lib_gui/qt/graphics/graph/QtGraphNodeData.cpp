@@ -1,11 +1,11 @@
-#include "QtGraphNodeData.h"
+#include "qt/graphics/graph/QtGraphNodeData.h"
 
 #include <QVector2D>
 
+#include "app/paths/ResourcePaths.h"
+#include "data/graph/token_component/TokenComponentFilePath.h"
 #include "FilePath.h"
-#include "GraphFocusHandler.h"
-#include "ResourcePaths.h"
-#include "TokenComponentFilePath.h"
+#include "qt/graphics/GraphFocusHandler.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageActivateNodes.h"

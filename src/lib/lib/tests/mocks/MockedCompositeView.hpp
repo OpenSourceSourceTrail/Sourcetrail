@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "CompositeView.h"
+#include "component/view/CompositeView.h"
 
 struct MockedCompositeView final : CompositeView {
   explicit MockedCompositeView(ViewLayout* viewLayout)

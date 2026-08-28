@@ -3,13 +3,13 @@
 
 #include <QWidget>
 
-#include "CodeFocusHandler.h"
-#include "ErrorInfo.h"
-#include "LocationType.h"
+#include "data/ErrorInfo.h"
+#include "data/location/LocationType.h"
 #include "MessageListener.h"
-#include "QtCodeFileList.h"
-#include "QtCodeFileSingle.h"
-#include "QtThreadedFunctor.h"
+#include "qt/element/code/CodeFocusHandler.h"
+#include "qt/element/code/QtCodeFileList.h"
+#include "qt/element/code/QtCodeFileSingle.h"
+#include "qt/utility/QtThreadedFunctor.h"
 #include "type/MessageWindowFocus.h"
 
 class QLabel;

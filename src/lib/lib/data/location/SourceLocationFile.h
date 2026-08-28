@@ -6,10 +6,10 @@
 #include <ostream>
 #include <set>
 // internal
+#include "data/location/LocationType.h"
+#include "data/location/SourceLocation.h"
 #include "FilePath.h"
 #include "GlobalId.hpp"
-#include "LocationType.h"
-#include "SourceLocation.h"
 
 class SourceLocationFile final {
 public:

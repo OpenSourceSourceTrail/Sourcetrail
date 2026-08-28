@@ -1,12 +1,12 @@
-#include "QtProjectWizardContentFlags.h"
+#include "qt/project_wizard/content/QtProjectWizardContentFlags.h"
 // Qt5
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
 
-#include "QtStringListBox.h"
-#include "SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "qt/element/dialog/QtStringListBox.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
 
 QtProjectWizardContentFlags::QtProjectWizardContentFlags(std::shared_ptr<SourceGroupSettingsWithCxxPathsAndFlags> settings,
                                                          QtProjectWizardWindow* window,

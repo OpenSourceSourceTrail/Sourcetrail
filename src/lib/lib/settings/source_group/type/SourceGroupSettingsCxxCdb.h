@@ -1,12 +1,12 @@
 #ifndef SOURCE_GROUP_SETTINGS_CXX_CDB_H
 #define SOURCE_GROUP_SETTINGS_CXX_CDB_H
 
-#include "SourceGroupSettingsWithComponents.h"
-#include "SourceGroupSettingsWithCxxCdbPath.h"
-#include "SourceGroupSettingsWithCxxPathsAndFlags.h"
-#include "SourceGroupSettingsWithCxxPchOptions.h"
-#include "SourceGroupSettingsWithExcludeFilters.h"
-#include "SourceGroupSettingsWithIndexedHeaderPaths.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxCdbPath.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithIndexedHeaderPaths.h"
+#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/SourceGroupSettingsWithComponents.h"
 
 class SourceGroupSettingsCxxCdb
     : public SourceGroupSettingsWithComponents<SourceGroupSettingsWithCxxCdbPath,

@@ -12,10 +12,10 @@
 #ifndef _WIN32
 #  undef private
 #endif
+#include "component/TabId.h"
 #include "Message.h"
 #include "MessageFilter.h"
 #include "MessageListener.h"
-#include "TabId.h"
 
 
 namespace {

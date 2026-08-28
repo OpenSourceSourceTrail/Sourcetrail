@@ -1,7 +1,7 @@
 #ifndef QT_PROJECT_WIZARD_CONTENT_PATHS_FRAMEWORK_SEARCH_H
 #define QT_PROJECT_WIZARD_CONTENT_PATHS_FRAMEWORK_SEARCH_H
 
-#include "QtProjectWizardContentPaths.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPaths.h"
 
 class QtProjectWizardContentPathsFrameworkSearch : public QtProjectWizardContentPaths {
   Q_OBJECT

@@ -1,6 +1,6 @@
 #pragma once
-#include "AccessKind.h"
-#include "QtGraphNode.h"
+#include "data/parser/AccessKind.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 class QtGraphNodeAccess : public QtGraphNode {
   Q_OBJECT

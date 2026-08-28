@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include "StorageAccessProxy.h"
+#include "data/storage/StorageAccessProxy.h"
 
 /**
  * @brief A class that acts as a cache layer for storage access, inheriting from StorageAccessProxy.

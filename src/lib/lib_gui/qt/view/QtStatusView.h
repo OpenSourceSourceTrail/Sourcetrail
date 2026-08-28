@@ -1,9 +1,9 @@
 #pragma once
 #include <QWidget>
 
-#include "QtThreadedFunctor.h"
+#include "component/view/StatusView.h"
+#include "qt/utility/QtThreadedFunctor.h"
 #include "Status.h"
-#include "StatusView.h"
 
 class QBoxLayout;
 class QCheckBox;

@@ -1,9 +1,9 @@
-#include "IntermediateStorage.h"
+#include "data/storage/IntermediateStorage.h"
 
 #include <algorithm>
 #include <ranges>
 
-#include "LocationType.h"
+#include "data/location/LocationType.h"
 #include "RangesTo.hpp"
 #include "utility.h"
 

@@ -3,12 +3,12 @@
 
 #include <clang/AST/RecursiveASTVisitor.h>
 
-#include "CxxAstVisitorComponentBraceRecorder.h"
-#include "CxxAstVisitorComponentContext.h"
-#include "CxxAstVisitorComponentDeclRefKind.h"
-#include "CxxAstVisitorComponentImplicitCode.h"
-#include "CxxAstVisitorComponentIndexer.h"
-#include "CxxAstVisitorComponentTypeRefKind.h"
+#include "data/parser/cxx/CxxAstVisitorComponentBraceRecorder.h"
+#include "data/parser/cxx/CxxAstVisitorComponentContext.h"
+#include "data/parser/cxx/CxxAstVisitorComponentDeclRefKind.h"
+#include "data/parser/cxx/CxxAstVisitorComponentImplicitCode.h"
+#include "data/parser/cxx/CxxAstVisitorComponentIndexer.h"
+#include "data/parser/cxx/CxxAstVisitorComponentTypeRefKind.h"
 
 class CanonicalFilePathCache;
 class ParserClient;

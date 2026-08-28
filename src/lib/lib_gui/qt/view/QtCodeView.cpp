@@ -1,13 +1,13 @@
-#include "QtCodeView.h"
+#include "qt/view/QtCodeView.h"
 
-#include "CodeController.h"
-#include "ColorScheme.h"
-#include "QtCodeArea.h"
-#include "QtCodeNavigator.h"
-#include "QtHighlighter.h"
-#include "QtViewWidgetWrapper.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "component/controller/CodeController.h"
+#include "qt/element/code/QtCodeArea.h"
+#include "qt/element/code/QtCodeNavigator.h"
+#include "qt/utility/QtHighlighter.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
+#include "settings/ColorScheme.h"
 
 QtCodeView::QtCodeView(ViewLayout* viewLayout) : CodeView(viewLayout), m_widget{new QtCodeNavigator} {
   std::ignore = QObject::connect(m_widget, &QtCodeNavigator::focusIn, m_widget, [this]() { setNavigationFocus(true); });

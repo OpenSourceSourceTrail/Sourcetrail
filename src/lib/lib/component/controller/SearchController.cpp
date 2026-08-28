@@ -1,8 +1,8 @@
-#include "SearchController.h"
+#include "component/controller/SearchController.h"
 
+#include "component/view/SearchView.h"
+#include "data/storage/StorageAccess.h"
 #include "logging.h"
-#include "SearchView.h"
-#include "StorageAccess.h"
 #include "type/tab/MessageTabState.h"
 
 SearchController::SearchController(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}

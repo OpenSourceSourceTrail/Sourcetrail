@@ -1,4 +1,4 @@
-#include "QtCodeField.h"
+#include "qt/element/code/QtCodeField.h"
 
 #include <boost/locale/encoding.hpp>
 
@@ -7,13 +7,13 @@
 #include <QTextBlock>
 #include <QWindow>
 
-#include "ColorScheme.h"
-#include "IApplicationSettings.hpp"
+#include "data/location/SourceLocation.h"
+#include "data/location/SourceLocationFile.h"
 #include "logging.h"
-#include "QtContextMenu.h"
-#include "QtHighlighter.h"
-#include "SourceLocation.h"
-#include "SourceLocationFile.h"
+#include "qt/utility/QtContextMenu.h"
+#include "qt/utility/QtHighlighter.h"
+#include "settings/ColorScheme.h"
+#include "settings/IApplicationSettings.hpp"
 #include "TextCodec.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageActivateSourceLocations.h"

@@ -1,4 +1,4 @@
-#include "QtKeyboardShortcuts.h"
+#include "qt/window/QtKeyboardShortcuts.h"
 
 #include <utility>
 
@@ -7,8 +7,8 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/utility/utilityQt.h"
 
 QtShortcutTable::QtShortcutTable(QWidget* parent) : QTableWidget(parent) {}
 

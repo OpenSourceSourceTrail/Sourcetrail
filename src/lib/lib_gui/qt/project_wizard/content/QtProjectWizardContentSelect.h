@@ -1,7 +1,7 @@
 #pragma once
-#include "LanguageType.h"
-#include "QtProjectWizardContent.h"
-#include "SourceGroupType.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
+#include "settings/LanguageType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 class QButtonGroup;
 class SolutionParserManager;

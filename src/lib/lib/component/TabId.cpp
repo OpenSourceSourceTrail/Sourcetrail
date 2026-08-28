@@ -1,4 +1,4 @@
-#include "TabId.h"
+#include "component/TabId.h"
 
 constexpr Id AppId = 1;
 constexpr Id BackgroundId = 2;

@@ -1,8 +1,8 @@
-#include "QtStringListBox.h"
+#include "qt/element/dialog/QtStringListBox.h"
 
 #include <QListWidget>
 
-#include "QtStringListBoxItem.h"
+#include "qt/element/dialog/QtStringListBoxItem.h"
 
 QtStringListBox::QtStringListBox(QWidget* parent, const QString& listName) : QtListBox(parent, listName) {}
 

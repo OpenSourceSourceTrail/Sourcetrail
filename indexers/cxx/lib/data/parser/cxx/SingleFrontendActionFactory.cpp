@@ -1,4 +1,4 @@
-#include "SingleFrontendActionFactory.h"
+#include "data/parser/cxx/SingleFrontendActionFactory.h"
 
 SingleFrontendActionFactory::SingleFrontendActionFactory(clang::FrontendAction* action) : m_action(action) {}
 

@@ -1,4 +1,4 @@
-#include "QtListBox.h"
+#include "qt/element/dialog/QtListBox.h"
 
 #include <utility>
 
@@ -7,11 +7,11 @@
 #include <QScrollBar>
 #include <QWheelEvent>
 
-#include "QtIconButton.h"
-#include "QtListBoxItem.h"
-#include "QtTextEditDialog.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/element/button/QtIconButton.h"
+#include "qt/element/dialog/QtListBoxItem.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/window/QtTextEditDialog.h"
 #include "utilityString.h"
 
 void QtListWidget::mouseDoubleClickEvent(QMouseEvent* /*event*/) {

@@ -3,7 +3,7 @@
 #include <memory>
 #include <set>
 
-#include "Storage.h"
+#include "data/storage/Storage.h"
 
 class IntermediateStorage : public Storage {
 public:

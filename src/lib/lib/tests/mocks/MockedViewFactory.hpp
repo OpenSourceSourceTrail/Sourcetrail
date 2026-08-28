@@ -2,7 +2,7 @@
 
 #include <gmock/gmock.h>
 
-#include "ViewFactory.h"
+#include "component/view/ViewFactory.h"
 
 struct MockedViewFactory : public ViewFactory {
   using MainViewPtr = std::shared_ptr<MainView>;

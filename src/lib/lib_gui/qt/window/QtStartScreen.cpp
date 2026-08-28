@@ -1,4 +1,4 @@
-#include "QtStartScreen.hpp"
+#include "qt/window/QtStartScreen.hpp"
 
 #include <ranges>
 #include <utility>
@@ -15,12 +15,12 @@
 #include <QPushButton>
 #include <QUrl>
 
-#include "globalStrings.h"
-#include "IApplicationSettings.hpp"
+#include "app/paths/UserPaths.h"
+#include "qt/element/model/RecentItemModel.hpp"
+#include "qt/utility/utilityQt.h"
 #include "RangesTo.hpp"
-#include "RecentItemModel.hpp"
-#include "UserPaths.h"
-#include "utilityQt.h"
+#include "settings/IApplicationSettings.hpp"
+#include "utility/globalStrings.h"
 #include "Version.h"
 
 namespace {

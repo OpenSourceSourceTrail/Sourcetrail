@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "QtWindow.h"
+#include "qt/window/QtWindow.h"
 
 class QtProjectWizardContent;
 

@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentCustomCommand.h"
+#include "qt/project_wizard/content/QtProjectWizardContentCustomCommand.h"
 // Qt5
 #include <QCheckBox>
 #include <QGridLayout>
@@ -8,10 +8,10 @@
 // boost
 #include <boost/filesystem/path.hpp>
 // internal
+#include "data/storage/StorageVersion.h"
 #include "FileSystem.h"
-#include "ProjectSettings.h"
-#include "SourceGroupSettingsCustomCommand.h"
-#include "StorageVersion.h"
+#include "settings/ProjectSettings.h"
+#include "settings/source_group/type/SourceGroupSettingsCustomCommand.h"
 
 QtProjectWizardContentCustomCommand::QtProjectWizardContentCustomCommand(std::shared_ptr<SourceGroupSettingsCustomCommand> settings,
                                                                          QtProjectWizardWindow* window)

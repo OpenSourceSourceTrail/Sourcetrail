@@ -3,9 +3,9 @@
 #include <QWidget>
 // internal
 #include "FilePath.h"
-#include "QtHelpButton.h"
-#include "QtProjectWizardWindow.h"
-#include "QtThreadedFunctor.h"
+#include "qt/element/button/QtHelpButton.h"
+#include "qt/project_wizard/QtProjectWizardWindow.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 QT_FORWARD_DECLARE_CLASS(QFrame);
 QT_FORWARD_DECLARE_CLASS(QGridLayout);

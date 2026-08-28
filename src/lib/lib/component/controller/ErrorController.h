@@ -2,7 +2,7 @@
 // STL
 #include <map>
 // internal
-#include "ActivationListener.h"
+#include "component/controller/helper/ActivationListener.h"
 #include "MessageListener.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"
@@ -13,8 +13,8 @@
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStarted.h"
 //
-#include "Controller.h"
-#include "ErrorView.h"
+#include "component/controller/Controller.h"
+#include "component/view/ErrorView.h"
 
 class StorageAccess;
 

@@ -1,7 +1,7 @@
 #pragma once
-#include "BookmarkView.h"
-#include "ControllerProxy.h"
-#include "QtThreadedFunctor.h"
+#include "component/controller/helper/ControllerProxy.h"
+#include "component/view/BookmarkView.h"
+#include "qt/utility/QtThreadedFunctor.h"
 
 class QFrame;
 class QtBookmarkBrowser;

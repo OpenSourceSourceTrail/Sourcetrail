@@ -1,4 +1,4 @@
-#include "QtSmartSearchBox.h"
+#include "qt/element/search/QtSmartSearchBox.h"
 
 #include <deque>
 #include <regex>
@@ -9,9 +9,9 @@
 
 #include <stdlib.h>
 
-#include "ColorScheme.h"
-#include "GraphViewStyle.h"
-#include "NodeTypeSet.h"
+#include "component/view/GraphViewStyle.h"
+#include "data/NodeTypeSet.h"
+#include "settings/ColorScheme.h"
 #include "type/focus/MessageFocusedSearchView.h"
 #include "utility.h"
 #include "utilityString.h"

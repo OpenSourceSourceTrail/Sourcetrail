@@ -1,7 +1,7 @@
-#include "SourceGroupSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 
 #include "ConfigManager.hpp"
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 #include "utilityString.h"
 
 const size_t SourceGroupSettings::s_version = 1;

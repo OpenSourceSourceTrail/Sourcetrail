@@ -3,8 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "data/storage/sqlite/SqliteStorage.h"
 #include "Migration.h"
-#include "SqliteStorage.h"
 
 class SqliteStorageMigration : public Migration<SqliteStorage> {
 public:

@@ -1,4 +1,4 @@
-#include "CxxName.h"
+#include "data/parser/cxx/name/CxxName.h"
 
 #include "utilityString.h"
 

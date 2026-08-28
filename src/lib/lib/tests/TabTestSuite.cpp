@@ -3,6 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "component/Tab.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
@@ -14,7 +15,6 @@
 #include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#include "Tab.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/MessageRefreshUI.h"
 

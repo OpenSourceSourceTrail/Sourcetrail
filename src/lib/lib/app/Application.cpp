@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "app/Application.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -8,32 +8,32 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
-#include "ColorScheme.h"
-#include "DialogView.h"
+#include "app/paths/UserPaths.h"
+#include "component/controller/IDECommunicationController.h"
+#include "component/NetworkFactory.h"
+#include "component/TabId.h"
+#include "component/view/DialogView.h"
+#include "component/view/GraphViewStyle.h"
+#include "component/view/MainView.h"
+#include "component/view/ViewFactory.h"
+#include "data/storage/StorageCache.h"
+#include "factory/IFactory.hpp"
 #include "filter_types/MessageFilterErrorCountUpdate.h"
 #include "filter_types/MessageFilterFocusInOut.h"
 #include "filter_types/MessageFilterSearchAutocomplete.h"
-#include "GraphViewStyle.h"
-#include "IApplicationSettings.hpp"
-#include "IDECommunicationController.h"
-#include "IFactory.hpp"
-#include "ISharedMemoryGarbageCollector.hpp"
 #include "logging.h"
-#include "MainView.h"
 #include "MessageQueue.h"
-#include "NetworkFactory.h"
-#include "ProjectSettings.h"
-#include "SharedMemory.h"
-#include "StorageCache.h"
-#include "TabId.h"
+#include "settings/ColorScheme.h"
+#include "settings/IApplicationSettings.hpp"
+#include "settings/ProjectSettings.h"
 #include "TaskDispatchRegistry.h"
 #include "type/MessageQuitApplication.h"
 #include "type/MessageStatus.h"
-#include "UserPaths.h"
+#include "utility/interprocess/ISharedMemoryGarbageCollector.hpp"
+#include "utility/interprocess/SharedMemory.h"
 #include "utilityString.h"
 #include "utilityUuid.h"
 #include "Version.h"
-#include "ViewFactory.h"
 
 
 namespace fs = std::filesystem;

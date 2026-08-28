@@ -3,11 +3,11 @@
 #include <chrono>
 #include <memory>
 
-#include "Application.h"
+#include "app/Application.h"
 #include "ConvertEvents.h"
+#include "data/ErrorCountInfo.h"
 #include "EngineCall.h"
 #include "EngineChannel.h"
-#include "ErrorCountInfo.h"
 #include "HttpClient.h"
 #include "logging.h"
 #include "ProtoJson.h"

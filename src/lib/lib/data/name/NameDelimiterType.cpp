@@ -1,4 +1,4 @@
-#include "NameDelimiterType.h"
+#include "data/name/NameDelimiterType.h"
 
 #include <vector>
 

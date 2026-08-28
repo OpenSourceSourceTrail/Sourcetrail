@@ -1,11 +1,11 @@
-#include "GeneratePCHAction.h"
+#include "data/parser/cxx/GeneratePCHAction.h"
 
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/MultiplexConsumer.h>
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Serialization/ASTWriter.h>
 
-#include "PreprocessorCallbacks.h"
+#include "data/parser/cxx/PreprocessorCallbacks.h"
 
 GeneratePCHAction::GeneratePCHAction(std::shared_ptr<ParserClient> client,
                                      std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache)

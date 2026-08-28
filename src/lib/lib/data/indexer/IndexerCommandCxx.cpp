@@ -1,9 +1,9 @@
-#include "IndexerCommandCxx.h"
+#include "data/indexer/IndexerCommandCxx.h"
 
 #include <boost/json/array.hpp>
 #include <boost/json/object.hpp>
 
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
 #include "utility.h"
 #include "utilityString.h"
 

@@ -1,8 +1,8 @@
-#include "QtIconButton.h"
+#include "qt/element/button/QtIconButton.h"
 // Qt5
 #include <QEvent>
 // internal
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 
 QtIconButton::QtIconButton(const FilePath& iconPath, const FilePath& hoveredIconPath, QWidget* parent)
     : QPushButton(QLatin1String(""), parent), m_iconPath(iconPath), m_hoveredIconPath(hoveredIconPath), m_color(Qt::transparent) {

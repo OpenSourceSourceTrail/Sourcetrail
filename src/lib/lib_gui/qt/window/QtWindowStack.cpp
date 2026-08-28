@@ -1,6 +1,6 @@
-#include "QtWindowStack.h"
+#include "qt/window/QtWindowStack.h"
 
-#include "QtWindow.h"
+#include "qt/window/QtWindow.h"
 
 
 QtWindowStackElement::QtWindowStackElement(QWidget* parent) : QWidget(parent) {}

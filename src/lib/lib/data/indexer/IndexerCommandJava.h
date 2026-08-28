@@ -2,7 +2,7 @@
 
 #include <set>
 
-#include "IndexerCommand.h"
+#include "data/indexer/IndexerCommand.h"
 
 class IndexerCommandJava : public IndexerCommand {
 public:

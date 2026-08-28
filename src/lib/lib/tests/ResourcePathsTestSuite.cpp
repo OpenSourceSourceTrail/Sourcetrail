@@ -3,8 +3,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "AppPath.h"
-#include "ResourcePaths.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/ResourcePaths.h"
 
 namespace fs = std::filesystem;
 

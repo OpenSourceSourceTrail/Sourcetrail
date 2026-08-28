@@ -1,12 +1,12 @@
-#include "SourceGroupJavaEmpty.h"
+#include "project/SourceGroupJavaEmpty.h"
 
 #include <utility>
 
+#include "data/indexer/IndexerCommandJava.h"
+#include "data/indexer/MemoryIndexerCommandProvider.h"
 #include "FileManager.h"
-#include "IndexerCommandJava.h"
-#include "MemoryIndexerCommandProvider.h"
-#include "RefreshInfo.h"
-#include "SourceGroupSettingsJavaEmpty.h"
+#include "project/RefreshInfo.h"
+#include "settings/source_group/type/SourceGroupSettingsJavaEmpty.h"
 #include "utility.h"
 
 SourceGroupJavaEmpty::SourceGroupJavaEmpty(std::shared_ptr<SourceGroupSettingsJavaEmpty> settings)

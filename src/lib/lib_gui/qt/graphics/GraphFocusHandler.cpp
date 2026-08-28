@@ -1,9 +1,9 @@
-#include "GraphFocusHandler.h"
+#include "qt/graphics/GraphFocusHandler.h"
 
 #include <QVector2D>
 
-#include "QtGraphEdge.h"
-#include "QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphEdge.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 #include "type/focus/MessageFocusChanged.h"
 #include "utility.h"
 

@@ -1,6 +1,6 @@
-#include "CxxIndexerCommandProvider.h"
+#include "data/indexer/CxxIndexerCommandProvider.h"
 
-#include "IndexerCommandCxx.h"
+#include "data/indexer/IndexerCommandCxx.h"
 #include "logging.h"
 
 CxxIndexerCommandProvider::CxxIndexerCommandProvider() : m_nextId(1) {}

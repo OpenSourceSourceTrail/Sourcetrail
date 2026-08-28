@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
 
-#include "ISharedMemoryGarbageCollector.hpp"
 #include "MessageQueue.h"
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
+#include "utility/interprocess/ISharedMemoryGarbageCollector.hpp"
 
 struct IProject;
 class StorageCache;

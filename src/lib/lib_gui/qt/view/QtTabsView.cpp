@@ -1,21 +1,21 @@
-#include "QtTabsView.h"
+#include "qt/view/QtTabsView.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QStyle>
 #include <QVariant>
 
-#include "Application.h"
-#include "ColorScheme.h"
-#include "GraphViewStyle.h"
+#include "app/Application.h"
+#include "app/paths/ResourcePaths.h"
+#include "component/controller/TabsController.h"
+#include "component/TabId.h"
+#include "component/view/GraphViewStyle.h"
 #include "logging.h"
-#include "QtSelfRefreshIconButton.h"
-#include "QtTabBar.h"
-#include "QtViewWidgetWrapper.h"
-#include "ResourcePaths.h"
-#include "TabId.h"
-#include "TabsController.h"
-#include "utilityQt.h"
+#include "qt/element/button/QtSelfRefreshIconButton.h"
+#include "qt/element/QtTabBar.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
+#include "settings/ColorScheme.h"
 
 QtTabsView::QtTabsView(ViewLayout* viewLayout) : TabsView(viewLayout), m_widget(new QWidget), m_insertedTabCount(0) {
   auto* layout = new QHBoxLayout{m_widget};

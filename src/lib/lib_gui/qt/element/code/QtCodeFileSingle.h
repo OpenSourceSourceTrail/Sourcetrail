@@ -6,7 +6,7 @@
 #include <QFrame>
 
 #include "FilePath.h"
-#include "QtCodeNavigable.h"
+#include "qt/element/code/QtCodeNavigable.h"
 #include "TimeStamp.h"
 
 class QLabel;

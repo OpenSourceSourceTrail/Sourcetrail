@@ -1,13 +1,13 @@
-#include "ErrorController.h"
+#include "component/controller/ErrorController.h"
 // STL
 #include <vector>
 // internal
-#include "Application.h"
-#include "DialogView.h"
-#include "IApplicationSettings.hpp"
-#include "IProject.hpp"
-#include "StorageAccess.h"
-#include "TabId.h"
+#include "app/Application.h"
+#include "component/TabId.h"
+#include "component/view/DialogView.h"
+#include "data/storage/StorageAccess.h"
+#include "project/IProject.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 ErrorController::ErrorController(StorageAccess* pStorageAccess) : m_storageAccess(pStorageAccess) {}
 

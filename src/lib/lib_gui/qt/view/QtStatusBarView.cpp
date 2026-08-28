@@ -1,10 +1,10 @@
-#include "QtStatusBarView.h"
+#include "qt/view/QtStatusBarView.h"
 
 #include <QStatusBar>
 
 #include "logging.h"
-#include "QtMainView.h"
-#include "QtStatusBar.h"
+#include "qt/element/QtStatusBar.h"
+#include "qt/view/QtMainView.h"
 
 QtStatusBarView::QtStatusBarView(ViewLayout* viewLayout) : StatusBarView(viewLayout), m_widget(new QtStatusBar) {
   m_widget->show();

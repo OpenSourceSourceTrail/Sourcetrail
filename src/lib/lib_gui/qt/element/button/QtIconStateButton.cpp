@@ -1,8 +1,8 @@
-#include "QtIconStateButton.h"
+#include "qt/element/button/QtIconStateButton.h"
 
 #include <QEvent>
 
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 
 QtIconStateButton::QtIconStateButton(QWidget* parent) : QPushButton(QLatin1String(""), parent) {
   setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

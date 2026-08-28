@@ -1,4 +1,4 @@
-#include "QtTextEditDialog.h"
+#include "qt/window/QtTextEditDialog.h"
 
 #include <utility>
 

@@ -2,11 +2,11 @@
 #include <gtest/gtest.h>
 
 #include "../../../src/lib/lib/tests/mocks/MockedApplicationSetting.hpp"
-#include "IncludeDirective.h"
-#include "IncludeProcessing.h"
 #include "language_packages.h"
 #include "TextAccess.h"
 #include "utility.h"
+#include "utility/IncludeDirective.h"
+#include "utility/IncludeProcessing.h"
 
 struct CxxIncludeProcessing : testing::Test {
   void SetUp() override {

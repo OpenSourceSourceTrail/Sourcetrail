@@ -1,4 +1,4 @@
-#include "NodeKind.h"
+#include "data/NodeKind.h"
 
 int nodeKindToInt(NodeKind kind) {
   return kind;

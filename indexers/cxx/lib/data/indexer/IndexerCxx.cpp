@@ -1,6 +1,6 @@
-#include "IndexerCxx.h"
+#include "data/indexer/IndexerCxx.h"
 // internal
-#include "CxxParser.h"
+#include "data/parser/cxx/CxxParser.h"
 #include "FileRegister.h"
 
 void IndexerCxx::doIndex(std::shared_ptr<IndexerCommandCxx> indexerCommand,

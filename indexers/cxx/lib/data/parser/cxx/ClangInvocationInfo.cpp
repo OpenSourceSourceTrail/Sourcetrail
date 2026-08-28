@@ -1,4 +1,4 @@
-#include "ClangInvocationInfo.h"
+#include "data/parser/cxx/ClangInvocationInfo.h"
 
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
@@ -11,7 +11,7 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/TargetParser/Host.h>
 
-#include "CxxCompilationDatabaseSingle.h"
+#include "data/parser/cxx/CxxCompilationDatabaseSingle.h"
 #include "utilityString.h"
 
 namespace {

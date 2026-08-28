@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "GraphViewStyle.h"
-#include "GraphViewStyleImpl.h"
-#include "NodeType.h"
+#include "component/view/GraphViewStyle.h"
+#include "component/view/GraphViewStyleImpl.h"
+#include "data/NodeType.h"
 
 using namespace testing;
 

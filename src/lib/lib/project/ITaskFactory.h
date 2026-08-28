@@ -9,7 +9,7 @@
 #include "../../scheduling/TaskDecoratorRepeat.h"
 #include "../../scheduling/TaskReturnSuccessIf.h"
 #include "../../scheduling/TaskSetValue.h"
-#include "IndexerCommandType.h"
+#include "data/indexer/IndexerCommandType.h"
 
 class DialogView;
 class FilePath;

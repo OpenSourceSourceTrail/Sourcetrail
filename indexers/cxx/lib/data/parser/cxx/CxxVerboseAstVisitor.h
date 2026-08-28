@@ -1,7 +1,7 @@
 #pragma once
 #include <clang/AST/TypeLoc.h>
 
-#include "CxxAstVisitor.h"
+#include "data/parser/cxx/CxxAstVisitor.h"
 
 class CanonicalFilePathCache;
 class ParserClient;

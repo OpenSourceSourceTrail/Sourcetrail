@@ -1,7 +1,7 @@
 #pragma once
 #include <QFrame>
 
-#include "ControllerProxy.h"
+#include "component/controller/helper/ControllerProxy.h"
 
 class QLabel;
 class QPushButton;

@@ -3,13 +3,13 @@
 #include <QDir>
 #include <QDirIterator>
 
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/ResourcePaths.h"
+#include "app/paths/UserPaths.h"
 #include "FilePath.h"
-#include "ResourcePaths.h"
-#include "UserPaths.h"
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 //
-#include "details/ApplicationSettings.h"
+#include "settings/details/ApplicationSettings.h"
 
 inline void setupPlatform(int /*argc*/, [[maybe_unused]] char* argv[]) {
   auto home = qEnvironmentVariable("HOME", "~");

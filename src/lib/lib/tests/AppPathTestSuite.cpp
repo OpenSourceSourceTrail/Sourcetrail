@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
 
 TEST(AppPath, sharedDataDirectoryRootsThePluginDirectory) {
   EXPECT_FALSE(AppPath::setSharedDataDirectoryPath(FilePath{""}));

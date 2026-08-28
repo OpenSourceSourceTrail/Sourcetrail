@@ -1,10 +1,10 @@
-#include "ApplicationSettingsPrefiller.h"
+#include "settings/ApplicationSettingsPrefiller.h"
 
-#include "IApplicationSettings.hpp"
 #include "logging.h"
+#include "settings/IApplicationSettings.hpp"
 #include "type/MessageStatus.h"
 #include "utility.h"
-#include "utilityPathDetection.h"
+#include "utility/path_detector/utilityPathDetection.h"
 
 void ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings* settings) {
   bool updated = false;

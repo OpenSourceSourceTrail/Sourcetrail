@@ -1,9 +1,9 @@
-#include "TaskInjectStorage.h"
+#include "data/TaskInjectStorage.h"
 
 #include <utility>
 
-#include "Storage.h"
-#include "StorageProvider.h"
+#include "data/storage/Storage.h"
+#include "data/storage/StorageProvider.h"
 
 TaskInjectStorage::TaskInjectStorage(std::shared_ptr<StorageProvider> storageProvider, std::weak_ptr<Storage> target)
     : m_storageProvider(std::move(storageProvider)), m_target(std::move(target)) {}

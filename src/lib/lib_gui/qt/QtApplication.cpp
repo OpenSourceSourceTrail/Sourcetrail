@@ -1,4 +1,4 @@
-#include "QtApplication.h"
+#include "qt/QtApplication.h"
 
 #include <QFileOpenEvent>
 

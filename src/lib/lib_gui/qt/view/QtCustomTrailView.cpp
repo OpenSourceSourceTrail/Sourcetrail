@@ -1,4 +1,4 @@
-#include "QtCustomTrailView.h"
+#include "qt/view/QtCustomTrailView.h"
 
 #include <QBoxLayout>
 #include <QButtonGroup>
@@ -10,14 +10,14 @@
 #include <QRadioButton>
 #include <QSlider>
 
-#include "ColorScheme.h"
-#include "NodeTypeSet.h"
-#include "QtMainWindow.h"
-#include "QtSmartSearchBox.h"
-#include "ResourcePaths.h"
-#include "TabId.h"
+#include "app/paths/ResourcePaths.h"
+#include "component/TabId.h"
+#include "data/NodeTypeSet.h"
+#include "qt/element/search/QtSmartSearchBox.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/window/QtMainWindow.h"
+#include "settings/ColorScheme.h"
 #include "type/activation/MessageActivateTrail.h"
-#include "utilityQt.h"
 
 QtCustomTrailView::QtCustomTrailView(ViewLayout* viewLayout)
     : QWidget(utility::getMainWindowforMainView(viewLayout)), CustomTrailView(nullptr), m_controllerProxy(this, TabId::app()) {

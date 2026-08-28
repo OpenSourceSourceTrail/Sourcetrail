@@ -1,13 +1,13 @@
-#include "QtProjectWizardContentPathsSource.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.h"
 
 #include <QMessageBox>
 
 #include "FileManager.h"
 #include "FilePathFilter.h"
-#include "SourceGroupSettings.h"
-#include "SourceGroupSettingsWithExcludeFilters.h"
-#include "SourceGroupSettingsWithSourceExtensions.h"
-#include "SourceGroupSettingsWithSourcePaths.h"
+#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourceExtensions.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourcePaths.h"
+#include "settings/source_group/SourceGroupSettings.h"
 #include "utility.h"
 #include "utilityFile.h"
 

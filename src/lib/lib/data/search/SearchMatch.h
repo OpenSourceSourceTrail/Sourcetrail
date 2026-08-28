@@ -2,9 +2,9 @@
 #include <string>
 #include <vector>
 
+#include "data/graph/Node.h"
+#include "data/NodeKind.h"
 #include "GlobalId.hpp"
-#include "Node.h"
-#include "NodeKind.h"
 
 class NodeTypeSet;
 

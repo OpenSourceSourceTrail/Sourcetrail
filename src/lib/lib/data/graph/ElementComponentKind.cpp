@@ -1,4 +1,4 @@
-#include "ElementComponentKind.h"
+#include "data/graph/ElementComponentKind.h"
 
 int elementComponentKindToInt(ElementComponentKind kind) {
   return static_cast<int>(kind);

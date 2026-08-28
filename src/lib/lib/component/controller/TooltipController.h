@@ -1,7 +1,7 @@
 #ifndef TOOLTIP_CONTROLLER_H
 #define TOOLTIP_CONTROLLER_H
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
 #include "MessageListener.h"
 #include "type/activation/MessageActivateTokens.h"
 #include "type/code/MessageActivateLocalSymbols.h"

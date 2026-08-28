@@ -5,7 +5,7 @@
 #include "Vec2f.h"
 
 // internal
-#include "DummyNode.h"
+#include "component/controller/helper/DummyNode.h"
 #include "GlobalId.hpp"
 
 struct DummyEdge;

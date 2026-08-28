@@ -1,7 +1,7 @@
 #ifndef QT_PROJECT_WIZARD_CONTENT_PATHS_INDEXED_HEADER_PATHS_H
 #define QT_PROJECT_WIZARD_CONTENT_PATHS_INDEXED_HEADER_PATHS_H
 
-#include "QtProjectWizardContentPaths.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPaths.h"
 
 class SourceGroupSettingsCxxCdb;
 

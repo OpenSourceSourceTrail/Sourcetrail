@@ -354,20 +354,9 @@ add_custom_command(
 
 add_dependencies(Sourcetrail_lib_gui versionnumber)
 
-get_target_property(_lib_gui_sources Sourcetrail_lib_gui SOURCES)
-foreach(_src ${_lib_gui_sources})
-  if(NOT IS_ABSOLUTE "${_src}")
-    set(_src "${CMAKE_CURRENT_SOURCE_DIR}/${_src}")
-  endif()
-  cmake_path(IS_PREFIX CMAKE_CURRENT_SOURCE_DIR "${_src}" NORMALIZE _under_src)
-  if(_under_src)
-    get_filename_component(_dir "${_src}" DIRECTORY)
-    list(APPEND _lib_gui_include_dirs "${_dir}")
-  endif()
-endforeach()
-list(REMOVE_DUPLICATES _lib_gui_include_dirs)
-
-target_include_directories(Sourcetrail_lib_gui PUBLIC ${_lib_gui_include_dirs} ${CMAKE_BINARY_DIR}/src/lib/lib_gui
+# One include root, e.g. #include "qt/view/QtCodeView.h". The binary dirs carry the generated
+# includes.h / productVersion.h and language_packages.h.
+target_include_directories(Sourcetrail_lib_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/src/lib/lib_gui
                                                       ${CMAKE_BINARY_DIR}/src/lib/lib)
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/platform_includes/includes.h.in"

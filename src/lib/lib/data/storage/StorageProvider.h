@@ -14,7 +14,7 @@
 
 #include <nonstd/expected.hpp>
 
-#include "IntermediateStorage.h"
+#include "data/storage/IntermediateStorage.h"
 
 /**
  * @brief A class that provides storages for the data processing

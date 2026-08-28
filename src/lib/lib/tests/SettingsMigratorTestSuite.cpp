@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "Settings.h"
-#include "SettingsMigrationLambda.h"
-#include "SettingsMigrationMoveKey.h"
-#include "SettingsMigrator.h"
+#include "settings/migration/SettingsMigrationLambda.h"
+#include "settings/migration/SettingsMigrationMoveKey.h"
+#include "settings/migration/SettingsMigrator.h"
+#include "settings/Settings.h"
 #include "TextAccess.h"
 
 namespace {

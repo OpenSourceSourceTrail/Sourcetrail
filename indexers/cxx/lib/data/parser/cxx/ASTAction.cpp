@@ -1,9 +1,9 @@
-#include "ASTAction.h"
+#include "data/parser/cxx/ASTAction.h"
 // clang
 #include <clang/Frontend/CompilerInstance.h>
 // internal
-#include "ASTConsumer.h"
-#include "PreprocessorCallbacks.h"
+#include "data/parser/cxx/ASTConsumer.h"
+#include "data/parser/cxx/PreprocessorCallbacks.h"
 
 ASTAction::ASTAction(std::shared_ptr<ParserClient> client,
                      std::shared_ptr<CanonicalFilePathCache> canonicalFilePathCache,

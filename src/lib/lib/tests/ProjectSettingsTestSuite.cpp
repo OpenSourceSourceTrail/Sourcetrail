@@ -2,10 +2,10 @@
 
 #include <gtest/gtest.h>
 
-#include "ProjectSettings.h"
-#include "SourceGroupSettings.h"
-#include "SourceGroupSettingsJavaEmpty.h"
-#include "SourceGroupSettingsWithSourcePaths.h"
+#include "settings/ProjectSettings.h"
+#include "settings/source_group/component/SourceGroupSettingsWithSourcePaths.h"
+#include "settings/source_group/SourceGroupSettings.h"
+#include "settings/source_group/type/SourceGroupSettingsJavaEmpty.h"
 
 constexpr auto SettingsPath = L"data/SettingsTestSuite/settings.xml";
 

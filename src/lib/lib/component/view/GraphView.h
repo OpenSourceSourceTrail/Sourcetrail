@@ -2,11 +2,11 @@
 
 #include <vector>
 
+#include "component/controller/helper/ScreenSearchInterfaces.h"
+#include "component/view/View.h"
+#include "data/GroupType.h"
 #include "GlobalId.hpp"
-#include "GroupType.h"
-#include "ScreenSearchInterfaces.h"
 #include "Vec2f.h"
-#include "View.h"
 
 struct DummyEdge;
 struct DummyNode;

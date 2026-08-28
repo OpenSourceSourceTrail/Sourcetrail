@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Graph.h"
+#include "data/graph/Graph.h"
 
 namespace {
 class TestToken : public Token {

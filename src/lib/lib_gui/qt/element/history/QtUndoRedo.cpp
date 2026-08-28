@@ -1,12 +1,12 @@
-#include "QtUndoRedo.h"
+#include "qt/element/history/QtUndoRedo.h"
 
 #include <QHBoxLayout>
 #include <QTimer>
 
-#include "QtContextMenu.h"
-#include "QtHistoryList.h"
-#include "QtSearchBarButton.h"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/element/history/QtHistoryList.h"
+#include "qt/element/search/QtSearchBarButton.h"
+#include "qt/utility/QtContextMenu.h"
 #include "type/history/MessageHistoryRedo.h"
 #include "type/history/MessageHistoryUndo.h"
 

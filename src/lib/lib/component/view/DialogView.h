@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "ErrorCountInfo.h"
-#include "RefreshInfo.h"
+#include "data/ErrorCountInfo.h"
+#include "project/RefreshInfo.h"
 
 struct IProject;
 class StorageAccess;

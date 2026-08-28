@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SearchMatch.h"
-#include "View.h"
+#include "component/view/View.h"
+#include "data/search/SearchMatch.h"
 
 class SearchController;
 

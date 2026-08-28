@@ -2,9 +2,9 @@
 // STL
 #include <cstdint>
 // internal
+#include "component/TabId.h"
 #include "FilePath.h"
 #include "Message.h"
-#include "TabId.h"
 
 class MessageActivateFile final : public Message<MessageActivateFile> {
 public:

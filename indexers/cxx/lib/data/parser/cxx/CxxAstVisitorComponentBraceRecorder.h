@@ -1,8 +1,8 @@
 #ifndef CXX_AST_VISITOR_COMPONENT_BRACE_RECORDER_H
 #define CXX_AST_VISITOR_COMPONENT_BRACE_RECORDER_H
 
-#include "CxxAstVisitorComponent.h"
-#include "ParseLocation.h"
+#include "data/parser/cxx/CxxAstVisitorComponent.h"
+#include "data/parser/ParseLocation.h"
 
 class ParserClient;
 

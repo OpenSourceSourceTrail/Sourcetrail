@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "ViewLayout.h"
+#include "component/view/ViewLayout.h"
 
 struct MockedViewLayout : ViewLayout {
   MOCK_METHOD(void, addView, (View*), (override));

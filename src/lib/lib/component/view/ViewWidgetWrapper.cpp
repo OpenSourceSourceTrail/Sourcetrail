@@ -1,4 +1,4 @@
-#include "ViewWidgetWrapper.h"
+#include "component/view/ViewWidgetWrapper.h"
 
 ViewWidgetWrapper::ViewWidgetWrapper() {}
 

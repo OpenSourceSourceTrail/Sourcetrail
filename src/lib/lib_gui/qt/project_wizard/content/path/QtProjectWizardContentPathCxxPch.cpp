@@ -1,10 +1,10 @@
-#include "QtProjectWizardContentPathCxxPch.h"
+#include "qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.h"
 
 #include <QMessageBox>
 
 #include "CompilationDatabaseInfo.h"
-#include "SourceGroupSettingsCxxCdb.h"
-#include "SourceGroupSettingsWithCxxPchOptions.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
 #include "utilityFile.h"
 

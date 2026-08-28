@@ -1,5 +1,5 @@
 #pragma once
-#include "QtProgressBarDialog.h"
+#include "qt/window/QtProgressBarDialog.h"
 
 class QtUnknownProgressDialog : public QtProgressBarDialog {
   Q_OBJECT

@@ -1,4 +1,4 @@
-#include "CxxVs10To14HeaderPathDetector.h"
+#include "utility/path_detector/cxx_header/CxxVs10To14HeaderPathDetector.h"
 
 #include <string>
 
@@ -9,7 +9,7 @@
 #include "FilePath.h"
 #include "logging.h"
 #include "utility.h"
-#include "utilityCxxHeaderDetection.h"
+#include "utility/path_detector/cxx_header/utilityCxxHeaderDetection.h"
 #include "utilityString.h"
 
 namespace {

@@ -1,4 +1,4 @@
-#include "BookmarkButtonsView.h"
+#include "component/view/BookmarkButtonsView.h"
 
 BookmarkButtonsView::BookmarkButtonsView(ViewLayout* viewLayout) : View(viewLayout), m_schedulerId(0) {}
 

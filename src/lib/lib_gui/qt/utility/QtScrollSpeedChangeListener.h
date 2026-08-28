@@ -2,7 +2,7 @@
 #define QT_SCROLL_SPEED_CHANGE_LISTENER
 
 #include "MessageListener.h"
-#include "QtThreadedFunctor.h"
+#include "qt/utility/QtThreadedFunctor.h"
 #include "type/MessageScrollSpeedChange.h"
 
 class QScrollBar;

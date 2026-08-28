@@ -1,4 +1,4 @@
-#include "SourceGroupSettingsWithCppStandard.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCppStandard.h"
 
 #include "ConfigManager.hpp"
 

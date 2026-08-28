@@ -392,24 +392,10 @@ target_sources(
           settings/source_group/type/SourceGroupSettingsCustomCommand.h
           settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 
-get_target_property(_lib_sources Sourcetrail_lib SOURCES)
-foreach(_src ${_lib_sources})
-  if(NOT IS_ABSOLUTE "${_src}")
-    set(_src "${CMAKE_CURRENT_SOURCE_DIR}/${_src}")
-  endif()
-  cmake_path(IS_PREFIX CMAKE_CURRENT_SOURCE_DIR "${_src}" NORMALIZE _under_src)
-  if(_under_src)
-    get_filename_component(_dir "${_src}" DIRECTORY)
-    list(APPEND _lib_include_dirs "${_dir}")
-  endif()
-endforeach()
-list(REMOVE_DUPLICATES _lib_include_dirs)
-
-target_include_directories(
-  Sourcetrail_lib PUBLIC ${_lib_include_dirs} ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/
-                         ${CMAKE_BINARY_DIR}/src/lib/lib)
-
-target_include_directories(Sourcetrail_lib PUBLIC "${CMAKE_SOURCE_DIR}/src/lib/proto")
+# One include root. Headers are spelled by their path below it, e.g.
+# #include "data/graph/Graph.h". The binary dir carries the generated language_packages.h; the proto
+# headers arrive through the Sourcetrail::lib::proto::api link below.
+target_include_directories(Sourcetrail_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/src/lib/lib)
 
 target_link_libraries(
   Sourcetrail_lib
@@ -495,12 +481,6 @@ target_sources(
           project/RefreshInfoGenerator.cpp
           project/RefreshInfoGenerator.h)
 
-target_include_directories(
-  Sourcetrail_lib_engine
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/factory/impls ${CMAKE_CURRENT_SOURCE_DIR}/data
-         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/migration
-         ${CMAKE_CURRENT_SOURCE_DIR}/data/storage/sqlite ${CMAKE_CURRENT_SOURCE_DIR}/project)
-
 target_link_libraries(
   Sourcetrail_lib_engine
   PUBLIC Sourcetrail::lib::lib CppSQLite::CppSQLite3
@@ -536,10 +516,11 @@ target_sources(
           utility/path_detector/cxx_header/CxxVs17HeaderPathDetector.cpp
           utility/path_detector/cxx_header/utilityCxxHeaderDetection.cpp)
 
+# The same root as Sourcetrail_lib -- these sources live under it -- but this target deliberately
+# does not link Sourcetrail_lib, so it needs the root in its own right.
 target_include_directories(
   Sourcetrail_lib_path_detection
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/
-         ${CMAKE_CURRENT_SOURCE_DIR}/utility/path_detector/cxx_header/
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
 
 target_link_libraries(

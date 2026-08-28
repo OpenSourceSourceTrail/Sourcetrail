@@ -1,11 +1,11 @@
-#include "CxxTemplateParameterStringResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTemplateParameterStringResolver.h"
 
 #include <sstream>
 
 #include <clang/AST/DeclTemplate.h>
 #include <clang/AST/PrettyPrinter.h>
 
-#include "CxxTypeNameResolver.h"
+#include "data/parser/cxx/name_resolver/CxxTypeNameResolver.h"
 #include "utilityString.h"
 
 CxxTemplateParameterStringResolver::CxxTemplateParameterStringResolver(CanonicalFilePathCache* canonicalFilePathCache)

@@ -12,7 +12,7 @@
 
 #define private public
 #include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
-#include "RecentItemModel.hpp"
+#include "qt/element/model/RecentItemModel.hpp"
 #undef private
 
 namespace {

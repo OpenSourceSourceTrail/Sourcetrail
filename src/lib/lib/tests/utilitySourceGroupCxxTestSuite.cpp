@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "utilitySourceGroupCxx.h"
+#include "project/utilitySourceGroupCxx.h"
 
 
 namespace {

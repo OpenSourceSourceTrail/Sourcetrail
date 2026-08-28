@@ -1,4 +1,4 @@
-#include "details/ApplicationSettings.h"
+#include "settings/details/ApplicationSettings.h"
 
 #include <filesystem>
 #include <memory>
@@ -6,13 +6,13 @@
 #include <spdlog/common.h>
 #include <system_error>
 
-#include "ResourcePaths.h"
-#include "SettingsMigrationLambda.h"
-#include "SettingsMigrationMoveKey.h"
-#include "SettingsMigrator.h"
+#include "app/paths/ResourcePaths.h"
+#include "app/paths/UserPaths.h"
+#include "settings/migration/SettingsMigrationLambda.h"
+#include "settings/migration/SettingsMigrationMoveKey.h"
+#include "settings/migration/SettingsMigrator.h"
 #include "Status.h"
 #include "to_underlying.hpp"
-#include "UserPaths.h"
 #include "utility.h"
 #include "utilityFile.h"
 

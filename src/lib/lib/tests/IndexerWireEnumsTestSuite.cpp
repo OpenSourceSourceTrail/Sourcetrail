@@ -2,9 +2,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 // internal
-#include "IndexerCommandType.h"
-#include "LanguageType.h"
-#include "SourceGroupType.h"
+#include "data/indexer/IndexerCommandType.h"
+#include "settings/LanguageType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 using namespace ::testing;
 

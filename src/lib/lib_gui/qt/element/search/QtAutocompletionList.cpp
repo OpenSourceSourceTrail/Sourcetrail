@@ -1,13 +1,13 @@
-#include "QtAutocompletionList.h"
+#include "qt/element/search/QtAutocompletionList.h"
 
 #include <QPainter>
 #include <QScrollBar>
 
-#include "ColorScheme.h"
-#include "GraphViewStyle.h"
-#include "IApplicationSettings.hpp"
-#include "QtDeviceScaledPixmap.h"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "component/view/GraphViewStyle.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "settings/ColorScheme.h"
+#include "settings/IApplicationSettings.hpp"
 #include "utilityString.h"
 
 QtAutocompletionModel::QtAutocompletionModel(QObject* parent) : QAbstractTableModel(parent) {}

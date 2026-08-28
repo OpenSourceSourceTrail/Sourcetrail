@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "PathDetector.h"
+#include "utility/path_detector/PathDetector.h"
 
 class CombinedPathDetector : public PathDetector {
 public:

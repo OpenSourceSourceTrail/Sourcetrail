@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "FilePath.h"
-#include "SourceGroupSettingsComponent.h"
+#include "settings/source_group/component/SourceGroupSettingsComponent.h"
 
 class SourceGroupSettingsWithJavaClassPath : public SourceGroupSettingsComponent {
 public:

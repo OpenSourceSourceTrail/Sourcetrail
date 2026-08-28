@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "Component.h"
-#include "ComponentFactory.h"
-#include "DialogView.h"
+#include "component/Component.h"
+#include "component/ComponentFactory.h"
+#include "component/view/DialogView.h"
 
 class CompositeView;
 class DialogView;

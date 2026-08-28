@@ -7,8 +7,8 @@
 
 #include <grpcpp/server.h>
 
-#include "IndexerCommandType.h"
-#include "IndexerWorkerServiceImpl.h"
+#include "data/indexer/grpc/IndexerWorkerServiceImpl.h"
+#include "data/indexer/IndexerCommandType.h"
 #include "MessageListener.h"
 #include "Task.h"
 #include "type/indexing/MessageIndexingInterrupted.h"

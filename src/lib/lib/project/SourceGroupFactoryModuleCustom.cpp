@@ -1,7 +1,7 @@
-#include "SourceGroupFactoryModuleCustom.h"
+#include "project/SourceGroupFactoryModuleCustom.h"
 
-#include "SourceGroupCustomCommand.h"
-#include "SourceGroupSettingsCustomCommand.h"
+#include "project/SourceGroupCustomCommand.h"
+#include "settings/source_group/type/SourceGroupSettingsCustomCommand.h"
 
 bool SourceGroupFactoryModuleCustom::supports(SourceGroupType type) const {
   switch(type) {

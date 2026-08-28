@@ -1,6 +1,6 @@
-#include "QtHelpButton.h"
+#include "qt/element/button/QtHelpButton.h"
 
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
 
 QtHelpButton::QtHelpButton(const QtHelpButtonInfo& info, QWidget* parent)
     : QtIconButton(ResourcePaths::getGuiDirectoryPath().concatenate(L"window/help.png"),

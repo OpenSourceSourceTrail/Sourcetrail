@@ -1,7 +1,7 @@
 #pragma once
 
-#include "QtIndexingDialog.h"
-#include "RefreshInfo.h"
+#include "project/RefreshInfo.h"
+#include "qt/window/QtIndexingDialog.h"
 
 class QLabel;
 class QRadioButton;

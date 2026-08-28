@@ -1,4 +1,4 @@
-#include "PlatformUserPaths.h"
+#include "app/paths/PlatformUserPaths.h"
 
 #include <cstdlib>
 #include <filesystem>
@@ -11,9 +11,9 @@
 #  include <mach-o/dyld.h>
 #endif
 
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/UserPaths.h"
 #include "FileSystem.h"
-#include "UserPaths.h"
 #include "utilityApp.h"
 
 namespace {

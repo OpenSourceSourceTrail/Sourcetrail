@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 
 #include "gmock/gmock.h"
-#include "SharedMemoryGarbageCollector.h"
+#include "utility/interprocess/details/SharedMemoryGarbageCollector.h"
 
 struct MockedSharedMemory : ISharedMemory {};
 

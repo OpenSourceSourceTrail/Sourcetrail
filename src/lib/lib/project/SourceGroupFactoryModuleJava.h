@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SourceGroupFactoryModule.h"
+#include "project/SourceGroupFactoryModule.h"
 
 class SourceGroupFactoryModuleJava : public SourceGroupFactoryModule {
 public:

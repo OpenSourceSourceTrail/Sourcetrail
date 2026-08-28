@@ -1,4 +1,4 @@
-#include "CxxDeclName.h"
+#include "data/parser/cxx/name/CxxDeclName.h"
 
 CxxDeclName::CxxDeclName(std::wstring name) : m_name(std::move(name)) {}
 

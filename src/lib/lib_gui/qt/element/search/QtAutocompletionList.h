@@ -9,8 +9,8 @@
 #include <QListView>
 #include <QStyledItemDelegate>
 
-#include "QtDeviceScaledPixmap.h"
-#include "SearchMatch.h"
+#include "data/search/SearchMatch.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
 
 class QtAutocompletionModel : public QAbstractTableModel {
   Q_OBJECT

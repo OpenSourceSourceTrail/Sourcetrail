@@ -1,17 +1,17 @@
-#include "QtHistoryList.h"
+#include "qt/element/history/QtHistoryList.h"
 
 #include <QBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QScrollBar>
 
-#include "ColorScheme.h"
-#include "GraphViewStyle.h"
-#include "QtDeviceScaledPixmap.h"
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
+#include "component/view/GraphViewStyle.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "qt/utility/utilityQt.h"
+#include "settings/ColorScheme.h"
 #include "type/history/MessageHistoryToPosition.h"
 #include "type/tab/MessageTabOpenWith.h"
-#include "utilityQt.h"
 #include "utilityString.h"
 
 QtHistoryItem::QtHistoryItem(const SearchMatch& match, size_t index_, bool isCurrent) : index(index_), m_match(match) {

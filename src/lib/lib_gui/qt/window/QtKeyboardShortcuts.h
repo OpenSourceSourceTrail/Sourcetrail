@@ -2,7 +2,7 @@
 #include <QScrollArea>
 #include <QTableWidget>
 
-#include "QtWindow.h"
+#include "qt/window/QtWindow.h"
 
 class QtShortcutTable : public QTableWidget {
   Q_OBJECT

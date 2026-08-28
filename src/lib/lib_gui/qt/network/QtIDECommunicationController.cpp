@@ -1,8 +1,8 @@
-#include "QtIDECommunicationController.h"
+#include "qt/network/QtIDECommunicationController.h"
 
 #include <functional>
 
-#include "IApplicationSettings.hpp"
+#include "settings/IApplicationSettings.hpp"
 
 QtIDECommunicationController::QtIDECommunicationController(QObject* parent, StorageAccess* storageAccess)
     : IDECommunicationController(storageAccess), m_tcpWrapper(parent) {

@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 
 struct MockedProjectSettings : ProjectSettings {
   MOCK_METHOD(bool, load, (const FilePath&, bool), (override));

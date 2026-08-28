@@ -1,4 +1,4 @@
-#include "QtUnknownProgressDialog.h"
+#include "qt/window/QtUnknownProgressDialog.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>

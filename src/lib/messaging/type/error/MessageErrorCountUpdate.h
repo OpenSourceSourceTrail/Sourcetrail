@@ -1,6 +1,6 @@
 #pragma once
-#include "ErrorCountInfo.h"
-#include "ErrorInfo.h"
+#include "data/ErrorCountInfo.h"
+#include "data/ErrorInfo.h"
 #include "Message.h"
 
 class MessageErrorCountUpdate final : public Message<MessageErrorCountUpdate> {

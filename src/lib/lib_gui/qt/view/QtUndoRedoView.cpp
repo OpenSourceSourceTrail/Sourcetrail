@@ -1,8 +1,8 @@
-#include "QtUndoRedoView.h"
+#include "qt/view/QtUndoRedoView.h"
 
-#include "QtViewWidgetWrapper.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
 
 QtUndoRedoView::QtUndoRedoView(ViewLayout* viewLayout) : UndoRedoView(viewLayout), m_widget{new QtUndoRedo} {}
 

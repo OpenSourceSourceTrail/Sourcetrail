@@ -1,7 +1,7 @@
 #pragma once
 
-#include "QtPathListBox.h"
-#include "QtWindow.h"
+#include "qt/element/dialog/QtPathListBox.h"
+#include "qt/window/QtWindow.h"
 
 class FilePath;
 

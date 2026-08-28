@@ -3,7 +3,7 @@
 #include <QSizeGrip>
 #include <QWidget>
 // internal
-#include "QtWindowStack.h"
+#include "qt/window/QtWindowStack.h"
 
 class QLabel;
 class QPushButton;

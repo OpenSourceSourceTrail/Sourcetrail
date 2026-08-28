@@ -5,7 +5,7 @@
 
 #include "CommandlineCommandIndex.h"
 #include "CommandLineParser.h"
-#include "IApplicationSettings.hpp"
+#include "settings/IApplicationSettings.hpp"
 #include "utilities/CollectOutStream.hpp"
 #include "utilities/FileHandler.hpp"
 

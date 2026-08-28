@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "UserPaths.h"
+#include "app/paths/UserPaths.h"
 
 namespace fs = std::filesystem;
 

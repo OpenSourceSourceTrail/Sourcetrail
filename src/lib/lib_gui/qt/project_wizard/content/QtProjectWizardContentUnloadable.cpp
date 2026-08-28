@@ -1,9 +1,9 @@
-#include "QtProjectWizardContentUnloadable.h"
+#include "qt/project_wizard/content/QtProjectWizardContentUnloadable.h"
 // Qt5
 #include <QGridLayout>
 #include <QLabel>
 // internal
-#include "SourceGroupSettingsUnloadable.h"
+#include "settings/source_group/type/SourceGroupSettingsUnloadable.h"
 
 QtProjectWizardContentUnloadable::QtProjectWizardContentUnloadable(std::shared_ptr<SourceGroupSettingsUnloadable> settings,
                                                                    QtProjectWizardWindow* window)

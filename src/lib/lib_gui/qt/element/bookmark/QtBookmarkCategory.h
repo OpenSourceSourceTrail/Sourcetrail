@@ -3,8 +3,8 @@
 
 #include <QFrame>
 
-#include "BookmarkController.h"
-#include "ControllerProxy.h"
+#include "component/controller/BookmarkController.h"
+#include "component/controller/helper/ControllerProxy.h"
 #include "GlobalId.hpp"
 
 class QLabel;

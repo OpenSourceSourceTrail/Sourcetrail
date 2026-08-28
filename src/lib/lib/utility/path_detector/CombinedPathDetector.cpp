@@ -1,4 +1,4 @@
-#include "CombinedPathDetector.h"
+#include "utility/path_detector/CombinedPathDetector.h"
 
 #include "FilePath.h"
 

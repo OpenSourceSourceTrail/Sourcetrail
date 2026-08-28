@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "Settings.h"
+#include "settings/Settings.h"
 
 using namespace testing;
 

@@ -1,4 +1,4 @@
-#include "QtBookmarkCategory.h"
+#include "qt/element/bookmark/QtBookmarkCategory.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -6,8 +6,8 @@
 #include <QPushButton>
 #include <QTreeWidget>
 
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/utility/utilityQt.h"
 
 QtBookmarkCategory::QtBookmarkCategory(ControllerProxy<BookmarkController>* controllerProxy)
     : m_controllerProxy(controllerProxy), m_id(0) {

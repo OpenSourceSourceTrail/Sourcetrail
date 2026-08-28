@@ -5,11 +5,6 @@ add_subdirectory(http)
 add_library(Sourcetrail_core INTERFACE)
 add_library(Sourcetrail::lib::core ALIAS Sourcetrail_core)
 
-target_include_directories(
-  Sourcetrail_core
-  INTERFACE ${CMAKE_SOURCE_DIR}/src/lib/lib/utility/ ${CMAKE_SOURCE_DIR}/src/lib/lib/app/paths/
-            ${CMAKE_SOURCE_DIR}/src/lib/lib/utility/file/ ${CMAKE_SOURCE_DIR}/src/lib/lib/utility/text/)
-
 target_link_libraries(Sourcetrail_core INTERFACE Boost::date_time Boost::system Boost::filesystem)
 
 target_link_libraries(

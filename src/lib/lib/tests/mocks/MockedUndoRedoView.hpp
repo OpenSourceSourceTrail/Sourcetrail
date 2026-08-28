@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "UndoRedoView.h"
+#include "component/view/UndoRedoView.h"
 
 struct MockedUndoRedoView final : UndoRedoView {
   MockedUndoRedoView(ViewLayout* viewLayout) : UndoRedoView(viewLayout) {}

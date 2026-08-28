@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "IndexerCommand.h"
-#include "IndexerComposite.h"
-#include "IntermediateStorage.h"
+#include "data/indexer/IndexerCommand.h"
+#include "data/indexer/IndexerComposite.h"
+#include "data/storage/IntermediateStorage.h"
 #include "MockedIndexer.hpp"
 
 using namespace testing;

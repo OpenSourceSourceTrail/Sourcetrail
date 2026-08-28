@@ -2,10 +2,10 @@
 // STL
 #include <unordered_map>
 // internal
-#include "CxxAstVisitorComponent.h"
-#include "ParseLocation.h"
-#include "ReferenceKind.h"
-#include "SymbolKind.h"
+#include "data/parser/cxx/CxxAstVisitorComponent.h"
+#include "data/parser/ParseLocation.h"
+#include "data/parser/ReferenceKind.h"
+#include "data/parser/SymbolKind.h"
 
 class CxxContext;
 class ParserClient;

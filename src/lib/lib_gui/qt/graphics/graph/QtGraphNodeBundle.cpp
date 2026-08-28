@@ -1,11 +1,11 @@
-#include "QtGraphNodeBundle.h"
+#include "qt/graphics/graph/QtGraphNodeBundle.h"
 
 #include <QBrush>
 #include <QPen>
 #include <QVector2D>
 
-#include "GraphViewStyle.h"
-#include "QtCountCircleItem.h"
+#include "component/view/GraphViewStyle.h"
+#include "qt/graphics/base/QtCountCircleItem.h"
 #include "type/graph/MessageGraphNodeBundleSplit.h"
 
 QtGraphNodeBundle::QtGraphNodeBundle(

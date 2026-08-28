@@ -1,4 +1,4 @@
-#include "QtSelectPathsDialog.h"
+#include "qt/window/QtSelectPathsDialog.h"
 
 #include <set>
 #include <tuple>

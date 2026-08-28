@@ -13,7 +13,7 @@
 
 #include "EngineChannel.h"
 #include "MessageQueue.h"
-#include "QtEngineSupervisor.h"
+#include "qt/engine/QtEngineSupervisor.h"
 
 using namespace std::chrono_literals;
 

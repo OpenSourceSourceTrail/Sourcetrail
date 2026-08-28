@@ -1,18 +1,18 @@
-#include "BookmarkController.h"
+#include "component/controller/BookmarkController.h"
 
 #include <algorithm>
 #include <ranges>
 
-#include "Bookmark.h"
-#include "BookmarkCategory.h"
-#include "BookmarkView.h"
-#include "EdgeBookmark.h"
+#include "component/TabId.h"
+#include "component/view/BookmarkView.h"
+#include "data/bookmark/Bookmark.h"
+#include "data/bookmark/BookmarkCategory.h"
+#include "data/bookmark/EdgeBookmark.h"
+#include "data/bookmark/NodeBookmark.h"
+#include "data/storage/StorageAccess.h"
+#include "data/storage/type/StorageEdge.h"
 #include "logging.h"
-#include "NodeBookmark.h"
 #include "RangesTo.hpp"
-#include "StorageAccess.h"
-#include "StorageEdge.h"
-#include "TabId.h"
 #include "type/bookmark/MessageBookmarkButtonState.h"
 #include "type/bookmark/MessageBookmarkUpdate.hpp"
 #include "type/graph/MessageActivateEdge.h"

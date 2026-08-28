@@ -1,6 +1,6 @@
-#include "MainView.h"
+#include "component/view/MainView.h"
 
-#include "TabId.h"
+#include "component/TabId.h"
 
 MainView::MainView(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : m_componentManager(viewFactory, storageAccess) {}

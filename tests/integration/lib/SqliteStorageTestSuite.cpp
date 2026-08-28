@@ -14,7 +14,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "SqliteStorage.h"
+#include "data/storage/sqlite/SqliteStorage.h"
 #include "TimeStamp.h"
 
 struct MockedSqliteStorage : SqliteStorage {

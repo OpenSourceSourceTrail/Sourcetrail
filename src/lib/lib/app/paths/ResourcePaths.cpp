@@ -1,6 +1,6 @@
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
 
-#include "AppPath.h"
+#include "app/paths/AppPath.h"
 #include "utilityApp.h"
 
 FilePath ResourcePaths::getColorSchemesDirectoryPath() {

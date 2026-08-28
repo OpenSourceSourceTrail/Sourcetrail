@@ -1,7 +1,7 @@
 #pragma once
 // internal
-#include "Indexer.h"
-#include "IndexerCommandCxx.h"
+#include "data/indexer/Indexer.h"
+#include "data/indexer/IndexerCommandCxx.h"
 
 class IndexerCxx final : public Indexer<IndexerCommandCxx> {
 private:

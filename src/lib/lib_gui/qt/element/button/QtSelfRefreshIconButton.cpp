@@ -1,10 +1,10 @@
-#include "QtSelfRefreshIconButton.h"
+#include "qt/element/button/QtSelfRefreshIconButton.h"
 
 #include <utility>
 
 #include <QResizeEvent>
 
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 
 QtSelfRefreshIconButton::QtSelfRefreshIconButton(const QString& text, FilePath iconPath, std::string buttonKey, QWidget* parent)
     : QPushButton(text, parent), m_text(text), m_iconPath(std::move(iconPath)), m_buttonKey(std::move(buttonKey)) {

@@ -1,3 +1,3 @@
-#include "IProject.hpp"
+#include "project/IProject.hpp"
 
 IProject::~IProject() noexcept = default;

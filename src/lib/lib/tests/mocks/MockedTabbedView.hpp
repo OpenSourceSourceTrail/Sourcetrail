@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "TabbedView.h"
+#include "component/view/TabbedView.h"
 
 struct MockedTabbedView final : TabbedView {
   MockedTabbedView(ViewLayout* viewLayout) : TabbedView(viewLayout, "Mocked") {}

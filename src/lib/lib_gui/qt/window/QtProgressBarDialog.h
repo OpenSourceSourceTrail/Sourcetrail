@@ -1,5 +1,5 @@
 #pragma once
-#include "QtIndexingDialog.h"
+#include "qt/window/QtIndexingDialog.h"
 
 class QLabel;
 class QtProgressBar;

@@ -1,4 +1,4 @@
-#include "utilityClang.h"
+#include "data/parser/cxx/utilityClang.h"
 
 #include <clang/AST/Decl.h>
 #include <clang/AST/DeclCXX.h>
@@ -8,9 +8,9 @@
 #include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
 
-#include "CanonicalFilePathCache.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
+#include "data/parser/ParseLocation.h"
 #include "FilePath.h"
-#include "ParseLocation.h"
 #include "utilityString.h"
 
 clang::SourceLocation utility::getTypeNameLoc(clang::TypeLoc typeLoc) {

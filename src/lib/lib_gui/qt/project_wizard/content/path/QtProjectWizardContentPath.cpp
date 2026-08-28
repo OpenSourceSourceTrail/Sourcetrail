@@ -1,10 +1,10 @@
-#include "QtProjectWizardContentPath.h"
+#include "qt/project_wizard/content/path/QtProjectWizardContentPath.h"
 // Qt5
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
 // internal
-#include "SourceGroupSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 #include "utilityFile.h"
 
 QtProjectWizardContentPath::QtProjectWizardContentPath(QtProjectWizardWindow* window) : QtProjectWizardContent(window) {}

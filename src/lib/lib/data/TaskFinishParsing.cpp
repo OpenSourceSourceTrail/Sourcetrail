@@ -1,10 +1,10 @@
-#include "TaskFinishParsing.h"
+#include "data/TaskFinishParsing.h"
 
 #include <utility>
 
 #include "../../scheduling/Blackboard.h"
-#include "DialogView.h"
-#include "PersistentStorage.h"
+#include "component/view/DialogView.h"
+#include "data/storage/PersistentStorage.h"
 #include "TimeStamp.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStatus.h"

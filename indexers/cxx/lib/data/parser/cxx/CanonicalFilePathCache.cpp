@@ -1,10 +1,10 @@
-#include "CanonicalFilePathCache.h"
+#include "data/parser/cxx/CanonicalFilePathCache.h"
 
 #include <clang/AST/ASTContext.h>
 #include <clang/Basic/FileManager.h>
 #include <clang/Basic/Version.h>
 
-#include "utilityClang.h"
+#include "data/parser/cxx/utilityClang.h"
 #include "utilityString.h"
 
 #if CLANG_VERSION_MAJOR > 15

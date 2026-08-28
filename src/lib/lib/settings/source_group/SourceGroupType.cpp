@@ -1,4 +1,4 @@
-#include "SourceGroupType.h"
+#include "settings/source_group/SourceGroupType.h"
 
 std::string sourceGroupTypeToString(SourceGroupType v) {
   switch(v) {

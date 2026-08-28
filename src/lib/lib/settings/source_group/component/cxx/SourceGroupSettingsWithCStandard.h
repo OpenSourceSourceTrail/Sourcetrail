@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "SourceGroupSettingsComponent.h"
+#include "settings/source_group/component/SourceGroupSettingsComponent.h"
 
 class SourceGroupSettingsWithCStandard : public SourceGroupSettingsComponent {
 public:

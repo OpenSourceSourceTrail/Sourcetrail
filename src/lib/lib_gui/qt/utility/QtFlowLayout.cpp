@@ -1,6 +1,6 @@
 // from: http://doc.qt.io/qt-5/qtwidgets-layouts-flowlayout-flowlayout-cpp.html
 
-#include "QtFlowLayout.h"
+#include "qt/utility/QtFlowLayout.h"
 
 #include <QWidget>
 

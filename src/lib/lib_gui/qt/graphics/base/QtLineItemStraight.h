@@ -4,7 +4,7 @@
 #include <QGraphicsItem>
 #include <QVector2D>
 
-#include "GraphViewStyle.h"
+#include "component/view/GraphViewStyle.h"
 
 class QtLineItemStraight : public QGraphicsLineItem {
 public:

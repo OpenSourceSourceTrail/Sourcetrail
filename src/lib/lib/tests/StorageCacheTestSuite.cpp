@@ -1,10 +1,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "Graph.h"
+#include "data/graph/Graph.h"
 #include "TextAccess.h"
 #define private public    // NOLINT(clang-diagnostic-keyword-macro)
-#include "StorageCache.h"
+#include "data/storage/StorageCache.h"
 #undef private
 
 namespace {

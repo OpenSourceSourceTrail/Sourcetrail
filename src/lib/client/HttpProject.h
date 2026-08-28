@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "IProject.hpp"
+#include "project/IProject.hpp"
 
 class EngineChannel;
 

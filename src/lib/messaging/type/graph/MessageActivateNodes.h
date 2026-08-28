@@ -1,9 +1,9 @@
 #pragma once
 
+#include "component/TabId.h"
+#include "data/name/NameHierarchy.h"
 #include "GlobalId.hpp"
 #include "Message.h"
-#include "NameHierarchy.h"
-#include "TabId.h"
 
 class MessageActivateNodes final : public Message<MessageActivateNodes> {
 public:

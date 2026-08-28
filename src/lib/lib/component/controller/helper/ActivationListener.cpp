@@ -1,4 +1,4 @@
-#include "ActivationListener.h"
+#include "component/controller/helper/ActivationListener.h"
 
 const std::vector<SearchMatch>& ActivationListener::getSearchMatches() const {
   return m_searchMatches;

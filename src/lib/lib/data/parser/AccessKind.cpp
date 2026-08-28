@@ -1,4 +1,4 @@
-#include "AccessKind.h"
+#include "data/parser/AccessKind.h"
 
 AccessKind intToAccessKind(int v) {
   switch(v) {

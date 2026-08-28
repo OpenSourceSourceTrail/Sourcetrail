@@ -1,11 +1,11 @@
-#include "QtProgressBar.h"
+#include "qt/element/dialog/QtProgressBar.h"
 
 #include <QPainter>
 #include <QPaintEvent>
 #include <QPixmap>
 #include <QTimer>
 
-#include "ResourcePaths.h"
+#include "app/paths/ResourcePaths.h"
 
 QtProgressBar::QtProgressBar(QWidget* parent)
     : QWidget(parent)

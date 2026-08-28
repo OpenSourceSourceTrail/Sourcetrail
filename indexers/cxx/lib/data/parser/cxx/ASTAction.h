@@ -4,7 +4,7 @@
 // clang
 #include <clang/Frontend/FrontendAction.h>
 // internal
-#include "CommentHandler.h"
+#include "data/parser/cxx/CommentHandler.h"
 
 class ParserClient;
 class CanonicalFilePathCache;

@@ -1,11 +1,11 @@
-#include "QtPathListBox.h"
+#include "qt/element/dialog/QtPathListBox.h"
 
 #include <QLabel>
 #include <QListWidget>
 #include <QMimeData>
 #include <QtGui/qevent.h>
 
-#include "QtPathListBoxItem.h"
+#include "qt/element/dialog/QtPathListBoxItem.h"
 #include "utilityFile.h"
 
 QtPathListBox::QtPathListBox(QWidget* parent, const QString& listName, SelectionPolicyType selectionPolicy)

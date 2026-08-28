@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 // internal
-#include "Parser.h"
+#include "data/parser/Parser.h"
 
 class CanonicalFilePathCache;
 class CxxDiagnosticConsumer;

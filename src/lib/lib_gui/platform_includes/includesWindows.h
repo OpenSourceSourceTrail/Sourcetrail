@@ -6,12 +6,12 @@
 #include <type_traits>
 #include <windows.h>
 
-#include "Application.h"
-#include "AppPath.h"
+#include "app/Application.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/ResourcePaths.h"
+#include "app/paths/UserPaths.h"
 #include "FileSystem.h"
 #include "logging.h"
-#include "ResourcePaths.h"
-#include "UserPaths.h"
 #include "utility.h"
 #include "utilityApp.h"
 

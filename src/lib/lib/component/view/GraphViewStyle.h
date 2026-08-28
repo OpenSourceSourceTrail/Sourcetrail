@@ -6,11 +6,11 @@
 #include "Vec2f.h"
 
 // internal
-#include "AccessKind.h"
-#include "Edge.h"
+#include "data/graph/Edge.h"
+#include "data/GroupType.h"
+#include "data/NodeType.h"
+#include "data/parser/AccessKind.h"
 #include "FilePath.h"
-#include "GroupType.h"
-#include "NodeType.h"
 
 class GraphViewStyleImpl;
 

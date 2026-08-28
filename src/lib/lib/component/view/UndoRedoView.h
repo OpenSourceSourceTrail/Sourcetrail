@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "View.h"
+#include "component/view/View.h"
 
 class UndoRedoController;
 struct SearchMatch;

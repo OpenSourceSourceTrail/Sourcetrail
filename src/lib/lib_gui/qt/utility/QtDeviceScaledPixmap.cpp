@@ -1,8 +1,8 @@
-#include "QtDeviceScaledPixmap.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
 
 #include <QApplication>
 
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
 
 qreal QtDeviceScaledPixmap::devicePixelRatio() {
   QApplication* app = dynamic_cast<QApplication*>(QCoreApplication::instance());

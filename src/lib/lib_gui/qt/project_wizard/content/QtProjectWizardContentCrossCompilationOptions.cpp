@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentCrossCompilationOptions.h"
+#include "qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -6,7 +6,7 @@
 #include <QLabel>
 
 #include "logging.h"
-#include "SourceGroupSettingsWithCxxCrossCompilationOptions.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxCrossCompilationOptions.h"
 
 QtProjectWizardContentCrossCompilationOptions::QtProjectWizardContentCrossCompilationOptions(
     std::shared_ptr<SourceGroupSettingsWithCxxCrossCompilationOptions> sourceGroupSettings, QtProjectWizardWindow* window)

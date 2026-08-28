@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
+#include "data/ErrorCountInfo.h"
 #include "engine.pb.h"
-#include "ErrorCountInfo.h"
 
 class FilePath;
 

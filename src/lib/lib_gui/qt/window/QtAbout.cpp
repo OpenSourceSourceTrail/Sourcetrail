@@ -1,16 +1,16 @@
-#include "QtAbout.h"
+#include "qt/window/QtAbout.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "globalStrings.h"
-#include "QtDeviceScaledPixmap.h"
-#include "ResourcePaths.h"
-#include "StorageVersion.h"
+#include "app/paths/ResourcePaths.h"
+#include "data/storage/StorageVersion.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
+#include "qt/utility/utilityQt.h"
+#include "utility/globalStrings.h"
 #include "utilityApp.h"
-#include "utilityQt.h"
 #include "Version.h"
 
 QtAbout::QtAbout(QWidget* parent) : QtWindow{false, parent} {}

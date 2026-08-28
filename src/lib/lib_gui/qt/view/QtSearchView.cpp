@@ -1,9 +1,9 @@
-#include "QtSearchView.h"
+#include "qt/view/QtSearchView.h"
 
-#include "QtSearchBar.h"
-#include "QtViewWidgetWrapper.h"
-#include "ResourcePaths.h"
-#include "utilityQt.h"
+#include "app/paths/ResourcePaths.h"
+#include "qt/element/search/QtSearchBar.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
 
 QtSearchView::QtSearchView(ViewLayout* viewLayout) : SearchView(viewLayout), m_widget{new QtSearchBar} {}
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "ICxxToolchain.h"
+#include "project/ICxxToolchain.h"
 
 class DialogView;
 class FilePath;

@@ -52,16 +52,8 @@ target_sources(
           project/CxxToolchainLocal.cpp
           LanguagePackageCxx.cpp)
 
-target_include_directories(
-  Sourcetrail_lib_cxx
-  PUBLIC ${CMAKE_CURRENT_LIST_DIR}
-         ${CMAKE_CURRENT_LIST_DIR}/data/indexer/
-         ${CMAKE_CURRENT_LIST_DIR}/data/parser/cxx/name/
-         ${CMAKE_CURRENT_LIST_DIR}/data/parser/cxx/name_resolver/
-         ${CMAKE_CURRENT_LIST_DIR}/data/parser/cxx/
-         ${CMAKE_CURRENT_LIST_DIR}/project/
-         ${CMAKE_CURRENT_LIST_DIR}/utility/
-         ${CMAKE_CURRENT_LIST_DIR}/utility/codeblocks/)
+# One include root, e.g. #include "data/parser/cxx/CxxParser.h".
+target_include_directories(Sourcetrail_lib_cxx PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 
 target_include_directories(Sourcetrail_lib_cxx PRIVATE ${CMAKE_BINARY_DIR}/src/lib/lib)
 

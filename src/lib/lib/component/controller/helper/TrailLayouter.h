@@ -5,8 +5,8 @@
 #include <set>
 #include <vector>
 
-#include "DummyEdge.h"
-#include "DummyNode.h"
+#include "component/controller/helper/DummyEdge.h"
+#include "component/controller/helper/DummyNode.h"
 #include "Vec2f.h"
 
 // based on Sugiyama dependency graph layouting

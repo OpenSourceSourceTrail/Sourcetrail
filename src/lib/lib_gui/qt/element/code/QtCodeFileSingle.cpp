@@ -1,4 +1,4 @@
-#include "QtCodeFileSingle.h"
+#include "qt/element/code/QtCodeFileSingle.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -6,13 +6,13 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 
+#include "data/location/SourceLocationFile.h"
 #include "FilePath.h"
 #include "logging.h"
-#include "QtCodeArea.h"
-#include "QtCodeFileTitleBar.h"
-#include "QtCodeFileTitleButton.h"
-#include "QtCodeNavigator.h"
-#include "SourceLocationFile.h"
+#include "qt/element/code/QtCodeArea.h"
+#include "qt/element/code/QtCodeFileTitleBar.h"
+#include "qt/element/code/QtCodeFileTitleButton.h"
+#include "qt/element/code/QtCodeNavigator.h"
 #include "type/code/MessageChangeFileView.h"
 
 QtCodeFileSingle::QtCodeFileSingle(QtCodeNavigator* navigator, QWidget* /*parent*/)

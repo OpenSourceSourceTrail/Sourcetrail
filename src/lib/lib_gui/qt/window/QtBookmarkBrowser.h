@@ -3,10 +3,10 @@
 #include <QListWidget>
 #include <QTreeWidget>
 
-#include "Bookmark.h"
-#include "BookmarkController.h"
-#include "ControllerProxy.h"
-#include "QtWindow.h"
+#include "component/controller/BookmarkController.h"
+#include "component/controller/helper/ControllerProxy.h"
+#include "data/bookmark/Bookmark.h"
+#include "qt/window/QtWindow.h"
 
 class QtBookmark;
 

@@ -1,9 +1,9 @@
-#include "QtGraphNodeComponentClickable.h"
+#include "qt/graphics/component/QtGraphNodeComponentClickable.h"
 
 #include <QGraphicsSceneEvent>
 #include <QVector2D>
 
-#include "QtGraphNode.h"
+#include "qt/graphics/graph/QtGraphNode.h"
 
 QtGraphNodeComponentClickable::QtGraphNodeComponentClickable(QtGraphNode* graphNode)
     : QtGraphNodeComponent(graphNode), m_mousePos{}, m_mouseMoved(false) {}

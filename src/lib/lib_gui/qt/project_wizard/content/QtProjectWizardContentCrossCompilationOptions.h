@@ -1,7 +1,7 @@
 #ifndef QT_PROJECT_WIZARD_CONTENT_CROSS_COMPILATION_OPTIONS
 #define QT_PROJECT_WIZARD_CONTENT_CROSS_COMPILATION_OPTIONS
 
-#include "QtProjectWizardContent.h"
+#include "qt/project_wizard/content/QtProjectWizardContent.h"
 
 class QCheckBox;
 class QComboBox;

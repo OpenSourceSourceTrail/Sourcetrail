@@ -3,7 +3,7 @@
 
 #include <QVector2D>
 
-#include "QtRoundedRectItem.h"
+#include "qt/graphics/base/QtRoundedRectItem.h"
 
 class QtCountCircleItem : public QtRoundedRectItem {
 public:

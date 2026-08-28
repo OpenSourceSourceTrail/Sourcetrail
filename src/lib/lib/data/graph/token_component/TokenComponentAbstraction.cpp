@@ -1,4 +1,4 @@
-#include "TokenComponentAbstraction.h"
+#include "data/graph/token_component/TokenComponentAbstraction.h"
 
 TokenComponentAbstraction::TokenComponentAbstraction(AbstractionType abstraction) : m_abstraction(abstraction) {}
 

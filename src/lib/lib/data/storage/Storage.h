@@ -8,17 +8,17 @@
 #include <set>
 #include <string>
 
+#include "data/storage/type/StorageComponentAccess.h"
+#include "data/storage/type/StorageEdge.h"
+#include "data/storage/type/StorageElementComponent.h"
+#include "data/storage/type/StorageError.h"
+#include "data/storage/type/StorageFile.h"
+#include "data/storage/type/StorageLocalSymbol.h"
+#include "data/storage/type/StorageNode.h"
+#include "data/storage/type/StorageOccurrence.h"
+#include "data/storage/type/StorageSourceLocation.h"
+#include "data/storage/type/StorageSymbol.h"
 #include "GlobalId.hpp"
-#include "StorageComponentAccess.h"
-#include "StorageEdge.h"
-#include "StorageElementComponent.h"
-#include "StorageError.h"
-#include "StorageFile.h"
-#include "StorageLocalSymbol.h"
-#include "StorageNode.h"
-#include "StorageOccurrence.h"
-#include "StorageSourceLocation.h"
-#include "StorageSymbol.h"
 
 /**
  * @class Storage

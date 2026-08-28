@@ -1,8 +1,8 @@
-#include "View.h"
+#include "component/view/View.h"
 // STL
 #include <utility>
 // internal
-#include "ViewWidgetWrapper.h"
+#include "component/view/ViewWidgetWrapper.h"
 
 View::View(ViewLayout* pViewLayout) : m_viewLayout(pViewLayout) {}
 

@@ -4,8 +4,8 @@
 #include <memory>
 #include <string>
 // internal
-#include "Component.h"
-#include "ViewLayout.h"
+#include "component/Component.h"
+#include "component/view/ViewLayout.h"
 
 class ViewWidgetWrapper;
 

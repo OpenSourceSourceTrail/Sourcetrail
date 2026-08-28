@@ -1,4 +1,4 @@
-#include "QtFilesAndDirectoriesDialog.h"
+#include "qt/utility/QtFilesAndDirectoriesDialog.h"
 
 #include <QEvent>
 #include <QListView>

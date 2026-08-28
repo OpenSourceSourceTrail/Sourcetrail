@@ -4,7 +4,7 @@
 #ifndef _WIN32
 #  define private public    // NOLINT(clang-diagnostic-keyword-macro)
 #endif
-#include "SqliteIndexStorage.h"
+#include "data/storage/sqlite/SqliteIndexStorage.h"
 #ifndef _WIN32
 #  undef private
 #endif

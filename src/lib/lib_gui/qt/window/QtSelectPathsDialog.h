@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtTextEditDialog.h"
+#include "qt/window/QtTextEditDialog.h"
 
 class FilePath;
 class QListWidget;

@@ -1,7 +1,7 @@
-#include "QtProjectWizardContentPathsExclude.h"
+#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.h"
 
-#include "SourceGroupSettings.h"
-#include "SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
+#include "settings/source_group/SourceGroupSettings.h"
 #include "utility.h"
 #include "utilityString.h"
 

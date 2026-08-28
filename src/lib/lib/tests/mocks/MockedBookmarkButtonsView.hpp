@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "BookmarkButtonsView.h"
+#include "component/view/BookmarkButtonsView.h"
 
 struct MockedBookmarkButtonsView final : BookmarkButtonsView {
   explicit MockedBookmarkButtonsView(ViewLayout* viewLayout) : BookmarkButtonsView(viewLayout) {}

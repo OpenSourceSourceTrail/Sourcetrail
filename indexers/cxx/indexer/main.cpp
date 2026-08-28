@@ -5,21 +5,21 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
-#include "ApplicationSettings.h"
-#include "AppPath.h"
-#include "GrpcIndexer.h"
-#include "IApplicationSettings.hpp"
-#include "IndexerPluginRegistry.h"
+#include "app/IndexerPluginRegistry.h"
+#include "app/LanguagePackageManager.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/UserPaths.h"
+#include "data/indexer/grpc/GrpcIndexer.h"
 #include "language_packages.h"
-#include "LanguagePackageManager.h"
 #include "logging.h"
-#include "UserPaths.h"
+#include "settings/details/ApplicationSettings.h"
+#include "settings/IApplicationSettings.hpp"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
 #  include "CxxHelperMode.h"
-#  include "CxxToolchainLocal.h"
-#  include "ICxxToolchain.h"
 #  include "LanguagePackageCxx.h"
+#  include "project/CxxToolchainLocal.h"
+#  include "project/ICxxToolchain.h"
 #endif
 
 #ifdef _WIN32

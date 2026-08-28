@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "data/storage/sqlite/SqliteBookmarkStorage.h"
 #include "FileSystem.h"
-#include "SqliteBookmarkStorage.h"
 
 namespace {
 

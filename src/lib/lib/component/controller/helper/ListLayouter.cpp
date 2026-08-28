@@ -1,12 +1,12 @@
-#include "ListLayouter.h"
+#include "component/controller/helper/ListLayouter.h"
 // STL
 #include <algorithm>
 #include <cmath>
 #include <limits>
 
 // internal
-#include "DummyNode.h"
-#include "GraphViewStyle.h"
+#include "component/controller/helper/DummyNode.h"
+#include "component/view/GraphViewStyle.h"
 
 void ListLayouter::layoutRow(std::vector<std::shared_ptr<DummyNode>>* nodes, int gap) {
   layoutSimple(nodes, gap, 0, true);

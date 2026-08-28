@@ -1,4 +1,4 @@
-#include "QtCodeSnippet.h"
+#include "qt/element/code/QtCodeSnippet.h"
 
 #include <QBoxLayout>
 #include <QPushButton>
@@ -6,10 +6,10 @@
 
 #include <qmenu.h>
 
-#include "QtCodeFile.h"
-#include "QtCodeNavigator.h"
-#include "QtHoverButton.h"
-#include "SourceLocationFile.h"
+#include "data/location/SourceLocationFile.h"
+#include "qt/element/button/QtHoverButton.h"
+#include "qt/element/code/QtCodeFile.h"
+#include "qt/element/code/QtCodeNavigator.h"
 #include "type/code/MessageShowScope.h"
 
 QtCodeSnippet::QtCodeSnippet(const CodeSnippetParams& params, QtCodeNavigator* navigator, QtCodeFile* file)

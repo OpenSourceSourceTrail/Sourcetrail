@@ -4,13 +4,13 @@
 
 #include <gtest/gtest.h>
 
+#include "data/storage/PersistentStorage.h"
 #include "FileSystem.h"
-#include "PersistentStorage.h"
-#include "ProjectSettings.h"
-#include "RefreshInfo.h"
-#include "RefreshInfoGenerator.h"
-#include "SourceGroup.h"
-#include "SourceGroupSettings.h"
+#include "project/RefreshInfo.h"
+#include "project/RefreshInfoGenerator.h"
+#include "project/SourceGroup.h"
+#include "settings/ProjectSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 #include "utility.h"
 
 namespace {

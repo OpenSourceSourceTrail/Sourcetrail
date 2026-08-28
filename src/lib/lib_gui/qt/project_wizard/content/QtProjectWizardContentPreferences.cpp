@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentPreferences.h"
+#include "qt/project_wizard/content/QtProjectWizardContentPreferences.h"
 
 #include <utility>
 
@@ -13,12 +13,12 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/spdlog.h>
 
+#include "app/paths/ResourcePaths.h"
 #include "FileSystem.h"
-#include "IApplicationSettings.hpp"
-#include "ResourcePaths.h"
+#include "qt/utility/utilityQt.h"
+#include "settings/IApplicationSettings.hpp"
 #include "type/MessageSwitchColorScheme.h"
 #include "utilityApp.h"
-#include "utilityQt.h"
 
 QtProjectWizardContentPreferences::QtProjectWizardContentPreferences(QtProjectWizardWindow* window)
     : QtProjectWizardContent(window)

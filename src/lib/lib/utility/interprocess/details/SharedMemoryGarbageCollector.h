@@ -6,8 +6,8 @@
 #include <string>
 #include <thread>
 
-#include "ISharedMemoryGarbageCollector.hpp"
-#include "SharedMemory.h"
+#include "utility/interprocess/ISharedMemoryGarbageCollector.hpp"
+#include "utility/interprocess/SharedMemory.h"
 
 class SharedMemoryGarbageCollector : public lib::ISharedMemoryGarbageCollector {
 public:

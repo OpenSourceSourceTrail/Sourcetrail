@@ -4,9 +4,9 @@
 #include <memory>
 #include <vector>
 
-#include "MainView.h"
+#include "component/view/MainView.h"
 #include "MessageListener.h"
-#include "QtThreadedFunctor.h"
+#include "qt/utility/QtThreadedFunctor.h"
 #include "type/MessageProjectEdit.h"
 #include "type/MessageProjectNew.h"
 #include "type/MessageWindowChanged.h"

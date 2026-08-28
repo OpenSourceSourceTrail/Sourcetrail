@@ -1,7 +1,7 @@
-#include "CxxFrameworkPathDetector.h"
+#include "utility/path_detector/cxx_header/CxxFrameworkPathDetector.h"
 
 #include "FilePath.h"
-#include "utilityCxxHeaderDetection.h"
+#include "utility/path_detector/cxx_header/utilityCxxHeaderDetection.h"
 #include "utilityString.h"
 
 CxxFrameworkPathDetector::CxxFrameworkPathDetector(const std::string& compilerName)

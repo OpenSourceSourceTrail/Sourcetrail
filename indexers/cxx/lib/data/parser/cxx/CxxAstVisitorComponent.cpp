@@ -1,4 +1,4 @@
-#include "CxxAstVisitorComponent.h"
+#include "data/parser/cxx/CxxAstVisitorComponent.h"
 
 CxxAstVisitorComponent::CxxAstVisitorComponent(CxxAstVisitor* astVisitor) : m_astVisitor(astVisitor) {}
 

@@ -1,11 +1,11 @@
-#include "QtCompositeView.h"
+#include "qt/view/QtCompositeView.h"
 
 #include <QBoxLayout>
 #include <QWidget>
 
-#include "ColorScheme.h"
-#include "QtViewWidgetWrapper.h"
-#include "utilityQt.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
+#include "settings/ColorScheme.h"
 
 QtCompositeView::QtCompositeView(ViewLayout* viewLayout, CompositeDirection direction, const std::string& name, Id tabId)
     : CompositeView(viewLayout, direction, name, tabId) {

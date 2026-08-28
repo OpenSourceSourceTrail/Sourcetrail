@@ -1,4 +1,4 @@
-#include "CxxStaticFunctionDeclName.h"
+#include "data/parser/cxx/name/CxxStaticFunctionDeclName.h"
 
 CxxStaticFunctionDeclName::CxxStaticFunctionDeclName(std::wstring name,
                                                      std::vector<std::wstring> templateParameterNames,

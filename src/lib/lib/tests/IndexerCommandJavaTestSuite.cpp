@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include "Convert.h"
+#include "data/indexer/IndexerCommandJava.h"
 #include "FilePath.h"
-#include "IndexerCommandJava.h"
 
 TEST(IndexerCommandJava, getStaticIndexerCommandTypeReturnsJava) {
   EXPECT_EQ(INDEXER_COMMAND_JAVA, IndexerCommandJava::getStaticIndexerCommandType());

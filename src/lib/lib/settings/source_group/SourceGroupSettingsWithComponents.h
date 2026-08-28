@@ -1,7 +1,7 @@
 #ifndef SOURCE_GROUP_SETTINGS_WITH_COMPONENTS_H
 #define SOURCE_GROUP_SETTINGS_WITH_COMPONENTS_H
 
-#include "SourceGroupSettings.h"
+#include "settings/source_group/SourceGroupSettings.h"
 
 template <typename... ComponentTypes>
 class SourceGroupSettingsWithComponents

@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-#include "IndexerCommand.h"
+#include "data/indexer/IndexerCommand.h"
 
 class FilePath;
 

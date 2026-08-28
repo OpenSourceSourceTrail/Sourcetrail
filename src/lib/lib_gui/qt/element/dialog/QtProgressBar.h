@@ -2,7 +2,7 @@
 
 #include <QWidget>
 
-#include "QtDeviceScaledPixmap.h"
+#include "qt/utility/QtDeviceScaledPixmap.h"
 #include "TimeStamp.h"
 
 class QTimer;

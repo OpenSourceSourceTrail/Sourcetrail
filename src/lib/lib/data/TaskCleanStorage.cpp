@@ -1,12 +1,12 @@
-#include "TaskCleanStorage.h"
+#include "data/TaskCleanStorage.h"
 
 #include <utility>
 
 #include "../../scheduling/Blackboard.h"
-#include "Application.h"
-#include "DialogView.h"
+#include "app/Application.h"
+#include "component/view/DialogView.h"
+#include "data/storage/PersistentStorage.h"
 #include "FilePath.h"
-#include "PersistentStorage.h"
 
 TaskCleanStorage::TaskCleanStorage(std::weak_ptr<PersistentStorage> storage,
                                    std::shared_ptr<DialogView> dialogView,

@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentProjectData.h"
+#include "qt/project_wizard/content/QtProjectWizardContentProjectData.h"
 // Qt5
 #include <QGridLayout>
 #include <QLabel>
@@ -8,7 +8,7 @@
 #include <boost/filesystem/path.hpp>
 // internal
 #include "FileSystem.h"
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 
 QtProjectWizardContentProjectData::QtProjectWizardContentProjectData(std::shared_ptr<ProjectSettings> projectSettings,
                                                                      QtProjectWizardWindow* window,

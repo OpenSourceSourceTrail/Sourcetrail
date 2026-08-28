@@ -1,21 +1,21 @@
-#include "TaskBuildIndex.h"
+#include "data/indexer/TaskBuildIndex.h"
 
 #include <fmt/format.h>
 
 #include <grpcpp/server_builder.h>
 #include <spdlog/spdlog.h>
 
-#include "AppPath.h"
+#include "app/IndexerPluginRegistry.h"
+#include "app/paths/AppPath.h"
+#include "app/paths/UserPaths.h"
 #include "Blackboard.h"
-#include "DialogView.h"
-#include "GrpcIndexer.h"
-#include "IndexerCommandType.h"
-#include "IndexerPluginRegistry.h"
-#include "ParserClientImpl.h"
-#include "StorageProvider.h"
+#include "component/view/DialogView.h"
+#include "data/indexer/grpc/GrpcIndexer.h"
+#include "data/indexer/IndexerCommandType.h"
+#include "data/parser/ParserClientImpl.h"
+#include "data/storage/StorageProvider.h"
 #include "TimeStamp.h"
 #include "type/indexing/MessageIndexingStatus.h"
-#include "UserPaths.h"
 #include "utilityApp.h"
 #include "utilityString.h"
 

@@ -1,6 +1,6 @@
-#include "SourceGroupSettingsWithCStandard.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCStandard.h"
 
-#include "ProjectSettings.h"
+#include "settings/ProjectSettings.h"
 
 std::wstring SourceGroupSettingsWithCStandard::getDefaultCStandardStatic() {
 #ifdef __linux__

@@ -1,4 +1,4 @@
-#include "QtProjectWizardContentSourceGroupInfoText.h"
+#include "qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.h"
 // Qt5
 #include <QGridLayout>
 #include <QLabel>

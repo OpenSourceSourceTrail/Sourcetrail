@@ -1,10 +1,10 @@
 #pragma once
 // internal
-#include "Edge.h"
+#include "component/TabId.h"
+#include "data/graph/Edge.h"
+#include "data/name/NameHierarchy.h"
 #include "GlobalId.hpp"
 #include "Message.h"
-#include "NameHierarchy.h"
-#include "TabId.h"
 
 class MessageActivateTrailEdge final : public Message<MessageActivateTrailEdge> {
 public:

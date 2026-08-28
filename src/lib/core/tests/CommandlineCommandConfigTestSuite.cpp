@@ -3,8 +3,8 @@
 
 #include "CommandlineCommandConfig.h"
 #include "CommandLineParser.h"
-#include "IApplicationSettings.hpp"
 #include "MockedApplicationSetting.hpp"
+#include "settings/IApplicationSettings.hpp"
 #include "utilities/CollectOutStream.hpp"
 
 using namespace testing;

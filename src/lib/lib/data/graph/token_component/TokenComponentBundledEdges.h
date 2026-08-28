@@ -4,8 +4,8 @@
 #include <map>
 #include <set>
 
+#include "data/graph/token_component/TokenComponent.h"
 #include "GlobalId.hpp"
-#include "TokenComponent.h"
 
 class TokenComponentBundledEdges : public TokenComponent {
 public:

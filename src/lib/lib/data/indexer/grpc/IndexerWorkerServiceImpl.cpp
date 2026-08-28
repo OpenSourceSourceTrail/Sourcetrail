@@ -1,12 +1,12 @@
-#include "IndexerWorkerServiceImpl.h"
+#include "data/indexer/grpc/IndexerWorkerServiceImpl.h"
 
 #include <fmt/format.h>
 
 #include "Convert.h"
+#include "data/storage/IntermediateStorage.h"
+#include "data/storage/StorageProvider.h"
 #include "FilePath.h"
-#include "IntermediateStorage.h"
 #include "logging.h"
-#include "StorageProvider.h"
 #include "utilityString.h"
 
 IndexerWorkerServiceImpl::IndexerWorkerServiceImpl(std::shared_ptr<StorageProvider> storageProvider)

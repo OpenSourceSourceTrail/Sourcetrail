@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "Component.h"
-#include "Controller.h"
-#include "View.h"
+#include "component/Component.h"
+#include "component/controller/Controller.h"
+#include "component/view/View.h"
 
 using namespace ::testing;
 

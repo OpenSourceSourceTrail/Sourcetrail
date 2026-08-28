@@ -3,7 +3,7 @@
 #include <functional>
 // internal
 #include "../../../../scheduling/TaskLambda.h"
-#include "View.h"
+#include "component/view/View.h"
 
 template <typename ControllerType>
 class ControllerProxy {

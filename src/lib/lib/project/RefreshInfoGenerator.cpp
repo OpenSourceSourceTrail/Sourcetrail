@@ -1,11 +1,11 @@
-#include "RefreshInfoGenerator.h"
+#include "project/RefreshInfoGenerator.h"
 
+#include "data/storage/PersistentStorage.h"
 #include "FileInfo.h"
 #include "FileSystem.h"
-#include "PersistentStorage.h"
-#include "RefreshInfo.h"
-#include "SourceGroup.h"
-#include "SourceGroupStatusType.h"
+#include "project/RefreshInfo.h"
+#include "project/SourceGroup.h"
+#include "settings/source_group/SourceGroupStatusType.h"
 #include "TextAccess.h"
 #include "utility.h"
 

@@ -1,4 +1,4 @@
-#include "utilitySourceGroupCxx.h"
+#include "project/utilitySourceGroupCxx.h"
 
 #include <algorithm>
 #include <array>
@@ -12,14 +12,14 @@
 
 #include <unordered_map>
 
-#include "DialogView.h"
+#include "component/view/DialogView.h"
+#include "data/storage/IntermediateStorage.h"
+#include "data/storage/StorageProvider.h"
 #include "FilePath.h"
-#include "ICxxToolchain.h"
-#include "IntermediateStorage.h"
 #include "logging.h"
 #include "OrderedCache.h"
-#include "SourceGroupSettingsWithCxxPchOptions.h"
-#include "StorageProvider.h"
+#include "project/ICxxToolchain.h"
+#include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h"
 #include "TaskLambda.h"
 #include "type/MessageStatus.h"
 #include "utility.h"

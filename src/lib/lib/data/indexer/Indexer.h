@@ -3,11 +3,11 @@
 
 #include <memory>
 
-#include "IndexerBase.h"
-#include "IndexerCommand.h"
-#include "IndexerStateInfo.h"
+#include "data/indexer/IndexerBase.h"
+#include "data/indexer/IndexerCommand.h"
+#include "data/indexer/IndexerStateInfo.h"
+#include "data/parser/ParserClientImpl.h"
 #include "logging.h"
-#include "ParserClientImpl.h"
 
 template <typename T>
 class Indexer : public IndexerBase {

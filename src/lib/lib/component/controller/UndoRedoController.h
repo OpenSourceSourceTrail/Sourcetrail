@@ -3,7 +3,7 @@
 
 #include <list>
 
-#include "Controller.h"
+#include "component/controller/Controller.h"
 #include "MessageBase.h"
 #include "MessageListener.h"
 #include "type/activation/MessageActivateErrors.h"

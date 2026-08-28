@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QtWindowBase.h"
+#include "qt/window/QtWindowBase.h"
 
 class QLabel;
 class QPushButton;

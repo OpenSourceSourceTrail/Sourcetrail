@@ -1,8 +1,8 @@
 #pragma once
 // internal
+#include "component/TabId.h"
 #include "GlobalId.hpp"
 #include "Message.h"
-#include "TabId.h"
 
 class MessageGraphNodeBundleSplit final : public Message<MessageGraphNodeBundleSplit> {
 public:

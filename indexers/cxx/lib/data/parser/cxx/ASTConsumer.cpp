@@ -1,8 +1,8 @@
-#include "ASTConsumer.h"
+#include "data/parser/cxx/ASTConsumer.h"
 // internal
-#include "CxxAstVisitor.h"
-#include "CxxVerboseAstVisitor.h"
-#include "IApplicationSettings.hpp"
+#include "data/parser/cxx/CxxAstVisitor.h"
+#include "data/parser/cxx/CxxVerboseAstVisitor.h"
+#include "settings/IApplicationSettings.hpp"
 
 ASTConsumer::ASTConsumer(clang::ASTContext* context,
                          clang::Preprocessor* preprocessor,

@@ -1,9 +1,9 @@
-#include "SharedMemory.h"
+#include "utility/interprocess/SharedMemory.h"
 
 #include <fmt/format.h>
 
-#include "details/SharedMemoryGarbageCollector.h"
 #include "logging.h"
+#include "utility/interprocess/details/SharedMemoryGarbageCollector.h"
 
 const char* SharedMemory::s_memoryNamePrefix = "srctrlmem_";
 const char* SharedMemory::s_mutexNamePrefix = "srctrlmtx_";

@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
-#include "NameDelimiterType.h"
-#include "NameElement.h"
+#include "data/name/NameDelimiterType.h"
+#include "data/name/NameElement.h"
 
 class NameHierarchy {
 public:

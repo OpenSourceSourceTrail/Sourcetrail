@@ -6,7 +6,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "QtStartScreen.hpp"
+#include "qt/window/QtStartScreen.hpp"
 
 QtStartScreenTestSuite::QtStartScreenTestSuite() = default;
 

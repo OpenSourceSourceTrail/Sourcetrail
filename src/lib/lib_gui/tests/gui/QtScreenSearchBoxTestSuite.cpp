@@ -7,13 +7,13 @@
 
 #include <gtest/gtest.h>
 
-#include "ControllerProxy.h"
+#include "component/controller/helper/ControllerProxy.h"
+#include "component/controller/ScreenSearchController.h"
 #include "gui/utilities.hpp"
 #include "MockedView.hpp"
 #include "MockedViewLayout.hpp"
-#include "QtScreenSearchBox.h"
-#include "QtSelfRefreshIconButton.h"
-#include "ScreenSearchController.h"
+#include "qt/element/button/QtSelfRefreshIconButton.h"
+#include "qt/element/search/QtScreenSearchBox.h"
 
 struct QtScreenSearchBoxFix : testing::Test {
   void SetUp() override {

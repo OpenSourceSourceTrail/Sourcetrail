@@ -7,7 +7,7 @@
 
 #include "FilePath.h"
 #include "MessageListener.h"
-#include "QtWindowStack.h"
+#include "qt/window/QtWindowStack.h"
 #include "type/MessageRefreshUI.h"
 
 class Bookmark;

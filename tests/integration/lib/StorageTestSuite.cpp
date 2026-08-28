@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include "IntermediateStorage.h"
-#include "ParseLocation.h"
-#include "PersistentStorage.h"
+#include "data/parser/ParseLocation.h"
+#include "data/storage/IntermediateStorage.h"
+#include "data/storage/PersistentStorage.h"
 #include "utilityString.h"
 
 namespace {

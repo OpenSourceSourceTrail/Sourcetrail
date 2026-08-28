@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "IndexerComposite.h"
-#include "LanguagePackage.h"
-#include "LanguagePackageManager.h"
+#include "app/LanguagePackage.h"
+#include "app/LanguagePackageManager.h"
+#include "data/indexer/IndexerComposite.h"
 #include "mocks/MockedIndexer.hpp"
 #include "ScopedFunctor.h"
 

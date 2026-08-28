@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NetworkFactory.h"
+#include "component/NetworkFactory.h"
 
 class QtNetworkFactory final : public NetworkFactory {
 public:

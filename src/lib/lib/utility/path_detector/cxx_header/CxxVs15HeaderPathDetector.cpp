@@ -1,12 +1,12 @@
-#include "CxxVs15HeaderPathDetector.h"
+#include "utility/path_detector/cxx_header/CxxVs15HeaderPathDetector.h"
 
 #include <string>
 
 #include "FilePath.h"
 #include "FileSystem.h"
 #include "utility.h"
+#include "utility/path_detector/cxx_header/utilityCxxHeaderDetection.h"
 #include "utilityApp.h"
-#include "utilityCxxHeaderDetection.h"
 
 CxxVs15HeaderPathDetector::CxxVs15HeaderPathDetector() : PathDetector{"Visual Studio 2015"} {}
 

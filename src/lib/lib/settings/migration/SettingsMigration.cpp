@@ -1,6 +1,6 @@
-#include "SettingsMigration.h"
+#include "settings/migration/SettingsMigration.h"
 
-#include "Settings.h"
+#include "settings/Settings.h"
 
 SettingsMigration::SettingsMigration() = default;
 

@@ -2,7 +2,7 @@
 
 #include <CppSQLite3.h>
 
-#include "SqliteDatabaseIndex.h"
+#include "data/storage/sqlite/SqliteDatabaseIndex.h"
 
 namespace {
 

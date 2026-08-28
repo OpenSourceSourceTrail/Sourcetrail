@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "DialogView.h"
+#include "component/view/DialogView.h"
 
 struct MockedDialogView : DialogView {
   explicit MockedDialogView() : DialogView(UseCase::INDEXING, nullptr) {}

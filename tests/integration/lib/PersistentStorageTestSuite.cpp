@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "data/storage/PersistentStorage.h"
 #include "FilePath.h"
-#include "PersistentStorage.h"
 
 namespace {
 

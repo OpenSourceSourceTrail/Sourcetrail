@@ -5,16 +5,16 @@
 #include <gtest/gtest.h>
 
 #include "Capabilities.h"
+#include "data/graph/Graph.h"
+#include "data/location/SourceLocationCollection.h"
+#include "data/location/SourceLocationFile.h"
+#include "data/name/NameHierarchy.h"
+#include "data/NodeType.h"
 #include "EngineChannel.h"
 #include "EngineHttpService.h"
-#include "Graph.h"
 #include "HttpServer.h"
 #include "HttpStorageAccess.h"
 #include "MockedStorageAccess.hpp"
-#include "NameHierarchy.h"
-#include "NodeType.h"
-#include "SourceLocationCollection.h"
-#include "SourceLocationFile.h"
 #include "TextAccess.h"
 
 using testing::_;

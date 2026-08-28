@@ -3,11 +3,11 @@
 #include <map>
 #include <string>
 
-#include "DefinitionKind.h"
-#include "Edge.h"
-#include "NameHierarchy.h"
-#include "NodeType.h"
-#include "Token.h"
+#include "data/DefinitionKind.h"
+#include "data/graph/Edge.h"
+#include "data/graph/Token.h"
+#include "data/name/NameHierarchy.h"
+#include "data/NodeType.h"
 
 class Node : public Token {
 public:

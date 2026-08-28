@@ -1,4 +1,4 @@
-#include "QtGraphViewStyleImpl.h"
+#include "qt/view/QtGraphViewStyleImpl.h"
 
 #include <QFont>
 #include <QFontMetrics>

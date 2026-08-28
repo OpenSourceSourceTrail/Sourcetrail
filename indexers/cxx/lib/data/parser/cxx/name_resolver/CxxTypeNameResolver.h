@@ -1,8 +1,8 @@
 #ifndef CXX_TYPE_NAME_RESOLVER_H
 #define CXX_TYPE_NAME_RESOLVER_H
 
-#include "CxxNameResolver.h"
-#include "CxxTypeName.h"
+#include "data/parser/cxx/name/CxxTypeName.h"
+#include "data/parser/cxx/name_resolver/CxxNameResolver.h"
 
 class CxxTypeNameResolver : public CxxNameResolver {
 public:
