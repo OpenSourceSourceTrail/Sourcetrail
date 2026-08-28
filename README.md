@@ -10,6 +10,7 @@ __Links__
 * [Quick Start Guide](DOCUMENTATION.md#getting-started)
 * [Documentation](DOCUMENTATION.md)
 * [Changelog](CHANGELOG.md)
+* [MCP server](mcp/README.md) — expose the code index to an LLM coding agent
 
 !["Sourcetrail User Interface"](docs/readme/user_interface.png "Sourcetrail User Interface")
 
@@ -22,18 +23,22 @@ Sourcetrail is:
 
 ## How it works
 
-Sourcetrail is split into several processes that talk over gRPC:
+Sourcetrail is split into several processes:
 
 | Binary | Role |
 | --- | --- |
 | `Sourcetrail` | Qt GUI. Owns no database; it supervises the engine and reads everything through it. |
-| `Sourcetrail_engine` | Headless daemon. Owns the SQLite index and serves the GUI/CLI over gRPC. |
-| `Sourcetrail_indexer` | Indexer worker process, spawned per indexing job. Built from `indexers/cxx/` only when `BUILD_CXX_LANGUAGE_PACKAGE` is on. |
+| `sourcetrail_engine` | Headless daemon. Owns the SQLite index and serves the GUI/CLI over HTTP + JSON. |
+| `sourcetrail_indexer` | Indexer worker process, spawned per indexing job and driven by the engine over gRPC. Built from `indexers/cxx/` only when `BUILD_CXX_LANGUAGE_PACKAGE` is on. |
 | `Sourcetrail_cli` | Headless, Qt-free front end. |
 
 Indexers are plugins: each ships a manifest under `<build>/app/plugins/<name>/` and the
 engine discovers them at startup. The GUI only offers the languages the running engine
 reports, so a build without the C/C++ package simply shows fewer project types.
+
+Because the engine's HTTP+JSON API is a documented boundary, other clients can speak it too:
+[`mcp/`](mcp/README.md) is an [MCP](https://modelcontextprotocol.io) server that puts the
+indexed symbol/reference graph behind read-only tools for a coding agent.
 
 ## Using Sourcetrail
 
