@@ -91,6 +91,7 @@ target_sources(
           component/view/GraphViewStyle.cpp
           component/view/GraphViewStyle.h
           component/view/GraphViewStyleImpl.h
+          component/view/MetricGraphViewStyleImpl.h
           component/view/MainView.cpp
           component/view/MainView.h
           component/view/RefreshView.cpp
