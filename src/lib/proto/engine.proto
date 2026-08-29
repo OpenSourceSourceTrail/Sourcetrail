@@ -266,6 +266,72 @@ message GraphQueryResponse {
   // round trip to group nodes by file.
   repeated NodeIdToParentFileMapResponse.Entry parent_files = 3;
 }
+// ---------- Graph layout ----------------------------------------------------
+//
+// POST /api/v1/graph/layout runs the same pipeline the Qt view drives -- GraphController builds a
+// DummyNode tree, BucketLayouter/ListLayouter place it -- and answers with that tree, positions
+// included. A front end that cannot reuse the C++ layouters therefore does not have to reinvent
+// them; it only paints.
+//
+// Node boxes are sized from character metrics, so the client sends the metrics of the font *it*
+// will draw with. Otherwise the engine would lay out for one font and the client would paint in
+// another, and every box would be the wrong width.
+message GraphLayoutRequest {
+  repeated uint64 token_ids = 1;
+  repeated uint64 expanded_node_ids = 2;
+  // The viewport the layout is fitted into, in the client's own pixels.
+  float view_width = 3;
+  float view_height = 4;
+  // Average advance width and line height of the client's node font, in the same pixels.
+  float char_width = 5;
+  float char_height = 6;
+  // GroupType: 0 none, 1 file, 2 namespace.
+  int32 grouping = 7;
+}
+
+message LayoutNode {
+  // DummyNode::Type: 0 data, 1 access, 2 expand-toggle, 3 bundle, 4 qualifier, 5 text, 6 group.
+  int32 dummy_type = 1;
+  uint64 token_id = 2;
+  string name = 3;
+  // Absolute within the parent node; top-level nodes are absolute in the layout.
+  float x = 4;
+  float y = 5;
+  float width = 6;
+  float height = 7;
+  bool visible = 8;
+  bool active = 9;
+  bool connected = 10;
+  bool expanded = 11;
+  // AccessKind, for the access sections inside a class box.
+  int32 access_kind = 12;
+  // Node::NodeType of `data`, for colour and icon. 0 when the node carries no graph node.
+  int32 node_kind = 13;
+  // Non-zero on bundle nodes: how many nodes were folded into this one.
+  uint64 bundled_node_count = 14;
+  bool has_missing_child_nodes = 15;
+  repeated LayoutNode sub_nodes = 16;
+}
+
+message LayoutEdge {
+  uint64 token_id = 1;
+  uint64 owner_id = 2;
+  uint64 target_id = 3;
+  // Edge::EdgeType bit.
+  int32 edge_kind = 4;
+  bool visible = 5;
+  bool active = 6;
+  int32 weight = 7;
+  // TokenComponentBundledEdges::Direction: 0 invalid, 1 forward, 2 backward, 3 none.
+  int32 direction = 8;
+}
+
+message GraphLayoutResponse {
+  repeated LayoutNode nodes = 1;
+  repeated LayoutEdge edges = 2;
+  bool is_active_namespace = 3;
+}
+
 message SearchMatchesResponse { repeated ProtoSearchMatch matches = 1; }
 message FileInfoResponse { ProtoFileInfo file_info = 1; }
 message FileInfosResponse { repeated ProtoFileInfo file_infos = 1; }

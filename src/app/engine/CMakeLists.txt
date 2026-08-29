@@ -1,5 +1,12 @@
-add_executable(Sourcetrail_engine main.cpp EngineEventPublisher.cpp EngineEventPublisher.h EngineHttpService.cpp
-                                  EngineHttpService.h)
+add_executable(
+  Sourcetrail_engine
+  main.cpp
+  EngineEventPublisher.cpp
+  EngineEventPublisher.h
+  EngineHttpService.cpp
+  EngineHttpService.h
+  GraphLayoutService.cpp
+  GraphLayoutService.h)
 
 set_target_properties(Sourcetrail_engine PROPERTIES OUTPUT_NAME sourcetrail_engine RUNTIME_OUTPUT_DIRECTORY
                                                                                    "${PROJECT_BINARY_DIR}/app/")

@@ -9,6 +9,7 @@
 
 #include <condition_variable>
 
+#include "GraphLayoutService.h"
 #include "HttpServer.h"
 
 namespace sourcetrail {
@@ -72,6 +73,7 @@ private:
   http::Response handleDialogResponse(const http::Request& request);
 
   StorageAccess* mStorageAccess;
+  GraphLayoutService mGraphLayout;
   http::Server* mServer{nullptr};
   std::function<void()> mShutdownHandler;
 

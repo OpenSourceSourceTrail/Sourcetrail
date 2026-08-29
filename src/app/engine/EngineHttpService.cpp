@@ -102,7 +102,7 @@ bool parseBody(const http::Request& request, Message& message) {
 
 }    // namespace
 
-EngineHttpService::EngineHttpService(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
+EngineHttpService::EngineHttpService(StorageAccess* storageAccess) : mStorageAccess(storageAccess), mGraphLayout(storageAccess) {}
 
 EngineHttpService::~EngineHttpService() {
   abortDialogs();
@@ -453,6 +453,20 @@ void EngineHttpService::registerRoutes(http::Server& server) {
   });
 
   // -- Batch symbol resolution ----------------------------------------------
+
+  // Same graph data as GET /api/v1/graph, but run through the layout the Qt view drives, so a
+  // client that cannot link BucketLayouter gets positions instead of having to reinvent them.
+  // POST rather than GET: the client's font metrics are part of the input.
+  server.route("POST", "/api/v1/graph/layout", [this](const http::Request& request) {
+    sourcetrail::GraphLayoutRequest body;
+    if(!parseBody(request, body)) {
+      return badRequest("Malformed layout request");
+    }
+    if(body.char_width() <= 0.0F || body.char_height() <= 0.0F) {
+      return badRequest("char_width and char_height are required: node boxes are sized from them");
+    }
+    return ok(mGraphLayout.layout(body));
+  });
 
   server.route("POST", "/api/v1/symbols/resolve", [this](const http::Request& request) {
     sourcetrail::SymbolResolveRequest body;
