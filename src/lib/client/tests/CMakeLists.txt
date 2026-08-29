@@ -7,6 +7,7 @@ add_sourcetrail_test(
   NAME HttpStorageAccessTestSuite
   SOURCES HttpStorageAccessTestSuite.cpp EngineEventTestSuite.cpp
           "${PROJECT_SOURCE_DIR}/src/app/engine/EngineHttpService.cpp"
+          "${PROJECT_SOURCE_DIR}/src/app/engine/GraphLayoutService.cpp"
   DEPS lib::mocks
        Sourcetrail::lib::client
        Sourcetrail::lib::lib

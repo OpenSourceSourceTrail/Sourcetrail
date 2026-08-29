@@ -18,6 +18,7 @@
 #include "TextAccess.h"
 
 using testing::_;
+using testing::HasSubstr;
 using testing::Return;
 
 namespace {
@@ -279,4 +280,27 @@ TEST_F(HttpStorageAccessFix, capabilitiesAreServedAndGoEmptyWithoutAnEngine) {
   EXPECT_FALSE(capabilities.supportsSourceGroupType(SOURCE_GROUP_CUSTOM_COMMAND));
 
   capabilities.setChannel(nullptr);
+}
+
+/**
+ * The layout route builds a GraphController on first use, and GraphController registers itself with
+ * IMessageQueue. This fixture stands up no message queue -- neither does anything else that only
+ * wants to serve storage queries -- so the route has to degrade rather than dereference null.
+ */
+TEST_F(HttpStorageAccessFix, graphLayoutWithoutAMessageQueueAnswersEmptyInsteadOfCrashing) {
+  const auto response = mChannel->send("POST",
+                                       "/api/v1/graph/layout",
+                                       R"({"token_ids":["1"],"view_width":800,"view_height":600,)"
+                                       R"("char_width":7,"char_height":16})",
+                                       std::chrono::seconds(5));
+  ASSERT_TRUE(response.has_value());
+  EXPECT_TRUE(response->ok());
+  EXPECT_THAT(response->body, HasSubstr("\"nodes\":[]"));
+}
+
+/** Node boxes are sized from the client's font metrics; without them every box would be zero-wide. */
+TEST_F(HttpStorageAccessFix, graphLayoutRejectsMissingFontMetrics) {
+  const auto response = mChannel->send("POST", "/api/v1/graph/layout", R"({"token_ids":["1"]})", std::chrono::seconds(5));
+  ASSERT_TRUE(response.has_value());
+  EXPECT_EQ(response->status, 400);
 }
