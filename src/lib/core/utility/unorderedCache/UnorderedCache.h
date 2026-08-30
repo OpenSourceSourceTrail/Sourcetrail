@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <mutex>
 
 #include <unordered_map>
 
@@ -13,6 +14,7 @@ public:
 private:
   std::function<ValType(const KeyType&)> m_calculator;
   std::unordered_map<KeyType, ValType, Hasher> m_map;
+  std::mutex m_mutex;
 
   size_t m_hitCount{};
   size_t m_missCount{};
@@ -24,6 +26,7 @@ UnorderedCache<KeyType, ValType, Hasher>::UnorderedCache(std::function<ValType(c
 
 template <typename KeyType, typename ValType, typename Hasher>
 ValType UnorderedCache<KeyType, ValType, Hasher>::getValue(const KeyType& key) {
+  const std::lock_guard<std::mutex> lock(m_mutex);
   auto iterator = m_map.find(key);
   if(iterator != m_map.end()) {
     ++m_hitCount;

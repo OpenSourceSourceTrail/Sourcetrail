@@ -71,7 +71,7 @@
             "hidden": true,
             "cacheVariables": {
                 "BUILD_CXX_LANGUAGE_PACKAGE": "ON",
-                "Clang_DIR": "/home/ahussein/Documents/archive/Sourcetrail/llvm-project-llvmorg-23.1.0/install/lib/cmake/clang/"
+                "Clang_DIR": "${sourceDir}/external/lib/cmake/clang/"
             }
         },
         {
