@@ -1,7 +1,0 @@
-#pragma once
-
-void setupPlatform(int argc, char *argv[]);
-void setupApp(int argc, char *argv[]);
-
-// platform specific include
-#include "@PLATFORM_INCLUDE@"

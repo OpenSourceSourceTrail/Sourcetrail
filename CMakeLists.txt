@@ -131,7 +131,10 @@ find_package(
   COMPONENTS date_time filesystem locale program_options system
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
-find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg)
+find_package(
+  Qt6 6.10 REQUIRED
+  COMPONENTS Core Gui Qml Quick QuickControls2 Network Svg)
+qt_standard_project_setup(REQUIRES 6.10)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(copy_qt_binaries)
@@ -168,7 +171,7 @@ endif()
 # Only the indexer worker may link a language package. If one creeps back into the GUI, the engine or the
 # shared libraries, they stop compiling identically with and without BUILD_CXX_LANGUAGE_PACKAGE and the
 # gRPC enums start depending on the build flag again. Fail the configure instead of finding out at runtime.
-foreach(_target Sourcetrail_lib Sourcetrail_lib_engine Sourcetrail_lib_gui Sourcetrail Sourcetrail_engine
+foreach(_target Sourcetrail_lib Sourcetrail_lib_engine Sourcetrail_lib_qml Sourcetrail Sourcetrail_engine
                 Sourcetrail_cli)
   if(TARGET ${_target})
     get_target_property(_libs ${_target} LINK_LIBRARIES)
@@ -194,7 +197,7 @@ if(ENABLE_UNIT_TEST
 
   if(ENABLE_UNIT_TEST)
     add_subdirectory(${PROJECT_SOURCE_DIR}/src/lib/lib/tests/)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/src/lib/lib_gui/tests/)
+    add_subdirectory(${PROJECT_SOURCE_DIR}/src/lib/lib_qml/tests/)
     if(BUILD_CXX_LANGUAGE_PACKAGE)
       add_subdirectory(${PROJECT_SOURCE_DIR}/indexers/cxx/lib/tests/)
     endif()

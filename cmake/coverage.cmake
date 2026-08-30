@@ -21,7 +21,7 @@ if(ENABLE_COVERAGE)
         ${GCOVR_EXECUTABLE} -r ${PROJECT_SOURCE_DIR} -e ${PROJECT_SOURCE_DIR}/src/app -e
         ${PROJECT_SOURCE_DIR}/src/lib/core/tests -e ${PROJECT_SOURCE_DIR}/src/lib/external -e
         ${PROJECT_SOURCE_DIR}/indexers/cxx/indexer -e ${PROJECT_SOURCE_DIR}/src/lib/lib/tests -e
-        ${PROJECT_SOURCE_DIR}/indexers/cxx/lib/tests -e ${PROJECT_SOURCE_DIR}/src/lib/lib_gui/tests -e
+        ${PROJECT_SOURCE_DIR}/indexers/cxx/lib/tests -e ${PROJECT_SOURCE_DIR}/src/lib/lib_qml/tests -e
         ${PROJECT_SOURCE_DIR}/src/lib_utility/tests -e ${PROJECT_SOURCE_DIR}/src/lib/messaging/tests -e
         ${PROJECT_SOURCE_DIR}/src/lib/scheduling/tests -e ${PROJECT_SOURCE_DIR}/src/test -e ${PROJECT_SOURCE_DIR}/tests
         -e ${PROJECT_SOURCE_DIR}/indexers/java --html-nested=${PROJECT_BINARY_DIR}/coverage/index.html --gcov-delete -j

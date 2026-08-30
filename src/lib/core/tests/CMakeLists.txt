@@ -152,3 +152,9 @@ add_sourcetrail_test(
   SOURCES FileSystemTestSuite.cpp
   DEPS Sourcetrail::lib::core::utility::FileSystem
   TEST_PREFIX "unittests.core.")
+
+add_sourcetrail_test(
+  NAME utilityAppTestSuite
+  SOURCES utilityAppTestSuite.cpp
+  DEPS Sourcetrail::lib::core::utility::utilityApp
+  TEST_PREFIX "unittests.core.")

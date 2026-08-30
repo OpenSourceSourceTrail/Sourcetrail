@@ -4,7 +4,7 @@ add_subdirectory(external)
 add_subdirectory(proto)
 add_subdirectory(lib)
 add_subdirectory(client)
-add_subdirectory(lib_gui)
+add_subdirectory(lib_qml)
 
 add_subdirectory(core)
 add_subdirectory(scheduling)

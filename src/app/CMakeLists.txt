@@ -1,5 +1,5 @@
-# The executables. See the process model in CLAUDE.md: the GUI owns no database and reaches the
-# index through the engine, which is why cli/ and engine/ are Qt-free.
-add_subdirectory(gui)
+# The executables. See the process model in CLAUDE.md: the QML GUI links the engine as a library and
+# owns the index; cli/ and engine/ are the Qt-free headless front ends onto the same libraries.
+add_subdirectory(qml_gui)
 add_subdirectory(cli)
 add_subdirectory(engine)

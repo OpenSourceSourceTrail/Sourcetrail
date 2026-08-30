@@ -41,4 +41,4 @@ addlicense("Qt" "5.15" "http://qt.io" "${LICENSEFOLDER}/license_qt.txt")
 
 set(LICENSE_ARRAY "${LICENSE_ARRAY}\n")
 
-configure_file(${PROJECT_SOURCE_DIR}/cmake/licenses.h.in ${PROJECT_BINARY_DIR}/src/lib/lib_gui/licenses.h)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/licenses.h.in ${PROJECT_BINARY_DIR}/src/lib/lib_qml/licenses.h)
