@@ -6,7 +6,6 @@
 struct MockedSearchView final : SearchView {
   MockedSearchView(ViewLayout* viewLayout) : SearchView(viewLayout) {}
 
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
   MOCK_METHOD(void, refreshView, (), (override));
 
   MOCK_METHOD(std::wstring, getQuery, (), (const, override));

@@ -6,7 +6,6 @@
 struct MockedUndoRedoView final : UndoRedoView {
   MockedUndoRedoView(ViewLayout* viewLayout) : UndoRedoView(viewLayout) {}
 
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
   MOCK_METHOD(void, refreshView, (), (override));
 
   MOCK_METHOD(void, setRedoButtonEnabled, (bool), (override));

@@ -6,7 +6,6 @@
 struct MockedScreenSearchView final : ScreenSearchView {
   explicit MockedScreenSearchView(ViewLayout* viewLayout) : ScreenSearchView(viewLayout) {}
 
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
 
   MOCK_METHOD(void, refreshView, (), (override));
 

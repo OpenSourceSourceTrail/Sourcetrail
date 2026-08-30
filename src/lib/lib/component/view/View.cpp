@@ -1,8 +1,4 @@
 #include "component/view/View.h"
-// STL
-#include <utility>
-// internal
-#include "component/view/ViewWidgetWrapper.h"
 
 View::View(ViewLayout* pViewLayout) : m_viewLayout(pViewLayout) {}
 
@@ -12,12 +8,8 @@ void View::addToLayout() {
   m_viewLayout->addView(this);
 }
 
-void View::showDockWidget() {
+void View::showView() {
   m_viewLayout->showView(this);
-}
-
-ViewWidgetWrapper* View::getWidgetWrapper() const {
-  return m_widgetWrapper.get();
 }
 
 void View::setComponent(Component* component) {
@@ -30,8 +22,4 @@ ViewLayout* View::getViewLayout() const {
 
 void View::setEnabled(bool enabled) {
   return getViewLayout()->setViewEnabled(this, enabled);
-}
-
-void View::setWidgetWrapper(std::shared_ptr<ViewWidgetWrapper> widgetWrapper) {
-  m_widgetWrapper = std::move(widgetWrapper);
 }

@@ -1,12 +1,11 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/ComponentFactory.h"
+#include "component/Component.h"
 #include "MessageQueue.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStatusBarView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #ifndef _WIN32
 #  define private public    // NOLINT
@@ -25,14 +24,10 @@ struct StatusBarControllerFix : Test {
     messageQueue = std::make_shared<MockedMessageQueue>();
     IMessageQueue::setInstance(messageQueue);
 
-    MockedViewFactory viewFactory;
     storageAccess = std::make_shared<MockedStorageAccess>();
-    auto componentFactory = std::make_shared<ComponentFactory>(&viewFactory, storageAccess.get());
 
     statusBarView = std::make_shared<MockedStatusBarView>(&viewLayout);
-    EXPECT_CALL(viewFactory, createStatusBarView).WillOnce(Return(statusBarView));
-
-    component = componentFactory->createStatusBarComponent(&viewLayout);
+    component = std::make_shared<Component>(statusBarView, std::make_shared<StatusBarController>(storageAccess.get()));
     controller = component->getController<StatusBarController>();
     ASSERT_NE(nullptr, controller);
   }

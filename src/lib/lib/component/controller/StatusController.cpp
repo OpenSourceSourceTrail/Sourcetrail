@@ -21,7 +21,7 @@ void StatusController::handleMessage(MessageClearStatusView* /*message*/) {
 }
 
 void StatusController::handleMessage(MessageShowStatus* /*message*/) {
-  getView()->showDockWidget();
+  getView()->showView();
 }
 
 void StatusController::handleMessage(MessageStatus* message) {

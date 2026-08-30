@@ -12,6 +12,5 @@ struct MockedBookmarkView : BookmarkView {
   MOCK_METHOD(void, displayBookmarkCreator, (const std::vector<std::wstring>&, const std::vector<BookmarkCategory>&, Id), (override));
   MOCK_METHOD(bool, bookmarkBrowserIsVisible, (), (const, override));
 
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
   MOCK_METHOD(void, refreshView, (), (override));
 };

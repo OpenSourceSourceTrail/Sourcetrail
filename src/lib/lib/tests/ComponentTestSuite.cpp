@@ -10,7 +10,6 @@ using namespace ::testing;
 struct MockedView final : public View {
   MockedView() : View(nullptr) {}
   MOCK_METHOD(std::string, getName, (), (const, override));
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
   MOCK_METHOD(void, refreshView, (), (override));
 };
 struct MockedController final : public Controller {

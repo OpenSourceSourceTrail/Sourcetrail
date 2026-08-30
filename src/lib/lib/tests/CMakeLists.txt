@@ -12,8 +12,6 @@ set(test_lib_names
     AppPathTestSuite
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests
     BookmarkControllerTestSuite
-    ComponentFactoryTestSuite
-    ComponentManagerTestSuite
     ComponentTestSuite
     ConvertGraphTestSuite
     ConvertLocationsTestSuite
@@ -49,7 +47,6 @@ set(test_lib_names
     StatusBarControllerTestSuite
     StatusControllerTestSuite
     TabIdTestSuite
-    TabTestSuite
     TaskBuildIndexTestSuite
     TimeStampTestSuite
     TreeTestSuite
@@ -78,7 +75,4 @@ target_link_libraries(IncludeDirectiveTestSuite PRIVATE Sourcetrail::lib::core::
 # target_link_libraries(StatusBarControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
 # target_link_libraries(StatusControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
 
-if(WIN32)
-  target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
-endif()
 # ================================================================================================================================

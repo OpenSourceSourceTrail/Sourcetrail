@@ -66,8 +66,6 @@ target_sources(
           component/controller/StatusBarController.h
           component/controller/StatusController.cpp
           component/controller/StatusController.h
-          component/controller/TabsController.cpp
-          component/controller/TabsController.h
           component/controller/TooltipController.cpp
           component/controller/TooltipController.h
           component/controller/UndoRedoController.cpp
@@ -81,8 +79,6 @@ target_sources(
           component/view/BookmarkView.h
           component/view/CodeView.cpp
           component/view/CodeView.h
-          component/view/CompositeView.cpp
-          component/view/CompositeView.h
           component/view/CustomTrailView.h
           component/view/DialogView.cpp
           component/view/DialogView.h
@@ -94,8 +90,6 @@ target_sources(
           component/view/GraphViewStyle.h
           component/view/GraphViewStyleImpl.h
           component/view/MetricGraphViewStyleImpl.h
-          component/view/MainView.cpp
-          component/view/MainView.h
           component/view/RefreshView.cpp
           component/view/RefreshView.h
           component/view/ScreenSearchView.cpp
@@ -106,31 +100,18 @@ target_sources(
           component/view/StatusBarView.h
           component/view/StatusView.cpp
           component/view/StatusView.h
-          component/view/TabbedView.cpp
-          component/view/TabbedView.h
-          component/view/TabsView.cpp
-          component/view/TabsView.h
           component/view/TooltipView.cpp
           component/view/TooltipView.h
           component/view/UndoRedoView.cpp
           component/view/UndoRedoView.h
           component/view/View.cpp
           component/view/View.h
-          component/view/ViewFactory.h
           component/view/ViewLayout.cpp
           component/view/ViewLayout.h
-          component/view/ViewWidgetWrapper.cpp
-          component/view/ViewWidgetWrapper.h
           component/Component.cpp
           component/Component.h
-          component/ComponentFactory.cpp
-          component/ComponentFactory.h
-          component/ComponentManager.cpp
-          component/ComponentManager.h
           component/NetworkFactory.cpp
           component/NetworkFactory.h
-          component/Tab.cpp
-          component/Tab.h
           component/TabId.cpp
           component/TabId.h
           data/bookmark/Bookmark.cpp
@@ -460,8 +441,8 @@ add_dependencies(Sourcetrail_lib versionnumber)
 configure_file("${PROJECT_SOURCE_DIR}/cmake/productVersion.h.in" "${PROJECT_BINARY_DIR}/src/lib/lib/productVersion.h")
 
 # The engine-only half: everything that opens, migrates or drives the index database, plus the task
-# graph that fills it. Kept out of Sourcetrail_lib so the GUI physically cannot reach SQLite --
-# see the sqliteFreeGuiTestSuite check in tests/.
+# graph that fills it. Kept out of Sourcetrail_lib so the headless daemon and the CLI can be built
+# without it -- and so the indexer worker links storage without linking a front end.
 add_library(Sourcetrail_lib_engine)
 add_library(Sourcetrail::lib::lib_engine ALIAS Sourcetrail_lib_engine)
 

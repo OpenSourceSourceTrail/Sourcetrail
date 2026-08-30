@@ -1,11 +1,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/ComponentFactory.h"
+#include "component/Component.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStatusView.hpp"
-#include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "Status.h"
 #ifndef _WIN32
@@ -28,13 +27,8 @@ struct StatusControllerFix : Test {
 
     ON_CALL(*mApplicationSettings, getStatusFilter).WillByDefault(Return(0U));
 
-    MockedViewFactory viewFactory;
-    auto componentFactory = std::make_shared<ComponentFactory>(&viewFactory, nullptr);
-
     statusView = std::make_shared<MockedStatusView>(&viewLayout);
-    EXPECT_CALL(viewFactory, createStatusView).WillOnce(Return(statusView));
-
-    component = componentFactory->createStatusComponent(&viewLayout);
+    component = std::make_shared<Component>(statusView, std::make_shared<StatusController>());
     controller = component->getController<StatusController>();
     ASSERT_NE(nullptr, controller);
   }

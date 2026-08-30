@@ -43,7 +43,7 @@ void ErrorController::handleMessage(MessageActivateErrors* pMessage) {
   view->setErrorFilter(pMessage->filter);
 
   if(showErrors(pMessage->filter, true)) {
-    view->showDockWidget();
+    view->showView();
   }
 }
 
@@ -81,7 +81,7 @@ void ErrorController::handleMessage(MessageErrorCountUpdate* pMessage) {
     getView()->addErrors(errors, pMessage->errorCount, true);
 
     if(!Application::getInstance()->getDialogView(DialogView::UseCase::INDEXING)->dialogsHidden()) {
-      getView()->showDockWidget();
+      getView()->showView();
     }
 
     m_errorCount += errors.size();

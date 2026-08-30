@@ -3,13 +3,12 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/ComponentFactory.h"
+#include "component/Component.h"
 #include "component/controller/BookmarkController.h"
 #include "component/view/BookmarkView.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedBookmarkView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "type/bookmark/MessageBookmarkUpdate.hpp"
 
@@ -33,12 +32,8 @@ struct BookmarkControllerFix : public Test {
     mViewLayout = std::make_unique<StrictMock<MockedViewLayout>>();
     mView = std::make_shared<StrictMock<MockedBookmarkView>>(mViewLayout.get());
 
-    MockedViewFactory viewFactory;
-    EXPECT_CALL(viewFactory, createBookmarkView(mViewLayout.get())).InSequence(mSequence).WillOnce(Return(mView));
-
     mStorageAccess = std::make_unique<StrictMock<MockedStorageAccess>>();
-    ComponentFactory factory(&viewFactory, mStorageAccess.get());
-    mComponent = factory.createBookmarkComponent(mViewLayout.get());
+    mComponent = std::make_shared<Component>(mView, std::make_shared<BookmarkController>(mStorageAccess.get()));
     mController = mComponent->getController<BookmarkController>();
     ASSERT_FALSE(mController == nullptr);
   }

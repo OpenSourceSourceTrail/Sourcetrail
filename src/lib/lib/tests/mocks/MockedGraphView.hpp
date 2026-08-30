@@ -6,7 +6,6 @@
 struct MockedGraphView final : GraphView {
   explicit MockedGraphView(ViewLayout* viewLayout) : GraphView(viewLayout) {}
 
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
   MOCK_METHOD(void, refreshView, (), (override));
 
   using DummyNodeVec = std::vector<std::shared_ptr<DummyNode>>;

@@ -62,7 +62,6 @@ class HeadlessGraphView : public GraphView {
 public:
   HeadlessGraphView() : GraphView(nullptr) {}
 
-  void createWidgetWrapper() override {}
   void refreshView() override {}
 
   void rebuildGraph(std::shared_ptr<Graph> graph,

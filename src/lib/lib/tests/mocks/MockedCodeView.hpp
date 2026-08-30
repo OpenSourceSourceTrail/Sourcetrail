@@ -6,7 +6,6 @@
 struct MockedCodeView final : CodeView {
   explicit MockedCodeView(ViewLayout* viewLayout) : CodeView(viewLayout) {}
 
-  MOCK_METHOD(void, createWidgetWrapper, (), (override));
 
   MOCK_METHOD(void, refreshView, (), (override));
 
