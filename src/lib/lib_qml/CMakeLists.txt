@@ -25,6 +25,8 @@ qt_add_qml_module(
   QmlGraphViewStyleImpl.h
   ShellMessages.cpp
   ShellMessages.h
+  graph/EdgeRouter.cpp
+  graph/EdgeRouter.h
   network/QtIDECommunicationController.cpp
   network/QtIDECommunicationController.h
   network/QtNetworkFactory.cpp
@@ -36,7 +38,9 @@ qt_add_qml_module(
   qml/Main.qml
   qml/Theme.qml)
 
-target_include_directories(Sourcetrail_lib_qml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# The generated QML type registration includes every QML_ELEMENT header by basename
+# (#include <GraphModels.h>), so each directory holding one has to be on the include path.
+target_include_directories(Sourcetrail_lib_qml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/graph)
 
 target_link_libraries(
   Sourcetrail_lib_qml
