@@ -47,7 +47,7 @@ if(APPLE)
 endif()
 
 target_include_directories(Sourcetrail_indexer PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib"
-                                                       "${PROJECT_BINARY_DIR}/src/lib/lib_gui")
+                                                       "${PROJECT_BINARY_DIR}/src/lib/lib")
 
 # Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
 target_link_libraries(Sourcetrail_indexer PRIVATE Sourcetrail::warnings)

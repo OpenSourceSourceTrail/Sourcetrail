@@ -440,6 +440,23 @@ target_link_libraries(
 configure_file("${PROJECT_SOURCE_DIR}/cmake/language_packages.h.in"
                "${PROJECT_BINARY_DIR}/src/lib/lib/language_packages.h")
 
+# The version string is derived from git tags at build time, not hand-maintained. It lives here
+# rather than in a front end because every executable needs it and the headless ones must not reach
+# into a GUI library's build directory to get it.
+add_custom_target(versionnumber ALL)
+
+add_custom_command(
+  TARGET versionnumber
+  PRE_BUILD
+  COMMAND ${CMAKE_COMMAND} -DBINARY_DIR=${PROJECT_BINARY_DIR} -P ${PROJECT_SOURCE_DIR}/cmake/version.cmake
+  BYPRODUCTS ${PROJECT_BINARY_DIR}/src/lib/lib/productVersion.h
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMENT "check/update version number")
+
+add_dependencies(Sourcetrail_lib versionnumber)
+
+configure_file("${PROJECT_SOURCE_DIR}/cmake/productVersion.h.in" "${PROJECT_BINARY_DIR}/src/lib/lib/productVersion.h")
+
 # The engine-only half: everything that opens, migrates or drives the index database, plus the task
 # graph that fills it. Kept out of Sourcetrail_lib so the GUI physically cannot reach SQLite --
 # see the sqliteFreeGuiTestSuite check in tests/.

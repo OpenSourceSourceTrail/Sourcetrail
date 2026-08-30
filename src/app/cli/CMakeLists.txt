@@ -17,7 +17,7 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::commandline::CommandLineParser)
 
 target_include_directories(Sourcetrail_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}/src/lib/lib"
-                                                   "${PROJECT_BINARY_DIR}/src/lib/lib_gui")
+                                                   "${PROJECT_BINARY_DIR}/src/lib/lib")
 
 if(APPLE)
   find_library(CORE_FOUNDATION CoreFoundation)
