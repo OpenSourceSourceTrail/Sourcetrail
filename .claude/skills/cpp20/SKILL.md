@@ -16,5 +16,5 @@ description: C++ code style and conventions for Sourcetrail — clang-format, cl
 - `#pragma once` preferred over include guards.
 - Match the surrounding code's comment density, naming, and idiom.
 - Vendored third-party code lives in `src/lib/external/` — never lint or reformat it.
-- `src/lib/lib/` is Qt-free core business logic; do not introduce Qt types there. Qt code belongs in `src/lib/lib_gui/`.
+- `src/lib/lib/` is Qt-free core business logic; do not introduce Qt types there. Qt code belongs in `src/lib/lib_qml/`.
 - Keep proto conversion helpers (`src/lib/proto/Convert.{h,cpp}`) dependency-light — `lib` ↔ `proto_convert` had a circular dependency broken via an include-dir generator expression.

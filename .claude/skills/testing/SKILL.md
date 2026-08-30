@@ -31,7 +31,7 @@ ctest
 ## Where tests live
 
 - `src/lib/lib/tests/` — core business logic
-- `src/lib/lib_gui/tests/` — GUI
+- `src/lib/lib_qml/tests/` — GUI
 - `indexers/cxx/lib/tests/` — C/C++ language package
 - `tests/` — integration tests
 

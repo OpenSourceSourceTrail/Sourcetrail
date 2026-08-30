@@ -10,7 +10,7 @@ description: Sourcetrail architecture map — source tree layout, messaging pub/
 ```
 src/
   app/                  Executable entry points
-    gui/                Main GUI application binary (Sourcetrail)
+    qml_gui/            Main GUI application binary (Sourcetrail) -- Qt Quick shell + in-process engine
     cli/                Headless, Qt-free CLI client (Sourcetrail_cli)
     engine/             HTTP+JSON service impl for the engine daemon (Sourcetrail_engine)
   lib/                  Libraries
@@ -19,14 +19,18 @@ src/
                          text codec, migration, string utils, UUIDs, etc.)
     external/            Vendored third-party code (CppSQLite3, etc.)
     lib/                 Core business logic (Qt-free):
-      app/               Application singleton, LanguagePackageManager
-      component/         MVC-like Components (each owns a Controller + View pair)
+      app/               Application singleton, IAppShell (the only seam to a user interface),
+                         LanguagePackageManager
+      component/         MVC-like Components (each owns a Controller + View pair). Controllers hold
+                         the logic and are toolkit-free; views are abstract interfaces.
       data/              Domain model — graph, storage, search, full-text index
-      factory/           Abstract factories (IFactory, IViewFactory, INetworkFactory)
+      factory/           Abstract factories (IFactory, NetworkFactory). lib::Factory is the
+                         in-process one (owns PersistentStorage); client::ClientFactory talks HTTP.
       project/           Project lifecycle (load, refresh, build index)
       settings/          ProjectSettings and source group settings
       utility/           Lib-specific helpers
-    lib_gui/             Qt 6 GUI implementation (QtApplication, Qt views/windows)
+    lib_qml/             Qt Quick / QML GUI: AppShell (IAppShell + QML singleton), view-models,
+                         GuiThread.h (non-blocking bus-thread -> GUI-thread hop), qml/ scene
     messaging/           Pub/sub message bus
     scheduling/          Behavior-tree task scheduler
 
@@ -39,13 +43,19 @@ indexers/               Indexer plugins, one directory per plugin
 
 ## Messaging (`src/lib/messaging/`)
 
-Decoupled pub/sub bus. `MessageQueue` is the central singleton. Senders call `Message::dispatch()`. Receivers inherit `MessageListener<T>` and implement `handleMessage(T&)`. All message types live under `messaging/type/`. Primary cross-cutting communication mechanism (in-process). Cross-process: the GUI <-> engine boundary is HTTP + JSON (`src/lib/core/http`, `EngineHttpService`, server-sent events for engine->client push); the engine <-> indexer boundary is still gRPC — see `grpc-ipc` skill.
+Decoupled pub/sub bus. `MessageQueue` is the central singleton. Senders call `Message::dispatch()`. Receivers inherit `MessageListener<T>` and implement `handleMessage(T&)`. All message types live under `messaging/type/`. Primary cross-cutting communication mechanism (in-process). Cross-process: the QML GUI has no engine boundary -- it links `lib_engine` and owns the index. The
+daemon's HTTP + JSON boundary (`src/lib/core/http`, `EngineHttpService`, server-sent events) is still
+there for headless and web clients; the engine <-> indexer boundary is gRPC — see `grpc-ipc` skill.
+
+Views are called from the message-queue thread. In `lib_qml` every one of those calls hops to the GUI
+thread with `qml::postToGui` (queued, non-blocking) carrying an owned value snapshot -- never a
+reference into bus-thread data, and never a storage query on the GUI thread.
 
 ## Storage layer (`src/lib/lib/data/storage/`)
 
 - `IntermediateStorage` — in-memory buffer used during indexing; filled by parser/indexer.
 - `PersistentStorage` — delegates to `SqliteIndexStorage` (symbols, edges, locations) and `SqliteBookmarkStorage`. Inherits `StorageCache` for frequently accessed node/file lookups.
-- `StorageAccessProxy` — wraps `PersistentStorage` for read access; used by GUI components to query data without coupling to the full storage API.
+- `StorageAccessProxy` — wraps `PersistentStorage` (or `HttpStorageAccess`) for read access; `StorageCache` in front of it is what every controller actually holds.
 
 ## Task scheduler (`src/lib/scheduling/`)
 
