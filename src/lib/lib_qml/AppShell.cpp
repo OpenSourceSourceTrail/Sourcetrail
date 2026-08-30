@@ -4,7 +4,9 @@
 #include <QQmlEngine>
 
 #include "app/Application.h"
+#include "component/controller/ActivationController.h"
 #include "data/storage/StorageCache.h"
+#include "graph/GraphViewModel.h"
 #include "GuiThread.h"
 #include "QmlDialogView.h"
 #include "settings/IApplicationSettings.hpp"
@@ -94,6 +96,12 @@ void AppShell::setup() {
   // Runs inside Application::createInstance, so the message queue exists by now but the QML engine
   // does not yet -- nothing here may touch the scene.
   mMessages = std::make_unique<ShellMessages>(this);
+
+  auto* storageAccess = Application::getInstance()->getStorageCache();
+  mActivation = std::make_unique<ActivationController>(storageAccess);
+  mGraph = std::make_unique<graph::GraphViewModel>();
+  mGraph->attach(storageAccess);
+
   updateRecentProjectMenu();
 }
 

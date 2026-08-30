@@ -13,6 +13,11 @@
 class QQmlEngine;
 class QJSEngine;
 class ShellMessages;
+class ActivationController;
+
+namespace graph {
+class GraphViewModel;
+}
 
 /**
  * The QML front end's implementation of everything Application asks of a user interface.
@@ -117,4 +122,9 @@ private:
   QString mProjectSummary;
 
   std::unique_ptr<ShellMessages> mMessages;
+
+  // The activation controller has no view of its own: it turns "activate this node" into the
+  // MessageActivateTokens every panel actually listens for. Without one the graph never rebuilds.
+  std::unique_ptr<ActivationController> mActivation;
+  std::unique_ptr<graph::GraphViewModel> mGraph;
 };

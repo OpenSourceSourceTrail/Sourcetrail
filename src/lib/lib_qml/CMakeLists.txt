@@ -30,6 +30,8 @@ qt_add_qml_module(
   graph/GraphModels.cpp
   graph/GraphModels.h
   graph/GraphSnapshot.h
+  graph/GraphViewModel.cpp
+  graph/GraphViewModel.h
   graph/QmlGraphView.cpp
   graph/QmlGraphView.h
   network/QtIDECommunicationController.cpp
