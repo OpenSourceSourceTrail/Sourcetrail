@@ -4,3 +4,9 @@ add_sourcetrail_test(
   SOURCES globalStringsTestSuite.cpp
   DEPS Sourcetrail::lib::lib_qml
   TEST_PREFIX "unittests.lib_qml.")
+
+add_sourcetrail_test(
+  NAME GraphSnapshotTestSuite
+  SOURCES GraphSnapshotTestSuite.cpp
+  DEPS Sourcetrail::lib::lib_qml
+  TEST_PREFIX "unittests.lib_qml.")
