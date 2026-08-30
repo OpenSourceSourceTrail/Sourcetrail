@@ -12,11 +12,15 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 #---------------------------------------------------------------------------------------------------------------------------------
 option(BUILD_CXX_LANGUAGE_PACKAGE "Add C and C++ support to the Sourcetrail indexer." OFF)
 option(BUILD_DOC "Build documentation." OFF)
+
 option(ENABLE_UNIT_TEST "Build unit-tests." OFF)
 option(ENABLE_GUI_TEST "Build gui-tests." OFF)
 option(ENABLE_INTEGRATION_TEST "Build integration-tests." OFF)
+option(ENABLE_ENGINE_HTTP_TEST "Build engine_http." OFF)
+option(ENABLE_MCP_TEST "Build mcp." OFF)
 option(ENABLE_COVERAGE "Build coverage report, run `ninja coverage`." OFF)
 option(ENABLE_BUILD_WITH_TIME_TRACE "Trace building time." OFF)
+
 option(SOURCETRAIL_CMAKE_VERBOSE "CMake verbose" OFF)
 option(SOURCETRAIL_WARNING_AS_ERROR "Treat warnings as errors" OFF)
 option(SOURCETRAIL_USE_LIBCPP "Use libc++ instead of libstdc++" OFF)
@@ -198,8 +202,10 @@ if(ENABLE_UNIT_TEST
 
   if(ENABLE_INTEGRATION_TEST)
     add_subdirectory(tests)
-    # The MCP server is not built, only tested: it is a Python client of the engine's HTTP API.
-    add_subdirectory(mcp)
+    if(ENABLE_MCP_TEST)
+      # The MCP server is not built, only tested: it is a Python client of the engine's HTTP API.
+      add_subdirectory(mcp)
+    endif()
   endif()
 endif()
 # Assets -------------------------------------------------------------------------------------------------------------------------
