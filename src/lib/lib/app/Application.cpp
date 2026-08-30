@@ -8,14 +8,13 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include "app/IAppShell.hpp"
 #include "app/paths/UserPaths.h"
 #include "component/controller/IDECommunicationController.h"
 #include "component/NetworkFactory.h"
 #include "component/TabId.h"
 #include "component/view/DialogView.h"
 #include "component/view/GraphViewStyle.h"
-#include "component/view/MainView.h"
-#include "component/view/ViewFactory.h"
 #include "data/storage/StorageCache.h"
 #include "factory/IFactory.hpp"
 #include "filter_types/MessageFilterErrorCountUpdate.h"
@@ -100,15 +99,11 @@ std::string Application::sUuid;
 
 void Application::createInstance(const Version& version,
                                  std::shared_ptr<lib::IFactory> factory,
-                                 ViewFactory* viewFactory,
+                                 lib::IAppShell* shell,
                                  NetworkFactory* networkFactory) {
-  const bool hasGui = (nullptr != viewFactory);
+  const bool hasGui = (nullptr != shell);
 
   Version::setApplicationVersion(version);
-
-  if(hasGui) {
-    GraphViewStyle::setImpl(viewFactory->createGraphStyleImpl());
-  }
 
   // TODO(Hussein): We should create this iff multi-process is used
   if(auto collector = factory->createSharedMemoryGarbageCollector(); collector) {
@@ -125,8 +120,8 @@ void Application::createInstance(const Version& version,
   sInstance->mStorageCache = std::make_shared<StorageCache>();
 
   if(hasGui) {
-    sInstance->mMainView = viewFactory->createMainView(sInstance->mStorageCache.get());
-    sInstance->mMainView->setup();
+    sInstance->mShell = shell;
+    shell->setup();
   }
 
   if(nullptr != networkFactory) {
@@ -198,7 +193,7 @@ Application::Application(std::shared_ptr<lib::IFactory> factory, bool withGUI) :
 
 Application::~Application() {
   if(mHasGui) {
-    mMainView->saveLayout();
+    mShell->saveLayout();
   }
 
   if(auto* collector = lib::ISharedMemoryGarbageCollector::getInstanceRaw(); collector) {
@@ -215,8 +210,8 @@ int Application::handleDialog(const std::wstring& message, const std::vector<std
 }
 
 std::shared_ptr<DialogView> Application::getDialogView(DialogView::UseCase useCase) {
-  if(mMainView) {
-    return mMainView->getDialogView(useCase);
+  if(mShell) {
+    return mShell->getDialogView(useCase);
   }
 
   if(mDialogViewFactory) {
@@ -234,14 +229,14 @@ void Application::updateHistoryMenu(std::shared_ptr<MessageBase> message) {
   if(!message) {
     LOG_INFO("The message is empty");
   }
-  if(mMainView) {
-    mMainView->updateHistoryMenu(std::move(message));
+  if(mShell) {
+    mShell->updateHistoryMenu(std::move(message));
   }
 }
 
 void Application::handleMessage(MessageActivateWindow* /*pMessage*/) {
   if(mHasGui) {
-    mMainView->activateWindow();
+    mShell->activateWindow();
   }
 }
 
@@ -253,9 +248,9 @@ void Application::handleMessage(MessageCloseProject* /*pMessage*/) {
 
   mProject.reset();
   updateTitle();
-  // mMainView is null in headless processes (engine/CLI), which pass no view factory.
+  // mShell is null in headless processes (engine/CLI), which pass no shell.
   if(mHasGui) {
-    mMainView->clear();
+    mShell->clear();
   }
 }
 
@@ -298,7 +293,7 @@ void Application::handleMessage(MessageLoadProject* message) {
     mProject.reset();
 
     if(mHasGui) {
-      mMainView->clear();
+      mShell->clear();
     }
 
     try {
@@ -350,9 +345,9 @@ void Application::handleMessage(MessageRefreshUI* pMessage) {
       loadStyle(IApplicationSettings::getInstanceRaw()->getColorSchemePath());
     }
 
-    mMainView->refreshViews();
+    mShell->refreshViews();
 
-    mMainView->refreshUIState(pMessage->isAfterIndexing);
+    mShell->refreshUIState(pMessage->isAfterIndexing);
   }
 }
 
@@ -365,11 +360,11 @@ void Application::handleMessage(MessageSwitchColorScheme* pMessage) {
 
 void Application::handleMessage(MessageBookmarkUpdate* message) {
   assert(message != nullptr);
-  if(!mMainView) {
-    LOG_WARNING("MainView isn't initialized");
+  if(!mShell) {
+    LOG_WARNING("App shell isn't initialized");
     return;
   }
-  mMainView->updateBookmarksMenu(message->mBookmarks);
+  mShell->updateBookmarksMenu(message->mBookmarks);
 }
 
 // NOLINTNEXTLINE(readability-convert-member-functions-to-static)
@@ -394,10 +389,10 @@ void Application::loadWindow(bool showStartWindow) {
 
     updateTitle();
 
-    mMainView->loadWindow(showStartWindow);
+    mShell->loadWindow(showStartWindow);
     mLoadedWindow = true;
   } else if(!showStartWindow) {
-    mMainView->hideStartScreen();
+    mShell->hideStartScreen();
   }
 }
 
@@ -432,7 +427,7 @@ void Application::updateRecentProjects(const fs::path& projectSettingsFilePath) 
     appSettings->setRecentProjects(recentProjects);
     appSettings->save(UserPaths::getAppSettingsFilePath());
 
-    mMainView->updateRecentProjectMenu();
+    mShell->updateRecentProjectMenu();
   }
 }
 
@@ -474,7 +469,7 @@ void Application::updateTitle() {
       }
     }
 
-    mMainView->setTitle(title);
+    mShell->setTitle(title);
   }
 }
 

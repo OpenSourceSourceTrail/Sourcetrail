@@ -27,13 +27,13 @@ classDiagram
     -bool mLoadedWindow
     -std::shared_ptr<IProject> mProject
     -std::shared_ptr<StorageCache> mStorageCache
-    -std::shared_ptr<MainView> mMainView
+    -lib::IAppShell* mShell
     -std::shared_ptr<IDECommunicationController> mIdeCommunicationController
   }
 
   Application *-- IFactory
-  Application *-- IViewFactory
-  Application *-- INetworkFactory
+  Application *-- IAppShell
+  Application *-- NetworkFactory
   Application *-- ITaskManager
   Application *-- IMessageQueue
   Application *-- StorageCache

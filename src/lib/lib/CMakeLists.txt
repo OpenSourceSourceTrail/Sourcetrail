@@ -18,6 +18,8 @@ target_sources(
           app/paths/UserPaths.h
           app/Application.cpp
           app/Application.h
+          app/IAppShell.cpp
+          app/IAppShell.hpp
           app/IndexerPluginRegistry.cpp
           app/IndexerPluginRegistry.h
           app/LanguagePackage.h

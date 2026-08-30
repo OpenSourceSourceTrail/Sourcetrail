@@ -20,12 +20,11 @@
 
 class Bookmark;
 class IDECommunicationController;
-class MainView;
 class NetworkFactory;
 class StorageCache;
 class Version;
-class ViewFactory;
 namespace lib {
+struct IAppShell;
 struct IFactory;
 }
 
@@ -45,12 +44,12 @@ public:
    * @brief Creates the singleton instance of the Application.
    * @param version The version of the application.
    * @param factory Base factory object.
-   * @param viewFactory Pointer to the ViewFactory.
+   * @param shell Pointer to the user interface, or nullptr for a headless Application.
    * @param networkFactory Pointer to the NetworkFactory.
    */
   static void createInstance(const Version& version,
                              std::shared_ptr<lib::IFactory> factory,
-                             ViewFactory* viewFactory,
+                             lib::IAppShell* shell,
                              NetworkFactory* networkFactory);
 
   /**
@@ -164,9 +163,9 @@ public:
   std::shared_ptr<DialogView> getDialogView(DialogView::UseCase useCase);
 
   /**
-   * @brief Supplies the DialogView used when there is no MainView.
+   * @brief Supplies the DialogView used when there is no app shell.
    *
-   * A GUI-less Application otherwise hands out the do-nothing base DialogView, which silently drops
+   * A shell-less Application otherwise hands out the do-nothing base DialogView, which silently drops
    * every progress report. The engine sets this to a view that forwards them to its clients.
    */
   void setDialogViewFactory(std::function<std::shared_ptr<DialogView>(DialogView::UseCase)> factory);
@@ -222,7 +221,7 @@ private:
   std::shared_ptr<IProject> mProject;
   std::shared_ptr<StorageCache> mStorageCache;
 
-  std::shared_ptr<MainView> mMainView;
+  lib::IAppShell* mShell = nullptr;
   std::function<std::shared_ptr<DialogView>(DialogView::UseCase)> mDialogViewFactory;
 
   std::shared_ptr<IDECommunicationController> mIdeCommunicationController;
