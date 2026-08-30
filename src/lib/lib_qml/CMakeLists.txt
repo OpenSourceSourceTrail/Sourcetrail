@@ -27,6 +27,8 @@ qt_add_qml_module(
   ShellMessages.h
   graph/EdgeRouter.cpp
   graph/EdgeRouter.h
+  graph/GraphModels.cpp
+  graph/GraphModels.h
   graph/GraphSnapshot.h
   graph/QmlGraphView.cpp
   graph/QmlGraphView.h
