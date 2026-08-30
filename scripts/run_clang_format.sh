@@ -1,7 +1,11 @@
 #!/bin/env bash
 
 CHECK_PATH="."
-EXCLUDE_REGEX="bin"
+# Vendored and generated trees must never be reformatted. The Qt SDK in particular lives inside the
+# repo when it is installed locally, and clang-format silently turns its "@RESOURCE_NAME@" CMake
+# placeholders into "@RESOURCE_NAME @", which breaks every qt_add_resources build with a stray-'@'
+# error a long way from the cause.
+EXCLUDE_REGEX="(^|/)(bin|build[^/]*|Qt)(/|$)"
 INCLUDE_REGEX='^.*\.((((c|C)(c|pp|xx|\+\+)?$)|((h|H)h?(pp|xx|\+\+)?$))|(ino|pde|proto|cu))$'
 
 src_files=$(find "$CHECK_PATH" -name .git -prune -o -regextype posix-egrep -regex "$INCLUDE_REGEX" -print)
