@@ -42,6 +42,7 @@ qt_add_qml_module(
   network/QtTcpWrapper.h
   utility/globalStrings.h
   QML_FILES
+  qml/GraphPanel.qml
   qml/Main.qml
   qml/Theme.qml)
 

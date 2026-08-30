@@ -64,6 +64,26 @@ ApplicationWindow {
                 onClicked: AppShell.refresh(true)
             }
 
+            ToolSeparator {}
+
+            Button {
+                text: qsTr("Overview")
+                onClicked: GraphViewModel.showOverview()
+            }
+
+            Label {
+                text: qsTr("Group by")
+                color: Theme.textMuted
+                font.pixelSize: Theme.fontSizeSmall
+            }
+
+            ComboBox {
+                implicitWidth: 140
+                model: [qsTr("Nothing"), qsTr("File"), qsTr("Namespace")]
+                currentIndex: GraphViewModel.grouping
+                onActivated: GraphViewModel.grouping = currentIndex
+            }
+
             Item { Layout.fillWidth: true }
         }
     }
@@ -136,28 +156,12 @@ ApplicationWindow {
     Component {
         id: workspace
 
-        // Placeholder for the graph and code panels; they land with their view-models.
+        // The code panel joins the graph here once it has a view-model of its own.
         Rectangle {
             color: Theme.panel
 
-            ColumnLayout {
-                anchors.centerIn: parent
-                spacing: Theme.spacing
-
-                Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: AppShell.title
-                    color: Theme.text
-                    font.pixelSize: Theme.fontSizeLarge
-                }
-
-                Label {
-                    Layout.alignment: Qt.AlignHCenter
-                    text: AppShell.projectSummary
-                    color: Theme.textMuted
-                    font.family: Theme.monoFamily
-                    font.pixelSize: Theme.fontSize
-                }
+            GraphPanel {
+                anchors.fill: parent
             }
         }
     }
