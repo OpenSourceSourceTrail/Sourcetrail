@@ -30,11 +30,16 @@ Rectangle {
 
         Text {
             id: label
+
+            // Deriving tracking from font.pixelSize would read the same grouped property object
+            // this binding writes, which Qt reports as a binding loop. Carry the size separately.
+            readonly property int size: root.mono ? Theme.fontSmall : Theme.fontMicro
+
             color: root.accented ? Theme.accentHi : Theme.textMuted
             font.family: root.mono ? Theme.monoFamily : Theme.displayFamily
-            font.pixelSize: root.mono ? Theme.fontSmall : Theme.fontMicro
+            font.pixelSize: label.size
             font.capitalization: root.mono ? Font.MixedCase : Font.AllUppercase
-            font.letterSpacing: root.mono ? 0 : Theme.tracking(Theme.trackBadge, font.pixelSize)
+            font.letterSpacing: root.mono ? 0 : Theme.tracking(Theme.trackBadge, label.size)
             anchors.verticalCenter: parent.verticalCenter
         }
 
