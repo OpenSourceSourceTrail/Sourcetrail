@@ -20,6 +20,7 @@
 #include "component/view/GraphViewStyle.h"
 #include "factory/impls/Factory.hpp"
 #include "FilePath.h"
+#include "Fonts.h"
 #include "logging.h"
 #include "network/QtNetworkFactory.h"
 #include "productVersion.h"
@@ -94,8 +95,11 @@ int main(int argc, char* argv[]) {
   IApplicationSettings::setInstance(std::make_shared<ApplicationSettings>());
   platform_paths::setupPaths();
 
-  // Node boxes are sized from measured text, so the metrics have to be installed before any layout
-  // runs. The widget GUI got this from its ViewFactory; there is no view factory any more.
+  // Both of these have to happen before anything measures text. Node boxes are sized from measured
+  // text, so the metrics have to be installed before any layout runs -- and the metrics are only
+  // right once the vendored families the theme names are actually in the font database. The widget
+  // GUI got the style impl from its ViewFactory; there is no view factory any more.
+  qml::loadApplicationFonts();
   GraphViewStyle::setImpl(std::make_shared<QmlGraphViewStyleImpl>());
 
   AppShell shell;

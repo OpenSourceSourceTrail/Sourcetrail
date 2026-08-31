@@ -18,6 +18,8 @@ qt_add_qml_module(
   SOURCES
   AppShell.cpp
   AppShell.h
+  Fonts.cpp
+  Fonts.h
   GuiThread.h
   QmlDialogView.cpp
   QmlDialogView.h
