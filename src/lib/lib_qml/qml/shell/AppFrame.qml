@@ -17,7 +17,6 @@ Item {
     signal newProjectRequested()
     signal refreshRequested()
     signal preferencesRequested()
-    signal paletteRequested()
 
     // Ctrl on Linux and Windows, Command on macOS -- shown as the design writes it.
     readonly property string paletteShortcutLabel: Qt.platform.os === "osx" ? "⌘K" : "Ctrl+K"
@@ -43,7 +42,7 @@ Item {
             Layout.fillWidth: true
             trailOpen: root.trailOpen
             paletteShortcutLabel: root.paletteShortcutLabel
-            onPaletteRequested: root.paletteRequested()
+            onPaletteRequested: SearchViewModel.paletteOpen = true
             onTrailToggled: root.trailOpen = !root.trailOpen
             onErrorsRequested: rail.currentPage = rail.pageErrors
             onPreferencesRequested: root.preferencesRequested()
@@ -103,6 +102,8 @@ Item {
             onErrorsRequested: rail.currentPage = rail.pageErrors
         }
     }
+
+    CommandPalette {}
 
     // A controller asking to be seen -- StatusController and ErrorController both do this -- picks
     // the matching rail entry. View names come from View::getName().

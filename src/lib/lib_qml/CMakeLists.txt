@@ -42,6 +42,15 @@ qt_add_qml_module(
   network/QtNetworkFactory.h
   network/QtTcpWrapper.cpp
   network/QtTcpWrapper.h
+  search/ActionModel.cpp
+  search/ActionModel.h
+  search/MatchModel.cpp
+  search/MatchModel.h
+  search/QmlSearchView.cpp
+  search/QmlSearchView.h
+  search/SearchSnapshot.h
+  search/SearchViewModel.cpp
+  search/SearchViewModel.h
   shell/HistoryModel.cpp
   shell/HistoryModel.h
   shell/NavigationViewModel.cpp
@@ -71,6 +80,8 @@ qt_add_qml_module(
   qml/controls/StSegmented.qml
   qml/controls/StTextField.qml
   qml/controls/StToggle.qml
+  qml/search/CommandPalette.qml
+  qml/search/MatchRow.qml
   qml/shell/AppFrame.qml
   qml/shell/ContextPanel.qml
   qml/shell/HistoryPage.qml
@@ -84,7 +95,8 @@ qt_add_qml_module(
 # The generated QML type registration includes every QML_ELEMENT header by basename
 # (#include <GraphModels.h>), so each directory holding one has to be on the include path.
 target_include_directories(Sourcetrail_lib_qml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/graph
-                                                  ${CMAKE_CURRENT_SOURCE_DIR}/shell)
+                                                  ${CMAKE_CURRENT_SOURCE_DIR}/shell
+                                                  ${CMAKE_CURRENT_SOURCE_DIR}/search)
 
 target_link_libraries(
   Sourcetrail_lib_qml

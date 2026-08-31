@@ -9,6 +9,7 @@
 #include "graph/GraphViewModel.h"
 #include "GuiThread.h"
 #include "QmlDialogView.h"
+#include "search/SearchViewModel.h"
 #include "settings/IApplicationSettings.hpp"
 #include "shell/NavigationViewModel.h"
 #include "shell/StatusViewModel.h"
@@ -121,6 +122,8 @@ void AppShell::setup() {
   mNavigation->attach(storageAccess);
   mStatusModel = std::make_unique<shell::StatusViewModel>(nullptr);
   mStatusModel->attach(storageAccess);
+  mSearch = std::make_unique<search::SearchViewModel>(nullptr);
+  mSearch->attach(storageAccess);
 
   updateRecentProjectMenu();
 }

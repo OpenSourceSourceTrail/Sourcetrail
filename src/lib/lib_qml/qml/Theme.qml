@@ -98,6 +98,25 @@ QtObject {
 
     function tracking(em, pixelSize) { return em * pixelSize }
 
+    /**
+     * Marks up `text` so the characters at `indices` are drawn in `colour`, for Text.StyledText.
+     *
+     * Escaping is not optional here: these are C++ symbol names, so `std::vector<int>` and
+     * `operator&` are ordinary input, and StyledText would swallow or mangle them.
+     */
+    function highlight(text, indices, colour) {
+        const marked = new Set(indices ?? []);
+        let out = "";
+        for (let i = 0; i < text.length; ++i) {
+            const c = text[i] === "&" ? "&amp;"
+                    : text[i] === "<" ? "&lt;"
+                    : text[i] === ">" ? "&gt;"
+                    : text[i];
+            out += marked.has(i) ? "<font color=\"" + colour + "\">" + c + "</font>" : c;
+        }
+        return out;
+    }
+
     // ---- Metrics -----------------------------------------------------------------------------
     readonly property int spacing: 8
     readonly property int spacingTight: 4

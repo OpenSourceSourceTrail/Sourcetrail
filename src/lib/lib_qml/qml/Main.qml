@@ -112,6 +112,15 @@ ApplicationWindow {
     // sequence is spelled out; Qt maps "Ctrl" to Command on macOS automatically.
     Shortcut {
         sequences: ["Ctrl+K"]
-        onActivated: console.log("command palette arrives with the search view-model")
+        enabled: AppShell.projectLoaded
+        onActivated: SearchViewModel.paletteOpen = !SearchViewModel.paletteOpen
+    }
+
+    // The bus can ask for the search field too -- MessageFind, which the IDE plugin and the
+    // Edit menu both send.
+    Shortcut {
+        sequences: [StandardKey.Find]
+        enabled: AppShell.projectLoaded
+        onActivated: SearchViewModel.paletteOpen = true
     }
 }

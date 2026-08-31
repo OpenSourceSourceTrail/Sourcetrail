@@ -19,6 +19,10 @@ namespace graph {
 class GraphViewModel;
 }
 
+namespace search {
+class SearchViewModel;
+}
+
 namespace shell {
 class NavigationViewModel;
 class StatusViewModel;
@@ -149,4 +153,5 @@ private:
   std::unique_ptr<graph::GraphViewModel> mGraph;
   std::unique_ptr<shell::NavigationViewModel> mNavigation;
   std::unique_ptr<shell::StatusViewModel> mStatusModel;
+  std::unique_ptr<search::SearchViewModel> mSearch;
 };
