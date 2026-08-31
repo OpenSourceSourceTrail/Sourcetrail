@@ -27,6 +27,8 @@ qt_add_qml_module(
   QmlGraphViewStyleImpl.h
   ShellMessages.cpp
   ShellMessages.h
+  code/CodeHighlighter.cpp
+  code/CodeHighlighter.h
   graph/EdgeRouter.cpp
   graph/EdgeRouter.h
   graph/GraphModels.cpp
@@ -96,7 +98,8 @@ qt_add_qml_module(
 # (#include <GraphModels.h>), so each directory holding one has to be on the include path.
 target_include_directories(Sourcetrail_lib_qml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/graph
                                                   ${CMAKE_CURRENT_SOURCE_DIR}/shell
-                                                  ${CMAKE_CURRENT_SOURCE_DIR}/search)
+                                                  ${CMAKE_CURRENT_SOURCE_DIR}/search
+                                                  ${CMAKE_CURRENT_SOURCE_DIR}/code)
 
 target_link_libraries(
   Sourcetrail_lib_qml
@@ -110,5 +113,7 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::utility
           Sourcetrail::lib::core::utility::utilityApp
           Sourcetrail::lib::core::utility::file::FilePath
+          Sourcetrail::lib::core::utility::file::FileSystem
+          Sourcetrail::lib::core::utility::TextAccess
           Sourcetrail::lib::messaging
           Sourcetrail::warnings)
