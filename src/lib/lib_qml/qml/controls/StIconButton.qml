@@ -7,17 +7,19 @@ Button {
     id: root
 
     /** Rail buttons are borderless and fill on hover instead. */
-    property bool flat: false
+    property bool borderless: false
     property bool active: false
+    /** Overrides the resting glyph colour; hover and disabled still win. */
+    property color iconColor: root.borderless ? Theme.iconMuted : Theme.textDim
 
-    implicitWidth: root.flat ? Theme.railButtonSize : Theme.iconButtonSize
+    implicitWidth: root.borderless ? Theme.railButtonSize : Theme.iconButtonSize
     implicitHeight: implicitWidth
     hoverEnabled: true
 
     background: Rectangle {
         radius: Theme.radius
         color: root.active ? Theme.selected : (root.hovered && root.enabled ? Theme.raised : "transparent")
-        border.width: root.flat ? 0 : 1
+        border.width: root.borderless ? 0 : 1
         border.color: root.active ? Theme.accentLine : (root.hovered && root.enabled ? Theme.accent : Theme.lineStrong)
     }
 
@@ -28,7 +30,7 @@ Button {
         color: !root.enabled ? Theme.line
              : root.active ? Theme.accentHi
              : root.hovered ? Theme.text
-             : (root.flat ? Theme.iconMuted : Theme.textDim)
+             : root.iconColor
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }

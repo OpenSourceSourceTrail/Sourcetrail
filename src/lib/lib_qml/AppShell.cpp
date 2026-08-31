@@ -10,6 +10,8 @@
 #include "GuiThread.h"
 #include "QmlDialogView.h"
 #include "settings/IApplicationSettings.hpp"
+#include "shell/NavigationViewModel.h"
+#include "shell/StatusViewModel.h"
 #include "ShellMessages.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
@@ -115,6 +117,10 @@ void AppShell::setup() {
   mActivation = std::make_unique<ActivationController>(storageAccess);
   mGraph = std::make_unique<graph::GraphViewModel>(nullptr);
   mGraph->attach(storageAccess);
+  mNavigation = std::make_unique<shell::NavigationViewModel>(nullptr);
+  mNavigation->attach(storageAccess);
+  mStatusModel = std::make_unique<shell::StatusViewModel>(nullptr);
+  mStatusModel->attach(storageAccess);
 
   updateRecentProjectMenu();
 }

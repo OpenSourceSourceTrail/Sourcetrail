@@ -19,6 +19,11 @@ namespace graph {
 class GraphViewModel;
 }
 
+namespace shell {
+class NavigationViewModel;
+class StatusViewModel;
+}    // namespace shell
+
 /**
  * The QML front end's implementation of everything Application asks of a user interface.
  *
@@ -142,4 +147,6 @@ private:
   // MessageActivateTokens every panel actually listens for. Without one the graph never rebuilds.
   std::unique_ptr<ActivationController> mActivation;
   std::unique_ptr<graph::GraphViewModel> mGraph;
+  std::unique_ptr<shell::NavigationViewModel> mNavigation;
+  std::unique_ptr<shell::StatusViewModel> mStatusModel;
 };

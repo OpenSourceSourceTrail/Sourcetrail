@@ -42,6 +42,21 @@ qt_add_qml_module(
   network/QtNetworkFactory.h
   network/QtTcpWrapper.cpp
   network/QtTcpWrapper.h
+  shell/HistoryModel.cpp
+  shell/HistoryModel.h
+  shell/NavigationViewModel.cpp
+  shell/NavigationViewModel.h
+  shell/QmlStatusBarView.cpp
+  shell/QmlStatusBarView.h
+  shell/QmlStatusView.cpp
+  shell/QmlStatusView.h
+  shell/QmlUndoRedoView.cpp
+  shell/QmlUndoRedoView.h
+  shell/QmlViewLayout.cpp
+  shell/QmlViewLayout.h
+  shell/ShellSnapshot.h
+  shell/StatusViewModel.cpp
+  shell/StatusViewModel.h
   utility/globalStrings.h
   QML_FILES
   qml/GraphPanel.qml
@@ -55,11 +70,21 @@ qt_add_qml_module(
   qml/controls/StSectionLabel.qml
   qml/controls/StSegmented.qml
   qml/controls/StTextField.qml
-  qml/controls/StToggle.qml)
+  qml/controls/StToggle.qml
+  qml/shell/AppFrame.qml
+  qml/shell/ContextPanel.qml
+  qml/shell/HistoryPage.qml
+  qml/shell/IconRail.qml
+  qml/shell/MenuBar.qml
+  qml/shell/OverviewPage.qml
+  qml/shell/PlaceholderPage.qml
+  qml/shell/StatusBar.qml
+  qml/shell/Toolbar.qml)
 
 # The generated QML type registration includes every QML_ELEMENT header by basename
 # (#include <GraphModels.h>), so each directory holding one has to be on the include path.
-target_include_directories(Sourcetrail_lib_qml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/graph)
+target_include_directories(Sourcetrail_lib_qml PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/graph
+                                                  ${CMAKE_CURRENT_SOURCE_DIR}/shell)
 
 target_link_libraries(
   Sourcetrail_lib_qml
