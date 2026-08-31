@@ -29,6 +29,13 @@ qt_add_qml_module(
   ShellMessages.h
   code/CodeHighlighter.cpp
   code/CodeHighlighter.h
+  code/CodeModels.cpp
+  code/CodeModels.h
+  code/CodeSnapshot.h
+  code/CodeViewModel.cpp
+  code/CodeViewModel.h
+  code/QmlCodeView.cpp
+  code/QmlCodeView.h
   graph/EdgeRouter.cpp
   graph/EdgeRouter.h
   graph/GraphModels.cpp
@@ -73,6 +80,8 @@ qt_add_qml_module(
   qml/GraphPanel.qml
   qml/Main.qml
   qml/Theme.qml
+  qml/code/CodePanel.qml
+  qml/code/Snippet.qml
   qml/controls/StButton.qml
   qml/controls/StChip.qml
   qml/controls/StCornerMarks.qml

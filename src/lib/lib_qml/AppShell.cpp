@@ -4,6 +4,8 @@
 #include <QQmlEngine>
 
 #include "app/Application.h"
+#include "code/CodeHighlighter.h"
+#include "code/CodeViewModel.h"
 #include "component/controller/ActivationController.h"
 #include "data/storage/StorageCache.h"
 #include "graph/GraphViewModel.h"
@@ -124,6 +126,12 @@ void AppShell::setup() {
   mStatusModel->attach(storageAccess);
   mSearch = std::make_unique<search::SearchViewModel>(nullptr);
   mSearch->attach(storageAccess);
+  mCode = std::make_unique<code::CodeViewModel>(nullptr);
+  mCode->attach(storageAccess);
+
+  // Application::loadSettings has already loaded the colour scheme the rules take their colours
+  // from, so the rules can be resolved once here rather than per document.
+  code::CodeHighlighter::loadRules();
 
   updateRecentProjectMenu();
 }

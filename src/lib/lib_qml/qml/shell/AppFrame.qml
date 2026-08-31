@@ -70,29 +70,9 @@ Item {
                 Layout.fillHeight: true
             }
 
-            // The code panel's own view-model lands in a later phase; the frame reserves its place
-            // so the graph is laid out against the width it will actually have.
-            Rectangle {
+            CodePanel {
                 Layout.preferredWidth: Theme.codeWidth
                 Layout.fillHeight: true
-                color: Theme.panelAlt
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: Theme.line
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    width: parent.width - Theme.paddingWide * 2
-                    horizontalAlignment: Text.AlignHCenter
-                    text: qsTr("The code panel arrives with the code view-model.")
-                    color: Theme.textFaint
-                    font.family: Theme.bodyFamily
-                    font.pixelSize: Theme.fontCode
-                    wrapMode: Text.WordWrap
-                }
             }
         }
 

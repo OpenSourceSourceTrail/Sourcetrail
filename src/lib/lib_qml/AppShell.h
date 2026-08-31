@@ -15,6 +15,10 @@ class QJSEngine;
 class ShellMessages;
 class ActivationController;
 
+namespace code {
+class CodeViewModel;
+}
+
 namespace graph {
 class GraphViewModel;
 }
@@ -154,4 +158,5 @@ private:
   std::unique_ptr<shell::NavigationViewModel> mNavigation;
   std::unique_ptr<shell::StatusViewModel> mStatusModel;
   std::unique_ptr<search::SearchViewModel> mSearch;
+  std::unique_ptr<code::CodeViewModel> mCode;
 };
