@@ -19,7 +19,7 @@
 
 AppShell* AppShell::sInstance = nullptr;
 
-AppShell::AppShell() {
+AppShell::AppShell(QObject* parent) : QObject(parent) {
   sInstance = this;
 }
 
@@ -113,7 +113,7 @@ void AppShell::setup() {
 
   auto* storageAccess = Application::getInstance()->getStorageCache();
   mActivation = std::make_unique<ActivationController>(storageAccess);
-  mGraph = std::make_unique<graph::GraphViewModel>();
+  mGraph = std::make_unique<graph::GraphViewModel>(nullptr);
   mGraph->attach(storageAccess);
 
   updateRecentProjectMenu();

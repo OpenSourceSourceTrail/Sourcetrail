@@ -49,7 +49,16 @@ class AppShell final
   Q_PROPERTY(int uiFontSize READ uiFontSize WRITE setUiFontSize NOTIFY uiFontSizeChanged)
 
 public:
-  AppShell();
+  /**
+   * Takes a parent explicitly, with no default, so the type is NOT default-constructible.
+   *
+   * That is load-bearing, not style. QQmlPrivate::singletonConstructionMode() picks
+   * SingletonConstructionMode::Constructor whenever std::is_default_constructible is true, and only
+   * falls through to the create() factory when it is false -- so a default-constructible
+   * QML_SINGLETON silently gets a *second*, engine-owned instance and create() is never called.
+   * QML then binds to that orphan while C++ updates the real one.
+   */
+  explicit AppShell(QObject* parent);
   ~AppShell() override;
 
   /** QML singleton accessor. Ownership stays with main(). */

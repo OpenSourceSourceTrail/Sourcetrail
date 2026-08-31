@@ -49,7 +49,16 @@ class GraphViewModel final : public QObject {
   Q_PROPERTY(int grouping READ grouping WRITE setGrouping NOTIFY groupingChanged)
 
 public:
-  GraphViewModel();
+  /**
+   * Takes a parent explicitly, with no default, so the type is NOT default-constructible.
+   *
+   * That is load-bearing, not style. QQmlPrivate::singletonConstructionMode() picks
+   * SingletonConstructionMode::Constructor whenever std::is_default_constructible is true, and only
+   * falls through to the create() factory when it is false -- so a default-constructible
+   * QML_SINGLETON silently gets a *second*, engine-owned instance and create() is never called.
+   * QML then binds to that orphan while C++ updates the real one.
+   */
+  explicit GraphViewModel(QObject* parent);
   ~GraphViewModel() override;
 
   static GraphViewModel* create(QQmlEngine* qmlEngine, QJSEngine* jsEngine);

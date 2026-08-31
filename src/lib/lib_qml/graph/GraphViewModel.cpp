@@ -39,7 +39,7 @@ GroupType groupingFromInt(int value) {
 
 GraphViewModel* GraphViewModel::sInstance = nullptr;
 
-GraphViewModel::GraphViewModel() {
+GraphViewModel::GraphViewModel(QObject* parent) : QObject(parent) {
   sInstance = this;
 }
 

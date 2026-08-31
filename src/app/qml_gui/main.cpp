@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
   qml::loadApplicationFonts();
   GraphViewStyle::setImpl(std::make_shared<QmlGraphViewStyleImpl>());
 
-  AppShell shell;
+  AppShell shell{nullptr};
   QtNetworkFactory networkFactory;
 
   // lib::Factory is the in-process factory: the Project it builds owns a PersistentStorage, so this
