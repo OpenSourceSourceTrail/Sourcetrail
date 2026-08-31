@@ -48,6 +48,16 @@ target_link_libraries(
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::warnings)
 
+# bin/app/resource.qrc backs the ":/data/..." paths ResourcePaths hands out -- the fonts Theme.qml
+# names and the graph node icons. Nothing had compiled it since the widget GUI was deleted, so every
+# one of those lookups silently resolved to nothing: no vendored fonts, no node icons. It goes on
+# the executable rather than the QML static library because a static library's resource initialiser
+# is precisely the kind of object a linker drops when nothing references it.
+# Note the variable form: qt_add_resources() given a target treats its next argument as a resource
+# NAME, not a file, so passing the .qrc there compiles nothing and says nothing.
+qt_add_resources(SOURCETRAIL_APP_RESOURCES ${PROJECT_SOURCE_DIR}/bin/app/resource.qrc)
+target_sources(Sourcetrail PRIVATE ${SOURCETRAIL_APP_RESOURCES})
+
 target_include_directories(Sourcetrail PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib")
 
 set_target_properties(Sourcetrail PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/app/")

@@ -35,8 +35,17 @@ QColor toColor(const std::string& value) {
   return value.empty() ? QColor{} : QColor{QString::fromStdString(value)};
 }
 
+/**
+ * ResourcePaths hands back Qt resource paths (":/data/gui/..."), not filesystem paths, so these
+ * have to become "qrc:" URLs. QUrl::fromLocalFile on one yields "file:///:/data/gui/...", which
+ * silently resolves to nothing and leaves every node icon blank.
+ */
+QUrl resourceUrl(const FilePath& resourcePath) {
+  return QUrl{QStringLiteral("qrc") + QString::fromStdString(resourcePath.str())};
+}
+
 QUrl guiImage(const std::wstring& relativePath) {
-  return QUrl::fromLocalFile(QString::fromStdString(ResourcePaths::getGuiDirectoryPath().concatenate(relativePath).str()));
+  return resourceUrl(ResourcePaths::getGuiDirectoryPath().concatenate(relativePath));
 }
 
 QUrl accessIcon(AccessKind access) {
@@ -75,7 +84,7 @@ void applyStyle(NodeItem& item, const GraphViewStyle::NodeStyle& style) {
   item.iconSize = static_cast<int>(style.iconSize);
   item.hasHatching = style.hasHatching;
   if(!style.iconPath.empty()) {
-    item.iconSource = QUrl::fromLocalFile(QString::fromStdString(style.iconPath.str()));
+    item.iconSource = resourceUrl(style.iconPath);
   }
 }
 
