@@ -71,6 +71,20 @@ QString AppShell::projectSummary() const {
   return mProjectSummary;
 }
 
+int AppShell::uiFontSize() const {
+  return IApplicationSettings::getInstanceRaw()->getFontSize();
+}
+
+void AppShell::setUiFontSize(int pointSize) {
+  auto* settings = IApplicationSettings::getInstanceRaw();
+  if(settings->getFontSize() == pointSize) {
+    return;
+  }
+  settings->setFontSize(pointSize);
+  settings->save();
+  Q_EMIT uiFontSizeChanged();
+}
+
 void AppShell::loadProject(const QUrl& projectFile) {
   const auto path = projectFile.isLocalFile() ? projectFile.toLocalFile() : projectFile.toString();
   MessageLoadProject{FilePath{path.toStdString()}, false, RefreshMode::None}.dispatch();

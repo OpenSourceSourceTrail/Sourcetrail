@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -74,7 +75,7 @@ ApplicationWindow {
             Label {
                 text: qsTr("Group by")
                 color: Theme.textMuted
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSmall
             }
 
             ComboBox {
@@ -120,7 +121,7 @@ ApplicationWindow {
                 visible: AppShell.recentProjects.length > 0
                 text: qsTr("Recent")
                 color: Theme.textFaint
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSmall
             }
 
             ListView {
@@ -134,13 +135,16 @@ ApplicationWindow {
                 reuseItems: true
 
                 delegate: ItemDelegate {
+                    id: projectDelegate
                     required property string modelData
                     width: ListView.view.width
                     text: modelData
-                    onClicked: AppShell.loadProject("file://" + modelData)
+                    onClicked: AppShell.loadProject("file://" + projectDelegate.modelData)
 
+                    // `parent` is not reliably the delegate inside contentItem -- reach the text
+                    // through the delegate's own id instead.
                     contentItem: Label {
-                        text: parent.text
+                        text: projectDelegate.text
                         color: Theme.textDim
                         font.family: Theme.monoFamily
                         font.pixelSize: Theme.fontSize
@@ -188,7 +192,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 text: AppShell.indexing ? AppShell.progressMessage : AppShell.status
                 color: AppShell.statusIsError ? Theme.warn : Theme.textFaint
-                font.pixelSize: Theme.fontSizeSmall
+                font.pixelSize: Theme.fontSmall
                 elide: Text.ElideRight
             }
 

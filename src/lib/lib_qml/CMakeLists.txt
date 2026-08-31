@@ -46,7 +46,16 @@ qt_add_qml_module(
   QML_FILES
   qml/GraphPanel.qml
   qml/Main.qml
-  qml/Theme.qml)
+  qml/Theme.qml
+  qml/controls/StButton.qml
+  qml/controls/StChip.qml
+  qml/controls/StCornerMarks.qml
+  qml/controls/StIconButton.qml
+  qml/controls/StPanel.qml
+  qml/controls/StSectionLabel.qml
+  qml/controls/StSegmented.qml
+  qml/controls/StTextField.qml
+  qml/controls/StToggle.qml)
 
 # The generated QML type registration includes every QML_ELEMENT header by basename
 # (#include <GraphModels.h>), so each directory holding one has to be on the include path.

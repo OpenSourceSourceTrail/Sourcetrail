@@ -46,6 +46,7 @@ class AppShell final
   Q_PROPERTY(int progressPercent READ progressPercent NOTIFY progressChanged)
   Q_PROPERTY(QStringList recentProjects READ recentProjects NOTIFY recentProjectsChanged)
   Q_PROPERTY(QString projectSummary READ projectSummary NOTIFY projectSummaryChanged)
+  Q_PROPERTY(int uiFontSize READ uiFontSize WRITE setUiFontSize NOTIFY uiFontSizeChanged)
 
 public:
   AppShell();
@@ -63,6 +64,10 @@ public:
   [[nodiscard]] int progressPercent() const;
   [[nodiscard]] QStringList recentProjects() const;
   [[nodiscard]] QString projectSummary() const;
+
+  /** Interface font size in points. Theme.qml scales its whole type ramp from this. */
+  [[nodiscard]] int uiFontSize() const;
+  void setUiFontSize(int pointSize);
 
   /** @name Actions QML triggers. All of these dispatch and return; none of them block. @{ */
   Q_INVOKABLE void loadProject(const QUrl& projectFile);
@@ -102,6 +107,7 @@ Q_SIGNALS:
   void progressChanged();
   void recentProjectsChanged();
   void projectSummaryChanged();
+  void uiFontSizeChanged();
   void windowActivationRequested();
   void startScreenRequested(bool show);
   void viewsNeedRefresh(bool isAfterIndexing);

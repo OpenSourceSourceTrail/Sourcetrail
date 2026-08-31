@@ -1,3 +1,4 @@
+pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Shapes
@@ -83,6 +84,7 @@ Item {
                     model: GraphViewModel.edges
 
                     delegate: Shape {
+                        id: edge
                         required property string svgPath
                         required property string arrowSvgPath
                         required property color edgeColor
@@ -97,21 +99,21 @@ Item {
                         preferredRendererType: Shape.CurveRenderer
 
                         ShapePath {
-                            strokeColor: parent.edgeColor
-                            strokeWidth: parent.edgeWidth
+                            strokeColor: edge.edgeColor
+                            strokeWidth: edge.edgeWidth
                             fillColor: "transparent"
                             capStyle: ShapePath.RoundCap
                             joinStyle: ShapePath.RoundJoin
-                            strokeStyle: parent.isDashed ? ShapePath.DashLine : ShapePath.SolidLine
-                            PathSvg { path: parent.parent.svgPath }
+                            strokeStyle: edge.isDashed ? ShapePath.DashLine : ShapePath.SolidLine
+                            PathSvg { path: edge.svgPath }
                         }
 
                         ShapePath {
-                            strokeColor: parent.edgeColor
-                            strokeWidth: parent.edgeWidth
+                            strokeColor: edge.edgeColor
+                            strokeWidth: edge.edgeWidth
                             fillColor: "transparent"
                             capStyle: ShapePath.RoundCap
-                            PathSvg { path: parent.parent.arrowSvgPath }
+                            PathSvg { path: edge.arrowSvgPath }
                         }
                     }
                 }
@@ -169,7 +171,7 @@ Item {
                         }
 
                         Image {
-                            visible: node.iconSource != ""
+                            visible: node.iconSource !== ""
                             source: node.iconSource
                             x: node.iconOffsetX
                             y: node.iconOffsetY
@@ -229,8 +231,8 @@ Item {
                             enabled: node.isInteractive && node.nodeType !== root.typeText
                                      && node.nodeType !== root.typeAccess
                             acceptedButtons: Qt.LeftButton | Qt.MiddleButton
-                            onSingleTapped: function(event) {
-                                if (event.button === Qt.MiddleButton) {
+                            onSingleTapped: function(point, button) {
+                                if (button === Qt.MiddleButton) {
                                     if (node.tokenId)
                                         GraphViewModel.openInNewTab(node.tokenId)
                                     return
