@@ -1,5 +1,7 @@
 #pragma once
+#include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -49,6 +51,25 @@ public:
 
   [[nodiscard]] bool getShallowIndexingRequested() const;
 
+  /**
+   * Whether --engine was given: the GUI reads the index from a separate engine process over HTTP
+   * rather than hosting one itself. Without it the GUI owns the index in-process, with no HTTP hop.
+   */
+  [[nodiscard]] bool usesRemoteEngine() const;
+
+  /**
+   * The engine to attach to, as "host:port,token", or empty when --engine was given with no value:
+   * the GUI then spawns and supervises an engine of its own, as it used to.
+   */
+  [[nodiscard]] const std::string& getEngineEndpoint() const;
+
+  /**
+   * Port the in-process engine should serve HTTP on, or nullopt for no listener at all. 0 asks for
+   * an ephemeral port. Opt-in on purpose: a loopback port is reachable by every local process and
+   * by any page the user's browser loads, so a GUI nobody asked to be a server opens none.
+   */
+  [[nodiscard]] std::optional<uint16_t> getHttpPort() const;
+
 private:
   void processProjectfile();
 
@@ -64,6 +85,9 @@ private:
   FilePath m_projectFile;
   RefreshMode m_refreshMode = RefreshMode::UpdatedFiles;
   bool m_shallowIndexingRequested = false;
+  bool m_useRemoteEngine = false;
+  std::string m_engineEndpoint;
+  std::optional<uint16_t> m_httpPort;
 
   bool m_quit = false;
   bool m_withoutGUI = false;

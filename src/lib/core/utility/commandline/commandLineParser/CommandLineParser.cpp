@@ -18,7 +18,9 @@ CommandLineParser::CommandLineParser(std::string version) : m_version(std::move(
   options.add_options()
     ("help,h", "Print this help message")
     ("version,v", "Version of Sourcetrail")
-    ("project-file", po::value<std::string>(), "Open Sourcetrail with this project (.srctrlprj)");
+    ("project-file", po::value<std::string>(), "Open Sourcetrail with this project (.srctrlprj)")
+    ("engine", po::value<std::string>()->implicit_value(""), "Read the index from a separate engine process instead of hosting one in-process. With a \"host:port,token\" value, attach to that engine; without one, spawn and supervise a private engine")
+    ("http-port", po::value<uint16_t>(), "Serve the engine's HTTP API on this port (0 picks a free one) so clients such as the MCP server can reach the index");
   // clang-format on
 
   m_options.add(options);
@@ -73,6 +75,15 @@ void CommandLineParser::preparse(std::vector<std::string> args) {
       m_quit = true;
     }
 
+    if(variablesMap.contains("engine")) {
+      m_useRemoteEngine = true;
+      m_engineEndpoint = variablesMap["engine"].as<std::string>();
+    }
+
+    if(variablesMap.contains("http-port")) {
+      m_httpPort = variablesMap["http-port"].as<uint16_t>();
+    }
+
     if(variablesMap.count("project-file") != 0U) {
       m_projectFile = FilePath(variablesMap["project-file"].as<std::string>());
       processProjectfile();
@@ -104,6 +115,18 @@ void CommandLineParser::parse() {
     std::cerr << "ERROR: " << error.what() << std::endl << std::endl;
     std::cerr << m_options << std::endl;
   }
+}
+
+bool CommandLineParser::usesRemoteEngine() const {
+  return m_useRemoteEngine;
+}
+
+const std::string& CommandLineParser::getEngineEndpoint() const {
+  return m_engineEndpoint;
+}
+
+std::optional<uint16_t> CommandLineParser::getHttpPort() const {
+  return m_httpPort;
 }
 
 void CommandLineParser::setProjectFile(const FilePath& filepath) {
