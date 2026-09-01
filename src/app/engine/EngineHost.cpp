@@ -29,10 +29,27 @@ void registerSourceGroupModules() {
 
 HttpEndpoint::HttpEndpoint(StorageAccess* storageAccess, bool broadcastOnly)
     : mService(std::make_unique<EngineHttpService>(storageAccess))
+    // A loopback HTTP port is reachable by every process on the machine, and by any page the user's
+    // browser loads -- which the gRPC port it replaces was not. The token is the proof of being the
+    // client this engine was started for; start() hands it over on the handshake line, which only
+    // the parent process can read. An in-process caller needs none of it, so the routes exist from
+    // construction and callLocal() serves them whether or not anything ever listens.
+    , mServer(std::make_unique<http::Server>(utility::getUuidString()))
     , mPublisher(std::make_unique<EngineEventPublisher>(mService.get())) {
+  mService->registerRoutes(*mServer);
   if(!broadcastOnly) {
     mPublisher->installDialogViewFactory();
   }
+}
+
+std::optional<std::string> HttpEndpoint::callLocal(const std::string& method,
+                                                   const std::string& target,
+                                                   const std::string& body) const {
+  const http::Response response = mServer->dispatch(method, target, body);
+  if(response.status < 200 || response.status >= 300) {
+    return std::nullopt;
+  }
+  return response.body;
 }
 
 HttpEndpoint::~HttpEndpoint() {
@@ -40,16 +57,8 @@ HttpEndpoint::~HttpEndpoint() {
 }
 
 uint16_t HttpEndpoint::start(uint16_t port) {
-  // A loopback HTTP port is reachable by every process on the machine, and by any page the user's
-  // browser loads -- which the gRPC port it replaces was not. The token is the proof of being the
-  // client this engine was started for; it is handed over on the handshake line below, which only
-  // the parent process can read.
-  mServer = std::make_unique<http::Server>(utility::getUuidString());
-  mService->registerRoutes(*mServer);
-
   const uint16_t assignedPort = mServer->start(port);
   if(assignedPort == 0) {
-    mServer.reset();
     return 0;
   }
 
@@ -65,8 +74,8 @@ void HttpEndpoint::stop() {
     mService->abortDialogs();
   }
   if(mServer) {
+    // Kept alive rather than reset: callLocal() answers from these routes, listener or not.
     mServer->stop();
-    mServer.reset();
   }
 }
 

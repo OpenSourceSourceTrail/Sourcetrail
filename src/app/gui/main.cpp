@@ -15,6 +15,7 @@
 #include "ClientFactory.h"
 #include "CommandLineParser.h"
 #include "data/storage/StorageCache.h"
+#include "EngineCall.h"
 #include "EngineChannel.h"
 #include "EngineEventClient.h"
 #include "EngineHost.h"
@@ -90,23 +91,26 @@ std::shared_ptr<lib::IFactory> makeRemoteFactory(const commandline::CommandLineP
 }
 
 /**
- * Hosts the engine in this process when asked to, and keeps it alive for as long as the returned
- * handle lives. Returns nullptr when no HTTP listener was requested, which is the default: the
- * in-process read path needs no server, only a client such as the MCP one does.
+ * Hosts the engine in this process and keeps it alive for as long as the returned handle lives.
+ *
+ * The endpoint exists even without --http-port: the read path needs no server, but the parts of the
+ * GUI that ask the engine questions rather than reading the index -- what it can index, what a
+ * compilation database contains -- go through the same client calls a remote engine would answer,
+ * and with no channel those calls need a local dispatcher or they find no engine at all. A listener
+ * is opened only when a port was asked for, for clients such as the MCP server.
  */
-std::unique_ptr<engine_host::HttpEndpoint> serveHttpIfRequested(const commandline::CommandLineParser& commandLineParser) {
-  const auto port = commandLineParser.getHttpPort();
-  if(!port.has_value()) {
-    return nullptr;
-  }
-
+std::unique_ptr<engine_host::HttpEndpoint> hostEngine(const commandline::CommandLineParser& commandLineParser) {
   // broadcastOnly: the publisher's DialogView factory answers dialogs over the wire, which would
   // replace the real Qt dialogs this process has. Only the event broadcast is wanted here.
   auto endpoint = std::make_unique<engine_host::HttpEndpoint>(Application::getInstance()->getStorageCache(),
                                                               /*broadcastOnly=*/true);
-  if(endpoint->start(*port) == 0) {
+  client::setLocalDispatch(
+      [endpoint = endpoint.get()](const std::string& method, const std::string& target, const std::string& body) {
+        return endpoint->callLocal(method, target, body);
+      });
+
+  if(const auto port = commandLineParser.getHttpPort(); port.has_value() && endpoint->start(*port) == 0) {
     LOG_ERROR(fmt::format("Failed to serve the engine HTTP API on 127.0.0.1:{}", *port));
-    return nullptr;
   }
   return endpoint;
 }
@@ -153,12 +157,15 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
     Application::createInstance(version, std::make_shared<lib::Factory>(), nullptr, nullptr);
     engine_host::registerSourceGroupModules();
   }
-  [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
+  [[maybe_unused]] const ScopedFunctor scopedFunctor([]() {
+    client::setLocalDispatch(nullptr);
+    Application::destroyInstance();
+  });
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
 
   if(!commandLineParser.usesRemoteEngine()) {
-    httpEndpoint = serveHttpIfRequested(commandLineParser);
+    httpEndpoint = hostEngine(commandLineParser);
   }
 
   // TODO(Hussein): Replace with Boost or Qt
@@ -229,10 +236,13 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
     Application::createInstance(version, std::make_shared<lib::Factory>(), &viewFactory, &networkFactory);
     engine_host::registerSourceGroupModules();
   }
-  [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
+  [[maybe_unused]] const ScopedFunctor destroyApplication([]() {
+    client::setLocalDispatch(nullptr);
+    Application::destroyInstance();
+  });
 
   if(!commandLineParser.usesRemoteEngine()) {
-    httpEndpoint = serveHttpIfRequested(commandLineParser);
+    httpEndpoint = hostEngine(commandLineParser);
   }
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());

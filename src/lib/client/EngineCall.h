@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <functional>
 #include <optional>
 #include <string>
 #include <vector>
@@ -10,6 +11,18 @@
 #include "ProtoJson.h"
 
 namespace client {
+
+/**
+ * Serves a call without a socket, set when the engine is hosted in this same process.
+ *
+ * Returns the response body, or nullopt when the engine answered a non-2xx status. Installed by the
+ * process that hosts the engine (the GUI does, by default); with none installed and no channel a
+ * call simply finds no engine, which is read-only mode.
+ */
+using LocalDispatch = std::function<std::optional<std::string>(const std::string& method, const std::string& target,
+                                                               const std::string& body)>;
+void setLocalDispatch(LocalDispatch dispatch);
+[[nodiscard]] const LocalDispatch& localDispatch();
 
 /**
  * The one place an engine failure becomes an empty answer.
@@ -29,6 +42,15 @@ std::optional<Response> call(EngineChannel* channel,
                              const std::string& body = {},
                              std::optional<std::chrono::milliseconds> timeout = std::nullopt) {
   if(channel == nullptr) {
+    if(const LocalDispatch& local = localDispatch()) {
+      const std::optional<std::string> responseBody = local(method, target, body);
+      Response localMessage;
+      if(!responseBody || !proto::json::fromJson(*responseBody, localMessage)) {
+        LOG_WARNING(std::string("In-process engine call ") + what + " failed.");
+        return std::nullopt;
+      }
+      return localMessage;
+    }
     return std::nullopt;
   }
 
@@ -69,6 +91,9 @@ inline bool callVoid(EngineChannel* channel,
                      const std::string& body = {},
                      std::optional<std::chrono::milliseconds> timeout = std::nullopt) {
   if(channel == nullptr) {
+    if(const LocalDispatch& local = localDispatch()) {
+      return local(method, target, body).has_value();
+    }
     return false;
   }
 

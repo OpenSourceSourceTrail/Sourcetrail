@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 
 class StorageAccess;
@@ -46,6 +47,17 @@ public:
   HttpEndpoint& operator=(const HttpEndpoint&) = delete;
   HttpEndpoint(HttpEndpoint&&) = delete;
   HttpEndpoint& operator=(HttpEndpoint&&) = delete;
+
+  /**
+   * Serves one call from a client inside this process, bypassing the socket entirely. Returns the
+   * response body, or nullopt when the engine refused the call.
+   *
+   * Works whether or not start() was ever called: hosting the engine in-process is the GUI default,
+   * and it opens a port only when asked to.
+   */
+  [[nodiscard]] std::optional<std::string> callLocal(const std::string& method,
+                                                     const std::string& target,
+                                                     const std::string& body) const;
 
   /**
    * Starts listening and prints the `ENGINE_PORT <port> <token>` handshake line on stdout, flushed,
