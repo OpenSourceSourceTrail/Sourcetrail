@@ -71,6 +71,10 @@ size_t IndexerWorkerServiceImpl::getIndexedFileCount() const {
   return mIndexedFileCount.load();
 }
 
+double IndexerWorkerServiceImpl::getReceiveMilliseconds() const {
+  return mReceiveMilliseconds.load(std::memory_order_relaxed);
+}
+
 size_t IndexerWorkerServiceImpl::getStartedFileCount() const {
   return mStartedFileCount.load();
 }
@@ -113,12 +117,17 @@ grpc::Status IndexerWorkerServiceImpl::PullCommand(grpc::ServerContext* /*ctx*/,
 grpc::Status IndexerWorkerServiceImpl::PushIntermediateStorage(grpc::ServerContext* /*ctx*/,
                                                                const sourcetrail::PushIntermediateStorageRequest* req,
                                                                sourcetrail::PushIntermediateStorageResponse* /*resp*/) {
+  const auto receiveStart = std::chrono::steady_clock::now();
   auto storage = proto::convert::fromProto(req->storage());
   if(storage) {
     LOG_INFO(fmt::format("IndexerWorkerService: received IntermediateStorage from process {}", req->process_id()));
     mStorageProvider->insert(storage);
     mIndexedFileCount++;
   }
+  // fetch_add on a double needs a CAS loop; several worker threads land here at once.
+  const double elapsed = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - receiveStart).count();
+  double previous = mReceiveMilliseconds.load(std::memory_order_relaxed);
+  while(!mReceiveMilliseconds.compare_exchange_weak(previous, previous + elapsed, std::memory_order_relaxed)) {}
   return grpc::Status::OK;
 }
 

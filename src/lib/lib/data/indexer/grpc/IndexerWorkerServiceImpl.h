@@ -54,6 +54,11 @@ public:
   // Number of storages received (= files finished indexing)
   size_t getIndexedFileCount() const;
 
+  // Wall-clock milliseconds this process spent turning received messages back into an
+  // IntermediateStorage and handing it to the storage provider. The receive-side half of the
+  // worker boundary's cost; TaskBuildIndex logs it when indexing ends.
+  double getReceiveMilliseconds() const;
+
   // Number of files that have started indexing (monotonic; for progress display)
   size_t getStartedFileCount() const;
 
@@ -95,6 +100,7 @@ private:
 
   // broadcast interrupt to all WatchInterrupt streams
   std::atomic<size_t> mIndexedFileCount{0};
+  std::atomic<double> mReceiveMilliseconds{0.0};
   std::atomic<size_t> mStartedFileCount{0};
 
   std::mutex mInterruptListenersMutex;

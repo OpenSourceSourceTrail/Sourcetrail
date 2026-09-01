@@ -1,5 +1,7 @@
 #include "data/indexer/grpc/GrpcIndexer.h"
 
+#include <chrono>
+#include <cstdio>
 #include <thread>
 
 #include <fmt/format.h>
@@ -17,6 +19,31 @@
 GrpcIndexer::GrpcIndexer(std::string engineEndpoint, Id processId)
     : mEngineEndpoint(std::move(engineEndpoint)), mProcessId(processId) {}
 
+namespace {
+
+using WorkerClock = std::chrono::steady_clock;
+
+/**
+ * Wall-clock split of one worker's life: how much went into Clang, into building the protobuf
+ * message, and into the RPC that carries it back.
+ *
+ * Printed to stderr rather than logged, because worker logging is off unless verbose indexer
+ * logging is enabled *and* a log path was passed -- and the log path never reaches the worker's
+ * argv. stderr is drained by whoever spawned the process, so it always arrives.
+ */
+struct WorkerTimings {
+  double parseMs = 0.0;
+  double serializeMs = 0.0;
+  double pushMs = 0.0;
+  size_t files = 0;
+};
+
+double elapsedMs(WorkerClock::time_point start) {
+  return std::chrono::duration<double, std::milli>(WorkerClock::now() - start).count();
+}
+
+}    // namespace
+
 void GrpcIndexer::work() {
   grpc::ChannelArguments channelArgs;
   channelArgs.SetMaxReceiveMessageSize(grpc_indexer::UnlimitedMessageSize);
@@ -25,6 +52,8 @@ void GrpcIndexer::work() {
   auto stub = sourcetrail::IndexerWorkerService::NewStub(channel);
 
   auto pIndexer = LanguagePackageManager::getInstance()->instantiateSupportedIndexers();
+
+  WorkerTimings timings;
 
   // Watch interrupt in a background thread. The context is hoisted out so the
   // main loop can cancel the (otherwise blocking) server-streaming RPC on normal
@@ -98,7 +127,10 @@ void GrpcIndexer::work() {
     }
 
     LOG_INFO(fmt::format("{} indexing: {}", mProcessId, cmdMsg.source_file_path()));
+    const auto parseStart = WorkerClock::now();
     auto pResult = pIndexer->index(pCommand);
+    timings.parseMs += elapsedMs(parseStart);
+    ++timings.files;
 
     bool pushFailed = false;
     if(pResult && !interruptReceived) {
@@ -106,9 +138,14 @@ void GrpcIndexer::work() {
       grpc::ClientContext pushCtx;
       sourcetrail::PushIntermediateStorageRequest pushReq;
       pushReq.set_process_id(static_cast<uint64_t>(mProcessId));
+      const auto serializeStart = WorkerClock::now();
       *pushReq.mutable_storage() = proto::convert::toProto(*pResult);
+      timings.serializeMs += elapsedMs(serializeStart);
+
       sourcetrail::PushIntermediateStorageResponse pushResp;
+      const auto pushStart = WorkerClock::now();
       grpc::Status pushStatus = stub->PushIntermediateStorage(&pushCtx, pushReq, &pushResp);
+      timings.pushMs += elapsedMs(pushStart);
       if(!pushStatus.ok()) {
         pushFailed = true;
         LOG_ERROR(fmt::format("{} PushIntermediateStorage failed: {}", mProcessId, pushStatus.error_message()));
@@ -138,6 +175,15 @@ void GrpcIndexer::work() {
     sourcetrail::StatusReportResponse statusResp;
     stub->ReportStatus(&statusCtx, report, &statusResp);
   }
+
+  std::fprintf(stderr,
+               "INDEXER_TIMING process=%llu files=%zu parse_ms=%.1f serialize_ms=%.1f push_ms=%.1f\n",
+               static_cast<unsigned long long>(mProcessId),
+               timings.files,
+               timings.parseMs,
+               timings.serializeMs,
+               timings.pushMs);
+  std::fflush(stderr);
 
   LOG_INFO(fmt::format("{} GrpcIndexer shut down", mProcessId));
 }
