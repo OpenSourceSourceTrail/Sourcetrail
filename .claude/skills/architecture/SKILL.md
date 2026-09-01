@@ -12,7 +12,8 @@ src/
   app/                  Executable entry points
     gui/                Main GUI application binary (Sourcetrail)
     cli/                Headless, Qt-free CLI client (Sourcetrail_cli)
-    engine/             HTTP+JSON service impl for the engine daemon (Sourcetrail_engine)
+    engine/             The engine as a library (EngineHost, EngineHttpService) plus the
+                         standalone daemon binary (Sourcetrail_engine); the GUI links the same library
   lib/                  Libraries
     proto/              Payload schema (*.proto) + Convert helpers (storage <-> proto) + ProtoJson
     core/                Fine-grained utility libraries (file system, logging, config,
@@ -39,7 +40,7 @@ indexers/               Indexer plugins, one directory per plugin
 
 ## Messaging (`src/lib/messaging/`)
 
-Decoupled pub/sub bus. `MessageQueue` is the central singleton. Senders call `Message::dispatch()`. Receivers inherit `MessageListener<T>` and implement `handleMessage(T&)`. All message types live under `messaging/type/`. Primary cross-cutting communication mechanism (in-process). Cross-process: the GUI <-> engine boundary is HTTP + JSON (`src/lib/core/http`, `EngineHttpService`, server-sent events for engine->client push); the engine <-> indexer boundary is still gRPC — see `grpc-ipc` skill.
+Decoupled pub/sub bus. `MessageQueue` is the central singleton. Senders call `Message::dispatch()`. Receivers inherit `MessageListener<T>` and implement `handleMessage(T&)`. All message types live under `messaging/type/`. Primary cross-cutting communication mechanism (in-process), and the only one the GUI needs by default: it hosts the engine itself, so progress and status messages are already on its own bus. Cross-process: `EngineHttpService` still serves HTTP + JSON (`src/lib/core/http`, server-sent events for engine->client push) for the standalone daemon, the MCP server and a GUI started with `--engine`; the engine <-> indexer boundary is always gRPC — see `grpc-ipc` skill.
 
 ## Storage layer (`src/lib/lib/data/storage/`)
 
