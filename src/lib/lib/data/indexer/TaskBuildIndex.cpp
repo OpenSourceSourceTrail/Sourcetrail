@@ -56,6 +56,8 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
   // TaskFillIndexerCommandsQueue, which feeds its command queue.
   grpc::ServerBuilder builder;
   builder.AddListeningPort("localhost:0", grpc::InsecureServerCredentials(), &mEnginePort);
+  builder.SetMaxReceiveMessageSize(grpc_indexer::UnlimitedMessageSize);
+  builder.SetMaxSendMessageSize(grpc_indexer::UnlimitedMessageSize);
   builder.RegisterService(mIndexerWorkerService.get());
   mGrpcServer = builder.BuildAndStart();
 

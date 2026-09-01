@@ -18,7 +18,10 @@ GrpcIndexer::GrpcIndexer(std::string engineEndpoint, Id processId)
     : mEngineEndpoint(std::move(engineEndpoint)), mProcessId(processId) {}
 
 void GrpcIndexer::work() {
-  auto channel = grpc::CreateChannel(mEngineEndpoint, grpc::InsecureChannelCredentials());
+  grpc::ChannelArguments channelArgs;
+  channelArgs.SetMaxReceiveMessageSize(grpc_indexer::UnlimitedMessageSize);
+  channelArgs.SetMaxSendMessageSize(grpc_indexer::UnlimitedMessageSize);
+  auto channel = grpc::CreateCustomChannel(mEngineEndpoint, grpc::InsecureChannelCredentials(), channelArgs);
   auto stub = sourcetrail::IndexerWorkerService::NewStub(channel);
 
   auto pIndexer = LanguagePackageManager::getInstance()->instantiateSupportedIndexers();
