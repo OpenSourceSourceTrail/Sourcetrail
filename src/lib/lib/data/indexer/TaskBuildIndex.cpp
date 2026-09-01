@@ -16,6 +16,7 @@
 #include "data/indexer/IndexerCommandType.h"
 #include "data/parser/ParserClientImpl.h"
 #include "data/storage/StorageProvider.h"
+#include "settings/IApplicationSettings.hpp"
 #include "TimeStamp.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "utilityApp.h"
@@ -28,6 +29,18 @@ constexpr auto DelayTimeBeforeFinishUpdateInMs = 50;
 constexpr std::chrono::milliseconds CrashLoopThreshold{2000};
 /** Multiplied by the failure count, so the three attempts are spread over a few seconds. */
 constexpr std::chrono::milliseconds RespawnBackoff{500};
+
+// A worker's stdout is captured and dropped, so its own log file is the only way to see inside one.
+// The worker re-reads the verbose-indexer-logging setting itself and ignores a path it was not
+// asked to use; handing it the path is all the engine has to do. One file per worker, appended
+// across respawns so a crash loop stays readable.
+std::wstring indexerLogFilePath(int processId) {
+  const IApplicationSettings* settings = IApplicationSettings::getInstanceRaw();
+  if(!settings->getLoggingEnabled() || !settings->getVerboseIndexerLoggingEnabled()) {
+    return {};
+  }
+  return (settings->getLogDirectoryPath() / (L"indexer_p" + std::to_wstring(processId) + L".log")).wstring();
+}
 }    // namespace
 
 bool TaskBuildIndex::isCrashLoopExit(int exitCode, std::chrono::milliseconds ranFor) {
@@ -76,7 +89,8 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
     }
 
     const int processId = static_cast<int>(index + 1);
-    mProcessThreads.push_back(std::make_unique<std::thread>(&TaskBuildIndex::runIndexerProcess, this, processId, std::wstring{}));
+    mProcessThreads.push_back(
+        std::make_unique<std::thread>(&TaskBuildIndex::runIndexerProcess, this, processId, indexerLogFilePath(processId)));
   }
 
   blackboard->set<bool>("indexer_threads_started", true);
@@ -204,7 +218,7 @@ void TaskBuildIndex::handleMessage(MessageIndexingInterrupted* /*message*/) {
   mDialogView->showUnknownProgressDialog(L"Interrupting Indexing", L"Waiting for indexer\nthreads to finish");
 }
 
-void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logFilePath*/) {
+void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& logFilePath) {
   FilePath indexerProcessPath;
   FilePath launcherPath;
   std::vector<std::wstring> launcherArgs;
@@ -236,6 +250,9 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
   commandArguments.push_back(utility::decodeFromUtf8(endpoint));
   commandArguments.push_back(AppPath::getSharedDataDirectoryPath().getAbsolute().wstr());
   commandArguments.push_back(UserPaths::getUserDataDirectoryPath().getAbsolute().wstr());
+  if(!logFilePath.empty()) {
+    commandArguments.push_back(logFilePath);
+  }
 
   const std::wstring processPath = launcherPath.empty() ? indexerProcessPath.wstr() : launcherPath.wstr();
 
