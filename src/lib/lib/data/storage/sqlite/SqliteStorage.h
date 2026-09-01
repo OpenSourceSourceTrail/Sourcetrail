@@ -116,6 +116,26 @@ public:
 
 protected:
   /**
+   * @brief Apply the connection-level performance pragmas.
+   *
+   * Called from both constructors, after the database is open. These outlive any mode switch.
+   */
+  void applyConnectionPragmas() const;
+
+  /**
+   * @brief Trade durability for insert throughput while bulk-loading, or restore it afterwards.
+   *
+   * The index database is fully regenerable -- a crash mid-index already forces a reindex -- so the
+   * write phase runs without fsync and with an in-memory rollback journal. Every other phase gets
+   * WAL and synchronous=NORMAL.
+   *
+   * Must not be called inside a transaction: SQLite refuses to change journal_mode there.
+   *
+   * @param bulkWrite True while bulk-loading, false for normal read/clear use.
+   */
+  void setBulkWritePragmas(bool bulkWrite) const;
+
+  /**
    * @brief Setup the meta table
    */
   void setupMetaTable();
