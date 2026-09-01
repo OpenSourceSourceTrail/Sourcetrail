@@ -81,6 +81,16 @@ public:
   /** The bearer token every request must present. */
   [[nodiscard]] const std::string& authToken() const;
 
+  /**
+   * Serves one request without a socket, for a client living in this same process.
+   *
+   * The bearer token and the Origin check are skipped: both exist to keep other local processes and
+   * the user's browser off a loopback port, and an in-process caller crossed no such boundary. A
+   * server that was never start()ed still answers this, which is how the GUI hosts the engine
+   * without opening a port at all.
+   */
+  [[nodiscard]] Response dispatch(const std::string& method, const std::string& target, const std::string& body) const;
+
   /** Binds and starts serving; returns the bound port (pass 0 to let the OS choose). 0 on failure. */
   uint16_t start(uint16_t port);
 
