@@ -39,6 +39,8 @@
 
 namespace {
 constexpr int DefaultIndexerThreadCount = 4;
+constexpr size_t MinimumCommandQueueSize = 20;
+constexpr size_t CommandsPerWorkerInQueue = 4;
 
 // Single-language assumption (routing across mixed-language projects is a later increment):
 // resolve the worker command type from the first enabled non-custom source group's language.
@@ -163,8 +165,12 @@ void IndexTaskBuilder::addIndexerPipeline(const std::shared_ptr<TaskGroupSequenc
   taskParserWrapper->setTask(taskParallelIndexing);
 
   // add task for refilling the indexer command queue
+  // Deep enough that every worker can hold a command and still find the next one waiting; a
+  // fixed size smaller than the worker count leaves most of the pool idle.
+  const size_t commandQueueSize = std::max<size_t>(
+      MinimumCommandQueueSize, static_cast<size_t>(adjustedIndexerThreadCount) * CommandsPerWorkerInQueue);
   taskParallelIndexing->addTask(
-      m_taskFactory->createFillIndexerCommandsQueue(indexerWorkerService, std::move(indexerCommandProvider), 20));
+      m_taskFactory->createFillIndexerCommandsQueue(indexerWorkerService, std::move(indexerCommandProvider), commandQueueSize));
 
   // add task for indexing
   // Java has no in-process indexer (it is always an external plugin executable), so it must

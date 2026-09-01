@@ -33,7 +33,13 @@ Task::TaskState TaskFillIndexerCommandsQueue::doUpdate(std::shared_ptr<Blackboar
     return STATE_FAILURE;
   }
 
-  if(!fillCommandQueue()) {
+  if(fillCommandQueue()) {
+    // Just handed work over; come straight back rather than capping the feed rate at one
+    // batch per sleep interval.
+    return STATE_RUNNING;
+  }
+
+  {
     std::lock_guard<std::mutex> lock(m_commandsMutex);
 
     if(m_indexerCommandProvider->empty()) {
