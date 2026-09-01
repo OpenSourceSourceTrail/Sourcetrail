@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
   std::vector<std::string> args;
   if(argc > 1) {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    args = std::vector<std::string>(static_cast<size_t>(argc - 1), argv[1]);
+    args = std::vector<std::string>(argv + 1, argv + argc);
   }
 
   commandLineParser.preparse(std::move(args));
