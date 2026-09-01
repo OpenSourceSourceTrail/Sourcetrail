@@ -1,10 +1,12 @@
 #pragma once
 #include <atomic>
+#include <chrono>
 #include <deque>
 #include <memory>
 #include <mutex>
 #include <vector>
 
+#include <condition_variable>
 #include <grpcpp/grpcpp.h>
 
 #include "indexer_worker.grpc.pb.h"
@@ -15,11 +17,24 @@ class StorageProvider;
 
 class IndexerWorkerServiceImpl final : public sourcetrail::IndexerWorkerService::Service {
 public:
+  // How long PullCommand parks before telling an idle worker "nothing yet". Bounded so a parked
+  // call cannot wedge Server::Shutdown(), long enough that waiting for work costs nothing.
+  static constexpr std::chrono::milliseconds PullWait{1000};
+
   explicit IndexerWorkerServiceImpl(std::shared_ptr<StorageProvider> storageProvider);
   ~IndexerWorkerServiceImpl() override = default;
 
   // Called by TaskFillIndexerCommandsQueue to populate the command queue
   void fillCommands(std::vector<sourcetrail::IndexerCommand> commands);
+
+  // Called by TaskFillIndexerCommandsQueue once its provider is drained: from here on an empty
+  // queue means "no more work", which is what lets a worker exit. Commands still pending are
+  // handed out first.
+  void closeQueue();
+
+  // Whether closeQueue() has been called. Authoritative and immediate, unlike the
+  // "indexer_command_queue_stopped" blackboard flag TaskBuildIndex only re-reads every poll.
+  bool isQueueClosed();
 
   // Number of commands still waiting to be pulled by a worker
   size_t pendingCommandCount();
@@ -38,6 +53,11 @@ public:
 
   // Number of storages received (= files finished indexing)
   size_t getIndexedFileCount() const;
+
+  // Wall-clock milliseconds this process spent turning received messages back into an
+  // IntermediateStorage and handing it to the storage provider. The receive-side half of the
+  // worker boundary's cost; TaskBuildIndex logs it when indexing ends.
+  double getReceiveMilliseconds() const;
 
   // Number of files that have started indexing (monotonic; for progress display)
   size_t getStartedFileCount() const;
@@ -67,6 +87,8 @@ private:
 
   std::deque<sourcetrail::IndexerCommand> mCommandQueue;
   std::mutex mCommandMutex;
+  std::condition_variable mCommandCv;
+  bool mQueueClosed{false};    // guarded by mCommandMutex
 
   std::atomic<bool> mInterrupted{false};
   std::atomic<bool> mShuttingDown{false};
@@ -78,6 +100,7 @@ private:
 
   // broadcast interrupt to all WatchInterrupt streams
   std::atomic<size_t> mIndexedFileCount{0};
+  std::atomic<double> mReceiveMilliseconds{0.0};
   std::atomic<size_t> mStartedFileCount{0};
 
   std::mutex mInterruptListenersMutex;

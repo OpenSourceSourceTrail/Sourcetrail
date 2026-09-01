@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Sourcetrail is a free, offline, cross-platform (Windows/Linux) C/C++ source explorer built on Qt6. It indexes source code (via Clang/LibTooling when `BUILD_CXX_LANGUAGE_PACKAGE` is enabled) into a SQLite-backed graph database and lets users interactively explore symbols, references, and call graphs.
 
-It is **not** a single process: a Qt GUI, a headless engine daemon that owns the database, and per-job indexer workers. The GUI talks to the engine over **HTTP + JSON** (so a web app can speak it too); the engine talks to indexer workers over gRPC. See *Process model* below before making any change that crosses those boundaries.
+By default the GUI **hosts the engine in-process** and reads the index directly, with no serialization on the read path. The same engine also runs standalone as `sourcetrail_engine`, a headless HTTP + JSON daemon a web app or the MCP server can speak to, and the GUI can be pointed at one with `--engine <host:port,token>` instead of hosting its own. Indexer workers are always separate processes, reached over gRPC. See *Process model* below before making any change that crosses those boundaries.
 
 ## Build System
 
@@ -105,20 +105,27 @@ New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sour
 
 | Binary (`build/app/`) | Source | Role |
 | --- | --- | --- |
-| `Sourcetrail` | `src/app/gui` | Qt GUI. **Owns no database** — reads everything through the engine. |
-| `sourcetrail_engine` | `src/app/engine` | Headless HTTP daemon (`EngineHttpService`). Owns the SQLite index, the project state machine and the indexing task graph. |
+| `Sourcetrail` | `src/app/gui` | Qt GUI. Hosts the engine in-process by default; `--engine <host:port,token>` reads from a remote one instead, and `--http-port <n>` serves the HTTP API so clients such as the MCP server can attach. |
+| `sourcetrail_engine` | `src/app/engine` | The same engine, standalone: a headless HTTP daemon (`EngineHttpService`). Owns the SQLite index, the project state machine and the indexing task graph. |
 | `sourcetrail_indexer` | `indexers/cxx/indexer` | Indexer worker process, spawned per indexing job. Built only with `BUILD_CXX_LANGUAGE_PACKAGE`. |
 | `Sourcetrail_cli` | `src/app/cli` | Headless, Qt-free front end. |
 
-`QtEngineSupervisor` (`src/lib/lib_gui`) spawns the engine with `--port 0`; the engine prints
-`ENGINE_PORT <n> <token>` on its first stdout line, so instances can run side by side. The token is a
-per-run bearer credential every request must present: a loopback HTTP port is reachable by any local
-process and by any page the user's browser loads, which the gRPC port it replaced was not. Requests
-carrying an un-allow-listed `Origin` are refused outright. A dead engine is respawned with
-exponential backoff (max 5 attempts); while it is down, `HttpStorageAccess` returns empty results
-instead of failing, so the GUI stays alive and read-only.
+`src/app/engine/EngineHost.{h,cpp}` is the engine as a library (`Sourcetrail::app::engine_host`):
+source-group registration plus an `HttpEndpoint` that owns `EngineHttpService`, the `http::Server`
+and the event publisher. Both `sourcetrail_engine` and the GUI host it; in the GUI the publisher is
+constructed broadcast-only, because the real Qt dialogs must stay in place.
 
-The GUI/engine split is enforced at link time: `Sourcetrail_lib` holds the UI-agnostic business logic, `Sourcetrail_lib_engine` holds everything that touches SQLite (`PersistentStorage`, `Sqlite*Storage`, migrations, `Project`, `IndexTaskBuilder`, `RefreshInfoGenerator`). Only the engine and indexer link the latter. **Do not add a SQLite-touching header to `Sourcetrail_lib`.**
+Whoever starts a listener prints `ENGINE_PORT <n> <token>` on its first stdout line, so instances can
+run side by side. The token is a per-run bearer credential every request must present: a loopback
+HTTP port is reachable by any local process and by any page the user's browser loads. Requests
+carrying an un-allow-listed `Origin` are refused outright. This is why the GUI serves HTTP only when
+`--http-port` is passed.
+
+In remote mode (`--engine`), `QtEngineSupervisor` (`src/lib/lib_gui`) spawns the engine with
+`--port 0` and respawns a dead one with exponential backoff (max 5 attempts); while it is down,
+`HttpStorageAccess` returns empty results instead of failing, so the GUI stays alive and read-only.
+
+`Sourcetrail_lib` holds the UI-agnostic business logic; `Sourcetrail_lib_engine` holds everything that touches SQLite (`PersistentStorage`, `Sqlite*Storage`, migrations, `Project`, `IndexTaskBuilder`, `RefreshInfoGenerator`). The GUI, the CLI, the engine and the indexer all link the latter. `Sourcetrail_client` is the other side of the same boundary — `HttpStorageAccess`, `HttpProject`, `EngineEventClient` — and stays free of it: **do not add a SQLite-touching header to `Sourcetrail_lib` or `Sourcetrail_client`**, or the remote-engine and web-client paths stop being buildable on their own.
 
 ### Source layout
 

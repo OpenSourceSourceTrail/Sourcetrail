@@ -7,7 +7,12 @@ description: Sourcetrail cross-process IPC — the HTTP+JSON client/engine bound
 
 Two boundaries, with **different transports**. Message schemas for both live in `src/lib/proto/*.proto`.
 
-## Boundary A — client (GUI/web app) ↔ engine daemon: HTTP + JSON
+## Boundary A — client (web app, MCP, remote GUI) ↔ engine: HTTP + JSON
+
+Optional, not the GUI's default path. The GUI hosts the engine in-process and calls `StorageAccess`
+directly; this boundary exists for clients that are genuinely in another process — the MCP server,
+a web app, or a GUI started with `--engine <host:port,token>`. A GUI started with `--http-port <n>`
+serves it from inside the GUI process.
 
 Not gRPC: a browser cannot speak it, and the point of this boundary is that a web app can replace or
 sit alongside the Qt GUI.
@@ -43,6 +48,6 @@ which is what gRPC is good at. `indexer_worker.proto` is the only file that stil
 
 ## Processes
 
-- `Sourcetrail` (GUI) — the only client of boundary A. `Sourcetrail_cli` is **not** a client: it opens the database in-process via `lib_engine` and links neither `Sourcetrail_client` nor gRPC.
-- `Sourcetrail_engine` — engine daemon (HTTP server for clients, gRPC server for workers; entry point in `src/app/engine/`)
+- `Sourcetrail` (GUI) — hosts the engine in-process by default (`Sourcetrail::app::engine_host`), so it crosses boundary A only with `--engine`. It is a boundary-A *server* with `--http-port`. `Sourcetrail_cli` never crosses it: it opens the database in-process via `lib_engine` and links neither `Sourcetrail_client` nor an HTTP server.
+- `Sourcetrail_engine` — the standalone engine (HTTP server for clients, gRPC server for workers; entry point in `src/app/engine/`, engine itself in `EngineHost.{h,cpp}`)
 - `Sourcetrail_indexer` — indexer worker process (entry point in `indexers/cxx/indexer/`)

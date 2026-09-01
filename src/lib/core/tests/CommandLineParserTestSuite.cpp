@@ -68,7 +68,13 @@ TEST(CommandLineParserConfig, helpOption) {
         "Usage:\n  Sourcetrail [command] [option...] [positional arguments]\n\nCommands:\n  config                 Change "
         "preferences relevant to project indexing.*\n  index                  Index a certain project.*\n\n  * has its own "
         "--help\n\nOptions:\n  -h [ --help ]          Print this help message\n  -v [ --version ]       Version of Sourcetrail\n "
-        " --project-file arg     Open Sourcetrail with this project (.srctrlprj)\n\nPositional Arguments: \n  1: project-file\n";
+        " --project-file arg     Open Sourcetrail with this project (.srctrlprj)\n"
+        "  --engine arg           Read the index from a separate engine process instead \n                         of hosting "
+        "one in-process. With a \"host:port,token\" \n                         value, attach to that engine; without one, spawn "
+        "and \n                         supervise a private engine\n  --http-port arg        Serve the engine's HTTP API on this "
+        "port (0 picks a \n                         free one) so clients such as the MCP server can reach \n                     "
+        "    the index\n"
+        "\nPositional Arguments: \n  1: project-file\n";
     CollectOutStream collectCout(std::cout);
     parser.preparse(args);
     collectCout.close();
@@ -104,7 +110,13 @@ TEST(CommandLineParserConfig, projectFileOptionIsEmpty) {
   constexpr std::string_view MissingProjectString =
       "ERROR: the required argument for option '--project-file' is missing\n\n\nOptions:\n  -h [ --help ]          Print this "
       "help message\n  -v [ --version ]       Version of Sourcetrail\n  --project-file arg     Open Sourcetrail with this "
-      "project (.srctrlprj)\n\n";
+      "project (.srctrlprj)\n"
+      "  --engine arg           Read the index from a separate engine process instead \n                         of hosting one "
+      "in-process. With a \"host:port,token\" \n                         value, attach to that engine; without one, spawn and \n "
+      "                        supervise a private engine\n  --http-port arg        Serve the engine's HTTP API on this port (0 "
+      "picks a \n                         free one) so clients such as the MCP server can reach \n                         the "
+      "index\n"
+      "\n";
   std::vector<std::string> args{"--project-file"};
   commandline::CommandLineParser parser({});
   {

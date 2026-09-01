@@ -1,7 +1,10 @@
 #include "data/TaskInjectStorage.h"
 
+#include <chrono>
+#include <thread>
 #include <utility>
 
+#include "data/IndexingPhaseStats.h"
 #include "data/storage/Storage.h"
 #include "data/storage/StorageProvider.h"
 
@@ -16,11 +19,16 @@ Task::TaskState TaskInjectStorage::doUpdate(std::shared_ptr<Blackboard> /*blackb
       const auto source = std::move(result.value());
       // TODO(Hussein): What happen if lock failed but provider is consumed?!
       if(const auto target = m_target.lock()) {
+        const indexing_stats::ScopedPhase timer(indexing_stats::inject);
         target->inject(source.get());
         return STATE_SUCCESS;
       }
     }
   }
+
+  // Nothing queued. Same reasoning as TaskMergeStorages: back off only when there was no work.
+  std::this_thread::sleep_for(std::chrono::milliseconds(indexing_stats::InjectStorageIdleDelayMs));
+  indexing_stats::injectIdle.add(static_cast<double>(indexing_stats::InjectStorageIdleDelayMs));
 
   return STATE_FAILURE;
 }

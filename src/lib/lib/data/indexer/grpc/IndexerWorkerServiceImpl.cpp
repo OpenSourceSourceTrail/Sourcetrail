@@ -13,10 +13,26 @@ IndexerWorkerServiceImpl::IndexerWorkerServiceImpl(std::shared_ptr<StorageProvid
     : mStorageProvider(std::move(storageProvider)) {}
 
 void IndexerWorkerServiceImpl::fillCommands(std::vector<sourcetrail::IndexerCommand> commands) {
-  const std::lock_guard<std::mutex> lock(mCommandMutex);
-  for(auto& cmd : commands) {
-    mCommandQueue.push_back(std::move(cmd));
+  {
+    const std::lock_guard<std::mutex> lock(mCommandMutex);
+    for(auto& cmd : commands) {
+      mCommandQueue.push_back(std::move(cmd));
+    }
   }
+  mCommandCv.notify_all();
+}
+
+void IndexerWorkerServiceImpl::closeQueue() {
+  {
+    const std::lock_guard<std::mutex> lock(mCommandMutex);
+    mQueueClosed = true;
+  }
+  mCommandCv.notify_all();
+}
+
+bool IndexerWorkerServiceImpl::isQueueClosed() {
+  const std::lock_guard<std::mutex> lock(mCommandMutex);
+  return mQueueClosed;
 }
 
 size_t IndexerWorkerServiceImpl::pendingCommandCount() {
@@ -26,11 +42,13 @@ size_t IndexerWorkerServiceImpl::pendingCommandCount() {
 
 void IndexerWorkerServiceImpl::setInterrupted(bool interrupted) {
   mInterrupted.store(interrupted);
+  mCommandCv.notify_all();
   notifyInterruptListeners();
 }
 
 void IndexerWorkerServiceImpl::requestShutdown() {
   mShuttingDown.store(true);
+  mCommandCv.notify_all();
   notifyInterruptListeners();
 }
 
@@ -53,6 +71,10 @@ size_t IndexerWorkerServiceImpl::getIndexedFileCount() const {
   return mIndexedFileCount.load();
 }
 
+double IndexerWorkerServiceImpl::getReceiveMilliseconds() const {
+  return mReceiveMilliseconds.load(std::memory_order_relaxed);
+}
+
 size_t IndexerWorkerServiceImpl::getStartedFileCount() const {
   return mStartedFileCount.load();
 }
@@ -71,16 +93,23 @@ std::vector<FilePath> IndexerWorkerServiceImpl::getCurrentlyIndexedSourceFilePat
 grpc::Status IndexerWorkerServiceImpl::PullCommand(grpc::ServerContext* /*ctx*/,
                                                    const sourcetrail::PullCommandRequest* /*req*/,
                                                    sourcetrail::PullCommandResponse* resp) {
-  const std::lock_guard<std::mutex> lock(mCommandMutex);
+  // Park here rather than answering "nothing found" the instant the queue runs dry: an empty
+  // response is what makes a worker exit, and a worker exit costs a whole process restart.
+  std::unique_lock<std::mutex> lock(mCommandMutex);
+  mCommandCv.wait_for(
+      lock, PullWait, [this]() { return !mCommandQueue.empty() || mQueueClosed || mInterrupted.load() || mShuttingDown.load(); });
 
-  if(mInterrupted.load() || mCommandQueue.empty()) {
-    resp->set_command_found(false);
+  // An interrupt discards the remaining work; a plain close does not, so pending commands are
+  // still handed out after the producer is done.
+  if(!mCommandQueue.empty() && !mInterrupted.load() && !mShuttingDown.load()) {
+    *resp->mutable_command() = std::move(mCommandQueue.front());
+    mCommandQueue.pop_front();
+    resp->set_command_found(true);
     return grpc::Status::OK;
   }
 
-  *resp->mutable_command() = std::move(mCommandQueue.front());
-  mCommandQueue.pop_front();
-  resp->set_command_found(true);
+  resp->set_command_found(false);
+  resp->set_queue_closed(mQueueClosed || mInterrupted.load() || mShuttingDown.load());
 
   return grpc::Status::OK;
 }
@@ -88,12 +117,17 @@ grpc::Status IndexerWorkerServiceImpl::PullCommand(grpc::ServerContext* /*ctx*/,
 grpc::Status IndexerWorkerServiceImpl::PushIntermediateStorage(grpc::ServerContext* /*ctx*/,
                                                                const sourcetrail::PushIntermediateStorageRequest* req,
                                                                sourcetrail::PushIntermediateStorageResponse* /*resp*/) {
+  const auto receiveStart = std::chrono::steady_clock::now();
   auto storage = proto::convert::fromProto(req->storage());
   if(storage) {
     LOG_INFO(fmt::format("IndexerWorkerService: received IntermediateStorage from process {}", req->process_id()));
     mStorageProvider->insert(storage);
     mIndexedFileCount++;
   }
+  // fetch_add on a double needs a CAS loop; several worker threads land here at once.
+  const double elapsed = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - receiveStart).count();
+  double previous = mReceiveMilliseconds.load(std::memory_order_relaxed);
+  while(!mReceiveMilliseconds.compare_exchange_weak(previous, previous + elapsed, std::memory_order_relaxed)) {}
   return grpc::Status::OK;
 }
 

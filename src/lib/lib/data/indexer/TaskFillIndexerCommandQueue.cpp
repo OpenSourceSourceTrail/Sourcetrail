@@ -33,7 +33,13 @@ Task::TaskState TaskFillIndexerCommandsQueue::doUpdate(std::shared_ptr<Blackboar
     return STATE_FAILURE;
   }
 
-  if(!fillCommandQueue()) {
+  if(fillCommandQueue()) {
+    // Just handed work over; come straight back rather than capping the feed rate at one
+    // batch per sleep interval.
+    return STATE_RUNNING;
+  }
+
+  {
     std::lock_guard<std::mutex> lock(m_commandsMutex);
 
     if(m_indexerCommandProvider->empty()) {
@@ -47,6 +53,9 @@ Task::TaskState TaskFillIndexerCommandsQueue::doUpdate(std::shared_ptr<Blackboar
 }
 
 void TaskFillIndexerCommandsQueue::doExit(std::shared_ptr<Blackboard> blackboard) {
+  // The provider is drained, so an empty queue now really is the end of the work. Say so, or
+  // the workers park in PullCommand until it times out.
+  m_indexerWorkerService->closeQueue();
   blackboard->set<bool>("indexer_command_queue_stopped", true);
 }
 

@@ -707,6 +707,29 @@ private:
 
   std::vector<std::pair<int, SqliteDatabaseIndex>> getIndices() const;
 
+  /**
+   * @brief The rowid the next inserted element row will get.
+   *
+   * Every element-backed table (node, edge, local_symbol, source_location) allocates its ids from
+   * the element table's rowid sequence. Reading the sequence once and handing out consecutive ids
+   * lets the matching element rows go in as one batched insert afterwards, instead of one
+   * statement per row -- see insertElementRows().
+   *
+   * Only valid while nothing else inserts into element. Storage::inject holds a mutex and fills
+   * the tables one at a time, so call this at the point of use rather than caching it.
+   */
+  [[nodiscard]] Id getNextElementId() const;
+
+  /**
+   * @brief Insert the element rows for ids already handed out by getNextElementId().
+   *
+   * @param count Number of rows to insert.
+   * @param firstId The id getNextElementId() returned before the caller started handing ids out.
+   * @return False if SQLite did not assign the predicted rowids, which would leave every reference
+   *         to them dangling. The caller cannot repair that, but it is logged rather than silent.
+   */
+  bool insertElementRows(size_t count, Id firstId);
+
   void clearTables() override;
   void setupTables() override;
   void setupPrecompiledStatements() override;
@@ -806,6 +829,7 @@ private:
   InsertBatchStatement<StorageSourceLocationData> m_insertSourceLocationBatchStatement;
   InsertBatchStatement<StorageOccurrence> m_insertOccurrenceBatchStatement;
   InsertBatchStatement<StorageComponentAccess> m_insertComponentAccessBatchStatement;
+  InsertBatchStatement<StorageElementComponent> m_insertElementComponentBatchStatement;
 
   CppSQLite3Statement m_insertElementStmt;
   CppSQLite3Statement m_insertElementComponentStmt;

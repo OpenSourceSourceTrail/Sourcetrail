@@ -179,7 +179,7 @@ bool GraphLayoutService::ensureController() {
   }
   // GraphController registers with IMessageQueue on construction; without one that is a null
   // dereference rather than a degraded layout.
-  if(!IMessageQueue::getInstance()) {
+  if(!IMessageQueue::hasInstance()) {
     LOG_ERROR("Cannot lay out a graph before the message queue exists.");
     return false;
   }

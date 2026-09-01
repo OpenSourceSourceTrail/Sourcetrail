@@ -1,5 +1,7 @@
 #include "data/indexer/TaskBuildIndex.h"
 
+#include <cstdio>
+
 #include <fmt/format.h>
 
 #include <grpcpp/server_builder.h>
@@ -56,6 +58,8 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
   // TaskFillIndexerCommandsQueue, which feeds its command queue.
   grpc::ServerBuilder builder;
   builder.AddListeningPort("localhost:0", grpc::InsecureServerCredentials(), &mEnginePort);
+  builder.SetMaxReceiveMessageSize(grpc_indexer::UnlimitedMessageSize);
+  builder.SetMaxSendMessageSize(grpc_indexer::UnlimitedMessageSize);
   builder.RegisterService(mIndexerWorkerService.get());
   mGrpcServer = builder.BuildAndStart();
 
@@ -161,6 +165,16 @@ void TaskBuildIndex::doExit(std::shared_ptr<Blackboard> blackboard) {
     }
   }
 
+  if(mIndexerWorkerService) {
+    // Receive-side cost of the worker boundary: deserializing each IntermediateStorage and handing
+    // it to the storage provider. The send side is the INDEXER_TIMING line each worker prints.
+    std::fprintf(stderr,
+                 "INDEXER_TIMING engine files=%zu receive_ms=%.1f\n",
+                 mIndexerWorkerService->getIndexedFileCount(),
+                 mIndexerWorkerService->getReceiveMilliseconds());
+    std::fflush(stderr);
+  }
+
   // Shut down gRPC server. requestShutdown() unblocks any outstanding
   // WatchInterrupt streams first, since Server::Shutdown() otherwise waits
   // forever for them to return on a normal, non-interrupted indexing run.
@@ -234,10 +248,24 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
 
   int result = 1;
   int consecutiveFailures = 0;
-  while((!mIndexerCommandQueueStopped || result != 0) && !mInterrupted) {
+  // Ask the service directly instead of the blackboard flag doUpdate only refreshes every poll:
+  // a worker that exits cleanly the instant the queue closes must not be respawned.
+  const auto queueClosed = [this]() { return mIndexerWorkerService && mIndexerWorkerService->isQueueClosed(); };
+
+  while((!queueClosed() || result != 0) && !mInterrupted) {
     const auto startedAt = std::chrono::steady_clock::now();
-    result = utility::executeProcess(processPath, commandArguments, FilePath(), false, -1).exitCode;
+    const utility::ProcessOutput processOutput = utility::executeProcess(processPath, commandArguments, FilePath(), false, -1);
+    result = processOutput.exitCode;
     const auto ranFor = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startedAt);
+
+    // A worker's output is captured rather than inherited, so its timing line would be dropped
+    // here. Pass just that one line through; everything else stays as quiet as it was.
+    for(const std::wstring& line : utility::splitToVector(processOutput.output, L"\n")) {
+      if(line.find(L"INDEXER_TIMING") != std::wstring::npos) {
+        std::fprintf(stderr, "%s\n", utility::encodeToUtf8(line).c_str());
+        std::fflush(stderr);
+      }
+    }
     LOG_INFO(fmt::format("Indexer process {} returned with {} after {}ms", processId, result, ranFor.count()));
 
     if(!isCrashLoopExit(result, ranFor)) {
@@ -272,7 +300,7 @@ void TaskBuildIndex::runIndexerThread(int processId) {
     if(!mInterrupted) {
       std::this_thread::sleep_for(std::chrono::milliseconds(DelayTimeBeforeStartWorkInMs));
     }
-  } while(!mIndexerCommandQueueStopped && !mInterrupted);
+  } while(mIndexerWorkerService && !mIndexerWorkerService->isQueueClosed() && !mInterrupted);
 
   {
     const std::lock_guard<std::mutex> lock(mRunningThreadCountMutex);

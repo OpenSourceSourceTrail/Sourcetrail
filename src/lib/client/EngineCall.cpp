@@ -2,6 +2,21 @@
 
 namespace client {
 
+namespace {
+LocalDispatch& dispatchSlot() {
+  static LocalDispatch sDispatch;
+  return sDispatch;
+}
+}    // namespace
+
+void setLocalDispatch(LocalDispatch dispatch) {
+  dispatchSlot() = std::move(dispatch);
+}
+
+const LocalDispatch& localDispatch() {
+  return dispatchSlot();
+}
+
 std::string urlEncode(const std::string& text) {
   static constexpr char Hex[] = "0123456789ABCDEF";
 

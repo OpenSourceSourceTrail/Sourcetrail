@@ -1,19 +1,40 @@
-add_executable(
-  Sourcetrail_engine
-  main.cpp
+# The engine itself, as a library: the daemon binary below is one host for it, the GUI is the other.
+add_library(
+  Sourcetrail_engine_host STATIC
   EngineEventPublisher.cpp
   EngineEventPublisher.h
+  EngineHost.cpp
+  EngineHost.h
   EngineHttpService.cpp
   EngineHttpService.h
   GraphLayoutService.cpp
   GraphLayoutService.h)
+
+add_library(Sourcetrail::app::engine_host ALIAS Sourcetrail_engine_host)
+
+target_link_libraries(
+  Sourcetrail_engine_host
+  PUBLIC Sourcetrail::lib::lib_engine Sourcetrail::lib::proto::api Sourcetrail::lib::core::http Sourcetrail::lib::messaging
+  PRIVATE Sourcetrail::lib::core
+          Sourcetrail::lib::proto::convert
+          Sourcetrail::lib::core::utility::logging
+          Sourcetrail::lib::core::utility::TextAccess
+          Sourcetrail::lib::core::utility::utilityApp
+          Sourcetrail::lib::core::utility::utilityUuid
+          Sourcetrail::warnings)
+
+target_include_directories(Sourcetrail_engine_host PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+                           PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib")
+
+add_executable(Sourcetrail_engine main.cpp)
 
 set_target_properties(Sourcetrail_engine PROPERTIES OUTPUT_NAME sourcetrail_engine RUNTIME_OUTPUT_DIRECTORY
                                                                                    "${PROJECT_BINARY_DIR}/app/")
 
 target_link_libraries(
   Sourcetrail_engine
-  PRIVATE Sourcetrail::lib::core
+  PRIVATE Sourcetrail::app::engine_host
+          Sourcetrail::lib::core
           Sourcetrail::lib::lib_engine
           Sourcetrail::lib::utility::PathDetection
           Sourcetrail::lib::proto::api

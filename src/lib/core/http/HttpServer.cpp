@@ -398,6 +398,19 @@ void Server::route(std::string method, std::string path, Handler handler) {
   table[{std::move(method), std::move(path)}] = std::move(handler);
 }
 
+Response Server::dispatch(const std::string& method, const std::string& target, const std::string& body) const {
+  Request request;
+  request.method = method;
+  request.body = body;
+  parseTarget(target, request);
+
+  const Handler* handler = mImpl->findRoute(request.method, request.path, request.param);
+  if(handler == nullptr) {
+    return Response::error(404, "Not found");
+  }
+  return (*handler)(request);
+}
+
 void Server::eventStream(std::string path) {
   mImpl->eventPath = std::move(path);
 }

@@ -29,6 +29,7 @@ set(test_lib_names
     IndexerWireEnumsTestSuite
     IndexerCompositeTestSuite
     IndexerPluginRegistryTestSuite
+    IndexerWorkerServiceTestSuite
     IntermediateStorageTestSuite
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite

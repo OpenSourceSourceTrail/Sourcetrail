@@ -9,6 +9,7 @@
 #include "data/graph/token_component/TokenComponentFilePath.h"
 #include "data/graph/token_component/TokenComponentInheritanceChain.h"
 #include "data/graph/token_component/TokenComponentIsAmbiguous.h"
+#include "data/IndexingPhaseStats.h"
 #include "data/location/SourceLocationCollection.h"
 #include "data/location/SourceLocationFile.h"
 #include "data/NodeTypeSet.h"
@@ -373,13 +374,26 @@ bool PersistentStorage::getFilePathIndexed(const FilePath& path) const {
 void PersistentStorage::buildCaches() {
   clearCaches();
 
-  buildFilePathMaps();
-  buildSearchIndex();
-  buildMemberEdgeIdOrderMap();
-  buildHierarchyCache();
+  {
+    const indexing_stats::ScopedPhase timer(indexing_stats::filePathMaps);
+    buildFilePathMaps();
+  }
+  {
+    const indexing_stats::ScopedPhase timer(indexing_stats::searchIndex);
+    buildSearchIndex();
+  }
+  {
+    const indexing_stats::ScopedPhase timer(indexing_stats::memberEdgeOrder);
+    buildMemberEdgeIdOrderMap();
+  }
+  {
+    const indexing_stats::ScopedPhase timer(indexing_stats::hierarchyCache);
+    buildHierarchyCache();
+  }
 }
 
 void PersistentStorage::optimizeMemory() {
+  const indexing_stats::ScopedPhase timer(indexing_stats::optimizeDatabase);
   m_sqliteIndexStorage.setTime();
   m_sqliteIndexStorage.optimizeMemory();
 
@@ -472,6 +486,7 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
 
     if(m_fullTextSearchCodec != codec.getName()) {
       MessageStatus(L"Building fulltext search index", false, true).dispatch();
+      const indexing_stats::ScopedPhase timer(indexing_stats::fullTextIndex);
       buildFullTextSearchIndex();
     }
   }

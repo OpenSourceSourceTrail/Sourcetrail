@@ -12,6 +12,7 @@
 #include "app/IndexerPluginRegistry.h"
 #include "component/TabId.h"
 #include "component/view/DialogView.h"
+#include "data/IndexingPhaseStats.h"
 #include "data/storage/PersistentStorage.h"
 #include "data/storage/StorageCache.h"
 #include "FilePath.h"
@@ -465,6 +466,10 @@ void Project::swapToTempStorage(std::shared_ptr<DialogView> dialogView) {
   // dialogView->showUnknownProgressDialog(L"Finish Indexing", L"Building caches");
   m_storage->buildCaches();
   // dialogView->hideUnknownProgressDialog();
+
+  // Everything the pipeline measured, once the last cache is built: this is the only point where
+  // the whole run -- merge, inject, caches, VACUUM -- has finished.
+  indexing_stats::print();
 
   m_storageCache->setSubject(m_storage);
   m_state = ProjectStateType::LOADED;

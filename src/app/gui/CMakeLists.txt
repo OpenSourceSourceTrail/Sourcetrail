@@ -30,11 +30,11 @@ endif()
 
 target_link_libraries(
   Sourcetrail
-  PUBLIC Sourcetrail::lib::core Sourcetrail::lib::lib Sourcetrail::lib::lib_gui Sourcetrail::lib::client Qt6::Widgets
-         Qt6::Network
+  PUBLIC Sourcetrail::lib::core Sourcetrail::lib::lib Sourcetrail::lib::lib_gui Sourcetrail::lib::client
+         Sourcetrail::app::engine_host Qt6::Widgets Qt6::Network
   PRIVATE Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::ScopedFunctor
           Sourcetrail::lib::core::utility::utilityApp Sourcetrail::lib::core::utility::commandline::CommandLineParser
-          Sourcetrail::lib::proto::convert)
+          Sourcetrail::lib::proto::convert Sourcetrail::lib::utility::PathDetection)
 
 target_include_directories(Sourcetrail PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib_gui" "${PROJECT_BINARY_DIR}/src/lib")
 
@@ -52,18 +52,6 @@ file(COPY ${PROJECT_SOURCE_DIR}/bin/app/data/gui/icon/sourcetrail.ico DESTINATIO
 
 if(WIN32 AND NOT ${SR_IS_CI})
   copy_qt_binaries("${PROJECT_BINARY_DIR}/app/" TRUE)
-endif()
-
-# The regression guard for the whole GUI <-> engine boundary: the GUI must reach the index database
-# only through gRPC. A single #include of a storage header re-links SQLite into this binary and is
-# otherwise invisible, so assert on the symbol table rather than on anyone's discipline.
-if((ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST) AND NOT WIN32)
-  find_program(NM_EXECUTABLE nm)
-  if(NM_EXECUTABLE)
-    add_test(NAME "guard.gui.linksNoSqlite"
-             COMMAND ${CMAKE_COMMAND} -DBINARY=$<TARGET_FILE:Sourcetrail> -DNM=${NM_EXECUTABLE} -P
-                     "${PROJECT_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
-  endif()
 endif()
 
 # Project warning set. PRIVATE so it applies here and is not inflicted on consumers.

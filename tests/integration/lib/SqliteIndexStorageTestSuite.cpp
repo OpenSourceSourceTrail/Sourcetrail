@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <CppSQLite3.h>
+
 #include "FileSystem.h"
 #ifndef _WIN32
 #  define private public    // NOLINT(clang-diagnostic-keyword-macro)
@@ -295,6 +297,214 @@ TEST_F(SqliteIndexStorageTest, SetMode_ClearsAllTemporaryIndices) {
   EXPECT_TRUE(mStorage->m_tempEdgeIndex.empty());
   EXPECT_TRUE(mStorage->m_tempLocalSymbolIndex.empty());
   EXPECT_TRUE(mStorage->m_tempSourceLocationIndices.empty());
+}
+#endif
+
+
+#ifndef _WIN32
+// The element table's rowid sequence backs the ids of nodes, edges, local symbols and source
+// locations. Those are handed out from a single read of the sequence and the matching element rows
+// go in as one batched insert afterwards, so a drift between the two would silently dangle every
+// reference. These tests pin that down.
+
+TEST_F(SqliteIndexStorageTest, AddNodes_IdsMatchTheElementRowsWrittenForThem) {
+  // given
+  std::vector<StorageNode> nodes;
+  for(int i = 0; i < 10; i++) {
+    nodes.emplace_back(0, StorageNodeData(i, L"node" + std::to_wstring(i)));
+  }
+
+  // when
+  const Id firstId = mStorage->getNextElementId();
+  const std::vector<Id> ids = mStorage->addNodes(nodes);
+
+  // then
+  ASSERT_EQ(nodes.size(), ids.size());
+  for(size_t i = 0; i < ids.size(); i++) {
+    EXPECT_EQ(ids[i], mStorage->getNodeById(ids[i]).id) << "node " << i << " is not stored under the id it was given";
+  }
+  EXPECT_EQ(firstId + nodes.size(), mStorage->getNextElementId()) << "element rows and node ids drifted apart";
+}
+
+TEST_F(SqliteIndexStorageTest, AddNodes_SecondBatchDoesNotReuseIdsFromTheFirst) {
+  // given
+  const std::vector<Id> first = mStorage->addNodes(
+      {StorageNode(0, StorageNodeData(1, L"a")), StorageNode(0, StorageNodeData(1, L"b"))});
+
+  // when
+  const std::vector<Id> second = mStorage->addNodes(
+      {StorageNode(0, StorageNodeData(1, L"c")), StorageNode(0, StorageNodeData(1, L"d"))});
+
+  // then
+  std::set<Id> unique(first.begin(), first.end());
+  unique.insert(second.begin(), second.end());
+  EXPECT_EQ(first.size() + second.size(), unique.size());
+}
+
+TEST_F(SqliteIndexStorageTest, AddNodes_DeduplicatedNodesConsumeNoElementRow) {
+  // given
+  const std::vector<Id> first = mStorage->addNodes({StorageNode(0, StorageNodeData(1, L"a"))});
+
+  // when: the same serialized name comes back alongside a new one
+  const std::vector<Id> second = mStorage->addNodes(
+      {StorageNode(0, StorageNodeData(1, L"a")), StorageNode(0, StorageNodeData(1, L"b"))});
+
+  // then: "a" resolves to the existing id and only "b" allocates
+  EXPECT_EQ(first.front(), second.front());
+  EXPECT_NE(second.front(), second.back());
+  EXPECT_EQ(second.back() + 1, mStorage->getNextElementId()) << "the deduplicated node still consumed an element row";
+}
+
+TEST_F(SqliteIndexStorageTest, AddEdgesAndLocalSymbols_ShareTheElementSequenceWithoutCollidingWithNodes) {
+  // given
+  const std::vector<Id> nodeIds = mStorage->addNodes(
+      {StorageNode(0, StorageNodeData(1, L"a")), StorageNode(0, StorageNodeData(1, L"b"))});
+
+  // when
+  const std::vector<Id> edgeIds = mStorage->addEdges({StorageEdge(0, StorageEdgeData(1, nodeIds[0], nodeIds[1]))});
+  const std::vector<Id> symbolIds = mStorage->addLocalSymbols({StorageLocalSymbol(0, StorageLocalSymbolData(L"f<local>"))});
+
+  // then
+  std::set<Id> unique(nodeIds.begin(), nodeIds.end());
+  unique.insert(edgeIds.begin(), edgeIds.end());
+  unique.insert(symbolIds.begin(), symbolIds.end());
+  EXPECT_EQ(nodeIds.size() + edgeIds.size() + symbolIds.size(), unique.size());
+  EXPECT_EQ(edgeIds.front(), mStorage->getEdgeById(edgeIds.front()).id);
+}
+
+TEST_F(SqliteIndexStorageTest, InsertElementRows_ChunksBeyondASingleStatement) {
+  // given: more rows than fit one chunked INSERT, to cover the multi-chunk path
+  constexpr size_t RowCount = 1200;
+  const Id firstId = mStorage->getNextElementId();
+
+  // when
+  const bool success = mStorage->insertElementRows(RowCount, firstId);
+
+  // then
+  EXPECT_TRUE(success);
+  EXPECT_EQ(firstId + RowCount, mStorage->getNextElementId());
+}
+
+TEST_F(SqliteIndexStorageTest, GetEdgesBySourceOrTargetId_ReturnsEachEdgeOnce) {
+  // given
+  const std::vector<Id> nodeIds = mStorage->addNodes(
+      {StorageNode(0, StorageNodeData(1, L"a")), StorageNode(0, StorageNodeData(1, L"b"))});
+  const Id outgoing = mStorage->addEdge(StorageEdgeData(1, nodeIds[0], nodeIds[1]));
+  const Id incoming = mStorage->addEdge(StorageEdgeData(1, nodeIds[1], nodeIds[0]));
+  // a self-edge matches both halves of the query and must not be returned twice
+  const Id self = mStorage->addEdge(StorageEdgeData(1, nodeIds[0], nodeIds[0]));
+
+  // when
+  const std::vector<StorageEdge> edges = mStorage->getEdgesBySourceOrTargetId(nodeIds[0]);
+
+  // then
+  std::set<Id> ids;
+  for(const StorageEdge& edge : edges) {
+    ids.insert(edge.id);
+  }
+  EXPECT_EQ(edges.size(), ids.size()) << "an edge was returned more than once";
+  EXPECT_EQ(std::set<Id>({outgoing, incoming, self}), ids);
+}
+#endif
+
+
+#ifndef _WIN32
+namespace {
+// Reads the schema through a second, independent connection, so the assertions below are about what
+// actually landed in the file rather than about the storage object's own bookkeeping.
+std::set<std::string> readIndexNames(const FilePath& databasePath) {
+  CppSQLite3DB database;
+  database.open(utility::encodeToUtf8(databasePath.wstr()).c_str());
+
+  std::set<std::string> names;
+  CppSQLite3Query query = database.execQuery("SELECT name FROM sqlite_master WHERE type = 'index';");
+  while(!query.eof()) {
+    names.emplace(query.getStringField(0, ""));
+    query.nextRow();
+  }
+  return names;
+}
+
+// journal_mode=WAL is recorded in the database header, so another connection sees it. MEMORY is
+// per-connection and leaves no trace, which is why the write phase is asserted negatively.
+std::string readJournalMode(const FilePath& databasePath) {
+  CppSQLite3DB database;
+  database.open(utility::encodeToUtf8(databasePath.wstr()).c_str());
+
+  CppSQLite3Query query = database.execQuery("PRAGMA journal_mode;");
+  return query.eof() ? std::string() : utility::toLowerCase(std::string(query.getStringField(0, "")));
+}
+}    // namespace
+
+// setMode() drops every index not tagged for the requested mode. Tagging a column the read path
+// filters on for CLEAR or WRITE only means the GUI queries it with no index at all, which is a full
+// table scan on every graph expansion. These names must stay present in READ mode.
+TEST(SqliteIndexStorageModeTest, SetModeRead_KeepsTheIndexesTheReadPathQueriesThrough) {
+  const FilePath databasePath(L"data/SQLiteTestSuite/mode_read.sqlite");
+  std::ignore = FileSystem::remove(databasePath);
+
+  std::set<std::string> names;
+  {
+    SqliteIndexStorage storage(databasePath);
+    storage.setup();
+    storage.setMode(SqliteIndexStorage::STORAGE_MODE_READ);
+    names = readIndexNames(databasePath);
+  }
+  std::ignore = FileSystem::remove(databasePath);
+
+  for(const char* required : {"edge_source_node_id_index",
+                              "edge_target_node_id_index",
+                              "node_serialized_name_index",
+                              "source_location_file_node_id_index",
+                              "file_path_index",
+                              "occurrence_element_id_index",
+                              "occurrence_source_location_id_index",
+                              "element_component_element_id_index"}) {
+    EXPECT_TRUE(names.count(required) == 1) << required << " is missing in STORAGE_MODE_READ";
+  }
+}
+
+TEST(SqliteIndexStorageModeTest, SetModeWrite_DropsTheIndexesThatOnlySlowInsertsDown) {
+  const FilePath databasePath(L"data/SQLiteTestSuite/mode_write.sqlite");
+  std::ignore = FileSystem::remove(databasePath);
+
+  std::set<std::string> names;
+  {
+    SqliteIndexStorage storage(databasePath);
+    storage.setup();
+    storage.setMode(SqliteIndexStorage::STORAGE_MODE_WRITE);
+    names = readIndexNames(databasePath);
+  }
+  std::ignore = FileSystem::remove(databasePath);
+
+  // Bulk insert dedupes in memory, so these earn nothing during the write phase.
+  EXPECT_TRUE(names.count("edge_source_node_id_index") == 0);
+  EXPECT_TRUE(names.count("edge_target_node_id_index") == 0);
+  EXPECT_TRUE(names.count("node_serialized_name_index") == 0);
+  // addFile() looks a path up before every insert, so this one has to stay.
+  EXPECT_TRUE(names.count("file_path_index") == 1);
+}
+
+TEST(SqliteIndexStorageModeTest, SetMode_SwitchesTheJournalToMatchThePhase) {
+  const FilePath databasePath(L"data/SQLiteTestSuite/mode_journal.sqlite");
+  std::ignore = FileSystem::remove(databasePath);
+
+  std::string writeJournal;
+  std::string readJournal;
+  {
+    SqliteIndexStorage storage(databasePath);
+    storage.setup();
+
+    storage.setMode(SqliteIndexStorage::STORAGE_MODE_WRITE);
+    writeJournal = readJournalMode(databasePath);
+
+    storage.setMode(SqliteIndexStorage::STORAGE_MODE_READ);
+    readJournal = readJournalMode(databasePath);
+  }
+  std::ignore = FileSystem::remove(databasePath);
+
+  EXPECT_NE("wal", writeJournal) << "the bulk-write phase should not be paying for WAL";
+  EXPECT_EQ("wal", readJournal);
 }
 #endif
 

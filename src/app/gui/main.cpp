@@ -14,7 +14,12 @@
 #include "app/paths/ResourcePaths.h"
 #include "ClientFactory.h"
 #include "CommandLineParser.h"
+#include "data/storage/StorageCache.h"
+#include "EngineCall.h"
+#include "EngineChannel.h"
 #include "EngineEventClient.h"
+#include "EngineHost.h"
+#include "factory/impls/Factory.hpp"
 #include "FilePath.h"
 #include "HttpStorageAccess.h"
 #include "includes.h"
@@ -57,6 +62,59 @@ std::shared_ptr<lib::IFactory> startEngineAndMakeFactory(QtEngineSupervisor& sup
   return std::make_shared<client::ClientFactory>(supervisor.getChannel(), storageAccess);
 }
 
+/**
+ * Builds the factory for a remote engine: either attaching to the one named on the command line, or
+ * -- with a bare --engine -- spawning and supervising a private one, which is what the GUI used to
+ * do unconditionally.
+ *
+ * `channel` and `storageAccess` outlive the returned factory's use, so both are owned by the caller.
+ */
+std::shared_ptr<lib::IFactory> makeRemoteFactory(const commandline::CommandLineParser& commandLineParser,
+                                                 QtEngineSupervisor& supervisor,
+                                                 std::unique_ptr<EngineChannel>& channel,
+                                                 std::shared_ptr<HttpStorageAccess>& storageAccess) {
+  const std::string& endpoint = commandLineParser.getEngineEndpoint();
+  if(endpoint.empty()) {
+    return startEngineAndMakeFactory(supervisor, storageAccess);
+  }
+
+  // "host:port,token" -- the two halves of the handshake line the engine printed. Attaching means
+  // nobody supervises that engine: it was already running and is not ours to restart.
+  const auto separator = endpoint.rfind(',');
+  if(separator == std::string::npos) {
+    LOG_ERROR(fmt::format("--engine expects \"host:port,token\", got \"{}\"", endpoint));
+    return nullptr;
+  }
+  channel = std::make_unique<EngineChannel>(endpoint.substr(0, separator), endpoint.substr(separator + 1));
+  storageAccess = std::make_shared<HttpStorageAccess>(channel.get());
+  return std::make_shared<client::ClientFactory>(channel.get(), storageAccess);
+}
+
+/**
+ * Hosts the engine in this process and keeps it alive for as long as the returned handle lives.
+ *
+ * The endpoint exists even without --http-port: the read path needs no server, but the parts of the
+ * GUI that ask the engine questions rather than reading the index -- what it can index, what a
+ * compilation database contains -- go through the same client calls a remote engine would answer,
+ * and with no channel those calls need a local dispatcher or they find no engine at all. A listener
+ * is opened only when a port was asked for, for clients such as the MCP server.
+ */
+std::unique_ptr<engine_host::HttpEndpoint> hostEngine(const commandline::CommandLineParser& commandLineParser) {
+  // broadcastOnly: the publisher's DialogView factory answers dialogs over the wire, which would
+  // replace the real Qt dialogs this process has. Only the event broadcast is wanted here.
+  auto endpoint = std::make_unique<engine_host::HttpEndpoint>(Application::getInstance()->getStorageCache(),
+                                                              /*broadcastOnly=*/true);
+  client::setLocalDispatch(
+      [endpoint = endpoint.get()](const std::string& method, const std::string& target, const std::string& body) {
+        return endpoint->callLocal(method, target, body);
+      });
+
+  if(const auto port = commandLineParser.getHttpPort(); port.has_value() && endpoint->start(*port) == 0) {
+    LOG_ERROR(fmt::format("Failed to serve the engine HTTP API on 127.0.0.1:{}", *port));
+  }
+  return endpoint;
+}
+
 void checkRunFromScript() {
 #ifndef D_WINDOWS
   std::error_code errorCode;
@@ -77,16 +135,38 @@ int runConsole(int argc, char** argv, const Version& version, commandline::Comma
 
   QtEngineSupervisor supervisor;
   std::shared_ptr<HttpStorageAccess> storageAccess;
-  Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), nullptr, nullptr);
-  [[maybe_unused]] const ScopedFunctor scopedFunctor([]() { Application::destroyInstance(); });
+  std::unique_ptr<EngineChannel> channel;
+  std::unique_ptr<client::EngineEventClient> eventClient;
+  std::unique_ptr<engine_host::HttpEndpoint> httpEndpoint;
 
-  // Indexing progress, status lines and "the index is ready" all originate on the engine's message
-  // bus; this is the only thing that carries them across. Started after createInstance, which is
-  // what sets up the local IMessageQueue it dispatches onto.
-  client::EngineEventClient eventClient(supervisor.getChannel());
-  eventClient.start();
+  if(commandLineParser.usesRemoteEngine()) {
+    auto factory = makeRemoteFactory(commandLineParser, supervisor, channel, storageAccess);
+    if(!factory) {
+      return EXIT_FAILURE;
+    }
+    Application::createInstance(version, std::move(factory), nullptr, nullptr);
+    // Indexing progress, status lines and "the index is ready" all originate on the engine's message
+    // bus; this is the only thing that carries them across. Started after createInstance, which is
+    // what sets up the local IMessageQueue it dispatches onto.
+    eventClient = std::make_unique<client::EngineEventClient>(channel ? channel.get() : supervisor.getChannel());
+    eventClient->start();
+  } else {
+    // In-process: lib::Factory builds the real Project, which owns PersistentStorage and points the
+    // StorageCache at it. Every progress message is already on this process's bus, so there is
+    // nothing to carry across and no EngineEventClient.
+    Application::createInstance(version, std::make_shared<lib::Factory>(), nullptr, nullptr);
+    engine_host::registerSourceGroupModules();
+  }
+  [[maybe_unused]] const ScopedFunctor scopedFunctor([]() {
+    client::setLocalDispatch(nullptr);
+    Application::destroyInstance();
+  });
 
   ApplicationSettingsPrefiller::prefillPaths(IApplicationSettings::getInstanceRaw());
+
+  if(!commandLineParser.usesRemoteEngine()) {
+    httpEndpoint = hostEngine(commandLineParser);
+  }
 
   // TODO(Hussein): Replace with Boost or Qt
   std::ignore = std::signal(SIGINT, signalHandler);
@@ -138,13 +218,32 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 
   QtEngineSupervisor supervisor;
   std::shared_ptr<HttpStorageAccess> storageAccess;
-  Application::createInstance(version, startEngineAndMakeFactory(supervisor, storageAccess), &viewFactory, &networkFactory);
-  [[maybe_unused]] const ScopedFunctor destroyApplication([]() { Application::destroyInstance(); });
+  std::unique_ptr<EngineChannel> channel;
+  std::unique_ptr<client::EngineEventClient> eventClient;
+  std::unique_ptr<engine_host::HttpEndpoint> httpEndpoint;
 
-  // See runConsole: without this the GUI never hears back from the engine, so nothing refreshes
-  // after a load and indexing progress stays at 0%.
-  client::EngineEventClient eventClient(supervisor.getChannel());
-  eventClient.start();
+  if(commandLineParser.usesRemoteEngine()) {
+    auto factory = makeRemoteFactory(commandLineParser, supervisor, channel, storageAccess);
+    if(!factory) {
+      return EXIT_FAILURE;
+    }
+    Application::createInstance(version, std::move(factory), &viewFactory, &networkFactory);
+    // See runConsole: without this the GUI never hears back from the engine, so nothing refreshes
+    // after a load and indexing progress stays at 0%.
+    eventClient = std::make_unique<client::EngineEventClient>(channel ? channel.get() : supervisor.getChannel());
+    eventClient->start();
+  } else {
+    Application::createInstance(version, std::make_shared<lib::Factory>(), &viewFactory, &networkFactory);
+    engine_host::registerSourceGroupModules();
+  }
+  [[maybe_unused]] const ScopedFunctor destroyApplication([]() {
+    client::setLocalDispatch(nullptr);
+    Application::destroyInstance();
+  });
+
+  if(!commandLineParser.usesRemoteEngine()) {
+    httpEndpoint = hostEngine(commandLineParser);
+  }
 
   const auto message = fmt::format("Starting Sourcetrail {}bit, version {}", utility::getAppArchTypeString(), version.toString());
   MessageStatus{utility::decodeFromUtf8(message)}.dispatch();
@@ -190,7 +289,7 @@ int main(int argc, char* argv[]) {
   std::vector<std::string> args;
   if(argc > 1) {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-    args = std::vector<std::string>(static_cast<size_t>(argc - 1), argv[1]);
+    args = std::vector<std::string>(argv + 1, argv + argc);
   }
 
   commandLineParser.preparse(std::move(args));

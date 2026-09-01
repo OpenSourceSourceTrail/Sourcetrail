@@ -14,6 +14,7 @@ SqliteStorage::SqliteStorage() {
   }
 
   executeStatement("PRAGMA foreign_keys=ON;");
+  applyConnectionPragmas();
 }
 
 SqliteStorage::SqliteStorage(const FilePath& dbFilePath) : m_dbFilePath(dbFilePath.getCanonical()) {
@@ -30,6 +31,7 @@ SqliteStorage::SqliteStorage(const FilePath& dbFilePath) : m_dbFilePath(dbFilePa
   }
 
   executeStatement("PRAGMA foreign_keys=ON;");
+  applyConnectionPragmas();
 }
 
 SqliteStorage::~SqliteStorage() {
@@ -74,6 +76,28 @@ void SqliteStorage::setVersion(size_t version) {
   insertOrUpdateMetaValue("storage_version", std::to_string(version));
 }
 
+void SqliteStorage::applyConnectionPragmas() const {
+  // Negative cache_size is KiB rather than pages, so this is 64 MiB regardless of page size.
+  executeStatement("PRAGMA cache_size=-65536;");
+  // Index rebuilds and ORDER BY spill to memory instead of a temp file.
+  executeStatement("PRAGMA temp_store=MEMORY;");
+}
+
+void SqliteStorage::setBulkWritePragmas(bool bulkWrite) const {
+  executeStatement(bulkWrite ? "PRAGMA synchronous=OFF;" : "PRAGMA synchronous=NORMAL;");
+
+  // journal_mode returns the mode it settled on rather than acting as DML, so it has to go through
+  // executeQuery. WAL is unavailable on network filesystems and on the :memory: database; SQLite
+  // then keeps the current mode and reports it back instead of failing, which is fine -- the
+  // pragma is an optimization, not a requirement.
+  const std::string requested = bulkWrite ? "MEMORY" : "WAL";
+  if(CppSQLite3Query query = executeQuery(fmt::format("PRAGMA journal_mode={};", requested)); !query.eof()) {
+    if(const std::string actual = query.getStringField(0, ""); !utility::equalsCaseInsensitive(actual, requested)) {
+      LOG_INFO(fmt::format("Requested journal_mode={} but the database is using {}.", requested, actual));
+    }
+  }
+}
+
 void SqliteStorage::beginTransaction() {
   executeStatement("BEGIN TRANSACTION;");
 }
@@ -88,6 +112,9 @@ void SqliteStorage::rollbackTransaction() {
 
 void SqliteStorage::optimizeMemory() const {
   executeStatement("VACUUM;");
+  // Give the query planner table statistics. Without them it picks badly on the multi-way joins the
+  // read path uses. Runs once per index, not on every open.
+  executeStatement("ANALYZE;");
 }
 
 bool SqliteStorage::isEmpty() const {
