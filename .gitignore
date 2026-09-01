@@ -84,3 +84,12 @@ CMakeUserPresets.json
 # extracted release asset in CI). The Conan install folder itself sits under the
 # already-ignored .conan/.
 /external/
+.omc/
+
+# Conan 2 writes these environment scripts into the source dir on `conan install`.
+/conanbuild.sh
+/conanrun.sh
+/conanbuildenv-*.sh
+/conanrunenv-*.sh
+/deactivate_conanbuild.sh
+/deactivate_conanrun.sh
