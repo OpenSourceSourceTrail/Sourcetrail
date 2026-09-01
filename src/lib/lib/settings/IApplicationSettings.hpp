@@ -121,9 +121,6 @@ struct IApplicationSettings : Settings {
   [[nodiscard]] virtual int getIndexerThreadCount() const noexcept = 0;
   virtual void setIndexerThreadCount(int count) noexcept = 0;
 
-  [[nodiscard]] virtual bool getMultiProcessIndexingEnabled() const noexcept = 0;
-  virtual void setMultiProcessIndexingEnabled(bool enabled) noexcept = 0;
-
   [[nodiscard]] virtual std::vector<std::filesystem::path> getHeaderSearchPaths() const noexcept = 0;
   [[nodiscard]] virtual std::vector<std::filesystem::path> getHeaderSearchPathsExpanded() const noexcept = 0;
   virtual bool setHeaderSearchPaths(const std::vector<std::filesystem::path>& headerSearchPaths) noexcept = 0;

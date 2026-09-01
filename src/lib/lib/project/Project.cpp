@@ -51,8 +51,6 @@ Project::Project(std::shared_ptr<ProjectSettings> settings,
     m_refreshStage = RefreshStageType::NONE;
     MessageIndexingFinished().dispatch();
   };
-  callbacks.hasCxxSourceGroup = [this]() { return hasCxxSourceGroup(); };
-  callbacks.hasJavaSourceGroup = [this]() { return hasJavaSourceGroup(); };
 
   m_indexTaskBuilder = std::make_unique<IndexTaskBuilder>(
       taskFactory ? std::move(taskFactory) : std::make_shared<DefaultTaskFactory>(), m_appUUID, std::move(callbacks));
@@ -501,26 +499,6 @@ void Project::discardTempStorage() {
     LOG_INFO("Discarding temporary indexing data");
     FileSystem::remove(tempIndexDbPath);
   }
-}
-
-bool Project::hasCxxSourceGroup() const {
-  for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-    if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED) {
-      if(sourceGroup->getLanguage() == LANGUAGE_C || sourceGroup->getLanguage() == LANGUAGE_CPP) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-bool Project::hasJavaSourceGroup() const {
-  for(const std::shared_ptr<SourceGroup>& sourceGroup : m_sourceGroups) {
-    if(sourceGroup->getStatus() == SOURCE_GROUP_STATUS_ENABLED && sourceGroup->getLanguage() == LANGUAGE_JAVA) {
-      return true;
-    }
-  }
-  return false;
 }
 
 std::shared_ptr<TaskGroupSequence> Project::createIndexTasks(RefreshInfo info,

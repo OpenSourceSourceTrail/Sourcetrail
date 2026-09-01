@@ -95,6 +95,5 @@ private:
   QComboBox* m_threads;
   QLabel* m_threadsInfoLabel;
 
-  QCheckBox* m_multiProcessIndexing;
   QComboBox* mLoggingLevelComboBox;
 };

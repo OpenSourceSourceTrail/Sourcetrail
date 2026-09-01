@@ -19,8 +19,8 @@ namespace client {
  * process that hosts the engine (the GUI does, by default); with none installed and no channel a
  * call simply finds no engine, which is read-only mode.
  */
-using LocalDispatch = std::function<std::optional<std::string>(const std::string& method, const std::string& target,
-                                                               const std::string& body)>;
+using LocalDispatch =
+    std::function<std::optional<std::string>(const std::string& method, const std::string& target, const std::string& body)>;
 void setLocalDispatch(LocalDispatch dispatch);
 [[nodiscard]] const LocalDispatch& localDispatch();
 

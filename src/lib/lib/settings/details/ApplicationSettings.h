@@ -99,8 +99,6 @@ public:
   int getIndexerThreadCount() const noexcept override;
   void setIndexerThreadCount(int count) noexcept override;
 
-  bool getMultiProcessIndexingEnabled() const noexcept override;
-  void setMultiProcessIndexingEnabled(bool enabled) noexcept override;
 
   std::vector<std::filesystem::path> getHeaderSearchPaths() const noexcept override;
   std::vector<std::filesystem::path> getHeaderSearchPathsExpanded() const noexcept override;

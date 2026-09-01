@@ -67,7 +67,6 @@ public:
                                                            std::shared_ptr<StorageProvider> storageProvider,
                                                            std::shared_ptr<DialogView> dialogView,
                                                            std::string appUUID,
-                                                           bool multiProcessIndexing,
                                                            IndexerCommandType commandType) = 0;
   virtual std::shared_ptr<TaskMergeStorages> createMergeStorages(std::shared_ptr<StorageProvider> storageProvider) = 0;
   virtual std::shared_ptr<TaskInjectStorage> createInjectStorage(std::shared_ptr<StorageProvider> storageProvider,

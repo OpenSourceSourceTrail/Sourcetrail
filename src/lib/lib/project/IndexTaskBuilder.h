@@ -25,8 +25,6 @@ public:
     std::function<void(std::shared_ptr<DialogView>)> onKeepDatabase;
     std::function<void()> onDiscardDatabase;
     std::function<void()> onIndexingFinished;
-    std::function<bool()> hasCxxSourceGroup;
-    std::function<bool()> hasJavaSourceGroup;
   };
 
   IndexTaskBuilder(std::shared_ptr<ITaskFactory> taskFactory, std::string appUUID, Callbacks callbacks);

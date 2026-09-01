@@ -156,7 +156,15 @@ grpc::Status IndexerWorkerServiceImpl::ReportStatus(grpc::ServerContext* /*ctx*/
   }
   case sourcetrail::StatusReport::PROCESS_DONE: {
     const std::lock_guard<std::mutex> lock(mStatusMutex);
-    mCurrentFileByProcess.erase(pid);
+    // A file still in progress when the worker says it is done never produced symbols -- the
+    // worker had no indexer for it, or its push failed. Dropping it here would lose the only
+    // record that it failed, since a clean exit means doExit's crash sweep finds nothing.
+    if(auto entry = mCurrentFileByProcess.find(pid); entry != mCurrentFileByProcess.end()) {
+      if(!entry->second.empty()) {
+        mCrashedFiles.emplace_back(utility::decodeFromUtf8(entry->second));
+      }
+      mCurrentFileByProcess.erase(entry);
+    }
     LOG_INFO(fmt::format("IndexerWorkerService: process {} done", pid));
     break;
   }

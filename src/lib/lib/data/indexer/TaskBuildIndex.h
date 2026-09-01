@@ -26,7 +26,6 @@ public:
                  std::shared_ptr<StorageProvider> storageProvider,
                  std::shared_ptr<DialogView> dialogView,
                  std::string appUUID,
-                 bool multiProcessIndexing,
                  IndexerCommandType commandType);
 
   /**
@@ -50,7 +49,6 @@ protected:
   void handleMessage(MessageIndexingInterrupted* message) override;
 
   void runIndexerProcess(int processId, const std::wstring& logFilePath);
-  void runIndexerThread(int processId);
   void updateIndexingDialog(const std::shared_ptr<Blackboard>& blackboard, const std::vector<FilePath>& sourcePaths);
 
   static const std::wstring sProcessName;
@@ -59,7 +57,6 @@ protected:
   std::shared_ptr<StorageProvider> mStorageProvider;
   std::shared_ptr<DialogView> mDialogView;
   const std::string mAppUUID;
-  bool mMultiProcessIndexing;
   IndexerCommandType mCommandType;
 
   std::shared_ptr<IndexerWorkerServiceImpl> mIndexerWorkerService;

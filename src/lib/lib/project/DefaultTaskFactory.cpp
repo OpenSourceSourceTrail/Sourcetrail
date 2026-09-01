@@ -66,14 +66,12 @@ std::shared_ptr<TaskBuildIndex> DefaultTaskFactory::createBuildIndex(size_t proc
                                                                      std::shared_ptr<StorageProvider> storageProvider,
                                                                      std::shared_ptr<DialogView> dialogView,
                                                                      std::string appUUID,
-                                                                     bool multiProcessIndexing,
                                                                      IndexerCommandType commandType) {
   return std::make_shared<TaskBuildIndex>(processCount,
                                           std::move(indexerWorkerService),
                                           std::move(storageProvider),
                                           std::move(dialogView),
                                           std::move(appUUID),
-                                          multiProcessIndexing,
                                           commandType);
 }
 

@@ -14,7 +14,8 @@ add_library(Sourcetrail::app::engine_host ALIAS Sourcetrail_engine_host)
 
 target_link_libraries(
   Sourcetrail_engine_host
-  PUBLIC Sourcetrail::lib::lib_engine Sourcetrail::lib::proto::api Sourcetrail::lib::core::http Sourcetrail::lib::messaging
+  PUBLIC Sourcetrail::lib::lib_engine Sourcetrail::lib::proto::api Sourcetrail::lib::core::http
+         Sourcetrail::lib::messaging
   PRIVATE Sourcetrail::lib::core
           Sourcetrail::lib::proto::convert
           Sourcetrail::lib::core::utility::logging
@@ -23,8 +24,10 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::utilityUuid
           Sourcetrail::warnings)
 
-target_include_directories(Sourcetrail_engine_host PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
-                           PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib")
+target_include_directories(
+  Sourcetrail_engine_host
+  PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+  PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib")
 
 add_executable(Sourcetrail_engine main.cpp)
 

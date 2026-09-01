@@ -23,7 +23,6 @@
 
 namespace {
 constexpr auto DelayTimeBeforeFinishUpdateInMs = 50;
-constexpr auto DelayTimeBeforeStartWorkInMs = 200;
 
 /** Below this, a non-zero exit means the worker never got going. */
 constexpr std::chrono::milliseconds CrashLoopThreshold{2000};
@@ -40,12 +39,10 @@ TaskBuildIndex::TaskBuildIndex(size_t processCount,
                                std::shared_ptr<StorageProvider> storageProvider,
                                std::shared_ptr<DialogView> dialogView,
                                std::string appUUID,
-                               bool multiProcessIndexing,
                                IndexerCommandType commandType)
     : mStorageProvider(std::move(storageProvider))
     , mDialogView(std::move(dialogView))
     , mAppUUID(std::move(appUUID))
-    , mMultiProcessIndexing(multiProcessIndexing)
     , mCommandType(commandType)
     , mIndexerWorkerService(std::move(indexerWorkerService))
     , mProcessCount(processCount) {}
@@ -70,7 +67,8 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
   // but commands are populated by TaskFillIndexerCommandQueue calling into StorageProvider.
   // We defer to doUpdate to ensure the command queue is filled before workers start.
 
-  // Start worker processes / threads
+  // Start worker processes. Each gets a thread here only to own the child process and drive its
+  // respawn loop; the indexing itself always happens on the far side of the worker boundary.
   for(size_t index = 0; index < mProcessCount; ++index) {
     {
       const std::lock_guard<std::mutex> lock(mRunningThreadCountMutex);
@@ -78,12 +76,7 @@ void TaskBuildIndex::doEnter(std::shared_ptr<Blackboard> blackboard) {
     }
 
     const int processId = static_cast<int>(index + 1);
-
-    if(mMultiProcessIndexing) {
-      mProcessThreads.push_back(std::make_unique<std::thread>(&TaskBuildIndex::runIndexerProcess, this, processId, std::wstring{}));
-    } else {
-      mProcessThreads.push_back(std::make_unique<std::thread>(&TaskBuildIndex::runIndexerThread, this, processId));
-    }
+    mProcessThreads.push_back(std::make_unique<std::thread>(&TaskBuildIndex::runIndexerProcess, this, processId, std::wstring{}));
   }
 
   blackboard->set<bool>("indexer_threads_started", true);
@@ -284,23 +277,6 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
     }
     std::this_thread::sleep_for(RespawnBackoff * consecutiveFailures);
   }
-
-  {
-    const std::lock_guard<std::mutex> lock(mRunningThreadCountMutex);
-    mRunningThreadCount--;
-  }
-}
-
-void TaskBuildIndex::runIndexerThread(int processId) {
-  const std::string endpoint = fmt::format("localhost:{}", mEnginePort);
-
-  do {
-    GrpcIndexer indexer(endpoint, static_cast<Id>(processId));
-    indexer.work();
-    if(!mInterrupted) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(DelayTimeBeforeStartWorkInMs));
-    }
-  } while(mIndexerWorkerService && !mIndexerWorkerService->isQueueClosed() && !mInterrupted);
 
   {
     const std::lock_guard<std::mutex> lock(mRunningThreadCountMutex);
