@@ -18,7 +18,6 @@
 #include "data/storage/StorageProvider.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TimeStamp.h"
-#include "type/indexing/MessageIndexingStatus.h"
 #include "utilityApp.h"
 #include "utilityString.h"
 
@@ -309,9 +308,7 @@ void TaskBuildIndex::updateIndexingDialog(const std::shared_ptr<Blackboard>& bla
 
   const size_t startedFileCount = mIndexerWorkerService ? mIndexerWorkerService->getStartedFileCount() : 0;
 
+  // DialogView::updateIndexingDialog publishes the status bar percentage from these same counts.
   mDialogView->updateIndexingDialog(
       startedFileCount, static_cast<size_t>(indexedSourceFileCount), static_cast<size_t>(sourceFileCount), sourcePaths);
-
-  const size_t progress = (sourceFileCount > 0) ? static_cast<size_t>(indexedSourceFileCount * 100 / sourceFileCount) : 0;
-  MessageIndexingStatus{true, progress}.dispatch();
 }

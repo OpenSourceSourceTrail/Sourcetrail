@@ -40,10 +40,10 @@ public:
                            bool initialShallowState,
                            std::function<void(const RefreshInfo& info)> onStartIndexing,
                            std::function<void()> onCancelIndexing) override;
-  void updateIndexingDialog(size_t startedFileCount,
-                            size_t finishedFileCount,
-                            size_t totalFileCount,
-                            const std::vector<FilePath>& sourcePaths) override;
+  void doUpdateIndexingDialog(size_t startedFileCount,
+                              size_t finishedFileCount,
+                              size_t totalFileCount,
+                              const std::vector<FilePath>& sourcePaths) override;
   void updateCustomIndexingDialog(size_t startedFileCount,
                                   size_t finishedFileCount,
                                   size_t totalFileCount,

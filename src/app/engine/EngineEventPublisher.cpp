@@ -40,10 +40,10 @@ void EngineDialogView::hideProgressDialog() {
   mService->broadcastEvent(proto::convert::toClearDialogsEvent());
 }
 
-void EngineDialogView::updateIndexingDialog(size_t startedFileCount,
-                                            size_t finishedFileCount,
-                                            size_t totalFileCount,
-                                            const std::vector<FilePath>& sourcePaths) {
+void EngineDialogView::doUpdateIndexingDialog(size_t startedFileCount,
+                                              size_t finishedFileCount,
+                                              size_t totalFileCount,
+                                              const std::vector<FilePath>& sourcePaths) {
   mService->broadcastEvent(
       proto::convert::toIndexingProgressEvent(startedFileCount, finishedFileCount, totalFileCount, sourcePaths));
 }

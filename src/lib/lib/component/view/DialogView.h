@@ -39,10 +39,13 @@ public:
                                    bool shallow,
                                    std::function<void(const RefreshInfo& info)> onStartIndexing,
                                    std::function<void()> onCancelIndexing);
-  virtual void updateIndexingDialog(size_t startedFileCount,
-                                    size_t finishedFileCount,
-                                    size_t totalFileCount,
-                                    const std::vector<FilePath>& sourcePaths);
+  // Not virtual: the status bar percentage is derived from the same two counts the dialog shows, so
+  // it is published here once instead of at every call site. Subclasses override
+  // doUpdateIndexingDialog to draw.
+  void updateIndexingDialog(size_t startedFileCount,
+                            size_t finishedFileCount,
+                            size_t totalFileCount,
+                            const std::vector<FilePath>& sourcePaths);
   virtual void updateCustomIndexingDialog(size_t startedFileCount,
                                           size_t finishedFileCount,
                                           size_t totalFileCount,
@@ -60,6 +63,11 @@ public:
   virtual int confirm(const std::wstring& message, const std::vector<std::wstring>& options);
 
 protected:
+  virtual void doUpdateIndexingDialog(size_t startedFileCount,
+                                      size_t finishedFileCount,
+                                      size_t totalFileCount,
+                                      const std::vector<FilePath>& sourcePaths);
+
   UseCase m_useCase;
   StorageAccess* m_storageAccess;
 

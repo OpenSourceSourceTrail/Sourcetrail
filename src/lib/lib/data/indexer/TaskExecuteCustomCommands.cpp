@@ -11,20 +11,12 @@
 #include "settings/IApplicationSettings.hpp"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/error/MessageErrorCountUpdate.h"
-#include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageShowStatus.h"
 #include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityFile.h"
 #include "utilityString.h"
-
-namespace {
-size_t toPercent(size_t value, size_t maxValue) {
-  constexpr size_t Percent = 100;
-  return value * Percent / maxValue;
-}
-}    // namespace
 
 TaskExecuteCustomCommands::TaskExecuteCustomCommands(std::unique_ptr<IndexerCommandProvider> indexerCommandProvider,
                                                      std::shared_ptr<PersistentStorage> storage,
@@ -187,7 +179,6 @@ void TaskExecuteCustomCommands::runIndexerCommand(const std::shared_ptr<IndexerC
                                             static_cast<size_t>(indexedSourceFileCount),
                                             mIndexerCommandCount,
                                             {sourcePath});
-    MessageIndexingStatus{true, toPercent(static_cast<size_t>(indexedSourceFileCount), mIndexerCommandCount)}.dispatch();
 
     const std::wstring command = indexerCommand->getCommand();
     const std::vector<std::wstring> arguments = indexerCommand->getArguments();

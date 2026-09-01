@@ -176,11 +176,8 @@ void EngineEventClient::apply(const sourcetrail::EngineEvent& event) {
                                  progress.total_file_count(),
                                  proto::convert::fromProtoSourcePaths(progress));
     }
-    // The status bar wants a percentage and the engine's own MessageIndexingStatus never crosses
-    // the boundary, so derive it from the counts that did.
-    const size_t total = progress.total_file_count();
-    const size_t percent = total > 0 ? progress.finished_file_count() * 100 / total : 0;
-    MessageIndexingStatus{true, percent}.dispatch();
+    // The engine's own MessageIndexingStatus never crosses the boundary; DialogView::updateIndexingDialog
+    // republishes it locally from the counts that did.
     break;
   }
 

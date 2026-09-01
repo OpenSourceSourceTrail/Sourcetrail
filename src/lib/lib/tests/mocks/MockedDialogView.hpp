@@ -27,7 +27,7 @@ struct MockedDialogView : DialogView {
                std::function<void()>),
               (override));
 
-  MOCK_METHOD(void, updateIndexingDialog, (size_t, size_t, size_t, const std::vector<FilePath>&), (override));
+  MOCK_METHOD(void, doUpdateIndexingDialog, (size_t, size_t, size_t, const std::vector<FilePath>&), (override));
 
   MOCK_METHOD(void, updateCustomIndexingDialog, (size_t, size_t, size_t, const std::vector<FilePath>&), (override));
 

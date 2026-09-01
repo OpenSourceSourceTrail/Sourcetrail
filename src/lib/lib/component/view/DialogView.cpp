@@ -1,5 +1,7 @@
 #include "component/view/DialogView.h"
 
+#include "type/indexing/MessageIndexingStatus.h"
+
 DialogView::DialogView(UseCase useCase, StorageAccess* storageAccess) : m_useCase(useCase), m_storageAccess(storageAccess) {}
 
 DialogView::~DialogView() = default;
@@ -34,10 +36,20 @@ void DialogView::startIndexingDialog(IProject* /*project*/,
                                      std::function<void(const RefreshInfo& info)> /*onStartIndexing*/,
                                      std::function<void()> /*onCancelIndexing*/) {}
 
-void DialogView::updateIndexingDialog(size_t /*startedFileCount*/,
-                                      size_t /*finishedFileCount*/,
-                                      size_t /*totalFileCount*/,
-                                      const std::vector<FilePath>& /*sourcePaths*/) {}
+void DialogView::updateIndexingDialog(size_t startedFileCount,
+                                      size_t finishedFileCount,
+                                      size_t totalFileCount,
+                                      const std::vector<FilePath>& sourcePaths) {
+  constexpr size_t Percent = 100;
+  MessageIndexingStatus{true, totalFileCount > 0 ? finishedFileCount * Percent / totalFileCount : 0}.dispatch();
+
+  doUpdateIndexingDialog(startedFileCount, finishedFileCount, totalFileCount, sourcePaths);
+}
+
+void DialogView::doUpdateIndexingDialog(size_t /*startedFileCount*/,
+                                        size_t /*finishedFileCount*/,
+                                        size_t /*totalFileCount*/,
+                                        const std::vector<FilePath>& /*sourcePaths*/) {}
 
 void DialogView::updateCustomIndexingDialog(size_t /*startedFileCount*/,
                                             size_t /*finishedFileCount*/,

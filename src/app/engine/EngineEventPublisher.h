@@ -31,10 +31,10 @@ public:
   void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress) override;
   void hideProgressDialog() override;
 
-  void updateIndexingDialog(size_t startedFileCount,
-                            size_t finishedFileCount,
-                            size_t totalFileCount,
-                            const std::vector<FilePath>& sourcePaths) override;
+  void doUpdateIndexingDialog(size_t startedFileCount,
+                              size_t finishedFileCount,
+                              size_t totalFileCount,
+                              const std::vector<FilePath>& sourcePaths) override;
   void updateCustomIndexingDialog(size_t startedFileCount,
                                   size_t finishedFileCount,
                                   size_t totalFileCount,

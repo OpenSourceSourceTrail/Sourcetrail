@@ -170,10 +170,10 @@ void QtDialogView::startIndexingDialog(IProject* project,
       });
 }
 
-void QtDialogView::updateIndexingDialog(size_t startedFileCount,
-                                        size_t finishedFileCount,
-                                        size_t totalFileCount,
-                                        const std::vector<FilePath>& sourcePaths) {
+void QtDialogView::doUpdateIndexingDialog(size_t startedFileCount,
+                                          size_t finishedFileCount,
+                                          size_t totalFileCount,
+                                          const std::vector<FilePath>& sourcePaths) {
   m_onQtThread([this, sourcePaths, startedFileCount, totalFileCount, finishedFileCount]() {
     if(!sourcePaths.empty()) {
       std::vector<std::wstring> stati;
