@@ -16,6 +16,11 @@ struct IMessageQueue {
   using Ptr = std::shared_ptr<IMessageQueue>;
   using MessageBufferType = std::deque<std::shared_ptr<MessageBase>>;
 
+  /** Whether an instance exists; getInstance() asserts rather than answering null. */
+  static bool hasInstance() noexcept {
+    return sInstance != nullptr;
+  }
+
   static Ptr getInstance() {
     assert(sInstance);
     return sInstance;

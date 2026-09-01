@@ -210,7 +210,15 @@ void QtProjectWizardContentSelect::populate(QGridLayout* layout, int& /*row*/) {
   layout->setColumnStretch(QtProjectWizardWindow::BACK_COL, 1);
   layout->setHorizontalSpacing(0);
 
-  m_languages->buttons().constFirst()->click();
+  // no engine, or an engine with no indexer plugins, means no language buttons at all
+  if(const QList<QAbstractButton*> languageButtons = m_languages->buttons(); !languageButtons.isEmpty()) {
+    languageButtons.constFirst()->click();
+  } else {
+    m_description->setText(QStringLiteral(
+        "No indexers are available. Sourcetrail cannot create a Source Group until an engine reporting "
+        "at least one indexer plugin is connected."));
+    m_window->setNextEnabled(false);
+  }
 }
 
 void QtProjectWizardContentSelect::save() {
