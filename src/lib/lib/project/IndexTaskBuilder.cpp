@@ -274,17 +274,28 @@ std::shared_ptr<TaskGroupSequence> IndexTaskBuilder::createIndexTasks(RefreshInf
                                                                       size_t& sourceFileCount) {
   auto taskSequential = m_taskFactory->createSequence();
 
-  addCleanStorageTask(taskSequential, info, tempStorage, dialogView);
+  auto indexingWork = m_taskFactory->createSequence();
+
+  addCleanStorageTask(indexingWork, info, tempStorage, dialogView);
 
   IndexerCommandProviders providers = buildIndexerCommandProviders(info, sourceGroups);
   sourceFileCount = providers.count;
 
-  addBlackboardSetupTasks(taskSequential, info, sourceFileCount);
+  addBlackboardSetupTasks(indexingWork, info, sourceFileCount);
 
   const int indexerThreadCount = getIndexerThreadCount();
 
-  addIndexerPipeline(taskSequential, std::move(providers.standard), tempStorage, dialogView, sourceGroups, indexerThreadCount);
-  addCustomCommandTask(taskSequential, std::move(providers.custom), tempStorage, dialogView, projectDirectory, indexerThreadCount);
+  addIndexerPipeline(indexingWork, std::move(providers.standard), tempStorage, dialogView, sourceGroups, indexerThreadCount);
+  addCustomCommandTask(indexingWork, std::move(providers.custom), tempStorage, dialogView, projectDirectory, indexerThreadCount);
+
+  // A failing child latches TaskGroupSequence into permanent failure, so the finalization tasks
+  // below would never run -- and onIndexingFinished is the only thing that clears the project's
+  // refresh stage. Without this, one failed run (a worker crash loop, an exception) silently makes
+  // every later refresh a no-op until the process restarts. The selector falls through to the
+  // no-op on failure, so finalization runs either way, exactly as it already does after an
+  // interrupt.
+  taskSequential->addTask(m_taskFactory->createSelector()->addChildTasks(indexingWork, m_taskFactory->createLambda([]() {})));
+
   addFinalizationTasks(taskSequential, tempStorage, dialogView);
 
   taskSequential->setIsBackgroundTask(true);
