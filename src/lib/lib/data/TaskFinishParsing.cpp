@@ -1,15 +1,39 @@
 #include "data/TaskFinishParsing.h"
 
+#include <chrono>
+#include <thread>
 #include <utility>
 
 #include "../../scheduling/Blackboard.h"
 #include "component/view/DialogView.h"
 #include "data/storage/PersistentStorage.h"
+#include "MessageQueue.h"
 #include "TimeStamp.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageStatus.h"
 #include "utilityString.h"
+
+namespace {
+// Something unrelated (an IDE ping, say) can keep the queue busy indefinitely; the report dialog
+// matters more than a perfectly drained queue.
+constexpr std::chrono::milliseconds MaxQueueDrainWait{2000};
+
+// The report dialog reaches the UI thread directly, while every progress and log message takes the
+// message queue first. Without this drain the dialog overtakes whatever is still queued, and those
+// messages then land behind it -- the log keeps scrolling and the status bar progress keeps
+// climbing while the run is already reported as finished.
+void drainMessageQueue() {
+  if(!IMessageQueue::hasInstance()) {
+    return;
+  }
+
+  const auto deadline = std::chrono::steady_clock::now() + MaxQueueDrainWait;
+  while(IMessageQueue::getInstanceRaw()->hasMessagesQueued() && std::chrono::steady_clock::now() < deadline) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+  }
+}
+}    // namespace
 
 TaskFinishParsing::TaskFinishParsing(std::shared_ptr<PersistentStorage> storage, std::shared_ptr<DialogView> dialogView)
     : m_storage(std::move(storage)), m_dialogView(std::move(dialogView)) {}
@@ -70,6 +94,11 @@ Task::TaskState TaskFinishParsing::doUpdate(std::shared_ptr<Blackboard> blackboa
   }
   MessageStatus(status, false, false).dispatch();
 
+  // Hide the progress bar before the dialog, not after it: dispatched here it is the last thing the
+  // status bar sees, instead of arriving once the user has already closed the report.
+  MessageIndexingStatus(false).dispatch();
+  drainMessageQueue();
+
   StorageStats stats = m_storage->getStorageStats();
   DatabasePolicy policy = m_dialogView->finishedIndexingDialog(static_cast<size_t>(indexedSourceFileCount),
                                                                static_cast<size_t>(sourceFileCount),
@@ -79,8 +108,6 @@ Task::TaskState TaskFinishParsing::doUpdate(std::shared_ptr<Blackboard> blackboa
                                                                errorInfo,
                                                                interruptedIndexing,
                                                                shallowIndexing);
-
-  MessageIndexingStatus(false).dispatch();
 
   if(policy == DATABASE_POLICY_KEEP) {
     blackboard->set("keep_database", true);
