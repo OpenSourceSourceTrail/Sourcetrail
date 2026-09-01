@@ -275,6 +275,8 @@ target_sources(
           data/NodeType.h
           data/NodeTypeSet.cpp
           data/NodeTypeSet.h
+          data/IndexingPhaseStats.cpp
+          data/IndexingPhaseStats.h
           data/TaskInjectStorage.cpp
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp

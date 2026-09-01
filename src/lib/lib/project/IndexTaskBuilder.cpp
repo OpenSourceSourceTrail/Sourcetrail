@@ -41,6 +41,11 @@ namespace {
 constexpr int DefaultIndexerThreadCount = 4;
 constexpr size_t MinimumCommandQueueSize = 20;
 constexpr size_t CommandsPerWorkerInQueue = 4;
+/**
+ * Concurrent merge branches. Each holds a taskflow worker for the whole run (it loops until another
+ * branch flips a flag), so this cannot grow without also raising the executor's thread floor.
+ */
+constexpr int MergeBranchCount = 4;
 
 // Single-language assumption (routing across mixed-language projects is a later increment):
 // resolve the worker command type from the first enabled non-custom source group's language.
@@ -189,21 +194,26 @@ void IndexTaskBuilder::addIndexerPipeline(const std::shared_ptr<TaskGroupSequenc
                                       multiProcess,
                                       getStandardCommandType(sourceGroups))));
 
-  // add task for merging the intermediate storages
-  taskParallelIndexing->addTask(m_taskFactory->createSequence()->addChildTasks(
-      // block until there are indexers running
-      makeBlockUntilTrue("indexer_threads_started", 25),
-      // merge until all indexers stopped and nothing left to merge
-      m_taskFactory->createRepeat(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 250)
-          ->addChildTask(m_taskFactory->createSelector()->addChildTasks(
-              m_taskFactory->createMergeStorages(storageProvider),
-              m_taskFactory->createReturnSuccessIfEquals<bool>("indexer_threads_stopped", false)))));
+  // add tasks for merging the intermediate storages
+  // Merging is what keeps the injector's work down -- dropping it entirely costs ~60% more wall
+  // time -- but one merger cannot keep up with the worker pool, so run several. Each merge takes
+  // its own pair out of the provider under that provider's mutex, so they do not contend further.
+  for(int mergeBranch = 0; mergeBranch < MergeBranchCount; ++mergeBranch) {
+    taskParallelIndexing->addTask(m_taskFactory->createSequence()->addChildTasks(
+        // block until there are indexers running
+        makeBlockUntilTrue("indexer_threads_started", 25),
+        // merge until all indexers stopped and nothing left to merge
+        m_taskFactory->createRepeat(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 0)
+            ->addChildTask(m_taskFactory->createSelector()->addChildTasks(
+                m_taskFactory->createMergeStorages(storageProvider),
+                m_taskFactory->createReturnSuccessIfEquals<bool>("indexer_threads_stopped", false)))));
+  }
 
   // add task for injecting the intermediate storages into the persistent storage
   taskParallelIndexing->addTask(m_taskFactory->createSequence()->addChildTasks(
       // block until there are indexers running
       makeBlockUntilTrue("indexer_threads_started", 25),
-      m_taskFactory->createRepeat(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
+      m_taskFactory->createRepeat(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 0)
           ->addChildTask(m_taskFactory->createSelector()->addChildTasks(
               m_taskFactory->createInjectStorage(storageProvider, tempStorage),
               // continuing when indexers still running, even if there are no storages right now.
@@ -216,7 +226,7 @@ void IndexTaskBuilder::addIndexerPipeline(const std::shared_ptr<TaskGroupSequenc
           [dialogView]() { dialogView->showUnknownProgressDialog(L"Finish Indexing", L"Saving\nRemaining Data"); }));
 
   // add task that injects the remaining intermediate storages into the persistent storage
-  sequence->addTask(m_taskFactory->createRepeat(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 25)
+  sequence->addTask(m_taskFactory->createRepeat(TaskDecoratorRepeat::CONDITION_WHILE_SUCCESS, Task::STATE_SUCCESS, 0)
                         ->addChildTask(m_taskFactory->createInjectStorage(storageProvider, tempStorage)));
 }
 

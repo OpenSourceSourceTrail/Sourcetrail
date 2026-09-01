@@ -35,6 +35,8 @@ struct WorkerTimings {
   double parseMs = 0.0;
   double serializeMs = 0.0;
   double pushMs = 0.0;
+  /** Blocked waiting for work. PullCommand parks server-side, so this is starvation, not polling. */
+  double pullMs = 0.0;
   size_t files = 0;
 };
 
@@ -93,7 +95,9 @@ void GrpcIndexer::work() {
     pullReq.set_process_id(static_cast<uint64_t>(mProcessId));
     sourcetrail::PullCommandResponse pullResp;
 
+    const auto pullStart = WorkerClock::now();
     grpc::Status status = stub->PullCommand(&ctx, pullReq, &pullResp);
+    timings.pullMs += elapsedMs(pullStart);
     if(!status.ok()) {
       LOG_ERROR(fmt::format("{} PullCommand failed: {}", mProcessId, status.error_message()));
       break;
@@ -177,12 +181,13 @@ void GrpcIndexer::work() {
   }
 
   std::fprintf(stderr,
-               "INDEXER_TIMING process=%llu files=%zu parse_ms=%.1f serialize_ms=%.1f push_ms=%.1f\n",
+               "INDEXER_TIMING process=%llu files=%zu parse_ms=%.1f serialize_ms=%.1f push_ms=%.1f pull_ms=%.1f\n",
                static_cast<unsigned long long>(mProcessId),
                timings.files,
                timings.parseMs,
                timings.serializeMs,
-               timings.pushMs);
+               timings.pushMs,
+               timings.pullMs);
   std::fflush(stderr);
 
   LOG_INFO(fmt::format("{} GrpcIndexer shut down", mProcessId));

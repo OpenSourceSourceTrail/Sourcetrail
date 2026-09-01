@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "data/IndexingPhaseStats.h"
+
 int StorageProvider::getStorageCount() const noexcept {
   const std::lock_guard lock(mStoragesMutex);
   return static_cast<int>(mStorages.size());
@@ -22,6 +24,7 @@ nonstd::expected<void, std::string> StorageProvider::insert(std::shared_ptr<Inte
   const auto iterator = std::ranges::find_if(
       mStorages, [storageSize](const auto& currentStorage) { return currentStorage->getSourceLocationCount() < storageSize; });
   std::ignore = mStorages.insert(iterator, std::move(storage));
+  indexing_stats::recordStorageQueueDepth(mStorages.size());
   return {};
 }
 
