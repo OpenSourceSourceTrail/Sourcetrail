@@ -100,6 +100,7 @@ void GrpcIndexer::work() {
     LOG_INFO(fmt::format("{} indexing: {}", mProcessId, cmdMsg.source_file_path()));
     auto pResult = pIndexer->index(pCommand);
 
+    bool pushFailed = false;
     if(pResult && !interruptReceived) {
       // Push result
       grpc::ClientContext pushCtx;
@@ -109,12 +110,16 @@ void GrpcIndexer::work() {
       sourcetrail::PushIntermediateStorageResponse pushResp;
       grpc::Status pushStatus = stub->PushIntermediateStorage(&pushCtx, pushReq, &pushResp);
       if(!pushStatus.ok()) {
+        pushFailed = true;
         LOG_ERROR(fmt::format("{} PushIntermediateStorage failed: {}", mProcessId, pushStatus.error_message()));
       }
     }
 
-    // Report finish
-    {
+    // Report finish -- but only if the engine actually got the symbols. Reporting FINISH_FILE for
+    // a push that failed counts the file as indexed while none of its symbols made it into the
+    // database; leaving it unreported instead routes it through the engine's failed-file path, so
+    // the user sees an error rather than a file that silently lost its contents.
+    if(!pushFailed) {
       grpc::ClientContext statusCtx;
       sourcetrail::StatusReport report;
       report.set_process_id(static_cast<uint64_t>(mProcessId));
