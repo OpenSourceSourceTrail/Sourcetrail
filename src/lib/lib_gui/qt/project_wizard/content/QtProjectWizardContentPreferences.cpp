@@ -264,16 +264,6 @@ void QtProjectWizardContentPreferences::populate(QGridLayout* layout, int& row) 
   m_threads->setItemText(0, QStringLiteral("default"));
   connect(m_threads, &QComboBox::activated, this, &QtProjectWizardContentPreferences::indexerThreadsChanges);
 
-  // multi process indexing
-  m_multiProcessIndexing = addCheckBox(
-      QStringLiteral("Multi Process<br />C/C++ Indexing"),
-      QStringLiteral("Run C/C++ indexer threads in different process"),
-      QStringLiteral("<p>Enable C/C++ indexer threads to run in different process.</p>"
-                     "<p>This prevents the application from crashing due to unforeseen exceptions while "
-                     "indexing.</p>"),
-      layout,
-      row);
-
   addGap(layout, row);
 
   addTitle(QStringLiteral("C/C++"), layout, row);
@@ -330,7 +320,6 @@ void QtProjectWizardContentPreferences::load() {
 
   m_threads->setCurrentIndex(appSettings->getIndexerThreadCount());    // index and value are the same
   indexerThreadsChanges(m_threads->currentIndex());
-  m_multiProcessIndexing->setChecked(appSettings->getMultiProcessIndexingEnabled());
 }
 
 void QtProjectWizardContentPreferences::save() {
@@ -379,7 +368,6 @@ void QtProjectWizardContentPreferences::save() {
   }
 
   appSettings->setIndexerThreadCount(m_threads->currentIndex());    // index and value are the same
-  appSettings->setMultiProcessIndexingEnabled(m_multiProcessIndexing->isChecked());
 
   appSettings->save();
 }

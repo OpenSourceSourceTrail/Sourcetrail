@@ -56,17 +56,17 @@ TEST_F(CommandlineFix, commandConfigFilepathVectorCommaSeparated) {
 }
 
 TEST_F(CommandlineFix, commandConfigBoolOptions) {
-  std::vector<std::string> args({"config", "--use-processes", "false"});
+  std::vector<std::string> args({"config", "--logging-enabled", "false"});
 
-  EXPECT_CALL(*mMocked, setMultiProcessIndexingEnabled(false)).WillOnce(::testing::Return());
+  EXPECT_CALL(*mMocked, setLoggingEnabled(false)).WillOnce(::testing::Return());
 
   commandline::CommandLineParser parser("2");
   parser.preparse(args);
   parser.parse();
 
-  EXPECT_CALL(*mMocked, setMultiProcessIndexingEnabled(true)).WillOnce(::testing::Return());
+  EXPECT_CALL(*mMocked, setLoggingEnabled(true)).WillOnce(::testing::Return());
 
-  std::vector<std::string> args1({"config", "--use-processes", "true"});
+  std::vector<std::string> args1({"config", "--logging-enabled", "true"});
 
   parser.preparse(args1);
   parser.parse();

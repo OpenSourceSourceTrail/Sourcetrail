@@ -82,8 +82,6 @@ struct MockedApplicationSettings : IApplicationSettings {
   MOCK_METHOD(int, getIndexerThreadCount, (), (const, noexcept, override));
   MOCK_METHOD(void, setIndexerThreadCount, (int), (noexcept, override));
 
-  MOCK_METHOD(bool, getMultiProcessIndexingEnabled, (), (const, noexcept, override));
-  MOCK_METHOD(void, setMultiProcessIndexingEnabled, (bool), (noexcept, override));
 
   MOCK_METHOD(std::vector<std::filesystem::path>, getHeaderSearchPaths, (), (const, noexcept, override));
   MOCK_METHOD(std::vector<std::filesystem::path>, getHeaderSearchPathsExpanded, (), (const, noexcept, override));
