@@ -136,7 +136,10 @@ void GrpcIndexer::work() {
     timings.parseMs += elapsedMs(parseStart);
     ++timings.files;
 
-    bool pushFailed = false;
+    // Only a result that actually reached the engine counts. index() returning null means no
+    // indexer handled the command at all, and reporting the file finished for that would count it
+    // as indexed while none of its symbols exist.
+    bool indexed = false;
     if(pResult && !interruptReceived) {
       // Push result
       grpc::ClientContext pushCtx;
@@ -150,17 +153,19 @@ void GrpcIndexer::work() {
       const auto pushStart = WorkerClock::now();
       grpc::Status pushStatus = stub->PushIntermediateStorage(&pushCtx, pushReq, &pushResp);
       timings.pushMs += elapsedMs(pushStart);
-      if(!pushStatus.ok()) {
-        pushFailed = true;
+      if(pushStatus.ok()) {
+        indexed = true;
+      } else {
         LOG_ERROR(fmt::format("{} PushIntermediateStorage failed: {}", mProcessId, pushStatus.error_message()));
       }
     }
 
     // Report finish -- but only if the engine actually got the symbols. Reporting FINISH_FILE for
-    // a push that failed counts the file as indexed while none of its symbols made it into the
-    // database; leaving it unreported instead routes it through the engine's failed-file path, so
-    // the user sees an error rather than a file that silently lost its contents.
-    if(!pushFailed) {
+    // a push that failed, or for a command no indexer could run, counts the file as indexed while
+    // none of its symbols made it into the database; leaving it unreported instead routes it
+    // through the engine's failed-file path, so the user sees an error rather than a file that
+    // silently lost its contents.
+    if(indexed) {
       grpc::ClientContext statusCtx;
       sourcetrail::StatusReport report;
       report.set_process_id(static_cast<uint64_t>(mProcessId));
