@@ -17,9 +17,8 @@ __Links__
 Sourcetrail is:
 * free
 * working offline
-* operating on Windows, ~~macOS~~ and Linux
+* operating on Windows, and Linux
 * supporting C/C++
-* ~~offering an SDK ([SourcetrailDB](https://github.com/CoatiSoftware/SourcetrailDB)) to write custom language extensions~~
 
 ## How it works
 
@@ -68,13 +67,13 @@ If you want to support a certain feature request or you have the same bug that a
 
 * Please read and follow the steps in [CONTRIBUTING.md](CONTRIBUTING.md) file.
 
-# How to Build
+## How to Build
 
 Building Sourcetrail requires several dependencies to be in place on your machine. However, our CMake based setup allows to disable indexing support for specific languages which reduces the number of dependencies to a minimum.
 
-## Building the Base Application
+### Building the Base Application
 
-### Required Tools
+#### Required Tools
 
 * __CMake v3.23 (required for Windows, Linux and MacOS)__
     * __Reason__: Used to generate a build configuration for your build system
@@ -89,7 +88,7 @@ Building Sourcetrail requires several dependencies to be in place on your machin
     * __Reason__: Used for building Sourcetrail
     * __Download__: https://visualstudio.microsoft.com/downloads/
 
-### Required dependencies
+#### Required dependencies
 
 * __Conan 2__
     * __Reason__: Package Manager. Pulls Boost, gRPC/protobuf, spdlog, fmt, SQLite and the rest.
@@ -110,18 +109,18 @@ Building Sourcetrail requires several dependencies to be in place on your machin
         Point CMake at it with `-DQt6_DIR=~/Qt/6.10.3/gcc_64/lib/cmake/Qt6`, or set it once in
         `CMakeUserPresets.json`. On Windows use `aqt install-qt windows desktop 6.10.3 win64_msvc2022_64`.
 
-### Optional dependencies
+#### Optional dependencies
 
 * __Maven + JDK 21__
     * __Reason__: Builds the Java indexer plugin. CMake enables `BUILD_JAVA_INDEXER` automatically when `mvn` is on your `PATH`; pass `-DBUILD_JAVA_INDEXER=OFF` to skip it.
 
-### Building
+#### Building
 
 The tracked CMake presets are `ci_<gnu|clang|msvc>_release`, optionally suffixed with
 `_build_cxx` for C/C++ indexing support. They all build into `<repo>/build/`. On Linux there
 is also `gnu_debug`, which builds into `<repo>/build-debug/`.
 
-#### On Windows `Faced some problems with Conan2 and Windows`
+##### On Windows `Faced some problems with Conan2 and Windows`
 * To set up your build environment run:
     ```
     $ pip install conan
@@ -132,7 +131,7 @@ is also `gnu_debug`, which builds into `<repo>/build-debug/`.
     $ cmake --build build
     ```
 
-#### On Unix
+##### On Unix
 
 * To set up your build environment run:
     ```
@@ -151,20 +150,20 @@ is also `gnu_debug`, which builds into `<repo>/build-debug/`.
     $ cmake --build build-debug
     ```
 
-### Running
+#### Running
 
 * All executables land in `build/app/`, next to the `data`, `user` and `plugins` directories
   they need. Run `build/app/Sourcetrail` from there; it starts `Sourcetrail_engine` itself.
 
-## Enable C/C++ Language Support
+### Enable C/C++ Language Support
 
-### Required dependencies
+#### Required dependencies
 
 * __LLVM/Clang 23.1.0__ (23 or newer is required; older releases do not provide the AST APIs the indexer uses)
     * __Reason__: Used for running the preprocessor on the indexed source code, building and traversing an Abstract Syntax Tree and generating error messages.
     * __Remarks__: It must be built with RTTI and the LLVM/clang-cpp dylibs — stock distro packages and the official LLVM release binaries are built with `LLVM_ENABLE_RTTI=OFF` and will not work.
 
-#### Building LLVM with Conan (Linux, recommended)
+##### Building LLVM with Conan (Linux, recommended)
 
 `.conan/recipes/llvm-clang/` is a Conan 2 recipe that performs exactly the build described
 below. Run:
@@ -191,13 +190,13 @@ $ ./scripts/build_llvm_conan.sh          # cache hit; creates the external/ syml
 
 That asset is produced by `.github/workflows/llvm.yml`, which is also what CI consumes.
 
-#### Building LLVM by hand
+##### Building LLVM by hand
 
 * __Building__: Make sure to check out the correct tag: `git checkout llvmorg-23.1.0`
 * __Building for Windows__: Follow [these steps](https://clang.llvm.org/get_started.html) to build the project. Run the cmake command exactly as described. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`.
 * __Building for Unix__: Follow this [installation guide](http://clang.llvm.org/docs/LibASTMatchersTutorial.html) to build the project. Make sure to build with `-DLLVM_ENABLE_PROJECTS:STRING=clang -DLLVM_ENABLE_RTTI:BOOL=ON -DCLANG_LINK_CLANG_DYLIB:BOOL=ON -DLLVM_LINK_LLVM_DYLIB:BOOL=ON -DLLVM_TARGETS_TO_BUILD=host`. These are the same flags the Conan recipe uses, so the two paths are interchangeable.
 
-### Building
+#### Building
 
 * Use the `_build_cxx` preset variant:
     ```
@@ -210,7 +209,7 @@ That asset is produced by `.github/workflows/llvm.yml`, which is also what CI co
     `-DBUILD_CXX_LANGUAGE_PACKAGE=ON -DClang_DIR=...` by hand.
 
 
-### How to Run the Tests
+#### How to Run the Tests
 
 The automated test suite of Sourcetrail is powered by [GTest](https://github.com/google/googletest).
 The `ci_*` presets already enable the unit, GUI and integration tests; on a custom configuration
@@ -221,15 +220,10 @@ Run them with:
 $ ctest --test-dir build
 ```
 
-### Special thanks
-A special thanks for jetbrain for providing a license for clion. 
-
-![Jetbrains](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg?_gl=1*1g15bg8*_ga*MzY0NDcyNy4xNjk2NjExMzg0*_ga_9J976DJZ68*MTcwNjcwNzIxNC40LjEuMTcwNjcwNzIyOS40NS4wLjA.&_ga=2.185029930.2038936796.1706702230-3644727.1696611384)
-
-### License
+#### License
 
 Sourcetrail is licensed under the [GNU General Public License Version 3](LICENSE.txt).
 
-### Trademark
+#### Trademark
 
 The "Sourcetrail" name is a trademark owned by Coati Software and is not included within the assets licensed under the GNU GPLv3.

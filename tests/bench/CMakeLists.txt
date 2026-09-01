@@ -5,11 +5,7 @@ add_executable(Sourcetrail_bench bench_storage_access.cpp)
 
 target_link_libraries(
   Sourcetrail_bench
-  PRIVATE Sourcetrail::lib::core
-          Sourcetrail::lib::lib
-          Sourcetrail::lib::lib_engine
-          Sourcetrail::lib::client
-          Sourcetrail::lib::core::utility::file::FilePath
-          Sourcetrail::warnings)
+  PRIVATE Sourcetrail::lib::core Sourcetrail::lib::lib Sourcetrail::lib::lib_engine Sourcetrail::lib::client
+          Sourcetrail::lib::core::utility::file::FilePath Sourcetrail::warnings)
 
 set_target_properties(Sourcetrail_bench PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/app/")
