@@ -47,6 +47,9 @@ Task::TaskState TaskFillIndexerCommandsQueue::doUpdate(std::shared_ptr<Blackboar
 }
 
 void TaskFillIndexerCommandsQueue::doExit(std::shared_ptr<Blackboard> blackboard) {
+  // The provider is drained, so an empty queue now really is the end of the work. Say so, or
+  // the workers park in PullCommand until it times out.
+  m_indexerWorkerService->closeQueue();
   blackboard->set<bool>("indexer_command_queue_stopped", true);
 }
 

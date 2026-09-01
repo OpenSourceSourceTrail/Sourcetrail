@@ -236,7 +236,11 @@ void TaskBuildIndex::runIndexerProcess(int processId, const std::wstring& /*logF
 
   int result = 1;
   int consecutiveFailures = 0;
-  while((!mIndexerCommandQueueStopped || result != 0) && !mInterrupted) {
+  // Ask the service directly instead of the blackboard flag doUpdate only refreshes every poll:
+  // a worker that exits cleanly the instant the queue closes must not be respawned.
+  const auto queueClosed = [this]() { return mIndexerWorkerService && mIndexerWorkerService->isQueueClosed(); };
+
+  while((!queueClosed() || result != 0) && !mInterrupted) {
     const auto startedAt = std::chrono::steady_clock::now();
     result = utility::executeProcess(processPath, commandArguments, FilePath(), false, -1).exitCode;
     const auto ranFor = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startedAt);
@@ -274,7 +278,7 @@ void TaskBuildIndex::runIndexerThread(int processId) {
     if(!mInterrupted) {
       std::this_thread::sleep_for(std::chrono::milliseconds(DelayTimeBeforeStartWorkInMs));
     }
-  } while(!mIndexerCommandQueueStopped && !mInterrupted);
+  } while(mIndexerWorkerService && !mIndexerWorkerService->isQueueClosed() && !mInterrupted);
 
   {
     const std::lock_guard<std::mutex> lock(mRunningThreadCountMutex);

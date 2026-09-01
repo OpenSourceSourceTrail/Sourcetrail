@@ -26,6 +26,9 @@ message PullCommandRequest {
 message PullCommandResponse {
   bool command_found = 1;
   IndexerCommand command = 2;
+  // Set when no command will ever arrive again, so the worker may exit. Without it an
+  // empty response is ambiguous and a momentarily empty queue tears the worker down.
+  bool queue_closed = 3;
 }
 
 message PushIntermediateStorageRequest {

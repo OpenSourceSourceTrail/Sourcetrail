@@ -71,8 +71,13 @@ void GrpcIndexer::work() {
     }
 
     if(!pullResp.command_found()) {
-      LOG_INFO(fmt::format("{} no more commands, shutting down", mProcessId));
-      break;
+      if(pullResp.queue_closed()) {
+        LOG_INFO(fmt::format("{} no more commands, shutting down", mProcessId));
+        break;
+      }
+      // The queue is only empty for now. PullCommand already blocked on our behalf, so this
+      // retries immediately instead of tearing down a process that is about to get work.
+      continue;
     }
 
     const sourcetrail::IndexerCommand& cmdMsg = pullResp.command();
