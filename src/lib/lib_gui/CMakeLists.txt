@@ -318,6 +318,7 @@ target_link_libraries(
          Sourcetrail::lib::client # QtEngineSupervisor hands its EngineChannel to the GUI
          Qt6::Widgets
          Qt6::Network
+         Qt6::Concurrent
          Qt6::Svg
          Sourcetrail::lib::core::utility::SingleValueCache
          Sourcetrail::lib::core::utility::LowMemoryStringMap

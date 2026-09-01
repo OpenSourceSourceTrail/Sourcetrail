@@ -131,7 +131,7 @@ find_package(
   COMPONENTS date_time filesystem locale program_options system
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
-find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg)
+find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg Concurrent)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(copy_qt_binaries)

@@ -72,11 +72,12 @@ void QtProjectWizardContentPathCDB::save() {
 }
 
 void QtProjectWizardContentPathCDB::refresh() {
-  m_model->clearFilePaths();
+  m_model->ensureUpToDate(m_window);
 
   if(m_fileCountLabel != nullptr) {
-    m_fileCountLabel->setText("<b>" + QString::number(getFilePaths().size()) +
-                              "</b> source files were found in the compilation database.");
+    m_fileCountLabel->setText(m_model->isLoading() ? QStringLiteral("reading the compilation database...") :
+                                                     "<b>" + QString::number(getFilePaths().size()) +
+                                      "</b> source files were found in the compilation database.");
   }
 }
 
