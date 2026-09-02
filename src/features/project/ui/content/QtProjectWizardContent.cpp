@@ -1,20 +1,20 @@
 #include "project/ui/content/QtProjectWizardContent.h"
-// STL
-#include <thread>
 // Qt5
 #include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
+#include <QtConcurrent>
 #include <QToolButton>
 // internal
 #include "qt/window/QtTextEditDialog.h"
 #include "utility.h"
 #include "utilityString.h"
 
-QtProjectWizardContent::QtProjectWizardContent(QtProjectWizardWindow* window)
-    : QWidget(window)
-    , m_window(window)
-    , m_showFilesFunctor(std::bind(&QtProjectWizardContent::showFilesDialog, this, std::placeholders::_1)) {}
+QtProjectWizardContent::QtProjectWizardContent(QtProjectWizardWindow* window) : QWidget(window), m_window(window) {
+  connect(&m_filePathsWatcher, &QFutureWatcher<std::vector<FilePath>>::finished, this, [this] {
+    showFilesDialog(m_filePathsWatcher.result());
+  });
+}
 
 void QtProjectWizardContent::populate(QGridLayout* /*layout*/, int& /*row**/) {}
 
@@ -122,10 +122,9 @@ void QtProjectWizardContent::filesButtonClicked() {
   m_window->saveContent();
   m_window->refreshContent();
 
-  std::thread([&]() {
-    const std::vector<FilePath> filePaths = getFilePaths();
-    m_showFilesFunctor(filePaths);
-  }).detach();
+  // getFilePaths() walks the source tree, so it must not run on the GUI thread. QFutureWatcher
+  // delivers back here rather than a detached thread reaching into a widget it does not own.
+  m_filePathsWatcher.setFuture(QtConcurrent::run([this] { return getFilePaths(); }));
 }
 
 void QtProjectWizardContent::showFilesDialog(const std::vector<FilePath>& filePaths) {

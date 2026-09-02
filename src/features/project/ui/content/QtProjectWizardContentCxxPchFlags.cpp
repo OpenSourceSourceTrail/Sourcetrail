@@ -7,6 +7,7 @@
 // internal
 #include "qt/element/dialog/QtStringListBox.h"
 #include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h"
+#include "utility.h"
 
 QtProjectWizardContentCxxPchFlags::QtProjectWizardContentCxxPchFlags(std::shared_ptr<SourceGroupSettingsWithCxxPchOptions> settings,
                                                                      QtProjectWizardWindow* window,
