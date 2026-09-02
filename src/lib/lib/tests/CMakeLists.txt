@@ -64,7 +64,6 @@ target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::lib::core::
 
 target_link_libraries(IncludeDirectiveTestSuite PRIVATE Sourcetrail::lib::core::utility::file::ScopedTemporaryFile)
 
-
 if(WIN32)
   target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")
 endif()

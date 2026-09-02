@@ -26,14 +26,8 @@ target_sources(
           messages/MessageStatus.h
           messages/MessageStatusFilterChanged.h)
 
-target_sources(
-  Sourcetrail_lib_gui
-  PRIVATE ui/QtStatusBar.cpp
-          ui/QtStatusBar.h
-          ui/QtStatusBarView.cpp
-          ui/QtStatusBarView.h
-          ui/QtStatusView.cpp
-          ui/QtStatusView.h)
+target_sources(Sourcetrail_lib_gui PRIVATE ui/QtStatusBar.cpp ui/QtStatusBar.h ui/QtStatusBarView.cpp
+                                           ui/QtStatusBarView.h ui/QtStatusView.cpp ui/QtStatusView.h)
 
 if(ENABLE_UNIT_TEST)
   foreach(test_name IN ITEMS StatusBarControllerTestSuite StatusControllerTestSuite)

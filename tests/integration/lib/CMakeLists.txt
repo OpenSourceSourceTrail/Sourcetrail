@@ -1,11 +1,7 @@
 # ${PROJECT_SOURCE_DIR}/tests/integration/lib/CMakeLists.txt
 
-set(test_lib_names
-    PersistentStorageTestSuite
-    SqliteDatabaseIndexTestSuite
-    SqliteIndexStorageTestSuite
-    SqliteStorageTestSuite
-    StorageTestSuite)
+set(test_lib_names PersistentStorageTestSuite SqliteDatabaseIndexTestSuite SqliteIndexStorageTestSuite
+                   SqliteStorageTestSuite StorageTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
   add_sourcetrail_test(

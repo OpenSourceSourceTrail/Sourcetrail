@@ -53,7 +53,8 @@ if(ENABLE_GUI_TEST)
 
   target_link_libraries(
     QtNetworkFactoryTestSuite
-    PUBLIC Qt6::Test GTest::gmock lib::mocks Sourcetrail::lib::lib Sourcetrail::lib::lib_gui Sourcetrail::lib::proto::convert
+    PUBLIC Qt6::Test GTest::gmock lib::mocks Sourcetrail::lib::lib Sourcetrail::lib::lib_gui
+           Sourcetrail::lib::proto::convert
     PRIVATE Sourcetrail::warnings)
 
   set_target_properties(

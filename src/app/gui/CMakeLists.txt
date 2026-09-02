@@ -32,15 +32,18 @@ target_link_libraries(
   Sourcetrail
   # An executable is nobody's dependency, so PUBLIC/PRIVATE make no difference here. PRIVATE says so.
   PRIVATE Sourcetrail::lib::core
-         Sourcetrail::lib::lib
-         Sourcetrail::lib::lib_gui
-         Sourcetrail::lib::client
-         Sourcetrail::app::engine_host
-         Qt6::Widgets
-         Qt6::Network
-          Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::ScopedFunctor
-          Sourcetrail::lib::core::utility::utilityApp Sourcetrail::lib::core::utility::commandline::CommandLineParser
-          Sourcetrail::lib::proto::convert Sourcetrail::lib::utility::PathDetection)
+          Sourcetrail::lib::lib
+          Sourcetrail::lib::lib_gui
+          Sourcetrail::lib::client
+          Sourcetrail::app::engine_host
+          Qt6::Widgets
+          Qt6::Network
+          Sourcetrail::lib::core::utility::logging
+          Sourcetrail::lib::core::utility::ScopedFunctor
+          Sourcetrail::lib::core::utility::utilityApp
+          Sourcetrail::lib::core::utility::commandline::CommandLineParser
+          Sourcetrail::lib::proto::convert
+          Sourcetrail::lib::utility::PathDetection)
 
 target_include_directories(Sourcetrail PRIVATE "${PROJECT_BINARY_DIR}/src/lib/lib_gui" "${PROJECT_BINARY_DIR}/src/lib")
 

@@ -11,13 +11,8 @@
 # The refresh *logic* is not here either -- RefreshInfo and RefreshInfoGenerator belong to the
 # project feature, which owns the state machine this button pokes.
 
-target_sources(
-  Sourcetrail_lib
-  PRIVATE logic/RefreshController.cpp
-          logic/RefreshController.h
-          logic/RefreshView.cpp
-          logic/RefreshView.h
-          messages/MessageRefresh.h)
+target_sources(Sourcetrail_lib PRIVATE logic/RefreshController.cpp logic/RefreshController.h logic/RefreshView.cpp
+                                       logic/RefreshView.h messages/MessageRefresh.h)
 
 target_sources(Sourcetrail_lib_gui PRIVATE ui/QtRefreshView.cpp ui/QtRefreshView.h)
 

@@ -20,12 +20,7 @@ target_sources(
           messages/MessageTabSelect.h
           messages/MessageTabState.h)
 
-target_sources(
-  Sourcetrail_lib_gui
-  PRIVATE ui/QtTabBar.cpp
-          ui/QtTabBar.h
-          ui/QtTabsView.cpp
-          ui/QtTabsView.h)
+target_sources(Sourcetrail_lib_gui PRIVATE ui/QtTabBar.cpp ui/QtTabBar.h ui/QtTabsView.cpp ui/QtTabsView.h)
 
 if(ENABLE_UNIT_TEST)
   add_sourcetrail_test(

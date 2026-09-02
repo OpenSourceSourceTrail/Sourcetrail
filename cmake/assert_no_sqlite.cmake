@@ -10,30 +10,18 @@ execute_process(
   OUTPUT_VARIABLE symbols
   RESULT_VARIABLE result
   ERROR_QUIET)
-if(NOT
-   result
-   EQUAL
-   0)
+if(NOT result EQUAL 0)
   message(FATAL_ERROR "nm failed on ${BINARY}")
 endif()
 
-string(
-  REGEX MATCHALL
-        "[^\n]*sqlite3_[^\n]*"
-        hits
-        "${symbols}")
+string(REGEX MATCHALL "[^\n]*sqlite3_[^\n]*" hits "${symbols}")
 list(LENGTH hits count)
 if(count GREATER 0)
   list(LENGTH hits total)
   if(total GREATER 5)
     set(total 5)
   endif()
-  list(
-    SUBLIST
-    hits
-    0
-    ${total}
-    sample)
+  list(SUBLIST hits 0 ${total} sample)
   string(REPLACE ";" "\n  " sample "${sample}")
   message(FATAL_ERROR "${BINARY} references SQLite (${count} symbols). The Presentation tier must "
                       "reach storage only through StorageAccess. First offenders:\n  ${sample}")

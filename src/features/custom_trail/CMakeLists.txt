@@ -6,12 +6,8 @@
 # No domain/ and no data/: the feature owns no types of its own and no storage. It queries through
 # StorageAccess with the graph feature's vocabulary and hands the result to its view.
 
-target_sources(
-  Sourcetrail_lib
-  PRIVATE logic/CustomTrailController.cpp
-          logic/CustomTrailController.h
-          logic/CustomTrailView.h
-          messages/MessageCustomTrailShow.h)
+target_sources(Sourcetrail_lib PRIVATE logic/CustomTrailController.cpp logic/CustomTrailController.h
+                                       logic/CustomTrailView.h messages/MessageCustomTrailShow.h)
 
 target_sources(Sourcetrail_lib_gui PRIVATE ui/QtCustomTrailView.cpp ui/QtCustomTrailView.h)
 

@@ -17,12 +17,7 @@ target_sources(
           messages/MessageTooltipHide.h
           messages/MessageTooltipShow.h)
 
-target_sources(
-  Sourcetrail_lib_gui
-  PRIVATE ui/QtTooltip.cpp
-          ui/QtTooltip.h
-          ui/QtTooltipView.cpp
-          ui/QtTooltipView.h)
+target_sources(Sourcetrail_lib_gui PRIVATE ui/QtTooltip.cpp ui/QtTooltip.h ui/QtTooltipView.cpp ui/QtTooltipView.h)
 
 if(ENABLE_UNIT_TEST)
   add_sourcetrail_test(

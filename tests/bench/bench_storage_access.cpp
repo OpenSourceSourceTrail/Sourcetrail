@@ -25,14 +25,14 @@
 #include <spdlog/sinks/sink.h>
 #include <spdlog/spdlog.h>
 
-#include "data/graph/Graph.h"
 #include "data/location/SourceLocationCollection.h"
 #include "data/location/SourceLocationFile.h"
-#include "data/NodeTypeSet.h"
 #include "data/storage/PersistentStorage.h"
 #include "data/storage/StorageStats.h"
 #include "EngineChannel.h"
 #include "FilePath.h"
+#include "graph/domain/Graph.h"
+#include "graph/domain/NodeTypeSet.h"
 #include "HttpStorageAccess.h"
 #include "MessageQueue.h"
 #include "settings/details/ApplicationSettings.h"

@@ -58,7 +58,9 @@ function(_st_collect_link_closure TARGET OUT_VAR)
     endforeach()
   endwhile()
 
-  set(${OUT_VAR} "${_closure}" PARENT_SCOPE)
+  set(${OUT_VAR}
+      "${_closure}"
+      PARENT_SCOPE)
 endfunction()
 
 # assert_no_transitive_link(<target> <forbidden>...)
@@ -85,8 +87,7 @@ function(assert_no_transitive_link TARGET)
     message(
       FATAL_ERROR
         "Tier violation: ${TARGET} must not depend on ${ARGN}.\n"
-        "The Presentation tier reads the index through StorageAccess, never through storage "
-        "types directly.\n"
+        "The Presentation tier reads the index through StorageAccess, never through storage " "types directly.\n"
         "Offending link path(s):\n${_report}\n")
   endif()
 

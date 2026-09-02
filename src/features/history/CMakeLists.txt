@@ -18,14 +18,8 @@ target_sources(
           messages/MessageHistoryToPosition.h
           messages/MessageHistoryUndo.h)
 
-target_sources(
-  Sourcetrail_lib_gui
-  PRIVATE ui/QtHistoryList.cpp
-          ui/QtHistoryList.h
-          ui/QtUndoRedo.cpp
-          ui/QtUndoRedo.h
-          ui/QtUndoRedoView.cpp
-          ui/QtUndoRedoView.h)
+target_sources(Sourcetrail_lib_gui PRIVATE ui/QtHistoryList.cpp ui/QtHistoryList.h ui/QtUndoRedo.cpp ui/QtUndoRedo.h
+                                           ui/QtUndoRedoView.cpp ui/QtUndoRedoView.h)
 
 if(ENABLE_UNIT_TEST)
   add_sourcetrail_test(
