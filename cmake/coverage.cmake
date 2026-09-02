@@ -35,7 +35,8 @@ if(ENABLE_COVERAGE)
     # gcovr's default search path is --root, so where the .gcda actually live
     # (the build tree) has to be passed explicitly as a positional search path.
     set(coverage_args
-        -r ${PROJECT_SOURCE_DIR}
+        -r
+        ${PROJECT_SOURCE_DIR}
         ${PROJECT_BINARY_DIR}
         --html-nested=${PROJECT_BINARY_DIR}/coverage/index.html
         --txt
@@ -43,10 +44,12 @@ if(ENABLE_COVERAGE)
         --exclude-throw-branches
         --gcov-ignore-errors=no_working_dir_found
         --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
-        --gcov-executable ${GCOV_EXECUTABLE}
+        --gcov-executable
+        ${GCOV_EXECUTABLE}
         --gcov-delete
         --sort-percentage
-        -j ${CORES_COUNT})
+        -j
+        ${CORES_COUNT})
     foreach(exclude IN LISTS coverage_excludes)
       list(APPEND coverage_args -e ${exclude})
     endforeach()
