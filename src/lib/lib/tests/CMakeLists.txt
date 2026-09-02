@@ -11,18 +11,23 @@ target_link_libraries(lib_test_utilities PRIVATE Sourcetrail::warnings)
 set(test_lib_names
     AppPathTestSuite
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests
+    CodeControllerTestSuite
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite
     ConvertGraphTestSuite
     ConvertLocationsTestSuite
     ConvertQueryTestSuite
+    CustomTrailControllerTestSuite
     DialogViewTestSuite
+    ErrorControllerTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
+    GraphControllerTestSuite
     GraphTestSuite
     GraphViewStyleTestSuite # TODO(SOUR-97)
     HierarchyCacheTestSuite
+    IDECommunicationControllerTestSuite
     IncludeDirectiveTestSuite
     utilitySourceGroupCxxTestSuite
     IndexerCommandJavaTestSuite
@@ -36,7 +41,10 @@ set(test_lib_names
     NetworkProtocolHelperTestSuite
     ProjectSettingsTestSuite
     ProjectTestSuite
+    RefreshControllerTestSuite
     ResourcePathsTestSuite
+    ScreenSearchControllerTestSuite
+    SearchControllerTestSuite
     SearchIndexTestSuite
     SettingsMigratorTestSuite
     SettingsTestSuite
@@ -50,9 +58,12 @@ set(test_lib_names
     StatusBarControllerTestSuite
     StatusControllerTestSuite
     TabIdTestSuite
+    TabsControllerTestSuite
     TabTestSuite
     TaskBuildIndexTestSuite
     TimeStampTestSuite
+    TooltipControllerTestSuite
+    UndoRedoControllerTestSuite
     TreeTestSuite
     UserPathsTestSuite)
 

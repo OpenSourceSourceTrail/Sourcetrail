@@ -1,4 +1,6 @@
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -16,19 +18,20 @@
 using namespace testing;
 using testing::Return;
 
-struct MockedMessageBookmarkUpdate : public MessageListener<MessageBookmarkUpdate> {
-  uint32_t mCountOfCall = 0;
-  void handleMessage(MessageBookmarkUpdate* /*message*/) override {
-    ++mCountOfCall;
-  }
-};
-
 struct BookmarkControllerFix : public Test {
   void SetUp() override {
     mMessageQueue = std::make_shared<MockedMessageQueue>();
     IMessageQueue::setInstance(mMessageQueue);
 
-    mBookmarkUpdate = std::make_unique<MockedMessageBookmarkUpdate>();
+    // MockedMessageQueue records dispatches instead of delivering them, so a MessageListener would
+    // never fire. Record every dispatch and assert on that. Both entry points matter:
+    // dispatch() reaches pushMessage(), dispatchImmediately() reaches processMessage().
+    EXPECT_CALL(*mMessageQueue, pushMessage(_)).Times(AnyNumber()).WillRepeatedly([this](std::shared_ptr<MessageBase> message) {
+      mDispatched.push_back(message->getType());
+    });
+    EXPECT_CALL(*mMessageQueue, processMessage(_, _))
+        .Times(AnyNumber())
+        .WillRepeatedly([this](const std::shared_ptr<MessageBase>& message, bool) { mDispatched.push_back(message->getType()); });
 
     mViewLayout = std::make_unique<StrictMock<MockedViewLayout>>();
     mView = std::make_shared<StrictMock<MockedBookmarkView>>(mViewLayout.get());
@@ -44,7 +47,6 @@ struct BookmarkControllerFix : public Test {
   }
 
   void TearDown() override {
-    mBookmarkUpdate.reset();
     mComponent.reset();
     IMessageQueue::setInstance(nullptr);
     mMessageQueue.reset();
@@ -70,7 +72,7 @@ struct BookmarkControllerFix : public Test {
 
   std::shared_ptr<MockedMessageQueue> mMessageQueue;
   testing::Sequence mSequence;
-  std::unique_ptr<MockedMessageBookmarkUpdate> mBookmarkUpdate;
+  std::vector<std::string> mDispatched;
   std::shared_ptr<StrictMock<MockedBookmarkView>> mView;
   std::shared_ptr<Component> mComponent;
   std::unique_ptr<StrictMock<MockedViewLayout>> mViewLayout;
@@ -82,14 +84,14 @@ TEST_F(BookmarkControllerFix, clear) {
   mController->clear();
 }
 
-TEST_F(BookmarkControllerFix, DISABLED_displayBookmarks) {
+TEST_F(BookmarkControllerFix, displayBookmarks) {
   EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
   EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
   EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
   mController->displayBookmarks();
 }
 
-TEST_F(BookmarkControllerFix, DISABLED_displayBookmarksFor) {
+TEST_F(BookmarkControllerFix, displayBookmarksFor) {
   EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
   EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
   EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
@@ -105,7 +107,7 @@ TEST_F(BookmarkControllerFix, displayBookmarksFor2) {
 }
 #endif
 
-TEST_F(BookmarkControllerFix, DISABLED_createBookmark) {
+TEST_F(BookmarkControllerFix, createBookmark) {
   EXPECT_CALL(*mStorageAccess, addNodeBookmark(_)).InSequence(mSequence).WillOnce(Return(0));
   MockUpdate();
 
@@ -115,10 +117,13 @@ TEST_F(BookmarkControllerFix, DISABLED_createBookmark) {
   constexpr Id expectedId = 10;
   mController->createBookmark(name, comment, category, expectedId);
 
-  EXPECT_EQ(1, mBookmarkUpdate->mCountOfCall);
+  // createBookmark() dispatches the button state; the update comes out of update(), which it calls
+  // through dispatchImmediately(). Both land in mDispatched.
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkButtonState"));
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkUpdate"));
 }
 
-TEST_F(BookmarkControllerFix, DISABLED_createBookmarkWithDefaultId) {
+TEST_F(BookmarkControllerFix, createBookmarkWithDefaultId) {
   EXPECT_CALL(*mStorageAccess, addNodeBookmark(_)).InSequence(mSequence).WillOnce(Return(0));
   MockUpdate();
 
@@ -128,7 +133,10 @@ TEST_F(BookmarkControllerFix, DISABLED_createBookmarkWithDefaultId) {
   constexpr Id expectedId = 0;
   mController->createBookmark(name, comment, category, expectedId);
 
-  EXPECT_EQ(1, mBookmarkUpdate->mCountOfCall);
+  // createBookmark() dispatches the button state; the update comes out of update(), which it calls
+  // through dispatchImmediately(). Both land in mDispatched.
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkButtonState"));
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkUpdate"));
 }
 
 TEST_F(BookmarkControllerFix, editBookmark) {
