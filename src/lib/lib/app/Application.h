@@ -9,7 +9,7 @@
 #include "project/IProject.hpp"
 // messages
 #include "MessageListener.h"
-#include "type/bookmark/MessageBookmarkUpdate.hpp"
+#include "bookmark/messages/MessageBookmarkUpdate.hpp"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageActivateWindow.h"
 #include "type/MessageCloseProject.h"

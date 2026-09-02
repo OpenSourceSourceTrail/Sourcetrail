@@ -11,7 +11,6 @@ target_link_libraries(lib_test_utilities PRIVATE Sourcetrail::warnings)
 set(test_lib_names
     AppPathTestSuite
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests
-    BookmarkControllerTestSuite
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite

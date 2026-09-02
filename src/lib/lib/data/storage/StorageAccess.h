@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#include "data/bookmark/BookmarkCategory.h"
-#include "data/bookmark/EdgeBookmark.h"
-#include "data/bookmark/NodeBookmark.h"
+#include "bookmark/domain/BookmarkCategory.h"
+#include "bookmark/domain/EdgeBookmark.h"
+#include "bookmark/domain/NodeBookmark.h"
 #include "data/ErrorCountInfo.h"
 #include "data/ErrorFilter.h"
 #include "data/ErrorInfo.h"

@@ -40,8 +40,6 @@ target_sources(
           component/controller/helper/TrailLayouter.h
           component/controller/ActivationController.cpp
           component/controller/ActivationController.h
-          component/controller/BookmarkController.cpp
-          component/controller/BookmarkController.h
           component/controller/CodeController.cpp
           component/controller/CodeController.h
           component/controller/Controller.cpp
@@ -73,10 +71,6 @@ target_sources(
           component/view/helper/CodeScrollParams.h
           component/view/helper/CodeSnippetParams.cpp
           component/view/helper/CodeSnippetParams.h
-          component/view/BookmarkButtonsView.cpp
-          component/view/BookmarkButtonsView.h
-          component/view/BookmarkView.cpp
-          component/view/BookmarkView.h
           component/view/CodeView.cpp
           component/view/CodeView.h
           component/view/CompositeView.cpp
@@ -131,14 +125,6 @@ target_sources(
           component/Tab.h
           component/TabId.cpp
           component/TabId.h
-          data/bookmark/Bookmark.cpp
-          data/bookmark/Bookmark.h
-          data/bookmark/BookmarkCategory.cpp
-          data/bookmark/BookmarkCategory.h
-          data/bookmark/EdgeBookmark.cpp
-          data/bookmark/EdgeBookmark.h
-          data/bookmark/NodeBookmark.cpp
-          data/bookmark/NodeBookmark.h
           data/fulltextsearch/FullTextSearchIndex.cpp
           data/fulltextsearch/FullTextSearchIndex.h
           data/fulltextsearch/SuffixArray.cpp
@@ -231,10 +217,6 @@ target_sources(
           data/search/SearchIndex.h
           data/search/SearchMatch.cpp
           data/search/SearchMatch.h
-          data/storage/type/StorageBookmarkCategory.h
-          data/storage/type/StorageBookmark.h
-          data/storage/type/StorageBookmarkedEdge.h
-          data/storage/type/StorageBookmarkedNode.h
           data/storage/type/StorageComponentAccess.h
           data/storage/type/StorageEdge.h
           data/storage/type/StorageElementComponent.h
@@ -468,8 +450,6 @@ target_sources(
           data/storage/migration/SqliteStorageMigrationLambda.cpp
           data/storage/migration/SqliteStorageMigrationLambda.h
           data/storage/migration/SqliteStorageMigrator.h
-          data/storage/sqlite/SqliteBookmarkStorage.cpp
-          data/storage/sqlite/SqliteBookmarkStorage.h
           data/storage/sqlite/SqliteDatabaseIndex.cpp
           data/storage/sqlite/SqliteDatabaseIndex.h
           data/storage/sqlite/SqliteIndexStorage.cpp

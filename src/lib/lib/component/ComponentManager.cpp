@@ -4,7 +4,7 @@
 
 #include "component/controller/Controller.h"
 #include "component/controller/ScreenSearchController.h"
-#include "component/view/BookmarkButtonsView.h"
+#include "bookmark/logic/BookmarkButtonsView.h"
 #include "component/view/CodeView.h"
 #include "component/view/CompositeView.h"
 #include "component/view/DialogView.h"

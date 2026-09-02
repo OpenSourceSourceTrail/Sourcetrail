@@ -2,8 +2,8 @@
 
 #include "component/view/GraphViewStyle.h"
 #include "qt/utility/utilityQt.h"
-#include "qt/view/QtBookmarkButtonsView.h"
-#include "qt/view/QtBookmarkView.h"
+#include "bookmark/ui/QtBookmarkButtonsView.h"
+#include "bookmark/ui/QtBookmarkView.h"
 #include "qt/view/QtCodeView.h"
 #include "qt/view/QtCompositeView.h"
 #include "qt/view/QtCustomTrailView.h"

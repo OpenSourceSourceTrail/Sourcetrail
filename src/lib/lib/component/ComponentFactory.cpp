@@ -4,7 +4,7 @@
 
 #include "component/Component.h"
 #include "component/controller/ActivationController.h"
-#include "component/controller/BookmarkController.h"
+#include "bookmark/logic/BookmarkController.h"
 #include "component/controller/CodeController.h"
 #include "component/controller/CustomTrailController.h"
 #include "component/controller/ErrorController.h"
@@ -17,7 +17,7 @@
 #include "component/controller/TabsController.h"
 #include "component/controller/TooltipController.h"
 #include "component/controller/UndoRedoController.h"
-#include "component/view/BookmarkView.h"
+#include "bookmark/logic/BookmarkView.h"
 #include "component/view/CodeView.h"
 #include "component/view/CustomTrailView.h"
 #include "component/view/ErrorView.h"

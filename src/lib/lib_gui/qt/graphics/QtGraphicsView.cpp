@@ -23,7 +23,7 @@
 #include "qt/utility/utilityQt.h"
 #include "settings/IApplicationSettings.hpp"
 #include "type/activation/MessageActivateLegend.h"
-#include "type/bookmark/MessageBookmarkCreate.h"
+#include "bookmark/messages/MessageBookmarkCreate.h"
 #include "type/code/MessageCodeShowDefinition.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/graph/MessageGraphNodeExpand.h"

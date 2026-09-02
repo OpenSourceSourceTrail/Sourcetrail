@@ -11,10 +11,6 @@ target_sources(
           platform_includes/includesLinux.h
           platform_includes/includesMac.h
           platform_includes/includesWindows.h
-          qt/element/bookmark/QtBookmark.cpp
-          qt/element/bookmark/QtBookmark.h
-          qt/element/bookmark/QtBookmarkCategory.cpp
-          qt/element/bookmark/QtBookmarkCategory.h
           qt/element/button/QtHelpButton.cpp
           qt/element/button/QtHelpButton.h
           qt/element/button/QtHoverButton.cpp
@@ -195,10 +191,6 @@ target_sources(
           qt/utility/QtThreadedFunctor.h
           qt/utility/utilityQt.cpp
           qt/utility/utilityQt.h
-          qt/view/QtBookmarkButtonsView.cpp
-          qt/view/QtBookmarkButtonsView.h
-          qt/view/QtBookmarkView.cpp
-          qt/view/QtBookmarkView.h
           qt/view/QtCodeView.cpp
           qt/view/QtCodeView.h
           qt/view/QtCompositeView.cpp
@@ -239,10 +231,6 @@ target_sources(
           qt/view/QtViewWidgetWrapper.h
           qt/window/QtAbout.cpp
           qt/window/QtAbout.h
-          qt/window/QtBookmarkBrowser.cpp
-          qt/window/QtBookmarkBrowser.h
-          qt/window/QtBookmarkCreator.cpp
-          qt/window/QtBookmarkCreator.h
           qt/window/QtIndexingDialog.cpp
           qt/window/QtIndexingDialog.h
           qt/window/QtIndexingProgressDialog.cpp

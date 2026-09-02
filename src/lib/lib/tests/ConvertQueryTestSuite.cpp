@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
 #include "ConvertQuery.h"
-#include "data/bookmark/BookmarkCategory.h"
-#include "data/bookmark/EdgeBookmark.h"
-#include "data/bookmark/NodeBookmark.h"
+#include "bookmark/domain/BookmarkCategory.h"
+#include "bookmark/domain/EdgeBookmark.h"
+#include "bookmark/domain/NodeBookmark.h"
 #include "data/ErrorFilter.h"
 #include "data/ErrorInfo.h"
 #include "data/location/SourceLocationFile.h"

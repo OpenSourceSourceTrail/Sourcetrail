@@ -6,7 +6,7 @@
 #include "component/ComponentManager.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedBookmarkButtonsView.hpp"
+#include "bookmark/tests/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedGraphView.hpp"

@@ -5,7 +5,7 @@
 
 #include "component/Tab.h"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedBookmarkButtonsView.hpp"
+#include "bookmark/tests/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedCompositeView.hpp"
 #include "mocks/MockedGraphView.hpp"
