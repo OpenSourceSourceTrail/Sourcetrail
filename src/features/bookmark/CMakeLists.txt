@@ -86,5 +86,5 @@ if(ENABLE_INTEGRATION_TEST)
     NAME SqliteBookmarkStorageTestSuite
     SOURCES tests/SqliteBookmarkStorageTestSuite.cpp
     DEPS GTest::gtest Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::file::FileSystem
-    TEST_PREFIX "integration.lib.")
+    TEST_PREFIX "integration.lib." LOCK filesystem)
 endif()

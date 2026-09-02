@@ -6,6 +6,8 @@
 #     DEPS Sourcetrail::lib::lib_engine      # on top of the two linked automatically
 #     TEST_PREFIX "unittests.lib."           # required; ctest name prefix, see the registered
 #                                            # prefixes in CLAUDE.md
+#     LOCK filesystem                        # optional; serializes against other suites
+#                                            # sharing the same name
 #     WORKING_DIRECTORY <dir>)               # defaults to ${PROJECT_BINARY_DIR}/test/
 #
 # Sourcetrail::gtest_main and Sourcetrail::warnings are linked for you. TEST_PREFIX is required
@@ -18,6 +20,7 @@ function(add_sourcetrail_test)
       NAME # Name of the test executable
       TEST_PREFIX # Prefix for test discovery
       WORKING_DIRECTORY # Working directory for tests
+      LOCK # optional ctest RESOURCE_LOCK, for suites sharing on-disk fixtures
   )
   set(multiValueArgs SOURCES # Source files
                      DEPS # dependencies
@@ -58,9 +61,17 @@ function(add_sourcetrail_test)
   # Set runtime output directory
   set_target_properties(${ARG_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${ARG_WORKING_DIRECTORY}")
 
+  # Every suite shares one WORKING_DIRECTORY, so suites that write real files collide under
+  # `ctest -j`. RESOURCE_LOCK makes ctest run everything holding the same lock name serially,
+  # while the rest of the suite still runs in parallel.
+  set(discovery_properties "")
+  if(DEFINED ARG_LOCK)
+    set(discovery_properties PROPERTIES RESOURCE_LOCK "${ARG_LOCK}")
+  endif()
+
   # Configure test discovery
   gtest_discover_tests(
     ${ARG_NAME}
     WORKING_DIRECTORY "${ARG_WORKING_DIRECTORY}" DISCOVERY_MODE PRE_TEST
-    TEST_PREFIX "${ARG_TEST_PREFIX}")
+    TEST_PREFIX "${ARG_TEST_PREFIX}" ${discovery_properties})
 endfunction()
