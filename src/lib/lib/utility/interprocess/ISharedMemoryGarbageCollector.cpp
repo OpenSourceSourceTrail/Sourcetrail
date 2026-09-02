@@ -15,8 +15,10 @@ ISharedMemoryGarbageCollector::Ptr ISharedMemoryGarbageCollector::getInstance() 
   return sInstance;
 }
 
+// No assert here, unlike getInstance(): a null collector is a supported state, not a bug. Every
+// caller -- SharedMemory::SharedMemory/~SharedMemory and Application::~Application -- guards with
+// `if(auto* collector = getInstanceRaw(); collector)`, and a headless run never installs one at all.
 ISharedMemoryGarbageCollector::RawPtr ISharedMemoryGarbageCollector::getInstanceRaw() noexcept {
-  assert(sInstance);
   return sInstance.get();
 }
 
