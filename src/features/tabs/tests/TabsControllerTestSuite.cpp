@@ -5,14 +5,14 @@
 #include <gtest/gtest.h>
 
 #include "component/ComponentFactory.h"
-#include "component/controller/TabsController.h"
-#include "component/view/TabsView.h"
 #include "mocks/HeadlessApplicationFixture.hpp"
 #include "mocks/MockedScreenSearchSender.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedTabsView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "tabs/logic/TabsController.h"
+#include "tabs/logic/TabsView.h"
+#include "tabs/tests/MockedTabsView.hpp"
 
 using namespace testing;
 

@@ -13,9 +13,9 @@
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "tabs/messages/MessageTabState.h"
 #include "type/search/MessageFind.h"
 #include "type/search/MessageSearchAutocomplete.h"
-#include "type/tab/MessageTabState.h"
 
 using namespace testing;
 

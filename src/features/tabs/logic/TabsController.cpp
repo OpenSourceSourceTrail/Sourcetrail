@@ -1,4 +1,4 @@
-#include "component/controller/TabsController.h"
+#include "tabs/logic/TabsController.h"
 
 #include <thread>
 

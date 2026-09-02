@@ -11,7 +11,7 @@
 #include "qt/utility/QtDeviceScaledPixmap.h"
 #include "qt/utility/utilityQt.h"
 #include "settings/ColorScheme.h"
-#include "type/tab/MessageTabOpenWith.h"
+#include "tabs/messages/MessageTabOpenWith.h"
 #include "utilityString.h"
 
 QtHistoryItem::QtHistoryItem(const SearchMatch& match, size_t index_, bool isCurrent) : index(index_), m_match(match) {

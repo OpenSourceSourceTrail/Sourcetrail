@@ -24,11 +24,11 @@
 #include "qt/utility/utilityQt.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TabId.h"
+#include "tabs/messages/MessageTabOpenWith.h"
 #include "type/code/MessageCodeReference.h"
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageToNextCodeReference.h"
 #include "type/focus/MessageFocusView.h"
-#include "type/tab/MessageTabOpenWith.h"
 #include "utility.h"
 
 QtCodeNavigator::QtCodeNavigator(QWidget* parent)

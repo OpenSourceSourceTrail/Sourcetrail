@@ -14,12 +14,12 @@
 #include "qt/utility/QtHighlighter.h"
 #include "settings/ColorScheme.h"
 #include "settings/IApplicationSettings.hpp"
+#include "tabs/messages/MessageTabOpenWith.h"
 #include "TextCodec.h"
 #include "tooltip/messages/MessageTooltipShow.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageActivateSourceLocations.h"
 #include "type/code/MessageActivateTokenIds.h"
-#include "type/tab/MessageTabOpenWith.h"
 #include "utility.h"
 
 std::vector<QtCodeField::AnnotationColor> QtCodeField::s_annotationColors;

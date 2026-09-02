@@ -48,8 +48,6 @@ target_sources(
           component/controller/ScreenSearchController.h
           component/controller/SearchController.cpp
           component/controller/SearchController.h
-          component/controller/TabsController.cpp
-          component/controller/TabsController.h
           component/view/helper/CodeScrollParams.h
           component/view/helper/CodeSnippetParams.cpp
           component/view/helper/CodeSnippetParams.h
@@ -73,8 +71,6 @@ target_sources(
           component/view/SearchView.h
           component/view/TabbedView.cpp
           component/view/TabbedView.h
-          component/view/TabsView.cpp
-          component/view/TabsView.h
           component/view/View.cpp
           component/view/View.h
           component/view/ViewFactory.h

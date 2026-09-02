@@ -77,8 +77,6 @@ target_sources(
           qt/element/dialog/QtStringListBoxItem.h
           qt/element/dialog/QtTextEdit.cpp
           qt/element/dialog/QtTextEdit.h
-          qt/element/QtTabBar.cpp
-          qt/element/QtTabBar.h
           qt/element/QtTable.cpp
           qt/element/QtTable.h
           qt/graphics/base/QtCountCircleItem.cpp
@@ -201,8 +199,6 @@ target_sources(
           qt/view/QtSearchView.h
           qt/view/QtTabbedView.cpp
           qt/view/QtTabbedView.h
-          qt/view/QtTabsView.cpp
-          qt/view/QtTabsView.h
           qt/view/QtViewFactory.cpp
           qt/view/QtViewFactory.h
           qt/view/QtViewWidgetWrapper.cpp

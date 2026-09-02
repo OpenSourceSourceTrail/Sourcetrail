@@ -53,7 +53,6 @@ set(test_lib_names
     StorageCacheTestSuite
     StorageProviderTestSuite
     TabIdTestSuite
-    TabsControllerTestSuite
     TabTestSuite
     TaskBuildIndexTestSuite
     TimeStampTestSuite

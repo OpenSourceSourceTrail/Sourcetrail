@@ -3,7 +3,7 @@
 #include "component/view/SearchView.h"
 #include "data/storage/StorageAccess.h"
 #include "logging.h"
-#include "type/tab/MessageTabState.h"
+#include "tabs/messages/MessageTabState.h"
 
 SearchController::SearchController(StorageAccess* storageAccess) : mStorageAccess(storageAccess) {}
 

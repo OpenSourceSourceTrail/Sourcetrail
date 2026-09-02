@@ -26,11 +26,11 @@
 #include "qt/utility/QtFileDialog.h"
 #include "qt/utility/utilityQt.h"
 #include "settings/IApplicationSettings.hpp"
+#include "tabs/messages/MessageTabOpenWith.h"
 #include "type/code/MessageCodeShowDefinition.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/graph/MessageGraphNodeExpand.h"
 #include "type/graph/MessageGraphNodeHide.h"
-#include "type/tab/MessageTabOpenWith.h"
 #include "utilityApp.h"
 
 QtGraphicsView::QtGraphicsView(GraphFocusHandler* focusHandler, QWidget* parent)

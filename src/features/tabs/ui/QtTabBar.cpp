@@ -1,4 +1,4 @@
-#include "qt/element/QtTabBar.h"
+#include "tabs/ui/QtTabBar.h"
 
 #include <QContextMenuEvent>
 

@@ -9,9 +9,9 @@
 #include "qt/utility/QtContextMenu.h"
 #include "settings/ColorScheme.h"
 #include "settings/IApplicationSettings.hpp"
+#include "tabs/messages/MessageTabOpenWith.h"
 #include "type/code/MessageActivateFile.h"
 #include "type/MessageProjectEdit.h"
-#include "type/tab/MessageTabOpenWith.h"
 #include "utilityString.h"
 
 QtCodeFileTitleButton::QtCodeFileTitleButton(QWidget* parent)
