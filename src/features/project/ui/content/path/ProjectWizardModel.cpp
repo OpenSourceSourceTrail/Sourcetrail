@@ -1,12 +1,11 @@
 #include "project/ui/content/path/ProjectWizardModel.hpp"
 
-#include <set>
-
 #include <QtConcurrent>
 
 #include "CompilationDatabaseInfo.h"
 #include "FilePathFilter.h"
 #include "logging.h"
+#include "project/logic/utilitySourceGroupCxx.h"
 #include "project/ui/QtProjectWizardWindow.h"
 #include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
 #include "utility.h"
@@ -33,31 +32,11 @@ ProjectWizardModel::CdbInfo readCompilationDatabase(const FilePath& cdbPath,
   }
   result.valid = true;
 
-  // Same filtering SourceGroupCxxCdb applies before indexing, so the count shown here is the count
-  // that will be indexed.
-  std::set<FilePath> sourceFilePaths;
-  std::set<FilePath> sourceDirectories;
-  for(const FilePath& path : info.sourceFiles) {
-    if(!FilePathFilter::areMatching(excludeFilters, path) && path.exists()) {
-      sourceFilePaths.insert(path);
-    }
-    sourceDirectories.insert(path.getParentDirectory());
-  }
-  result.filePaths = utility::getAsRelativeIfShorter(utility::toVector(sourceFilePaths), projectPath);
+  result.filePaths = utility::getAsRelativeIfShorter(
+      utility::toVector(utility::filterCdbSourceFiles(info.sourceFiles, excludeFilters)), projectPath);
 
-  // Canonicalizing the deduplicated directories rather than every single source file: a database
-  // lists thousands of files in a handful of directories, and each canonicalization is a syscall.
-  std::set<FilePath> headerPaths;
-  for(const FilePath& path : sourceDirectories) {
-    headerPaths.insert(path.getCanonical());
-  }
-  for(const FilePath& path : info.headerPaths) {
-    if(path.exists()) {
-      headerPaths.insert(path.getCanonical());
-    }
-  }
-  for(const FilePath& path : utility::getTopLevelPaths(headerPaths)) {
-    if(path.exists() && projectPath.contains(path)) {
+  for(const FilePath& path : utility::deriveCdbHeaderRoots(info.sourceFiles, info.headerPaths)) {
+    if(projectPath.contains(path)) {
       // the relative path is always shorter than the absolute path
       result.indexedHeaderPaths.push_back(path.getRelativeTo(projectPath));
     }

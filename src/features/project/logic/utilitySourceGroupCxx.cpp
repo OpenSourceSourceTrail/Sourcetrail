@@ -16,6 +16,7 @@
 #include "data/storage/IntermediateStorage.h"
 #include "data/storage/StorageProvider.h"
 #include "FilePath.h"
+#include "FilePathFilter.h"
 #include "logging.h"
 #include "OrderedCache.h"
 #include "project/logic/ICxxToolchain.h"
@@ -23,6 +24,7 @@
 #include "status/messages/MessageStatus.h"
 #include "TaskLambda.h"
 #include "utility.h"
+#include "utilityFile.h"
 #include "utilityString.h"
 
 namespace {
@@ -119,6 +121,44 @@ std::vector<FilePath> getSourceFilesFromCDB(const std::vector<CxxCompileCommand>
     filePaths.push_back(canonicalDirectoryPathCache.getValue(path.getParentDirectory()).concatenate(path.fileName()));
   }
   return filePaths;
+}
+
+std::set<FilePath> filterCdbSourceFiles(const std::vector<FilePath>& sourceFiles,
+                                        const std::vector<FilePathFilter>& excludeFilters) {
+  std::set<FilePath> filtered;
+  for(const FilePath& path : sourceFiles) {
+    if(!FilePathFilter::areMatching(excludeFilters, path) && path.exists()) {
+      filtered.insert(path);
+    }
+  }
+  return filtered;
+}
+
+std::vector<FilePath> deriveCdbHeaderRoots(const std::vector<FilePath>& sourceFiles, const std::vector<FilePath>& headerPaths) {
+  // Deduplicating the directories before canonicalizing them: a database lists thousands of files
+  // across a handful of directories, and each canonicalization is a syscall.
+  std::set<FilePath> directories;
+  for(const FilePath& path : sourceFiles) {
+    directories.insert(path.getParentDirectory());
+  }
+
+  std::set<FilePath> roots;
+  for(const FilePath& path : directories) {
+    roots.insert(path.getCanonical());
+  }
+  for(const FilePath& path : headerPaths) {
+    if(path.exists()) {
+      roots.insert(path.getCanonical());
+    }
+  }
+
+  std::vector<FilePath> topLevel;
+  for(const FilePath& path : utility::getTopLevelPaths(roots)) {
+    if(path.exists()) {
+      topLevel.push_back(path);
+    }
+  }
+  return topLevel;
 }
 
 bool containsIncludePchFlags(const std::vector<CxxCompileCommand>& commands) {

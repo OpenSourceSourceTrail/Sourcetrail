@@ -5,6 +5,7 @@
 
 #include "CompilationDatabaseInfo.h"
 #include "logging.h"
+#include "project/logic/utilitySourceGroupCxx.h"
 #include "qt/window/QtPathListDialog.h"
 #include "qt/window/QtSelectPathsDialog.h"
 #include "qt/window/QtTextEditDialog.h"
@@ -14,32 +15,13 @@
 
 std::vector<FilePath> QtProjectWizardContentPathsIndexedHeaders::getIndexedPathsDerivedFromCDB(
     std::shared_ptr<const SourceGroupSettingsCxxCdb> settings) {
-  std::set<FilePath> indexedHeaderPaths;
-  {
-    const client::CompilationDatabaseInfo info = client::inspectCompilationDatabase(
-        settings->getCompilationDatabasePathExpandedAndAbsolute());
-    if(info.valid) {
-      for(const FilePath& path : info.sourceFiles) {
-        indexedHeaderPaths.insert(path.getCanonical().getParentDirectory());
-      }
-      for(const FilePath& path : info.headerPaths) {
-        if(path.exists()) {
-          indexedHeaderPaths.insert(path.getCanonical());
-        }
-      }
-    } else {
-      LOG_WARNING("Unable to fetch indexed header paths. " + info.error);
-    }
+  const client::CompilationDatabaseInfo info = client::inspectCompilationDatabase(
+      settings->getCompilationDatabasePathExpandedAndAbsolute());
+  if(!info.valid) {
+    LOG_WARNING("Unable to fetch indexed header paths. " + info.error);
+    return {};
   }
-
-  std::vector<FilePath> topLevelPaths;
-  for(const FilePath& path : utility::getTopLevelPaths(indexedHeaderPaths)) {
-    if(path.exists()) {
-      topLevelPaths.push_back(path);
-    }
-  }
-
-  return topLevelPaths;
+  return utility::deriveCdbHeaderRoots(info.sourceFiles, info.headerPaths);
 }
 
 QtProjectWizardContentPathsIndexedHeaders::QtProjectWizardContentPathsIndexedHeaders(std::shared_ptr<SourceGroupSettings> settings,
