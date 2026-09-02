@@ -1,206 +1,215 @@
-#include <iostream>
-#include <thread>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include "component/controller/ActivationController.h"
-#include "ConsoleLogger.h"
+#include "data/graph/Edge.h"
 #include "data/name/NameHierarchy.h"
-#include "MessageActivateEdge.h"
-#include "MessageActivateTokenIds.h"
-#include "MessageActivateTokens.h"
-#include "MessageChangeFileView.h"
-#include "MessageRefreshUI.h"
-#include "MessageScrollToLine.h"
-#include "MessageSearch.h"
-#include "MessageStatus.h"
+#include "data/search/SearchMatch.h"
+#include "FilePath.h"
+#include "MockedMessageQueue.hpp"
+#include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "settings/IApplicationSettings.hpp"
 
-using namespace std::chrono_literals;
 using namespace testing;
 
-namespace {
-void addConsoleLogger() {
-  auto consoleLogger = std::make_shared<ConsoleLogger>();
-  consoleLogger->setLogLevel(Logger::LogLevel::LOG_ALL);
-  LogManager::getInstance()->setLoggingEnabled(true);
-  LogManager::getInstance()->addLogger(consoleLogger);
-}
-}    // namespace
-
+/**
+ * Characterization tests for ActivationController.
+ *
+ * The suite this replaces was never registered in CMake, so it had not compiled in a long time --
+ * it included a ConsoleLogger.h that no longer exists, and drove a real threaded MessageQueue with
+ * sleeps. This one follows the shape the other controller suites use: MockedMessageQueue records
+ * what was dispatched rather than delivering it, so the assertions are on the message traffic the
+ * controller produces.
+ *
+ * They pin what the controller does today; they are not a specification of what it should do.
+ */
 struct ActivationControllerFix : Test {
-  static void SetUpTestSuite() {
-    addConsoleLogger();
-    MessageQueue::getInstance()->startMessageLoopThreaded();
+  void SetUp() override {
+    mMessageQueue = std::make_shared<MockedMessageQueue>();
+    IMessageQueue::setInstance(mMessageQueue);
+
+    EXPECT_CALL(*mMessageQueue, registerListener(_)).Times(AnyNumber());
+    EXPECT_CALL(*mMessageQueue, unregisterListener(_)).Times(AnyNumber());
+    EXPECT_CALL(*mMessageQueue, pushMessage(_)).Times(AnyNumber()).WillRepeatedly([this](std::shared_ptr<MessageBase> message) {
+      mDispatched.push_back(message->getType());
+    });
+    EXPECT_CALL(*mMessageQueue, processMessage(_, _))
+        .Times(AnyNumber())
+        .WillRepeatedly([this](const std::shared_ptr<MessageBase>& message, bool) { mDispatched.push_back(message->getType()); });
+
+    mAppSettings = std::make_shared<NiceMock<MockedApplicationSettings>>();
+    IApplicationSettings::setInstance(mAppSettings);
+
+    mController = std::make_unique<ActivationController>(&mStorageAccess);
   }
 
-  static void TearDownTestSuite() {
-    MessageQueue::getInstance()->stopMessageLoop();
+  void TearDown() override {
+    mController.reset();
+    IApplicationSettings::setInstance(nullptr);
+    mAppSettings.reset();
+    IMessageQueue::setInstance(nullptr);
+    mMessageQueue.reset();
   }
 
-  MockedStorageAccess storageAccess;
+  template <typename MessageType>
+  void deliver(MessageType& message) {
+    static_cast<MessageListener<MessageType>*>(mController.get())->handleMessageBase(&message);
+  }
+
+  std::shared_ptr<MockedMessageQueue> mMessageQueue;
+  std::shared_ptr<NiceMock<MockedApplicationSettings>> mAppSettings;
+  std::vector<std::string> mDispatched;
+  StrictMock<MockedStorageAccess> mStorageAccess;
+  std::unique_ptr<ActivationController> mController;
 };
 
-struct SpyMessageActivateTokens : MessageListener<MessageActivateTokens> {
-  bool mCalled = false;
-  void handleMessage(MessageActivateTokens* /*message*/) override {
-    mCalled = true;
-  }
-};
-
-TEST_F(ActivationControllerFix, MessageActivateEdge) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateEdge{
-      Id{0},
-      Edge::EdgeType::EDGE_CALL,
-      NameHierarchy{},
-      NameHierarchy{},
-  }
-      .dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+TEST_F(ActivationControllerFix, clearIsANoOp) {
+  mController->clear();
+  EXPECT_THAT(mDispatched, IsEmpty());
 }
 
-TEST_F(ActivationControllerFix, MessageActivateBundleEdge) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateEdge{
-      Id{0},
-      Edge::EdgeType::EDGE_BUNDLED_EDGES,    // isBundledEdges
-      NameHierarchy{},
-      NameHierarchy{},
-  }
-      .dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+TEST_F(ActivationControllerFix, activatingAnEdgeActivatesItsOwnTokenId) {
+  MessageActivateEdge message(1, Edge::EDGE_CALL, NameHierarchy{}, NameHierarchy{});
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageActivateTokens"));
 }
 
-TEST_F(ActivationControllerFix, MessageActivateTokens) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageActivateTokens spyMessageActivateTokens;
-  EXPECT_CALL(storageAccess, getNodeIdForFileNode(_)).WillOnce(Return(1));
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
-  MessageActivateFile{FilePath{}}.dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+TEST_F(ActivationControllerFix, activatingABundledEdgeActivatesTheBundleInstead) {
+  MessageActivateEdge message(1, Edge::EDGE_BUNDLED_EDGES, NameHierarchy{}, NameHierarchy{});
+  message.bundledEdgesIds = {2, 3};
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageActivateTokens"));
 }
 
-struct SpyMessageChangeFileView
-    : MessageListener<MessageChangeFileView>
-    , MessageListener<MessageScrollToLine> {
-  bool mMessageChangeFileViewCalled = false;
-  void handleMessage(MessageChangeFileView* /*message*/) override {
-    mMessageChangeFileViewCalled = true;
-  }
-  bool mMessageScrollToLineCalled = false;
-  void handleMessage(MessageScrollToLine* /*message*/) override {
-    mMessageScrollToLineCalled = true;
-  }
-};
+TEST_F(ActivationControllerFix, activatingAKnownFileActivatesItsNode) {
+  EXPECT_CALL(mStorageAccess, getNodeIdForFileNode(_)).WillOnce(Return(7));
+  EXPECT_CALL(mStorageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
 
-TEST_F(ActivationControllerFix, MessageChangeFileView) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageChangeFileView spyMessageChangeFileView;
-  EXPECT_CALL(storageAccess, getNodeIdForFileNode(_)).WillOnce(Return(0));
-  MessageActivateFile{FilePath{}, 10}.dispatchImmediately();
-  std::this_thread::sleep_for(std::chrono::milliseconds{100});
-  EXPECT_TRUE(spyMessageChangeFileView.mMessageChangeFileViewCalled);
-  EXPECT_TRUE(spyMessageChangeFileView.mMessageScrollToLineCalled);
+  MessageActivateFile message{FilePath{L"/tmp/foo.cpp"}};
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageActivateTokens"));
 }
 
-TEST_F(ActivationControllerFix, EmptyMessageActivateNodes) {
-  const ActivationController controller(&storageAccess);
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
-  const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateNodes{}.dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+TEST_F(ActivationControllerFix, activatingAnUnknownFileFallsBackToChangingTheFileView) {
+  EXPECT_CALL(mStorageAccess, getNodeIdForFileNode(_)).WillOnce(Return(0));
+
+  MessageActivateFile message{FilePath{L"/tmp/foo.cpp"}};
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageChangeFileView"));
+  EXPECT_THAT(mDispatched, Not(Contains("MessageActivateTokens")));
 }
 
-TEST_F(ActivationControllerFix, MessageActivateNodes) {
-  const ActivationController controller(&storageAccess);
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
-  EXPECT_CALL(storageAccess, getNodeIdForNameHierarchy(_)).WillOnce(Return(1));
-  const SpyMessageActivateTokens spyMessageActivateTokens;
-  MessageActivateNodes messageActivateNodes;
-  messageActivateNodes.nodes.resize(2);
-  messageActivateNodes.nodes.back().nodeId = 1;
-  messageActivateNodes.dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+TEST_F(ActivationControllerFix, activatingAFileWithALineAlsoScrolls) {
+  EXPECT_CALL(mStorageAccess, getNodeIdForFileNode(_)).WillOnce(Return(0));
+
+  MessageActivateFile message{FilePath{L"/tmp/foo.cpp"}, 42};
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageScrollToLine"));
 }
 
-TEST_F(ActivationControllerFix, MessageActivateTokenIds) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageActivateTokens spyMessageActivateTokens;
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
-  MessageActivateTokenIds{{}}.dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+TEST_F(ActivationControllerFix, activatingNodesResolvesTheOnesGivenOnlyByName) {
+  EXPECT_CALL(mStorageAccess, getNodeIdForNameHierarchy(_)).WillOnce(Return(5));
+  EXPECT_CALL(mStorageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
+
+  MessageActivateNodes message;
+  message.addNode(0, NameHierarchy{L"foo", NAME_DELIMITER_CXX});
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageActivateTokens"));
 }
 
-struct SpyMessageActivateNodes : MessageListener<MessageActivateNodes> {
-  bool mCalled = false;
-  void handleMessage(MessageActivateNodes* /*message*/) override {
-    mCalled = true;
-  }
-};
+TEST_F(ActivationControllerFix, activatingTokenIdsLooksUpTheirSearchMatches) {
+  EXPECT_CALL(mStorageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
 
-TEST_F(ActivationControllerFix, DISABLED_ActivateSourceLocations) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageActivateNodes spyMessageActivateNodes;
-  EXPECT_CALL(storageAccess, getNodeIdsForLocationIds(_)).WillOnce(Return(std::vector<Id>{}));
-  EXPECT_CALL(storageAccess, getSearchMatchesForTokenIds(_)).WillOnce(Return(std::vector<SearchMatch>{}));
+  MessageActivateTokenIds message({1, 2});
+  deliver(message);
 
-  MessageActivateSourceLocations{{}, false}.dispatchImmediately();
-
-  std::this_thread::sleep_for(1s);
-
-  EXPECT_TRUE(spyMessageActivateNodes.mCalled);
+  EXPECT_THAT(mDispatched, Contains("MessageActivateTokens"));
 }
 
-struct SpyMessageRefreshUI
-    : MessageListener<MessageRefreshUI>
-    , MessageListener<MessageStatus> {
-  bool mMessageRefreshUICalled = false;
-  void handleMessage(MessageRefreshUI* /*message*/) override {
-    mMessageRefreshUICalled = true;
-  }
-  bool mMessageStatusCalled = false;
-  void handleMessage(MessageStatus* /*message*/) override {
-    mMessageStatusCalled = true;
-  }
-};
+TEST_F(ActivationControllerFix, activatingSourceLocationsActivatesTheirNodes) {
+  EXPECT_CALL(mStorageAccess, getNodeIdsForLocationIds(_)).WillOnce(Return(std::vector<Id>{9}));
 
-TEST_F(ActivationControllerFix, MessageResetZoom) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageRefreshUI spy;
+  MessageActivateSourceLocations message({1}, false);
+  deliver(message);
 
-  auto* settings = IApplicationSettings::getInstanceRaw();
-  settings->setFontSizeStd(settings->getFontSizeStd() + 1);
-
-  MessageResetZoom messageResetZoom;
-  messageResetZoom.dispatchImmediately();
-
-  std::this_thread::sleep_for(100ms);
-
-  EXPECT_TRUE(spy.mMessageRefreshUICalled);
-  EXPECT_TRUE(spy.mMessageStatusCalled);
+  EXPECT_THAT(mDispatched, Contains("MessageActivateNodes"));
 }
 
-TEST_F(ActivationControllerFix, MessageSearch) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageActivateTokens spyMessageActivateTokens;
+TEST_F(ActivationControllerFix, resetZoomOnlyRefreshesWhenTheFontSizeActuallyChanges) {
+  EXPECT_CALL(*mAppSettings, getFontSizeStd()).WillRepeatedly(Return(12));
+  EXPECT_CALL(*mAppSettings, getFontSize()).WillRepeatedly(Return(12));
 
-  MessageSearch{{}, NodeTypeSet{}}.dispatchImmediately();
-  EXPECT_TRUE(spyMessageActivateTokens.mCalled);
+  MessageResetZoom message;
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageStatus"));
+  EXPECT_THAT(mDispatched, Not(Contains("MessageRefreshUI")));
 }
 
-TEST_F(ActivationControllerFix, MessageZoom) {
-  const ActivationController controller(&storageAccess);
-  const SpyMessageRefreshUI spyMessageRefreshUI;
+TEST_F(ActivationControllerFix, resetZoomRefreshesTheUiWhenItHasToRestoreTheSize) {
+  EXPECT_CALL(*mAppSettings, getFontSizeStd()).WillRepeatedly(Return(12));
+  EXPECT_CALL(*mAppSettings, getFontSize()).WillRepeatedly(Return(20));
+  EXPECT_CALL(*mAppSettings, setFontSize(12));
 
-  MessageZoom{true}.dispatchImmediately();
+  MessageResetZoom message;
+  deliver(message);
 
-  std::this_thread::sleep_for(100ms);
+  EXPECT_THAT(mDispatched, Contains("MessageRefreshUI"));
+  EXPECT_THAT(mDispatched, Contains("MessageStatus"));
+}
 
-  EXPECT_TRUE(spyMessageRefreshUI.mMessageRefreshUICalled);
-  EXPECT_TRUE(spyMessageRefreshUI.mMessageStatusCalled);
+TEST_F(ActivationControllerFix, zoomingInAtTheMaximumIsIgnored) {
+  EXPECT_CALL(*mAppSettings, getFontSize()).WillRepeatedly(Return(24));
+  EXPECT_CALL(*mAppSettings, getFontSizeMax()).WillRepeatedly(Return(24));
+  EXPECT_CALL(*mAppSettings, getFontSizeMin()).WillRepeatedly(Return(6));
+
+  MessageZoom message(true);
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, IsEmpty());
+}
+
+TEST_F(ActivationControllerFix, zoomingInBelowTheMaximumStepsTheFontSizeUp) {
+  EXPECT_CALL(*mAppSettings, getFontSize()).WillRepeatedly(Return(12));
+  EXPECT_CALL(*mAppSettings, getFontSizeMax()).WillRepeatedly(Return(24));
+  EXPECT_CALL(*mAppSettings, getFontSizeMin()).WillRepeatedly(Return(6));
+  EXPECT_CALL(*mAppSettings, setFontSize(13));
+
+  MessageZoom message(true);
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageStatus"));
+  EXPECT_THAT(mDispatched, Contains("MessageRefreshUI"));
+}
+
+TEST_F(ActivationControllerFix, aSearchForTheErrorCommandGoesToTheErrorFeature) {
+  SearchMatch match;
+  match.searchType = SearchMatch::SEARCH_COMMAND;
+  match.name = SearchMatch::getCommandName(SearchMatch::COMMAND_ERROR);
+
+  MessageSearch message({match}, NodeTypeSet::all());
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageErrorsAll"));
+}
+
+TEST_F(ActivationControllerFix, aPlainSearchActivatesTheMatchedTokens) {
+  SearchMatch match;
+  match.searchType = SearchMatch::SEARCH_TOKEN;
+  match.tokenIds = {3};
+
+  MessageSearch message({match}, NodeTypeSet::all());
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageActivateTokens"));
 }
