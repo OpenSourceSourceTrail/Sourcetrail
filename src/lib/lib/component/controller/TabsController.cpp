@@ -2,11 +2,11 @@
 
 #include <thread>
 
-#include "../../../scheduling/TaskLambda.h"
 #include "app/Application.h"
 #include "component/controller/helper/ScreenSearchInterfaces.h"
-#include "component/TabId.h"
+#include "TabId.h"
 #include "TaskDispatchRegistry.h"
+#include "TaskLambda.h"
 #include "type/code/MessageScrollToLine.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageWindowChanged.h"

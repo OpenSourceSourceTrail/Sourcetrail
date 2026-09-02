@@ -10,7 +10,6 @@
 #include <QVBoxLayout>
 
 #include "app/paths/ResourcePaths.h"
-#include "component/TabId.h"
 #include "data/location/SourceLocation.h"
 #include "data/location/SourceLocationCollection.h"
 #include "data/location/SourceLocationFile.h"
@@ -22,6 +21,7 @@
 #include "qt/element/search/QtSearchBarButton.h"
 #include "qt/utility/utilityQt.h"
 #include "settings/IApplicationSettings.hpp"
+#include "TabId.h"
 #include "type/code/MessageCodeReference.h"
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageToNextCodeReference.h"

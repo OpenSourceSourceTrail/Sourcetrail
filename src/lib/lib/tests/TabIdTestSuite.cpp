@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/TabId.h"
+#include "TabId.h"
 
 // NOLINTNEXTLINE
 TEST(TabId, goodCase) {

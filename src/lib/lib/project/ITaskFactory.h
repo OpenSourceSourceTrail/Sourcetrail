@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "../../scheduling/Task.h"
-#include "../../scheduling/TaskDecoratorRepeat.h"
-#include "../../scheduling/TaskReturnSuccessIf.h"
-#include "../../scheduling/TaskSetValue.h"
 #include "data/indexer/IndexerCommandType.h"
+#include "Task.h"
+#include "TaskDecoratorRepeat.h"
+#include "TaskReturnSuccessIf.h"
+#include "TaskSetValue.h"
 
 class DialogView;
 class FilePath;

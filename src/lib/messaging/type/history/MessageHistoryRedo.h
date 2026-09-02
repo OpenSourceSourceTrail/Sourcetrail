@@ -1,8 +1,8 @@
 #ifndef MESSAGE_HISTORY_REDO_H
 #define MESSAGE_HISTORY_REDO_H
 
-#include "component/TabId.h"
 #include "Message.h"
+#include "TabId.h"
 
 class MessageHistoryRedo : public Message<MessageHistoryRedo> {
 public:

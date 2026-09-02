@@ -123,8 +123,6 @@ target_sources(
           component/NetworkFactory.h
           component/Tab.cpp
           component/Tab.h
-          component/TabId.cpp
-          component/TabId.h
           data/fulltextsearch/FullTextSearchIndex.cpp
           data/fulltextsearch/FullTextSearchIndex.h
           data/fulltextsearch/SuffixArray.cpp

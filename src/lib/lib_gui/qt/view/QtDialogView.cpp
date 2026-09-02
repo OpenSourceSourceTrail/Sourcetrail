@@ -8,8 +8,6 @@
 #include <QMessageBox>
 #include <QTimer>
 
-#include "../../../scheduling/TaskLambda.h"
-#include "component/TabId.h"
 #include "data/storage/StorageAccess.h"
 #include "project/IProject.hpp"
 #include "qt/window/QtIndexingDialog.h"
@@ -20,6 +18,8 @@
 #include "qt/window/QtMainWindow.h"
 #include "qt/window/QtUnknownProgressDialog.h"
 #include "qt/window/QtWindow.h"
+#include "TabId.h"
+#include "TaskLambda.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageStatus.h"
 #include "utility.h"

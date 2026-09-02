@@ -10,7 +10,6 @@
 #define private public
 #include "project/Project.h"
 #undef private
-#include "component/TabId.h"
 #include "data/indexer/IndexerCommandProvider.h"
 #include "data/storage/PersistentStorage.h"
 #include "MockedApplicationSetting.hpp"
@@ -23,6 +22,7 @@
 #include "settings/IApplicationSettings.hpp"
 #include "settings/source_group/SourceGroupSettings.h"
 #include "settings/source_group/type/SourceGroupSettingsCppEmpty.h"
+#include "TabId.h"
 #include "TaskDispatchRegistry.h"
 
 using namespace std::chrono_literals;

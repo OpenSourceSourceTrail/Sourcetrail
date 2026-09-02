@@ -15,7 +15,6 @@
 
 #include "app/paths/ResourcePaths.h"
 #include "component/controller/ErrorController.h"
-#include "component/TabId.h"
 #include "data/ErrorFilter.h"
 #include "qt/element/button/QtHelpButton.h"
 #include "qt/element/button/QtSelfRefreshIconButton.h"
@@ -24,6 +23,7 @@
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
 #include "settings/ColorScheme.h"
+#include "TabId.h"
 #include "type/MessageProjectEdit.h"
 
 QIcon QtErrorView::s_errorIcon;

@@ -1,7 +1,7 @@
 #pragma once
 // internal
-#include "component/TabId.h"
 #include "Message.h"
+#include "TabId.h"
 
 class MessageShowError final : public Message<MessageShowError> {
 public:

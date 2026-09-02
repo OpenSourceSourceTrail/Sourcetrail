@@ -4,9 +4,9 @@
 #include <memory>
 #include <queue>
 
-#include "../../../scheduling/Task.h"
 #include "FilePath.h"
 #include "MessageListener.h"
+#include "Task.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 
 class IndexerCommandProvider;

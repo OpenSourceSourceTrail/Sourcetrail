@@ -4,7 +4,7 @@
 #include <thread>
 #include <utility>
 
-#include "../../scheduling/Blackboard.h"
+#include "Blackboard.h"
 #include "component/view/DialogView.h"
 #include "data/storage/PersistentStorage.h"
 #include "MessageQueue.h"

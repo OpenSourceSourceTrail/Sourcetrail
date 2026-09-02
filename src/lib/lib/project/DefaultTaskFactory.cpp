@@ -1,10 +1,5 @@
 #include "project/DefaultTaskFactory.h"
 
-#include "../../scheduling/TaskFindKeyOnBlackboard.h"
-#include "../../scheduling/TaskflowGroupParallel.h"
-#include "../../scheduling/TaskGroupSelector.h"
-#include "../../scheduling/TaskGroupSequence.h"
-#include "../../scheduling/TaskLambda.h"
 #include "../data/indexer/IndexerCommandProvider.h"
 #include "../data/indexer/TaskBuildIndex.h"
 #include "../data/indexer/TaskExecuteCustomCommands.h"
@@ -14,6 +9,11 @@
 #include "../data/TaskFinishParsing.h"
 #include "../data/TaskInjectStorage.h"
 #include "../data/TaskMergeStorages.h"
+#include "TaskFindKeyOnBlackboard.h"
+#include "TaskflowGroupParallel.h"
+#include "TaskGroupSelector.h"
+#include "TaskGroupSequence.h"
+#include "TaskLambda.h"
 
 std::shared_ptr<TaskGroupSequence> DefaultTaskFactory::createSequence() {
   return std::make_shared<TaskGroupSequence>();

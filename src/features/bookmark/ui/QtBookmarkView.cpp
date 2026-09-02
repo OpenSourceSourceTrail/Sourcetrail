@@ -2,12 +2,12 @@
 
 #include <string>
 
-#include "component/TabId.h"
-#include "logging.h"
-#include "qt/view/QtMainView.h"
 #include "bookmark/ui/QtBookmarkBrowser.h"
 #include "bookmark/ui/QtBookmarkCreator.h"
+#include "logging.h"
+#include "qt/view/QtMainView.h"
 #include "qt/window/QtMainWindow.h"
+#include "TabId.h"
 
 namespace {
 QtMainView* getMainView(ViewLayout* viewLayout) {

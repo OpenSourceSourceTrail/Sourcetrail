@@ -5,11 +5,11 @@
 #include <QToolBar>
 
 #include "app/paths/ResourcePaths.h"
-#include "component/TabId.h"
 #include "qt/element/search/QtScreenSearchBox.h"
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
 #include "qt/window/QtMainWindow.h"
+#include "TabId.h"
 
 QtScreenSearchView::QtScreenSearchView(ViewLayout* viewLayout)
     : ScreenSearchView(viewLayout)

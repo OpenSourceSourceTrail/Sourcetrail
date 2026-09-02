@@ -3,18 +3,18 @@
 #include <algorithm>
 #include <ranges>
 
-#include "component/TabId.h"
-#include "bookmark/logic/BookmarkView.h"
 #include "bookmark/domain/Bookmark.h"
 #include "bookmark/domain/BookmarkCategory.h"
 #include "bookmark/domain/EdgeBookmark.h"
 #include "bookmark/domain/NodeBookmark.h"
+#include "bookmark/logic/BookmarkView.h"
+#include "bookmark/messages/MessageBookmarkButtonState.h"
+#include "bookmark/messages/MessageBookmarkUpdate.hpp"
 #include "data/storage/StorageAccess.h"
 #include "data/storage/type/StorageEdge.h"
 #include "logging.h"
 #include "RangesTo.hpp"
-#include "bookmark/messages/MessageBookmarkButtonState.h"
-#include "bookmark/messages/MessageBookmarkUpdate.hpp"
+#include "TabId.h"
 #include "type/graph/MessageActivateEdge.h"
 #include "type/graph/MessageActivateNodes.h"
 #include "utility.h"

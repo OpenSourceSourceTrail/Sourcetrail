@@ -7,10 +7,7 @@
 
 #include <fmt/format.h>
 
-#include "../../scheduling/Task.h"
-#include "../../scheduling/TaskGroupSequence.h"
 #include "app/IndexerPluginRegistry.h"
-#include "component/TabId.h"
 #include "component/view/DialogView.h"
 #include "data/IndexingPhaseStats.h"
 #include "data/storage/PersistentStorage.h"
@@ -27,6 +24,9 @@
 #include "settings/ProjectSettings.h"
 #include "settings/source_group/SourceGroupSettings.h"
 #include "settings/source_group/SourceGroupStatusType.h"
+#include "TabId.h"
+#include "Task.h"
+#include "TaskGroupSequence.h"
 #include "TextAccess.h"
 #include "type/error/MessageErrorCountClear.h"
 #include "type/indexing/MessageIndexingFinished.h"

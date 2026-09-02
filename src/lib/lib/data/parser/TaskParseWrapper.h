@@ -3,9 +3,9 @@
 
 #include <memory>
 
-#include "../../../scheduling/Task.h"
-#include "../../../scheduling/TaskDecorator.h"
-#include "../../../scheduling/TaskRunner.h"
+#include "Task.h"
+#include "TaskDecorator.h"
+#include "TaskRunner.h"
 #include "TimeStamp.h"
 
 class DialogView;

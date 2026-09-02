@@ -3,11 +3,11 @@
 #include <vector>
 // internal
 #include "app/Application.h"
-#include "component/TabId.h"
 #include "component/view/DialogView.h"
 #include "data/storage/StorageAccess.h"
 #include "project/IProject.hpp"
 #include "settings/IApplicationSettings.hpp"
+#include "TabId.h"
 
 ErrorController::ErrorController(StorageAccess* pStorageAccess) : m_storageAccess(pStorageAccess) {}
 

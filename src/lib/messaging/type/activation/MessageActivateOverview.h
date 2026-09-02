@@ -3,8 +3,8 @@
 #include "Message.h"
 #include "MessageActivateBase.h"
 //
-#include "component/TabId.h"
 #include "data/NodeTypeSet.h"
+#include "TabId.h"
 
 class MessageActivateOverview
     : public Message<MessageActivateOverview>

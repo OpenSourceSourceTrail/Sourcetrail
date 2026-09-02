@@ -8,7 +8,6 @@
 #include "app/Application.h"
 #include "app/paths/ResourcePaths.h"
 #include "component/controller/TabsController.h"
-#include "component/TabId.h"
 #include "component/view/GraphViewStyle.h"
 #include "logging.h"
 #include "qt/element/button/QtSelfRefreshIconButton.h"
@@ -16,6 +15,7 @@
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
 #include "settings/ColorScheme.h"
+#include "TabId.h"
 
 QtTabsView::QtTabsView(ViewLayout* viewLayout) : TabsView(viewLayout), m_widget(new QWidget), m_insertedTabCount(0) {
   auto* layout = new QHBoxLayout{m_widget};

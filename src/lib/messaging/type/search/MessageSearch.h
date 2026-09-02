@@ -2,9 +2,9 @@
 // internal
 #include "Message.h"
 //
-#include "component/TabId.h"
 #include "data/NodeTypeSet.h"
 #include "data/search/SearchMatch.h"
+#include "TabId.h"
 
 class MessageSearch final : public Message<MessageSearch> {
 public:
