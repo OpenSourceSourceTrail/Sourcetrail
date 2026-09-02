@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "data/indexer/IndexerCommandJava.h"
-#include "data/indexer/MemoryIndexerCommandProvider.h"
 #include "FileManager.h"
+#include "indexing/logic/IndexerCommandJava.h"
+#include "indexing/logic/MemoryIndexerCommandProvider.h"
 #include "project/RefreshInfo.h"
 #include "settings/source_group/type/SourceGroupSettingsJavaEmpty.h"
 #include "utility.h"

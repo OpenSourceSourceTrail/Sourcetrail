@@ -3,8 +3,8 @@
 #include "activation/messages/MessageActivateTrail.h"
 #include "component/controller/Controller.h"
 #include "custom_trail/messages/MessageCustomTrailShow.h"
+#include "indexing/messages/MessageIndexingFinished.h"
 #include "MessageListener.h"
-#include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageWindowClosed.h"
 
 class CustomTrailView;

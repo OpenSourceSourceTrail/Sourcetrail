@@ -10,8 +10,8 @@
 #define private public
 #include "project/Project.h"
 #undef private
-#include "data/indexer/IndexerCommandProvider.h"
 #include "data/storage/PersistentStorage.h"
+#include "indexing/logic/IndexerCommandProvider.h"
 #include "MockedApplicationSetting.hpp"
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedMessageQueue.hpp"

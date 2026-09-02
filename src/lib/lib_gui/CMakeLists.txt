@@ -159,14 +159,6 @@ target_sources(
           qt/view/QtViewWidgetWrapper.h
           qt/window/QtAbout.cpp
           qt/window/QtAbout.h
-          qt/window/QtIndexingDialog.cpp
-          qt/window/QtIndexingDialog.h
-          qt/window/QtIndexingProgressDialog.cpp
-          qt/window/QtIndexingProgressDialog.h
-          qt/window/QtIndexingReportDialog.cpp
-          qt/window/QtIndexingReportDialog.h
-          qt/window/QtIndexingStartDialog.cpp
-          qt/window/QtIndexingStartDialog.h
           qt/window/QtKeyboardShortcuts.cpp
           qt/window/QtKeyboardShortcuts.h
           qt/window/QtKnownProgressDialog.cpp

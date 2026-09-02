@@ -9,9 +9,9 @@
 #include "error/messages/MessageErrorsForFile.h"
 #include "error/messages/MessageErrorsHelpMessage.h"
 #include "error/messages/MessageShowError.h"
+#include "indexing/messages/MessageIndexingFinished.h"
+#include "indexing/messages/MessageIndexingStarted.h"
 #include "MessageListener.h"
-#include "type/indexing/MessageIndexingFinished.h"
-#include "type/indexing/MessageIndexingStarted.h"
 //
 #include "component/controller/Controller.h"
 #include "error/logic/ErrorView.h"

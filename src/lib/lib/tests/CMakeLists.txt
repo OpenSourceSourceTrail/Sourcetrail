@@ -26,9 +26,7 @@ set(test_lib_names
     HierarchyCacheTestSuite
     IncludeDirectiveTestSuite
     utilitySourceGroupCxxTestSuite
-    IndexerCommandJavaTestSuite
     IndexerWireEnumsTestSuite
-    IndexerCompositeTestSuite
     IndexerPluginRegistryTestSuite
     IndexerWorkerServiceTestSuite
     IntermediateStorageTestSuite
@@ -48,7 +46,6 @@ set(test_lib_names
     StorageProviderTestSuite
     TabIdTestSuite
     TabTestSuite
-    TaskBuildIndexTestSuite
     TimeStampTestSuite
     TreeTestSuite
     UserPathsTestSuite)

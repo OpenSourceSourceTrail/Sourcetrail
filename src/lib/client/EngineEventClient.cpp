@@ -10,12 +10,12 @@
 #include "error/domain/ErrorCountInfo.h"
 #include "error/messages/MessageErrorCountUpdate.h"
 #include "HttpClient.h"
+#include "indexing/messages/MessageIndexingFinished.h"
+#include "indexing/messages/MessageIndexingStarted.h"
+#include "indexing/messages/MessageIndexingStatus.h"
 #include "logging.h"
 #include "ProtoJson.h"
 #include "status/messages/MessageStatus.h"
-#include "type/indexing/MessageIndexingFinished.h"
-#include "type/indexing/MessageIndexingStarted.h"
-#include "type/indexing/MessageIndexingStatus.h"
 #include "utilityString.h"
 
 namespace client {

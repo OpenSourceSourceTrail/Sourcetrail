@@ -1,7 +1,7 @@
 #include "app/LanguagePackageManager.h"
 
 #include "app/LanguagePackage.h"
-#include "data/indexer/IndexerComposite.h"
+#include "indexing/logic/IndexerComposite.h"
 
 LanguagePackageManager::Ptr LanguagePackageManager::getInstance() {
   if(!s_instance) {

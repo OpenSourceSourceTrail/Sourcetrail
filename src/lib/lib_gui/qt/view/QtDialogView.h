@@ -3,10 +3,10 @@
 
 #include "component/view/DialogView.h"
 #include "error/messages/MessageErrorCountUpdate.h"
+#include "indexing/messages/MessageIndexingShowDialog.h"
 #include "MessageListener.h"
 #include "qt/utility/QtThreadedFunctor.h"
 #include "qt/window/QtWindowStack.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageWindowClosed.h"
 
 class QtMainWindow;

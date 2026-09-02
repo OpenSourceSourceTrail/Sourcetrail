@@ -2,9 +2,9 @@
 
 #include <utility>
 
-#include "data/indexer/CxxIndexerCommandProvider.h"
-#include "data/indexer/IndexerCommandCxx.h"
 #include "FileManager.h"
+#include "indexing/logic/CxxIndexerCommandProvider.h"
+#include "indexing/logic/IndexerCommandCxx.h"
 #include "logging.h"
 #include "project/RefreshInfo.h"
 #include "project/utilitySourceGroupCxx.h"

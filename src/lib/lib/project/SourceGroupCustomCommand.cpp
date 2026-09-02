@@ -1,8 +1,8 @@
 #include "project/SourceGroupCustomCommand.h"
 
-#include "data/indexer/IndexerCommandCustom.h"
 #include "data/storage/StorageVersion.h"
 #include "FileManager.h"
+#include "indexing/logic/IndexerCommandCustom.h"
 #include "project/RefreshInfo.h"
 #include "settings/ProjectSettings.h"
 #include "settings/source_group/type/SourceGroupSettingsCustomCommand.h"

@@ -3,8 +3,8 @@
 
 #include "app/LanguagePackage.h"
 #include "app/LanguagePackageManager.h"
-#include "data/indexer/IndexerComposite.h"
-#include "mocks/MockedIndexer.hpp"
+#include "indexing/logic/IndexerComposite.h"
+#include "indexing/tests/MockedIndexer.hpp"
 #include "ScopedFunctor.h"
 
 using namespace testing;

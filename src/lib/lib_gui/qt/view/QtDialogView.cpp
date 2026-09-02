@@ -9,11 +9,12 @@
 #include <QTimer>
 
 #include "data/storage/StorageAccess.h"
+#include "indexing/messages/MessageIndexingStatus.h"
+#include "indexing/ui/QtIndexingDialog.h"
+#include "indexing/ui/QtIndexingProgressDialog.h"
+#include "indexing/ui/QtIndexingReportDialog.h"
+#include "indexing/ui/QtIndexingStartDialog.h"
 #include "project/IProject.hpp"
-#include "qt/window/QtIndexingDialog.h"
-#include "qt/window/QtIndexingProgressDialog.h"
-#include "qt/window/QtIndexingReportDialog.h"
-#include "qt/window/QtIndexingStartDialog.h"
 #include "qt/window/QtKnownProgressDialog.h"
 #include "qt/window/QtMainWindow.h"
 #include "qt/window/QtUnknownProgressDialog.h"
@@ -21,7 +22,6 @@
 #include "status/messages/MessageStatus.h"
 #include "TabId.h"
 #include "TaskLambda.h"
-#include "type/indexing/MessageIndexingStatus.h"
 #include "utility.h"
 
 QtDialogView::QtDialogView(QtMainWindow* mainWindow, UseCase useCase, StorageAccess* storageAccess)

@@ -9,8 +9,8 @@
 #include "bookmark/messages/MessageBookmarkDelete.h"
 #include "bookmark/messages/MessageBookmarkEdit.h"
 #include "component/controller/Controller.h"
+#include "indexing/messages/MessageIndexingFinished.h"
 #include "MessageListener.h"
-#include "type/indexing/MessageIndexingFinished.h"
 
 class StorageAccess;
 

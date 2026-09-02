@@ -6,8 +6,8 @@
 #include <fmt/xchar.h>
 
 #include "app/Application.h"
-#include "data/indexer/CxxIndexerCommandProvider.h"
-#include "data/indexer/IndexerCommandCxx.h"
+#include "indexing/logic/CxxIndexerCommandProvider.h"
+#include "indexing/logic/IndexerCommandCxx.h"
 #include "logging.h"
 #include "project/RefreshInfo.h"
 #include "project/utilitySourceGroupCxx.h"

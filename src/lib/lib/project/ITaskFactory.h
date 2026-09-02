@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "data/indexer/IndexerCommandType.h"
+#include "indexing/domain/IndexerCommandType.h"
 #include "Task.h"
 #include "TaskDecoratorRepeat.h"
 #include "TaskReturnSuccessIf.h"

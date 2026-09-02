@@ -1,9 +1,9 @@
 #pragma once
 #include "component/view/DialogView.h"
 #include "error/messages/MessageErrorCountUpdate.h"
+#include "indexing/messages/MessageIndexingStarted.h"
 #include "MessageListener.h"
 #include "status/messages/MessageStatus.h"
-#include "type/indexing/MessageIndexingStarted.h"
 
 class EngineHttpService;
 

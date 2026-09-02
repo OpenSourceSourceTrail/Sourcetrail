@@ -2,9 +2,9 @@
 #include <gmock/gmock.h>
 
 #include "component/view/DialogView.h"
-#include "data/indexer/IndexerCommand.h"
-#include "data/indexer/IndexerCommandProvider.h"
 #include "data/storage/StorageProvider.h"
+#include "indexing/logic/IndexerCommand.h"
+#include "indexing/logic/IndexerCommandProvider.h"
 #include "project/SourceGroup.h"
 #include "settings/source_group/SourceGroupSettings.h"
 

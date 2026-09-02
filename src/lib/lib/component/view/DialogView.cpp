@@ -1,6 +1,6 @@
 #include "component/view/DialogView.h"
 
-#include "type/indexing/MessageIndexingStatus.h"
+#include "indexing/messages/MessageIndexingStatus.h"
 
 DialogView::DialogView(UseCase useCase, StorageAccess* storageAccess) : m_useCase(useCase), m_storageAccess(storageAccess) {}
 

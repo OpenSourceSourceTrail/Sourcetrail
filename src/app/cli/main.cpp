@@ -19,6 +19,7 @@
 #include "ConsoleApplication.h"
 #include "factory/impls/Factory.hpp"
 #include "FilePath.h"
+#include "indexing/messages/MessageIndexingInterrupted.h"
 #include "language_packages.h"
 #include "productVersion.h"
 #include "project/CxxToolchainRemote.h"
@@ -31,7 +32,6 @@
 #include "settings/ApplicationSettingsPrefiller.h"
 #include "settings/details/ApplicationSettings.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
 #include "Version.h"
 

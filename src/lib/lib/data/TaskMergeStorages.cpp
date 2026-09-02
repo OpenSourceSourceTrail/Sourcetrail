@@ -4,8 +4,8 @@
 #include <thread>
 #include <utility>
 
-#include "data/IndexingPhaseStats.h"
 #include "data/storage/StorageProvider.h"
+#include "indexing/domain/IndexingPhaseStats.h"
 
 TaskMergeStorages::TaskMergeStorages(std::shared_ptr<StorageProvider> storageProvider)
     : m_storageProvider(std::move(storageProvider)) {}

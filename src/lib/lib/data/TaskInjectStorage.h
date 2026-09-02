@@ -3,9 +3,9 @@
 
 #include <vector>
 
+#include "indexing/messages/MessageIndexingInterrupted.h"
 #include "MessageListener.h"
 #include "Task.h"
-#include "type/indexing/MessageIndexingInterrupted.h"
 
 class Storage;
 class StorageProvider;

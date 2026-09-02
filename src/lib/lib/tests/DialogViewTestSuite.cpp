@@ -2,9 +2,9 @@
 #include <gtest/gtest.h>
 
 #include "component/view/DialogView.h"
+#include "indexing/messages/MessageIndexingStatus.h"
 #include "MessageQueue.h"
 #include "MockedMessageQueue.hpp"
-#include "type/indexing/MessageIndexingStatus.h"
 
 using namespace testing;
 

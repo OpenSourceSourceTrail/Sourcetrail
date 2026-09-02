@@ -5,11 +5,11 @@
 #include <QHBoxLayout>
 
 #include "app/paths/ResourcePaths.h"
+#include "indexing/messages/MessageIndexingShowDialog.h"
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
 #include "refresh/messages/MessageRefresh.h"
 #include "search/ui/QtSearchBarButton.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
 
 QtRefreshView::QtRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout), m_widget{new QFrame} {
   m_widget->setObjectName(QStringLiteral("refresh_bar"));

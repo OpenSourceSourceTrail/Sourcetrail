@@ -9,9 +9,9 @@
 #include "project/IProject.hpp"
 // messages
 #include "bookmark/messages/MessageBookmarkUpdate.hpp"
+#include "indexing/messages/MessageIndexingFinished.h"
 #include "MessageListener.h"
 #include "refresh/messages/MessageRefresh.h"
-#include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageActivateWindow.h"
 #include "type/MessageCloseProject.h"
 #include "type/MessageLoadProject.h"

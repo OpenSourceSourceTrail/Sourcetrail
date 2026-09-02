@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "data/IndexingPhaseStats.h"
+#include "indexing/domain/IndexingPhaseStats.h"
 
 int StorageProvider::getStorageCount() const noexcept {
   const std::lock_guard lock(mStoragesMutex);

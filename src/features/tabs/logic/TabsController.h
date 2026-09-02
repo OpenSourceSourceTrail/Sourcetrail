@@ -4,6 +4,7 @@
 #include "activation/messages/MessageActivateErrors.h"
 #include "component/controller/Controller.h"
 #include "component/Tab.h"
+#include "indexing/messages/MessageIndexingFinished.h"
 #include "MessageListener.h"
 #include "tabs/logic/TabsView.h"
 #include "tabs/messages/MessageTabClose.h"
@@ -11,7 +12,6 @@
 #include "tabs/messages/MessageTabOpenWith.h"
 #include "tabs/messages/MessageTabSelect.h"
 #include "tabs/messages/MessageTabState.h"
-#include "type/indexing/MessageIndexingFinished.h"
 
 struct SearchMatch;
 

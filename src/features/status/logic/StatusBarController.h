@@ -5,12 +5,12 @@
 #include "error/messages/MessageErrorCountClear.h"
 #include "error/messages/MessageErrorCountUpdate.h"
 #include "ide_communication/messages/MessagePingReceived.h"
+#include "indexing/messages/MessageIndexingFinished.h"
+#include "indexing/messages/MessageIndexingStarted.h"
+#include "indexing/messages/MessageIndexingStatus.h"
 #include "MessageListener.h"
 #include "refresh/messages/MessageRefresh.h"
 #include "status/messages/MessageStatus.h"
-#include "type/indexing/MessageIndexingFinished.h"
-#include "type/indexing/MessageIndexingStarted.h"
-#include "type/indexing/MessageIndexingStatus.h"
 
 class StatusBarView;
 class StorageAccess;

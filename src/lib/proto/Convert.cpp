@@ -1,8 +1,5 @@
 #include "Convert.h"
 
-#include "data/indexer/IndexerCommand.h"
-#include "data/indexer/IndexerCommandCxx.h"
-#include "data/indexer/IndexerCommandJava.h"
 #include "data/storage/IntermediateStorage.h"
 #include "data/storage/type/StorageComponentAccess.h"
 #include "data/storage/type/StorageEdge.h"
@@ -13,6 +10,9 @@
 #include "data/storage/type/StorageSourceLocation.h"
 #include "data/storage/type/StorageSymbol.h"
 #include "error/domain/StorageError.h"
+#include "indexing/logic/IndexerCommand.h"
+#include "indexing/logic/IndexerCommandCxx.h"
+#include "indexing/logic/IndexerCommandJava.h"
 #include "logging.h"
 #include "utilityString.h"
 

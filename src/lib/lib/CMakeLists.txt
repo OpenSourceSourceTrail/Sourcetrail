@@ -92,37 +92,6 @@ target_sources(
           data/graph/Node.h
           data/graph/Token.cpp
           data/graph/Token.h
-          data/indexer/grpc/GrpcIndexer.cpp
-          data/indexer/grpc/GrpcIndexer.h
-          data/indexer/grpc/IndexerWorkerServiceImpl.cpp
-          data/indexer/grpc/IndexerWorkerServiceImpl.h
-          data/indexer/CombinedIndexerCommandProvider.cpp
-          data/indexer/CombinedIndexerCommandProvider.h
-          data/indexer/Indexer.h
-          data/indexer/IndexerBase.cpp
-          data/indexer/IndexerBase.h
-          data/indexer/IndexerCommand.cpp
-          data/indexer/IndexerCommand.h
-          data/indexer/IndexerCommandCustom.cpp
-          data/indexer/IndexerCommandCustom.h
-          data/indexer/CxxIndexerCommandProvider.cpp
-          data/indexer/CxxIndexerCommandProvider.h
-          data/indexer/IndexerCommandCxx.cpp
-          data/indexer/IndexerCommandJava.cpp
-          data/indexer/IndexerCommandJava.h
-          data/indexer/IndexerCommandProvider.cpp
-          data/indexer/IndexerCommandProvider.h
-          data/indexer/IndexerCommandType.cpp
-          data/indexer/IndexerCommandType.h
-          data/indexer/IndexerComposite.cpp
-          data/indexer/IndexerComposite.h
-          data/indexer/IndexerStateInfo.h
-          data/indexer/MemoryIndexerCommandProvider.cpp
-          data/indexer/MemoryIndexerCommandProvider.h
-          data/indexer/TaskBuildIndex.cpp
-          data/indexer/TaskBuildIndex.h
-          data/indexer/TaskFillIndexerCommandQueue.cpp
-          data/indexer/TaskFillIndexerCommandQueue.h
           data/location/LocationType.cpp
           data/location/LocationType.h
           data/location/SourceLocation.cpp
@@ -183,8 +152,6 @@ target_sources(
           data/NodeType.h
           data/NodeTypeSet.cpp
           data/NodeTypeSet.h
-          data/IndexingPhaseStats.cpp
-          data/IndexingPhaseStats.h
           data/TaskInjectStorage.cpp
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
@@ -365,8 +332,6 @@ target_sources(
           data/TaskCleanStorage.h
           data/TaskFinishParsing.cpp
           data/TaskFinishParsing.h
-          data/indexer/TaskExecuteCustomCommands.cpp
-          data/indexer/TaskExecuteCustomCommands.h
           data/parser/TaskParseWrapper.cpp
           data/parser/TaskParseWrapper.h
           data/storage/PersistentStorage.cpp
