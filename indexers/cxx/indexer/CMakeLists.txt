@@ -10,11 +10,6 @@ endif()
 
 add_executable(Sourcetrail_indexer main.cpp CxxHelperMode.cpp CxxHelperMode.h)
 
-# mimalloc's static override lib interposes malloc/free process-wide, so every new/delete and
-# unique_ptr/shared_ptr allocation in lib_cxx (Clang AST parsing is alloc-heavy) goes through it too.
-find_package(mimalloc REQUIRED)
-target_link_libraries(Sourcetrail_indexer PRIVATE mimalloc-static)
-
 set_target_properties(Sourcetrail_indexer PROPERTIES OUTPUT_NAME sourcetrail_indexer)
 
 # Advertise the built-in C/C++ indexer as a discoverable plugin. The manifest is the only way its

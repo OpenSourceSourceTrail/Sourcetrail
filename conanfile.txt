@@ -3,7 +3,6 @@ boost/1.83.0
 expected-lite/0.8.0
 fmt/12.1.0
 grpc/1.54.3
-mimalloc/2.1.7
 spdlog/1.17.0
 sqlite3/3.36.0 # It should be replaced with qt or orm
 taskflow/3.7.0
@@ -64,9 +63,6 @@ fmt*:shared=False
 fmt*:with_fmt_alias=True
 fmt*:with_os_api=True
 fmt*:with_wchar=True
-# mimalloc: static lib with process-wide malloc/free override linked into the indexer
-mimalloc*:shared=False
-mimalloc*:override=True
 # spdlog
 spdlog*:header_only=False
 spdlog*:shared=False
