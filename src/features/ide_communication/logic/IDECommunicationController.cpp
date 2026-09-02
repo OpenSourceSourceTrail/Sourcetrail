@@ -1,14 +1,14 @@
-#include "component/controller/IDECommunicationController.h"
+#include "ide_communication/logic/IDECommunicationController.h"
 
 #include "data/location/SourceLocationFile.h"
 #include "data/storage/StorageAccess.h"
 #include "FileSystem.h"
+#include "ide_communication/messages/MessagePingReceived.h"
 #include "logging.h"
 #include "status/messages/MessageStatus.h"
 #include "tabs/messages/MessageTabOpenWith.h"
 #include "type/MessageActivateWindow.h"
 #include "type/MessageProjectNew.h"
-#include "type/plugin/MessagePingReceived.h"
 
 IDECommunicationController::IDECommunicationController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
 

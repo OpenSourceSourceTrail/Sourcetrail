@@ -5,7 +5,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/controller/IDECommunicationController.h"
+#include "ide_communication/logic/IDECommunicationController.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 

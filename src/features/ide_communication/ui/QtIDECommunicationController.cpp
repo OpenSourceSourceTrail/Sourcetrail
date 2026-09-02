@@ -1,4 +1,4 @@
-#include "qt/network/QtIDECommunicationController.h"
+#include "ide_communication/ui/QtIDECommunicationController.h"
 
 #include <functional>
 

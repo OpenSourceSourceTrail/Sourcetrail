@@ -4,9 +4,9 @@
 
 #include <gmock/gmock.h>
 
-#include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
+#include "ide_communication/ui/QtNetworkFactory.h"
 #include "MessageQueue.h"
-#include "qt/network/QtNetworkFactory.h"
+#include "MockedMessageQueue.hpp"
 
 void QtNetworkFactoryTestSuite::initTestCase() {
   testing::InitGoogleMock();

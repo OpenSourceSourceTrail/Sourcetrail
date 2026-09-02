@@ -19,6 +19,7 @@
 
 #include "data/location/SourceLocationFile.h"
 #include "error/messages/MessageShowError.h"
+#include "ide_communication/messages/MessageMoveIDECursor.h"
 #include "qt/element/code/QtCodeNavigator.h"
 #include "qt/utility/compatibilityQt.h"
 #include "qt/utility/QtContextMenu.h"
@@ -30,7 +31,6 @@
 #include "type/code/MessageActivateTokenIds.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
-#include "type/plugin/MessageMoveIDECursor.h"
 #include "utility.h"
 #include "utilityApp.h"
 #include "utilityString.h"

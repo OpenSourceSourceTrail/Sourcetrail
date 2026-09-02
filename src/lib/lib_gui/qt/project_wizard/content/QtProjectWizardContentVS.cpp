@@ -3,7 +3,7 @@
 #include <QGridLayout>
 #include <QLabel>
 
-#include "type/plugin/MessageIDECreateCDB.h"
+#include "ide_communication/messages/MessageIDECreateCDB.h"
 #include "utility/globalStrings.h"
 
 QtProjectWizardContentVS::QtProjectWizardContentVS(QtProjectWizardWindow* window) : QtProjectWizardContent(window) {}

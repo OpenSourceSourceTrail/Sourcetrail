@@ -9,8 +9,6 @@
 #include <spdlog/spdlog.h>
 
 #include "app/paths/UserPaths.h"
-#include "component/controller/IDECommunicationController.h"
-#include "component/NetworkFactory.h"
 #include "component/view/DialogView.h"
 #include "component/view/GraphViewStyle.h"
 #include "component/view/MainView.h"
@@ -19,6 +17,8 @@
 #include "error/messages/MessageFilterErrorCountUpdate.h"
 #include "factory/IFactory.hpp"
 #include "filter_types/MessageFilterFocusInOut.h"
+#include "ide_communication/logic/IDECommunicationController.h"
+#include "ide_communication/logic/NetworkFactory.h"
 #include "logging.h"
 #include "MessageQueue.h"
 #include "search/messages/MessageFilterSearchAutocomplete.h"

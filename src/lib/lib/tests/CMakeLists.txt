@@ -25,7 +25,6 @@ set(test_lib_names
     GraphTestSuite
     GraphViewStyleTestSuite # TODO(SOUR-97)
     HierarchyCacheTestSuite
-    IDECommunicationControllerTestSuite
     IncludeDirectiveTestSuite
     utilitySourceGroupCxxTestSuite
     IndexerCommandJavaTestSuite
@@ -36,7 +35,6 @@ set(test_lib_names
     IntermediateStorageTestSuite
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite
-    NetworkProtocolHelperTestSuite
     ProjectSettingsTestSuite
     ProjectTestSuite
     ResourcePathsTestSuite

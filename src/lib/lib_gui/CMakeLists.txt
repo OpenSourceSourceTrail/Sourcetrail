@@ -109,14 +109,6 @@ target_sources(
           qt/graphics/GraphFocusHandler.h
           qt/graphics/QtGraphicsView.cpp
           qt/graphics/QtGraphicsView.h
-          qt/network/QtIDECommunicationController.cpp
-          qt/network/QtIDECommunicationController.h
-          qt/network/QtNetworkFactory.cpp
-          qt/network/QtNetworkFactory.h
-          qt/network/QtRequest.cpp
-          qt/network/QtRequest.h
-          qt/network/QtTcpWrapper.cpp
-          qt/network/QtTcpWrapper.h
           qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
           qt/project_wizard/content/path/QtProjectWizardContentPath.h
           qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp

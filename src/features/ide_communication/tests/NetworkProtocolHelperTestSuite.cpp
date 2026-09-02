@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "component/controller/helper/NetworkProtocolHelper.h"
+#include "ide_communication/logic/NetworkProtocolHelper.h"
 
 TEST(NetworkProtocolHelper, parseMessage) {
   std::wstring type = L"setActiveToken";

@@ -2,12 +2,12 @@
 #include <string>
 
 #include "component/controller/Controller.h"
-#include "component/controller/helper/NetworkProtocolHelper.h"
+#include "ide_communication/logic/NetworkProtocolHelper.h"
+#include "ide_communication/messages/MessageIDECreateCDB.h"
+#include "ide_communication/messages/MessageMoveIDECursor.h"
+#include "ide_communication/messages/MessagePluginPortChange.h"
 #include "MessageListener.h"
 #include "type/MessageWindowFocus.h"
-#include "type/plugin/MessageIDECreateCDB.h"
-#include "type/plugin/MessageMoveIDECursor.h"
-#include "type/plugin/MessagePluginPortChange.h"
 
 class StorageAccess;
 

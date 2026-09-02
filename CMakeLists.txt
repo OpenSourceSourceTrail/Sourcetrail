@@ -132,7 +132,10 @@ find_package(
   COMPONENTS date_time filesystem locale program_options system
   REQUIRED)
 # Qt -----------------------------------------------------------------------------------------------------------------------------
-find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg Concurrent)
+# Test is listed here, not only in the test block further down, because feature directories under
+# src/features register their own Qt Test suites and are configured from add_subdirectory(src)
+# above that block.
+find_package(Qt6 6.10 REQUIRED COMPONENTS Widgets PrintSupport Network Svg Concurrent Test)
 # Setup --------------------------------------------------------------------------------------------------------------------------
 if(WIN32)
   include(copy_qt_binaries)

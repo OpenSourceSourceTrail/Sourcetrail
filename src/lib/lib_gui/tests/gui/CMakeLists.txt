@@ -1,7 +1,6 @@
 # ${PROJECT_SOURCE_DIR}/src/lib_gui/tests/gui/CMakeLists.txt
 set(test_lib_gui_names
     QtContextMenuTestSuite
-    QtNetworkFactoryTestSuite
     #QtSelfRefreshIconButtonTestSuite NOTE: Not working in windows
     QtStartScreenTestSuite
     #RecentItemModelTestSuite NOTE: Not working in windows

@@ -1,6 +1,6 @@
-#include "qt/network/QtNetworkFactory.h"
+#include "ide_communication/ui/QtNetworkFactory.h"
 
-#include "qt/network/QtIDECommunicationController.h"
+#include "ide_communication/ui/QtIDECommunicationController.h"
 
 QtNetworkFactory::~QtNetworkFactory() = default;
 

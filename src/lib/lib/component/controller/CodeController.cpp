@@ -9,12 +9,12 @@
 #include "data/storage/StorageAccess.h"
 #include "error/messages/MessageShowError.h"
 #include "FileInfo.h"
+#include "ide_communication/messages/MessageMoveIDECursor.h"
 #include "logging.h"
 #include "settings/IApplicationSettings.hpp"
 #include "status/messages/MessageStatus.h"
 #include "TextAccess.h"
 #include "type/focus/MessageFocusView.h"
-#include "type/plugin/MessageMoveIDECursor.h"
 #include "utility.h"
 #include "utilityString.h"
 

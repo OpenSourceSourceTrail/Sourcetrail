@@ -29,8 +29,6 @@ target_sources(
           component/controller/helper/DummyNode.h
           component/controller/helper/ListLayouter.cpp
           component/controller/helper/ListLayouter.h
-          component/controller/helper/NetworkProtocolHelper.cpp
-          component/controller/helper/NetworkProtocolHelper.h
           component/controller/helper/SnippetMerger.cpp
           component/controller/helper/SnippetMerger.h
           component/controller/helper/TrailLayouter.cpp
@@ -41,8 +39,6 @@ target_sources(
           component/controller/Controller.h
           component/controller/GraphController.cpp
           component/controller/GraphController.h
-          component/controller/IDECommunicationController.cpp
-          component/controller/IDECommunicationController.h
           component/view/helper/CodeScrollParams.h
           component/view/helper/CodeSnippetParams.cpp
           component/view/helper/CodeSnippetParams.h
@@ -75,8 +71,6 @@ target_sources(
           component/ComponentFactory.h
           component/ComponentManager.cpp
           component/ComponentManager.h
-          component/NetworkFactory.cpp
-          component/NetworkFactory.h
           component/Tab.cpp
           component/Tab.h
           data/graph/token_component/TokenComponent.cpp
