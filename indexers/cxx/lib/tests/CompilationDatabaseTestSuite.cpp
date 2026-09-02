@@ -1,9 +1,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "project/CompilationDatabase.h"
 #include "project/CxxToolchainLocal.h"
-#include "project/ICxxToolchain.h"
+#include "project/logic/CompilationDatabase.h"
+#include "project/logic/ICxxToolchain.h"
 #include "ScopedTemporaryFile.hpp"
 
 using namespace testing;

@@ -48,7 +48,7 @@ foreach(test_name IN LISTS test_lib_names)
   add_sourcetrail_test(
     NAME ${test_name}
     SOURCES ${test_name}.cpp
-    DEPS lib_test_utilities lib::mocks Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess Qt6::Gui
+    DEPS lib_test_utilities lib::mocks Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess
     TEST_PREFIX "unittests.lib.")
 
   target_compile_definitions(${test_name} PUBLIC ST_TESTING=1)

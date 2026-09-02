@@ -9,7 +9,7 @@
 #include "app/LanguagePackageManager.h"
 #include "app/paths/AppPath.h"
 #include "app/paths/UserPaths.h"
-#include "data/indexer/grpc/GrpcIndexer.h"
+#include "indexing/logic/grpc/GrpcIndexer.h"
 #include "language_packages.h"
 #include "logging.h"
 #include "settings/details/ApplicationSettings.h"
@@ -19,7 +19,7 @@
 #  include "CxxHelperMode.h"
 #  include "LanguagePackageCxx.h"
 #  include "project/CxxToolchainLocal.h"
-#  include "project/ICxxToolchain.h"
+#  include "project/logic/ICxxToolchain.h"
 #endif
 
 #ifdef _WIN32

@@ -98,6 +98,7 @@ target_sources(
           data/storage/StorageProvider.cpp
           data/storage/StorageProvider.h
           data/storage/StorageStats.h
+          data/storage/StorageVersion.h
           data/TaskInjectStorage.cpp
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
@@ -195,21 +196,25 @@ target_link_libraries(
   PUBLIC Sourcetrail::lib::messaging
          Sourcetrail::lib::proto::api
          Sourcetrail::lib::proto::convert
-         gRPC::grpc++
          Sourcetrail::lib::core::utility::ConfigManager
          Sourcetrail::lib::core::utility::LowMemoryStringMap
          Sourcetrail::lib::core::utility::OrderedCache
+         # scheduling stays PUBLIC: ControllerProxy.h, a public Logic header every Qt view includes,
+         # takes a TaskLambda by value. Demoting it needs that header to stop naming Task first.
+         Sourcetrail::lib::scheduling
          Sourcetrail::lib::core::utility::Status
+         Sourcetrail::lib::core::utility::TimeStamp
          Sourcetrail::lib::core::utility::Tree
          Sourcetrail::lib::core::utility::utility
          Sourcetrail::lib::core::utility::Migration
          Sourcetrail::lib::core::utility::Migrator
+         Sourcetrail::lib::core::utility::file::FileInfo
          Sourcetrail::lib::core::utility::file::FilePath
          Sourcetrail::lib::core::utility::file::FilePathFilter
          Sourcetrail::lib::core::utility::toUnderlying
-         Sourcetrail::lib::scheduling
          nonstd::expected-lite
   PRIVATE Sourcetrail::lib::core
+          gRPC::grpc++
           Sourcetrail::lib::core::utility::rangesTo
           Sourcetrail::lib::core::utility::ConfigManager
           Sourcetrail::lib::core::utility::logging
@@ -265,6 +270,9 @@ target_sources(
 
 target_link_libraries(
   Sourcetrail_lib_engine
+  # CppSQLite stays PUBLIC: SqliteStorage.h -- a public header -- includes CppSQLite3.h, which is
+  # what the TODO(Hussein) at the top of that file is about. Demoting it to PRIVATE breaks every
+  # consumer that includes SqliteStorage.h; it can move once that header stops leaking the type.
   PUBLIC Sourcetrail::lib::lib CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::lib::core
           Sourcetrail::lib::core::utility::logging

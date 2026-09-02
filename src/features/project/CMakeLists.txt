@@ -136,7 +136,7 @@ if(ENABLE_UNIT_TEST)
     add_sourcetrail_test(
       NAME ${test_name}
       SOURCES tests/${test_name}.cpp
-      DEPS lib_test_utilities lib::mocks Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess Qt6::Gui
+      DEPS lib_test_utilities lib::mocks Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess
            Sourcetrail::lib::proto::convert
       TEST_PREFIX "unittests.lib.")
 

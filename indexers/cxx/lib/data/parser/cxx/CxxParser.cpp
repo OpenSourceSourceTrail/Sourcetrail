@@ -12,7 +12,6 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/VirtualFileSystem.h>
 // internal
-#include "data/indexer/IndexerCommandCxx.h"
 #include "data/parser/cxx/ASTAction.h"
 #include "data/parser/cxx/CanonicalFilePathCache.h"
 #include "data/parser/cxx/ClangInvocationInfo.h"
@@ -22,6 +21,7 @@
 #include "data/parser/ParserClient.h"
 #include "FilePath.h"
 #include "FileRegister.h"
+#include "indexing/logic/IndexerCommandCxx.h"
 #include "logging.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TextAccess.h"

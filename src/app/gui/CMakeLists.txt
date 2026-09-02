@@ -30,14 +30,15 @@ endif()
 
 target_link_libraries(
   Sourcetrail
-  PUBLIC Sourcetrail::lib::core
+  # An executable is nobody's dependency, so PUBLIC/PRIVATE make no difference here. PRIVATE says so.
+  PRIVATE Sourcetrail::lib::core
          Sourcetrail::lib::lib
          Sourcetrail::lib::lib_gui
          Sourcetrail::lib::client
          Sourcetrail::app::engine_host
          Qt6::Widgets
          Qt6::Network
-  PRIVATE Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::ScopedFunctor
+          Sourcetrail::lib::core::utility::logging Sourcetrail::lib::core::utility::ScopedFunctor
           Sourcetrail::lib::core::utility::utilityApp Sourcetrail::lib::core::utility::commandline::CommandLineParser
           Sourcetrail::lib::proto::convert Sourcetrail::lib::utility::PathDetection)
 
