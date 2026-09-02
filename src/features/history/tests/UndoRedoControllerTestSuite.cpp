@@ -5,16 +5,16 @@
 #include <gtest/gtest.h>
 
 #include "component/ComponentFactory.h"
-#include "component/controller/UndoRedoController.h"
-#include "component/view/UndoRedoView.h"
+#include "history/logic/UndoRedoController.h"
+#include "history/logic/UndoRedoView.h"
+#include "history/messages/MessageHistoryRedo.h"
+#include "history/messages/MessageHistoryUndo.h"
+#include "history/tests/MockedUndoRedoView.hpp"
 #include "mocks/HeadlessApplicationFixture.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "type/activation/MessageActivateLegend.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryUndo.h"
 
 using namespace testing;
 

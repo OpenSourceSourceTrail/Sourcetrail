@@ -63,7 +63,6 @@ set(test_lib_names
     TaskBuildIndexTestSuite
     TimeStampTestSuite
     TooltipControllerTestSuite
-    UndoRedoControllerTestSuite
     TreeTestSuite
     UserPathsTestSuite)
 

@@ -2,9 +2,9 @@
 
 #include <fmt/format.h>
 
+#include "bookmark/logic/BookmarkButtonsView.h"
 #include "component/controller/Controller.h"
 #include "component/controller/ScreenSearchController.h"
-#include "bookmark/logic/BookmarkButtonsView.h"
 #include "component/view/CodeView.h"
 #include "component/view/CompositeView.h"
 #include "component/view/DialogView.h"
@@ -12,8 +12,8 @@
 #include "component/view/RefreshView.h"
 #include "component/view/SearchView.h"
 #include "component/view/TabbedView.h"
-#include "component/view/UndoRedoView.h"
 #include "component/view/ViewFactory.h"
+#include "history/logic/UndoRedoView.h"
 #include "logging.h"
 
 namespace {

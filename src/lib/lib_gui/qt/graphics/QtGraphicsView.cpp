@@ -11,6 +11,9 @@
 #include <QTimer>
 
 #include "app/paths/ResourcePaths.h"
+#include "bookmark/messages/MessageBookmarkCreate.h"
+#include "history/messages/MessageHistoryRedo.h"
+#include "history/messages/MessageHistoryUndo.h"
 #include "qt/element/button/QtSelfRefreshIconButton.h"
 #include "qt/graphics/graph/QtGraphEdge.h"
 #include "qt/graphics/graph/QtGraphNode.h"
@@ -23,13 +26,10 @@
 #include "qt/utility/utilityQt.h"
 #include "settings/IApplicationSettings.hpp"
 #include "type/activation/MessageActivateLegend.h"
-#include "bookmark/messages/MessageBookmarkCreate.h"
 #include "type/code/MessageCodeShowDefinition.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/graph/MessageGraphNodeExpand.h"
 #include "type/graph/MessageGraphNodeHide.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryUndo.h"
 #include "type/tab/MessageTabOpenWith.h"
 #include "utilityApp.h"
 

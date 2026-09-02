@@ -2,9 +2,10 @@
 
 #include <memory>
 
+#include "bookmark/logic/BookmarkController.h"
+#include "bookmark/logic/BookmarkView.h"
 #include "component/Component.h"
 #include "component/controller/ActivationController.h"
-#include "bookmark/logic/BookmarkController.h"
 #include "component/controller/CodeController.h"
 #include "component/controller/CustomTrailController.h"
 #include "component/controller/ErrorController.h"
@@ -16,8 +17,6 @@
 #include "component/controller/StatusController.h"
 #include "component/controller/TabsController.h"
 #include "component/controller/TooltipController.h"
-#include "component/controller/UndoRedoController.h"
-#include "bookmark/logic/BookmarkView.h"
 #include "component/view/CodeView.h"
 #include "component/view/CustomTrailView.h"
 #include "component/view/ErrorView.h"
@@ -29,8 +28,9 @@
 #include "component/view/StatusView.h"
 #include "component/view/TabsView.h"
 #include "component/view/TooltipView.h"
-#include "component/view/UndoRedoView.h"
 #include "component/view/ViewFactory.h"
+#include "history/logic/UndoRedoController.h"
+#include "history/logic/UndoRedoView.h"
 
 ComponentFactory::ComponentFactory(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : m_viewFactory(viewFactory), m_storageAccess(storageAccess) {}

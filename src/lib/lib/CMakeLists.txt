@@ -66,8 +66,6 @@ target_sources(
           component/controller/TabsController.h
           component/controller/TooltipController.cpp
           component/controller/TooltipController.h
-          component/controller/UndoRedoController.cpp
-          component/controller/UndoRedoController.h
           component/view/helper/CodeScrollParams.h
           component/view/helper/CodeSnippetParams.cpp
           component/view/helper/CodeSnippetParams.h
@@ -104,8 +102,6 @@ target_sources(
           component/view/TabsView.h
           component/view/TooltipView.cpp
           component/view/TooltipView.h
-          component/view/UndoRedoView.cpp
-          component/view/UndoRedoView.h
           component/view/View.cpp
           component/view/View.h
           component/view/ViewFactory.h

@@ -1,9 +1,10 @@
 #include "qt/view/QtViewFactory.h"
 
-#include "component/view/GraphViewStyle.h"
-#include "qt/utility/utilityQt.h"
 #include "bookmark/ui/QtBookmarkButtonsView.h"
 #include "bookmark/ui/QtBookmarkView.h"
+#include "component/view/GraphViewStyle.h"
+#include "history/ui/QtUndoRedoView.h"
+#include "qt/utility/utilityQt.h"
 #include "qt/view/QtCodeView.h"
 #include "qt/view/QtCompositeView.h"
 #include "qt/view/QtCustomTrailView.h"
@@ -20,7 +21,6 @@
 #include "qt/view/QtTabbedView.h"
 #include "qt/view/QtTabsView.h"
 #include "qt/view/QtTooltipView.h"
-#include "qt/view/QtUndoRedoView.h"
 
 QtViewFactory::QtViewFactory() = default;
 

@@ -10,3 +10,4 @@ foreach(tier_target IN ITEMS Sourcetrail_lib Sourcetrail_lib_engine Sourcetrail_
 endforeach()
 
 add_subdirectory(bookmark)
+add_subdirectory(history)

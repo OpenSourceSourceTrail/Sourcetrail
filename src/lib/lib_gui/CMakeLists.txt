@@ -45,10 +45,6 @@ target_sources(
           qt/element/code/QtCodeNavigator.h
           qt/element/code/QtCodeSnippet.cpp
           qt/element/code/QtCodeSnippet.h
-          qt/element/history/QtHistoryList.cpp
-          qt/element/history/QtHistoryList.h
-          qt/element/history/QtUndoRedo.cpp
-          qt/element/history/QtUndoRedo.h
           qt/element/search/QtAutocompletionList.cpp
           qt/element/search/QtAutocompletionList.h
           qt/element/search/QtScreenSearchBox.cpp
@@ -223,8 +219,6 @@ target_sources(
           qt/view/QtTooltipView.h
           qt/view/QtTabsView.cpp
           qt/view/QtTabsView.h
-          qt/view/QtUndoRedoView.cpp
-          qt/view/QtUndoRedoView.h
           qt/view/QtViewFactory.cpp
           qt/view/QtViewFactory.h
           qt/view/QtViewWidgetWrapper.cpp

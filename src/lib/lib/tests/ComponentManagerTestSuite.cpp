@@ -3,10 +3,11 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "bookmark/tests/MockedBookmarkButtonsView.hpp"
 #include "component/ComponentManager.h"
+#include "history/tests/MockedUndoRedoView.hpp"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
-#include "bookmark/tests/MockedBookmarkButtonsView.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedGraphView.hpp"
@@ -14,7 +15,6 @@
 #include "mocks/MockedScreenSearchView.hpp"
 #include "mocks/MockedSearchView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "settings/IApplicationSettings.hpp"

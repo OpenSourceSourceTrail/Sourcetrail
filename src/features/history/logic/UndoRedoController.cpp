@@ -1,8 +1,8 @@
-#include "component/controller/UndoRedoController.h"
+#include "history/logic/UndoRedoController.h"
 
 #include "app/Application.h"
-#include "component/view/UndoRedoView.h"
 #include "data/storage/StorageAccess.h"
+#include "history/logic/UndoRedoView.h"
 #include "project/IProject.hpp"
 #include "type/MessageFlushUpdates.h"
 #include "type/search/MessageSearch.h"

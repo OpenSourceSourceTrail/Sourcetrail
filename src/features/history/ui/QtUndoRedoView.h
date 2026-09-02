@@ -4,8 +4,8 @@
 #include <memory>
 #include <string>
 
-#include "component/view/UndoRedoView.h"
-#include "qt/element/history/QtUndoRedo.h"
+#include "history/logic/UndoRedoView.h"
+#include "history/ui/QtUndoRedo.h"
 #include "qt/utility/QtThreadedFunctor.h"
 
 class QtUndoRedoView : public UndoRedoView {

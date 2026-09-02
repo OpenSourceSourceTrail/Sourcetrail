@@ -1,14 +1,14 @@
-#include "qt/element/history/QtUndoRedo.h"
+#include "history/ui/QtUndoRedo.h"
 
 #include <QHBoxLayout>
 #include <QTimer>
 
 #include "app/paths/ResourcePaths.h"
-#include "qt/element/history/QtHistoryList.h"
+#include "history/messages/MessageHistoryRedo.h"
+#include "history/messages/MessageHistoryUndo.h"
+#include "history/ui/QtHistoryList.h"
 #include "qt/element/search/QtSearchBarButton.h"
 #include "qt/utility/QtContextMenu.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryUndo.h"
 
 QtUndoRedo::QtUndoRedo() : m_pressed(false), m_historyList(nullptr), m_historyHiddenAt(TimeStamp::now()) {
   setObjectName(QStringLiteral("undo_redo_bar"));

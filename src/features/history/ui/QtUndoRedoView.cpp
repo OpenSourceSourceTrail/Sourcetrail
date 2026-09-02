@@ -1,4 +1,4 @@
-#include "qt/view/QtUndoRedoView.h"
+#include "history/ui/QtUndoRedoView.h"
 
 #include "app/paths/ResourcePaths.h"
 #include "qt/utility/utilityQt.h"

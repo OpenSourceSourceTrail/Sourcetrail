@@ -1,4 +1,4 @@
-#include "qt/element/history/QtHistoryList.h"
+#include "history/ui/QtHistoryList.h"
 
 #include <QBoxLayout>
 #include <QLabel>
@@ -7,10 +7,10 @@
 
 #include "app/paths/ResourcePaths.h"
 #include "component/view/GraphViewStyle.h"
+#include "history/messages/MessageHistoryToPosition.h"
 #include "qt/utility/QtDeviceScaledPixmap.h"
 #include "qt/utility/utilityQt.h"
 #include "settings/ColorScheme.h"
-#include "type/history/MessageHistoryToPosition.h"
 #include "type/tab/MessageTabOpenWith.h"
 #include "utilityString.h"
 

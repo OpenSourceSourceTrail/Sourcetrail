@@ -13,6 +13,8 @@
 #include "data/location/SourceLocation.h"
 #include "data/location/SourceLocationCollection.h"
 #include "data/location/SourceLocationFile.h"
+#include "history/messages/MessageHistoryRedo.h"
+#include "history/messages/MessageHistoryUndo.h"
 #include "logging.h"
 #include "qt/element/code/CodeFocusHandler.h"
 #include "qt/element/code/QtCodeArea.h"
@@ -26,8 +28,6 @@
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageToNextCodeReference.h"
 #include "type/focus/MessageFocusView.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryUndo.h"
 #include "type/tab/MessageTabOpenWith.h"
 #include "utility.h"
 

@@ -4,6 +4,9 @@
 #include <list>
 
 #include "component/controller/Controller.h"
+#include "history/messages/MessageHistoryRedo.h"
+#include "history/messages/MessageHistoryToPosition.h"
+#include "history/messages/MessageHistoryUndo.h"
 #include "MessageBase.h"
 #include "MessageListener.h"
 #include "type/activation/MessageActivateErrors.h"
@@ -27,9 +30,6 @@
 #include "type/graph/MessageGraphNodeHide.h"
 #include "type/graph/MessageGraphNodeMove.h"
 #include "type/graph/MessageScrollGraph.h"
-#include "type/history/MessageHistoryRedo.h"
-#include "type/history/MessageHistoryToPosition.h"
-#include "type/history/MessageHistoryUndo.h"
 #include "type/indexing//MessageIndexingFinished.h"
 #include "type/MessageRefreshUIState.h"
 
