@@ -20,10 +20,6 @@ set(test_lib_names
     DialogViewTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
-    GraphControllerTestSuite
-    GraphTestSuite
-    GraphViewStyleTestSuite # TODO(SOUR-97)
-    HierarchyCacheTestSuite
     IncludeDirectiveTestSuite
     IndexerWireEnumsTestSuite
     IndexerPluginRegistryTestSuite

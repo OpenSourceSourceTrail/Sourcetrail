@@ -1,0 +1,480 @@
+#include "graph/logic/BucketLayouter.h"
+
+#include "graph/logic/DummyEdge.h"
+#include "graph/logic/GraphViewStyle.h"
+
+Bucket::Bucket() = default;
+
+Bucket::Bucket(int i_, int j_) : i(i_), j(j_) {}
+
+int Bucket::getWidth() const {
+  return m_width;
+}
+
+int Bucket::getHeight() const {
+  return m_height;
+}
+
+bool Bucket::hasNode(std::shared_ptr<DummyNode> node) const {
+  for(const std::shared_ptr<DummyNode>& n : m_nodes) {
+    if(node == n) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+void Bucket::addNode(std::shared_ptr<DummyNode> node) {
+  m_nodes.insert(node);
+
+  m_width = (node->size.x > static_cast<float>(m_width) ? static_cast<int>(node->size.x) : m_width);
+  m_height += GraphViewStyle::toGridSize(static_cast<int>(node->size.y)) + GraphViewStyle::s_gridCellPadding;
+}
+
+const DummyNode::BundledNodesSet& Bucket::getNodes() const {
+  return m_nodes;
+}
+
+void Bucket::preLayout(Vec2f viewSize, bool addVerticalSplit, bool forceVerticalSplit) {
+  int cols = (viewSize.y > 0.0f ? static_cast<int>(static_cast<float>(m_height) / viewSize.y) : 0) + 1;
+
+  int x = 0;
+  int y = 0;
+  int height = m_height / cols;
+  int width = 0;
+
+  m_height = 0;
+
+  std::vector<int> colWidths;
+  std::vector<int> colHeights;
+  std::vector<std::vector<DummyNode*>> nodesInCol;
+  nodesInCol.push_back({});
+
+  int heightDiff = 0;
+  for(const std::shared_ptr<DummyNode>& node : m_nodes) {
+    if(y > height + heightDiff) {
+      // keep adding to the same columns if it only contains 1 element, which will end up
+      // above the middle split
+      if(nodesInCol.back().size() == 1 && m_nodes.size() > 1 && addVerticalSplit | forceVerticalSplit) {
+        heightDiff = y;
+      } else {
+        colHeights.push_back(y - GraphViewStyle::s_gridCellPadding);
+        colWidths.push_back(width);
+
+        y = 0;
+        x += GraphViewStyle::toGridOffset(width + 45);
+        width = 0;
+
+        nodesInCol.push_back({});
+
+        heightDiff = 0;
+      }
+    }
+
+    node->position.x = static_cast<float>(x);
+    node->position.y = static_cast<float>(y);
+
+    nodesInCol.back().push_back(node.get());
+
+    y += GraphViewStyle::toGridSize(static_cast<int>(node->size.y)) + GraphViewStyle::s_gridCellPadding;
+
+    width = std::max(width, static_cast<int>(node->size.x));
+    m_height = std::max(m_height, y);
+  }
+
+  colHeights.push_back(y - GraphViewStyle::s_gridCellPadding);
+  colWidths.push_back(width);
+
+  m_width = x + width;
+  m_height -= GraphViewStyle::s_gridCellPadding;
+
+  for(size_t idx = 0; idx < nodesInCol.size(); idx++) {
+    for(DummyNode* node : nodesInCol[idx]) {
+      node->columnSize.x = static_cast<float>(colWidths[idx]);
+      node->columnSize.y = static_cast<float>(colHeights[idx]);
+    }
+  }
+
+  m_colWidths = std::move(colWidths);
+
+  addVerticalSplit &= nodesInCol.size() > 1 || forceVerticalSplit;
+  if(!addVerticalSplit) {
+    return;
+  }
+
+  // align each column vertically and leave a gap in the middle where edges can pass through
+  // NOTE: m_height is not gonna be correct after this, but stays unchanged to allow correct
+  // positioning next to active node.
+  int nodeOffset = GraphViewStyle::s_gridCellPadding + GraphViewStyle::s_gridCellSize;
+
+  for(size_t idx = 0; idx < nodesInCol.size(); idx++) {
+    int offset = 0;
+    bool hasOffset = false;
+    int mid = colHeights[idx] / 2;
+
+    std::vector<DummyNode*> aboveNodes;
+    std::vector<DummyNode*> belowNodes;
+
+    int aboveNodesMaxWidth = 0;
+    int belowNodesMaxWidth = 0;
+
+    for(DummyNode* node : nodesInCol[idx]) {
+      bool above = true;
+
+      if(hasOffset) {
+        above = false;
+      } else if(nodesInCol[idx].size() == 1) {
+        offset -= static_cast<int>((node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding)) / 2);
+      } else if(node->position.y < static_cast<float>(mid) && node->position.y + node->size.y > static_cast<float>(mid)) {
+        if(static_cast<float>(mid) - node->position.y < (node->position.y + node->size.y) - static_cast<float>(mid)) {
+          offset = static_cast<int>(static_cast<float>(mid) - node->position.y +
+                                    static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2);
+          above = false;
+        } else {
+          offset = static_cast<int>(static_cast<float>(mid) - (node->position.y + node->size.y) -
+                                    static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2);
+        }
+        hasOffset = true;
+      } else if(node->position.y + node->size.y < static_cast<float>(mid) &&
+                static_cast<float>(mid) < node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding)) {
+        offset = static_cast<int>(static_cast<float>(mid) -
+                                  (node->position.y + node->size.y + static_cast<float>(GraphViewStyle::s_gridCellPadding) / 2));
+        hasOffset = true;
+      }
+
+      if(above) {
+        aboveNodes.push_back(node);
+        aboveNodesMaxWidth = std::max(aboveNodesMaxWidth, static_cast<int>(node->size.x));
+      } else {
+        belowNodes.push_back(node);
+        belowNodesMaxWidth = std::max(belowNodesMaxWidth, static_cast<int>(node->size.x));
+      }
+    }
+
+    offset += (m_height - colHeights[idx]) / 2;
+    for(DummyNode* node : aboveNodes) {
+      node->position.y += static_cast<float>(offset - nodeOffset);
+      node->columnSize.x = static_cast<float>(aboveNodesMaxWidth);
+    }
+    for(DummyNode* node : belowNodes) {
+      node->position.y += static_cast<float>(offset + nodeOffset);
+      node->columnSize.x = static_cast<float>(belowNodesMaxWidth);
+    }
+  }
+}
+
+void Bucket::layout(int x, int y, int width, int height) {
+  if(!m_nodes.size()) {
+    return;
+  }
+
+  Vec2f offset{.x = static_cast<float>(x + (width - m_width) / 2), .y = static_cast<float>(y + (height - m_height) / 2)};
+  offset = GraphViewStyle::alignOnRaster((*m_nodes.begin())->position + offset) - (*m_nodes.begin())->position;
+
+  for(const std::shared_ptr<DummyNode>& node : m_nodes) {
+    node->position += offset;
+  }
+}
+
+const std::vector<int> Bucket::getColWidths() const {
+  return m_colWidths;
+}
+
+int Bucket::getMiddleGapX() const {
+  int middleGapX = 0;
+  int dist = getWidth() / 2;
+
+  for(int colWidth : m_colWidths) {
+    int gapX = middleGapX + GraphViewStyle::toGridOffset(colWidth + 45);
+    int d = std::abs(getWidth() / 2 - gapX);
+    if(d < dist) {
+      dist = d;
+      middleGapX = gapX;
+    }
+  }
+
+  return middleGapX;
+}
+
+
+BucketLayouter::BucketLayouter(Vec2f viewSize) : m_viewSize(viewSize), m_i1(0), m_j1(0), m_i2(0), m_j2(0) {
+  m_buckets[0][0] = Bucket(0, 0);
+}
+
+void BucketLayouter::createBuckets(std::vector<std::shared_ptr<DummyNode>>& nodes,
+                                   const std::vector<std::shared_ptr<DummyEdge>>& edges) {
+  if(!nodes.size()) {
+    return;
+  }
+
+  bool activeNodeAdded = false;
+  for(std::shared_ptr<DummyNode>& node : nodes) {
+    if(node->hasActiveSubNode() || !edges.size()) {
+      getBucket(0, 0)->addNode(node);
+
+      node->bundleInfo.layoutVertical = false;
+      activeNodeAdded = true;
+      m_activeParentNode = node.get();
+    }
+  }
+
+  if(!edges.size()) {
+    return;
+  }
+
+  if(!activeNodeAdded) {
+    getBucket(0, 0)->addNode(nodes[0]);
+  }
+
+  std::deque<std::shared_ptr<DummyEdge>> remainingEdges(edges.begin(), edges.end());
+  size_t skipCount = 0;
+  bool force = false;
+
+  while(remainingEdges.size()) {
+    if(skipCount == remainingEdges.size()) {
+      force = true;
+    }
+
+    std::shared_ptr<DummyEdge> edge = remainingEdges.front();
+    remainingEdges.pop_front();
+
+    std::shared_ptr<DummyNode> owner = findTopMostDummyNodeRecursive(nodes, edge->ownerId, nullptr);
+    std::shared_ptr<DummyNode> target = findTopMostDummyNodeRecursive(nodes, edge->targetId, nullptr);
+
+    bool horizontal = true;
+
+    if(owner && target && owner != target && owner->getsLayouted() && target->getsLayouted()) {
+      horizontal = !owner->bundleInfo.layoutVertical && !target->bundleInfo.layoutVertical;
+
+      if(!horizontal) {
+        if((owner->bundleInfo.layoutVertical && owner->bundleInfo.isReferenced) ||
+           (target->bundleInfo.layoutVertical && target->bundleInfo.isReferencing)) {
+          std::swap(owner, target);
+        }
+      } else if(edge->getDirection() == TokenComponentBundledEdges::DIRECTION_BACKWARD ||
+                // put nodes with bidirectional edges on the left
+                (edge->getDirection() == TokenComponentBundledEdges::DIRECTION_NONE && !target->bundleInfo.isReferencing &&
+                 !target->bundleInfo.isReferenced)) {
+        std::swap(owner, target);
+      }
+
+      Bucket* ownerBucket = getBucket(owner);
+      Bucket* targetBucket = getBucket(target);
+
+      if(!ownerBucket && !targetBucket) {
+        if(force) {
+          ownerBucket = getBucket(0, 0);
+          ownerBucket->addNode(owner);
+        } else {
+          remainingEdges.push_back(edge);
+          skipCount++;
+          continue;
+        }
+      }
+
+      if(ownerBucket && targetBucket) {
+        horizontal = (ownerBucket->j == targetBucket->j);
+      } else if(ownerBucket) {
+        int i = horizontal ? ownerBucket->i + 1 : ownerBucket->i;
+        int j = horizontal ? ownerBucket->j : ownerBucket->j - 1;
+
+        getBucket(i, j)->addNode(target);
+      } else {
+        int i = horizontal ? targetBucket->i - 1 : targetBucket->i;
+        int j = horizontal ? targetBucket->j : targetBucket->j + 1;
+
+        getBucket(i, j)->addNode(owner);
+      }
+
+      skipCount = 0;
+    }
+
+    edge->layoutHorizontal = horizontal;
+  }
+}
+
+void BucketLayouter::layoutBuckets(bool addVerticalSplit) {
+  std::map<int, int> widths;
+  std::map<int, int> heights;
+
+  int maxMidWidth = 0;
+  int maxMidWidthJ = m_j1;
+
+  for(int j = m_j1; j <= m_j2; j++) {
+    for(int i = m_i1; i <= m_i2; i++) {
+      Bucket* bucket = &m_buckets[j][i];
+
+      bucket->preLayout(m_viewSize, i != 0, addVerticalSplit);
+
+      std::map<int, int>::iterator wt = widths.find(i);
+      if(wt == widths.end() || wt->second < bucket->getWidth()) {
+        widths[i] = bucket->getWidth();
+      }
+
+      std::map<int, int>::iterator ht = heights.find(j);
+      if(ht == heights.end() || ht->second < bucket->getHeight()) {
+        heights[j] = bucket->getHeight();
+      }
+
+      if(i == 0 && bucket->getWidth() > maxMidWidth) {
+        maxMidWidth = bucket->getWidth();
+        maxMidWidthJ = j;
+      }
+    }
+  }
+
+  int verticalOffset = 0;
+  if(m_activeParentNode) {
+    LayoutRect rect = m_activeParentNode->getActiveSubNodeRect();
+    verticalOffset = static_cast<int>((rect.top + rect.bottom - m_activeParentNode->size.y) / 2);
+  }
+
+  // Calculate x offsets in the middle column to align all columns in each bucket at the column
+  // gap closest to the middle to avoid weird edge routing.
+  std::map<int, int> xOffs;
+  std::map<int, int> xOffsFront;
+  bool useFront = false;
+
+  Bucket* maxWidthBucket = &m_buckets[maxMidWidthJ][0];
+  int maxWidthMiddleGapX = maxWidthBucket->getMiddleGapX();
+
+  for(int j = m_j1; j <= m_j2; j++) {
+    Bucket* bucket = &m_buckets[j][0];
+
+    // only align if max width bucket has multiple columns
+    if(j != maxMidWidthJ && maxWidthBucket->getColWidths().size() > 1) {
+      int xOff = maxWidthMiddleGapX - bucket->getMiddleGapX() - (widths[0] - bucket->getWidth()) / 2;
+
+      xOffs[j] = xOff;
+      xOffsFront[j] = (bucket->getWidth() - widths[0]) / 2;
+
+      // move to front if moving to column gap would be further away
+      if(std::abs((widths[0] - bucket->getWidth()) / 2) < std::abs(xOff)) {
+        useFront = true;
+      }
+    } else {
+      xOffs[j] = 0;
+      xOffsFront[j] = 0;
+    }
+  }
+
+  if(useFront) {
+    xOffs = xOffsFront;
+  }
+
+  int y = 0;
+  for(int j = m_j1; j <= m_j2; j++) {
+    int x = 0;
+    for(int i = m_i1; i <= m_i2; i++) {
+      Bucket* bucket = &m_buckets[j][i];
+
+      int xOff = 0;
+      int yOff = 0;
+
+      // move buckets over or below the middle one closer
+      if(i == 0 && (j == -1 || j == 1)) {
+        Bucket* midBucket = &m_buckets[0][0];
+        yOff = (heights[0] - midBucket->getHeight()) / 2 * -j;
+      }
+      // align buckets left and right of center to be vertically centered next to the active node
+      else if(j == 0 && i != 0 && verticalOffset != 0) {
+        yOff = verticalOffset;
+      }
+
+      if(i == 0) {
+        xOff = xOffs[j];
+      }
+
+      bucket->layout(x + xOff, y + yOff, widths[i], heights[j]);
+      x += widths[i] + GraphViewStyle::toGridGap(110);
+    }
+
+    y += heights[j] + GraphViewStyle::toGridGap(70);
+  }
+}
+
+std::vector<std::shared_ptr<DummyNode>> BucketLayouter::getSortedNodes() {
+  std::vector<std::shared_ptr<DummyNode>> sortedNodes;
+
+  for(int j = m_j1; j <= m_j2; j++) {
+    for(int i = m_i1; i <= m_i2; i++) {
+      DummyNode::BundledNodesSet nodes = m_buckets[j][i].getNodes();
+      sortedNodes.insert(sortedNodes.end(), nodes.begin(), nodes.end());
+    }
+  }
+
+  return sortedNodes;
+}
+
+std::shared_ptr<DummyNode> BucketLayouter::findTopMostDummyNodeRecursive(std::vector<std::shared_ptr<DummyNode>>& nodes,
+                                                                         Id tokenId,
+                                                                         std::shared_ptr<DummyNode> top) {
+  for(const std::shared_ptr<DummyNode>& node : nodes) {
+    std::shared_ptr<DummyNode> t = (top ? top : node);
+
+    if(node->visible && node->tokenId == tokenId) {
+      return t;
+    }
+
+    std::shared_ptr<DummyNode> result = findTopMostDummyNodeRecursive(node->subNodes, tokenId, t);
+    if(result != nullptr) {
+      return result;
+    }
+  }
+
+  return nullptr;
+}
+
+Bucket* BucketLayouter::getBucket(int i, int j) {
+  bool newColumn = false;
+  bool newRow = false;
+
+  if(i == m_i1 - 1) {
+    m_i1 = i;
+    newColumn = true;
+  } else if(i == m_i2 + 1) {
+    m_i2 = i;
+    newColumn = true;
+  }
+
+  if(newColumn) {
+    for(int cj = m_j1; cj <= m_j2; cj++) {
+      m_buckets[cj][i] = Bucket(i, cj);
+    }
+  }
+
+  if(j == m_j1 - 1) {
+    m_j1 = j;
+    newRow = true;
+  } else if(j == m_j2 + 1) {
+    m_j2 = j;
+    newRow = true;
+  }
+
+  if(newRow) {
+    for(int ci = m_i1; ci <= m_i2; ci++) {
+      m_buckets[j][ci] = Bucket(ci, j);
+    }
+  }
+
+  if(i >= m_i1 && i <= m_i2 && j >= m_j1 && j <= m_j2) {
+    return &m_buckets[j][i];
+  }
+
+  return nullptr;
+}
+
+Bucket* BucketLayouter::getBucket(std::shared_ptr<DummyNode> node) {
+  for(int j = m_j1; j <= m_j2; j++) {
+    for(int i = m_i1; i <= m_i2; i++) {
+      Bucket* bucket = &m_buckets[j][i];
+
+      if(bucket->hasNode(node)) {
+        return bucket;
+      }
+    }
+  }
+
+  return nullptr;
+}

@@ -47,46 +47,6 @@ target_sources(
           qt/element/dialog/QtTextEdit.h
           qt/element/QtTable.cpp
           qt/element/QtTable.h
-          qt/graphics/base/QtCountCircleItem.cpp
-          qt/graphics/base/QtCountCircleItem.h
-          qt/graphics/base/QtLineItemAngled.cpp
-          qt/graphics/base/QtLineItemAngled.h
-          qt/graphics/base/QtLineItemBase.cpp
-          qt/graphics/base/QtLineItemBase.h
-          qt/graphics/base/QtLineItemBezier.cpp
-          qt/graphics/base/QtLineItemBezier.h
-          qt/graphics/base/QtLineItemStraight.cpp
-          qt/graphics/base/QtLineItemStraight.h
-          qt/graphics/base/QtRoundedRectItem.cpp
-          qt/graphics/base/QtRoundedRectItem.h
-          qt/graphics/component/QtGraphNodeComponent.cpp
-          qt/graphics/component/QtGraphNodeComponent.h
-          qt/graphics/component/QtGraphNodeComponentClickable.cpp
-          qt/graphics/component/QtGraphNodeComponentClickable.h
-          qt/graphics/component/QtGraphNodeComponentMoveable.cpp
-          qt/graphics/component/QtGraphNodeComponentMoveable.h
-          qt/graphics/graph/QtGraphEdge.cpp
-          qt/graphics/graph/QtGraphEdge.h
-          qt/graphics/graph/QtGraphNode.cpp
-          qt/graphics/graph/QtGraphNode.h
-          qt/graphics/graph/QtGraphNodeAccess.cpp
-          qt/graphics/graph/QtGraphNodeAccess.h
-          qt/graphics/graph/QtGraphNodeBundle.cpp
-          qt/graphics/graph/QtGraphNodeBundle.h
-          qt/graphics/graph/QtGraphNodeData.cpp
-          qt/graphics/graph/QtGraphNodeData.h
-          qt/graphics/graph/QtGraphNodeExpandToggle.cpp
-          qt/graphics/graph/QtGraphNodeExpandToggle.h
-          qt/graphics/graph/QtGraphNodeGroup.cpp
-          qt/graphics/graph/QtGraphNodeGroup.h
-          qt/graphics/graph/QtGraphNodeQualifier.cpp
-          qt/graphics/graph/QtGraphNodeQualifier.h
-          qt/graphics/graph/QtGraphNodeText.cpp
-          qt/graphics/graph/QtGraphNodeText.h
-          qt/graphics/GraphFocusHandler.cpp
-          qt/graphics/GraphFocusHandler.h
-          qt/graphics/QtGraphicsView.cpp
-          qt/graphics/QtGraphicsView.h
           qt/utility/compatibilityQt.cpp
           qt/utility/compatibilityQt.h
           qt/utility/QtContextMenu.cpp
@@ -112,10 +72,6 @@ target_sources(
           qt/view/QtCompositeView.h
           qt/view/QtDialogView.cpp
           qt/view/QtDialogView.h
-          qt/view/QtGraphView.cpp
-          qt/view/QtGraphView.h
-          qt/view/QtGraphViewStyleImpl.cpp
-          qt/view/QtGraphViewStyleImpl.h
           qt/view/QtMainView.cpp
           qt/view/QtMainView.h
           qt/view/QtTabbedView.cpp

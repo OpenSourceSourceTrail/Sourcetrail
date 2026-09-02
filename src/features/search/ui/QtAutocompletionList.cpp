@@ -4,7 +4,7 @@
 #include <QScrollBar>
 
 #include "app/paths/ResourcePaths.h"
-#include "component/view/GraphViewStyle.h"
+#include "graph/logic/GraphViewStyle.h"
 #include "qt/utility/QtDeviceScaledPixmap.h"
 #include "settings/ColorScheme.h"
 #include "settings/IApplicationSettings.hpp"

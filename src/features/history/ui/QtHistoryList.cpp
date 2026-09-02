@@ -6,7 +6,7 @@
 #include <QScrollBar>
 
 #include "app/paths/ResourcePaths.h"
-#include "component/view/GraphViewStyle.h"
+#include "graph/logic/GraphViewStyle.h"
 #include "history/messages/MessageHistoryToPosition.h"
 #include "qt/utility/QtDeviceScaledPixmap.h"
 #include "qt/utility/utilityQt.h"

@@ -23,30 +23,14 @@ target_sources(
           app/LanguagePackage.h
           app/LanguagePackageManager.cpp
           app/LanguagePackageManager.h
-          component/controller/helper/BucketLayouter.cpp
-          component/controller/helper/BucketLayouter.h
-          component/controller/helper/DummyEdge.h
-          component/controller/helper/DummyNode.h
-          component/controller/helper/ListLayouter.cpp
-          component/controller/helper/ListLayouter.h
           component/controller/helper/SnippetMerger.cpp
           component/controller/helper/SnippetMerger.h
-          component/controller/helper/TrailLayouter.cpp
-          component/controller/helper/TrailLayouter.h
           component/controller/Controller.cpp
           component/controller/Controller.h
-          component/controller/GraphController.cpp
-          component/controller/GraphController.h
           component/view/CompositeView.cpp
           component/view/CompositeView.h
           component/view/DialogView.cpp
           component/view/DialogView.h
-          component/view/GraphView.cpp
-          component/view/GraphView.h
-          component/view/GraphViewStyle.cpp
-          component/view/GraphViewStyle.h
-          component/view/GraphViewStyleImpl.h
-          component/view/MetricGraphViewStyleImpl.h
           component/view/MainView.cpp
           component/view/MainView.h
           component/view/TabbedView.cpp
@@ -66,32 +50,6 @@ target_sources(
           component/ComponentManager.h
           component/Tab.cpp
           component/Tab.h
-          data/graph/token_component/TokenComponent.cpp
-          data/graph/token_component/TokenComponent.h
-          data/graph/token_component/TokenComponentAbstraction.cpp
-          data/graph/token_component/TokenComponentAbstraction.h
-          data/graph/token_component/TokenComponentAccess.cpp
-          data/graph/token_component/TokenComponentAccess.h
-          data/graph/token_component/TokenComponentBundledEdges.cpp
-          data/graph/token_component/TokenComponentBundledEdges.h
-          data/graph/token_component/TokenComponentConst.cpp
-          data/graph/token_component/TokenComponentConst.h
-          data/graph/token_component/TokenComponentFilePath.cpp
-          data/graph/token_component/TokenComponentFilePath.h
-          data/graph/token_component/TokenComponentInheritanceChain.h
-          data/graph/token_component/TokenComponentIsAmbiguous.h
-          data/graph/token_component/TokenComponentStatic.cpp
-          data/graph/token_component/TokenComponentStatic.h
-          data/graph/Edge.cpp
-          data/graph/Edge.h
-          data/graph/ElementComponentKind.cpp
-          data/graph/ElementComponentKind.h
-          data/graph/Graph.cpp
-          data/graph/Graph.h
-          data/graph/Node.cpp
-          data/graph/Node.h
-          data/graph/Token.cpp
-          data/graph/Token.h
           data/location/LocationType.cpp
           data/location/LocationType.h
           data/location/SourceLocation.cpp
@@ -140,18 +98,6 @@ target_sources(
           data/storage/StorageProvider.cpp
           data/storage/StorageProvider.h
           data/storage/StorageStats.h
-          data/DefinitionKind.cpp
-          data/DefinitionKind.h
-          data/GroupType.cpp
-          data/GroupType.h
-          data/HierarchyCache.cpp
-          data/HierarchyCache.h
-          data/NodeKind.cpp
-          data/NodeKind.h
-          data/NodeType.cpp
-          data/NodeType.h
-          data/NodeTypeSet.cpp
-          data/NodeTypeSet.h
           data/TaskInjectStorage.cpp
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
@@ -240,7 +186,7 @@ target_sources(
           settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 
 # One include root. Headers are spelled by their path below it, e.g.
-# #include "data/graph/Graph.h". The binary dir carries the generated language_packages.h; the proto
+# #include "graph/domain/Graph.h". The binary dir carries the generated language_packages.h; the proto
 # headers arrive through the Sourcetrail::lib::proto::api link below.
 target_include_directories(Sourcetrail_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/src/lib/lib)
 

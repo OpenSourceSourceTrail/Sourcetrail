@@ -9,8 +9,8 @@
 
 #include <stdlib.h>
 
-#include "component/view/GraphViewStyle.h"
-#include "data/NodeTypeSet.h"
+#include "graph/domain/NodeTypeSet.h"
+#include "graph/logic/GraphViewStyle.h"
 #include "settings/ColorScheme.h"
 #include "type/focus/MessageFocusedSearchView.h"
 #include "utility.h"

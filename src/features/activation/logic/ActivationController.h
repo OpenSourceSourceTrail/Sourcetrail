@@ -7,10 +7,10 @@
 #include "code/messages/MessageActivateFile.h"
 #include "code/messages/MessageActivateSourceLocations.h"
 #include "code/messages/MessageActivateTokenIds.h"
+#include "graph/messages/MessageActivateEdge.h"
+#include "graph/messages/MessageActivateNodes.h"
 #include "MessageListener.h"
 #include "search/messages/MessageSearch.h"
-#include "type/graph/MessageActivateEdge.h"
-#include "type/graph/MessageActivateNodes.h"
 #include "type/MessageResetZoom.h"
 #include "type/MessageZoom.h"
 

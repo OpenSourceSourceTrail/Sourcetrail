@@ -1,6 +1,6 @@
 #pragma once
 // internal
-#include "data/NodeTypeSet.h"
+#include "graph/domain/NodeTypeSet.h"
 #include "Message.h"
 #include "TabId.h"
 

@@ -1,8 +1,8 @@
 #include "custom_trail/logic/CustomTrailController.h"
 // internal
 #include "custom_trail/logic/CustomTrailView.h"
-#include "data/NodeTypeSet.h"
 #include "data/storage/StorageAccess.h"
+#include "graph/domain/NodeTypeSet.h"
 
 CustomTrailController::CustomTrailController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
 

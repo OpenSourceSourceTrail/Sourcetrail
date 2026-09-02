@@ -7,7 +7,7 @@
 
 #include "app/Application.h"
 #include "app/paths/ResourcePaths.h"
-#include "component/view/GraphViewStyle.h"
+#include "graph/logic/GraphViewStyle.h"
 #include "logging.h"
 #include "qt/element/button/QtSelfRefreshIconButton.h"
 #include "qt/utility/utilityQt.h"

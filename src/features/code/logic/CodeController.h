@@ -27,12 +27,12 @@
 #include "error/messages/MessageShowError.h"
 #include "FilePath.h"
 #include "GlobalId.hpp"
+#include "graph/messages/MessageActivateTrailEdge.h"
+#include "graph/messages/MessageDeactivateEdge.h"
 #include "MessageListener.h"
 #include "type/focus/MessageFocusChanged.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
-#include "type/graph//MessageActivateTrailEdge.h"
-#include "type/graph/MessageDeactivateEdge.h"
 #include "type/MessageFlushUpdates.h"
 
 class StorageAccess;

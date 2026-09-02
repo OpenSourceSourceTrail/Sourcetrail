@@ -3,7 +3,7 @@
 #include "Message.h"
 #include "MessageActivateBase.h"
 //
-#include "data/NodeTypeSet.h"
+#include "graph/domain/NodeTypeSet.h"
 #include "TabId.h"
 
 class MessageActivateOverview

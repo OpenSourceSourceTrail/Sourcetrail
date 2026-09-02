@@ -9,13 +9,13 @@
 #include "code/messages/MessageChangeFileView.h"
 #include "code/messages/MessageCodeShowDefinition.h"
 #include "component/controller/Controller.h"
+#include "graph/messages/MessageActivateTrailEdge.h"
+#include "graph/messages/MessageDeactivateEdge.h"
+#include "graph/messages/MessageGraphNodeBundleSplit.h"
+#include "graph/messages/MessageGraphNodeExpand.h"
+#include "graph/messages/MessageGraphNodeHide.h"
 #include "MessageListener.h"
 #include "search/logic/ScreenSearchInterfaces.h"
-#include "type/graph/MessageActivateTrailEdge.h"
-#include "type/graph/MessageDeactivateEdge.h"
-#include "type/graph/MessageGraphNodeBundleSplit.h"
-#include "type/graph/MessageGraphNodeExpand.h"
-#include "type/graph/MessageGraphNodeHide.h"
 
 class ScreenSearchController
     : public Controller

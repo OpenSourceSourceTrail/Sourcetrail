@@ -2,8 +2,8 @@
 
 #include "code/logic/CodeView.h"
 #include "code/messages/MessageActivateSourceLocations.h"
-#include "component/view/GraphView.h"
 #include "data/storage/StorageAccess.h"
+#include "graph/logic/GraphView.h"
 #include "TabId.h"
 #include "TaskDecoratorDelay.h"
 #include "TaskLambda.h"

@@ -2,7 +2,7 @@
 // internal
 #include "Message.h"
 //
-#include "data/NodeTypeSet.h"
+#include "graph/domain/NodeTypeSet.h"
 #include "search/domain/SearchMatch.h"
 #include "TabId.h"
 

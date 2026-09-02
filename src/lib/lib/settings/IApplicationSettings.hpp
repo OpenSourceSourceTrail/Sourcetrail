@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 
-#include "data/GroupType.h"
+#include "graph/domain/GroupType.h"
 #include "settings/Settings.h"
 
 struct IApplicationSettings : Settings {

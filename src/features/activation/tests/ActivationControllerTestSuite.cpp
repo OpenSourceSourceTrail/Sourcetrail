@@ -6,9 +6,9 @@
 #include <gtest/gtest.h>
 
 #include "activation/logic/ActivationController.h"
-#include "data/graph/Edge.h"
 #include "data/name/NameHierarchy.h"
 #include "FilePath.h"
+#include "graph/domain/Edge.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedStorageAccess.hpp"

@@ -12,11 +12,11 @@
 #include "bookmark/messages/MessageBookmarkUpdate.hpp"
 #include "data/storage/StorageAccess.h"
 #include "data/storage/type/StorageEdge.h"
+#include "graph/messages/MessageActivateEdge.h"
+#include "graph/messages/MessageActivateNodes.h"
 #include "logging.h"
 #include "RangesTo.hpp"
 #include "TabId.h"
-#include "type/graph/MessageActivateEdge.h"
-#include "type/graph/MessageActivateNodes.h"
 #include "utility.h"
 #include "utilityString.h"
 

@@ -2,8 +2,8 @@
 
 #include <QContextMenuEvent>
 
+#include "graph/ui/QtGraphicsView.h"
 #include "logging.h"
-#include "qt/graphics/QtGraphicsView.h"
 #include "qt/utility/QtContextMenu.h"
 
 
