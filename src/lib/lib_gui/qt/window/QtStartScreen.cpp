@@ -1,11 +1,11 @@
 #include "qt/window/QtStartScreen.hpp"
 
+#include <array>
 #include <ranges>
 #include <utility>
 
 #include <fmt/format.h>
 
-#include <QDebug>
 #include <QDesktopServices>
 #include <QHBoxLayout>
 #include <QIcon>
@@ -67,16 +67,17 @@ void QtStartScreen::setupStartScreen() {
   createRecentProjects(layout);
 
   // Move the window to center of the parent window.
-  const QSize size = sizeHint();
-  move(parentWidget()->width() / 2 - size.width() / 2, parentWidget()->height() / 2 - size.height() / 2);
+  if(auto* parent = parentWidget(); parent != nullptr) {
+    const QSize size = sizeHint();
+    move(parent->width() / 2 - size.width() / 2, parent->height() / 2 - size.height() / 2);
+  }
 
   setStyleSheet(utility::getStyleSheet(":/data/gui/startscreen/startscreen.css"));
 }
 
 void QtStartScreen::hideEvent(QHideEvent* hideEvent) {
-  if(mRecentModel->isDirty()) {
-    auto updatedRecentProjects = mRecentModel->getRecentProjects() |
-        std::views::transform([](auto item) -> std::filesystem::path { return item.path.wstring(); }) |
+  if(mRecentModel != nullptr && mRecentModel->isDirty()) {
+    auto updatedRecentProjects = mRecentModel->getRecentProjects() | std::views::transform(&element::model::RecentItem::path) |
         utility::toContainer<std::vector<std::filesystem::path>>();
 
     IApplicationSettings::getInstanceRaw()->setRecentProjects(updatedRecentProjects);
@@ -86,10 +87,6 @@ void QtStartScreen::hideEvent(QHideEvent* hideEvent) {
   }
 
   QtWindow::hideEvent(hideEvent);
-}
-
-void QtStartScreen::closeEvent(QCloseEvent* closeEvent) {
-  QtWindow::closeEvent(closeEvent);
 }
 
 void QtStartScreen::createRecentProjects(QHBoxLayout* layout) {
@@ -108,22 +105,18 @@ void QtStartScreen::createRecentProjects(QHBoxLayout* layout) {
 
   auto* viewList = new QListView;    // NOLINT(cppcoreguidelines-owning-memory)
   // NOLINTNEXTLINE(cppcoreguidelines-owning-memory)
-  mRecentModel = new element::model::RecentItemModel(recentProjects, maxRecentProjectsCount);
+  mRecentModel = new element::model::RecentItemModel(recentProjects, maxRecentProjectsCount, viewList);
   connect(viewList, &QListView::clicked, mRecentModel, &element::model::RecentItemModel::clicked);
 
   viewList->setContextMenuPolicy(Qt::ContextMenuPolicy::CustomContextMenu);
   connect(viewList, &QListView::customContextMenuRequested, this, [viewList, this](const QPoint& point) {
     QMenu contextMenu(tr("Context menu"), viewList);
-
-    QAction action1(tr("Delete"), viewList);
-    QObject::connect(&action1, &QAction::triggered, viewList, [viewList, point, this](auto) {
+    contextMenu.addAction(tr("Delete"), this, [viewList, point, this] {
       const auto index = viewList->indexAt(point);
       if(index.isValid()) {
         mRecentModel->removeItem(index.row());
       }
     });
-    contextMenu.addAction(&action1);
-
     contextMenu.exec(viewList->mapToGlobal(point));
   });
 

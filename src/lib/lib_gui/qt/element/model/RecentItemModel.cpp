@@ -1,13 +1,12 @@
 #include "qt/element/model/RecentItemModel.hpp"
 
+#include <algorithm>
 #include <ranges>
 
-#include <QMenu>
 #include <QMessageBox>
 #include <QMimeData>
 
 #include "RangesTo.hpp"
-#include "settings/IApplicationSettings.hpp"
 #include "settings/ProjectSettings.h"
 #include "type/MessageLoadProject.h"
 
@@ -24,15 +23,15 @@ QIcon getProjectIcon(LanguageType lang) {
   switch(lang) {
   case LanguageType::LANGUAGE_C:
     return CIcon;
-  case LANGUAGE_CPP:
+  case LanguageType::LANGUAGE_CPP:
     return CppIcon;
-  case LANGUAGE_CUSTOM:
+  case LanguageType::LANGUAGE_CUSTOM:
   default:
     return ProjectIcon;
   }
 }
 
-int showMissingProjectDialog(const std::wstring& projectFilePath) {
+bool showMissingProjectDialog(const std::wstring& projectFilePath) {
   QMessageBox msgBox;
   msgBox.setText(QStringLiteral("Missing Project File"));
   msgBox.setInformativeText(QString::fromStdWString(L"<p>Couldn't find \"" + projectFilePath +
@@ -41,7 +40,9 @@ int showMissingProjectDialog(const std::wstring& projectFilePath) {
   msgBox.addButton(QStringLiteral("Remove"), QMessageBox::ButtonRole::YesRole);
   msgBox.addButton(QStringLiteral("Keep"), QMessageBox::ButtonRole::NoRole);
   msgBox.setIcon(QMessageBox::Icon::Question);
-  return msgBox.exec();
+  msgBox.exec();
+  // exec()'s return value is opaque for custom buttons; the role is the documented way.
+  return msgBox.buttonRole(msgBox.clickedButton()) == QMessageBox::ButtonRole::YesRole;
 }
 
 }    // namespace
@@ -60,6 +61,10 @@ RecentItemModel::RecentItemModel(const std::vector<std::filesystem::path>& recen
                               recentProject};
                     }) |
       utility::toContainer<std::vector<RecentItem>>();
+
+  if(mRecentProjects.size() > mMaxRecentProjects) {
+    mRecentProjects.resize(mMaxRecentProjects);
+  }
 }
 
 QStringList RecentItemModel::mimeTypes() const {
@@ -75,6 +80,11 @@ QMimeData* RecentItemModel::mimeData(const QModelIndexList& indexes) const {
     return nullptr;
   }
 
+  const auto row = indexes.front().row();
+  if(row < 0 || static_cast<size_t>(row) >= mRecentProjects.size()) {
+    return nullptr;
+  }
+
   auto* data = new QMimeData;    // NOLINT(cppcoreguidelines-owning-memory): Qt will take ownership of the pointer
   const auto& format = types.front();
   QByteArray encoded;
@@ -84,8 +94,7 @@ QMimeData* RecentItemModel::mimeData(const QModelIndexList& indexes) const {
   QDataStream stream{&encoded, QIODevice::WriteOnly};
 #endif
 
-  auto item = mRecentProjects[static_cast<size_t>(indexes.front().row())];
-  stream << item;
+  stream << mRecentProjects[static_cast<size_t>(row)];
 
   data->setData(format, encoded);
 
@@ -119,6 +128,7 @@ bool RecentItemModel::dropMimeData(const QMimeData* data,
   } else {
     beginRow = rowCount(QModelIndex{});
   }
+  beginRow = std::clamp(beginRow, 0, rowCount(QModelIndex{}));
 
   QByteArray encodedData = data->data(MIME_TYPE);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
@@ -144,7 +154,7 @@ QVariant RecentItemModel::data(const QModelIndex& index, int role) const {
     return {};
   }
 
-  const auto& item = mRecentProjects[static_cast<size_t>(idx)];
+  const auto& item = mRecentProjects[idx];
   switch(role) {
   case Qt::DisplayRole:
     return item.title;
@@ -165,18 +175,25 @@ QVariant RecentItemModel::data(const QModelIndex& index, int role) const {
 }
 
 bool RecentItemModel::setData(const QModelIndex& index, const QVariant& value, [[maybe_unused]] int role) {
-  if(index.isValid()) {
-    if(value.canConvert<RecentItem>()) {
-      mRecentProjects[static_cast<size_t>(index.row())] = value.value<RecentItem>();
-    }
-    emit dataChanged(index, index);
-    mDirty = true;
-    return true;
+  const auto row = index.row();
+  if(!index.isValid() || row < 0 || static_cast<size_t>(row) >= mRecentProjects.size()) {
+    return false;
   }
-  return false;
+  if(!value.canConvert<RecentItem>()) {
+    return false;
+  }
+
+  mRecentProjects[static_cast<size_t>(row)] = value.value<RecentItem>();
+  emit dataChanged(index, index);
+  mDirty = true;
+  return true;
 }
 
 bool RecentItemModel::insertRows(int row, int count, const QModelIndex& /*parent*/) {
+  if(row < 0 || count <= 0 || static_cast<size_t>(row) > mRecentProjects.size()) {
+    return false;
+  }
+
   beginInsertRows(QModelIndex(), row, row + count - 1);
   mRecentProjects.insert(mRecentProjects.begin() + row, static_cast<size_t>(count), {});
   endInsertRows();
@@ -184,6 +201,10 @@ bool RecentItemModel::insertRows(int row, int count, const QModelIndex& /*parent
 }
 
 bool RecentItemModel::removeRows(int row, int count, const QModelIndex& /*parent*/) {
+  if(row < 0 || count <= 0 || static_cast<size_t>(row) + static_cast<size_t>(count) > mRecentProjects.size()) {
+    return false;
+  }
+
   beginRemoveRows(QModelIndex(), row, row + count - 1);
   auto begin = std::begin(mRecentProjects) + row;
   auto end = begin + count;
@@ -207,19 +228,10 @@ void RecentItemModel::clicked(const QModelIndex& index) {
     MessageLoadProject(FilePath{item.path.wstring()}).dispatch();
     return;
   }
-  const auto status = ::showMissingProjectDialog(item.path.wstring());
-  if(status == 0) {
-    mRecentProjects.erase(std::begin(mRecentProjects) + index.row());
-    updateRecentProjects();
+  if(::showMissingProjectDialog(item.path.wstring())) {
+    removeRows(index.row(), 1);
+    mDirty = true;
   }
-}
-
-void RecentItemModel::updateRecentProjects() {
-  const auto recentProjects = mRecentProjects |
-      std::views::transform([](const RecentItem& item) -> std::filesystem::path { return item.path; }) |
-      utility::toContainer<std::vector<std::filesystem::path>>();
-  IApplicationSettings::getInstanceRaw()->setRecentProjects(recentProjects);
-  IApplicationSettings::getInstanceRaw()->save();
 }
 
 }    // namespace qt::element::model

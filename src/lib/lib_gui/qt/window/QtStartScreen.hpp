@@ -54,7 +54,6 @@ public:
 
 protected:
   void hideEvent(QHideEvent* hideEvent) override;
-  void closeEvent(QCloseEvent* closeEvent) override;
 
 signals:
   /**

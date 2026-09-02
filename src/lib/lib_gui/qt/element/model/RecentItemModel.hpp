@@ -1,5 +1,6 @@
 #pragma once
 #include <filesystem>
+#include <utility>
 #include <vector>
 
 #include <QAbstractListModel>
@@ -8,7 +9,7 @@
 namespace qt::element::model {
 
 struct RecentItem final {
-  bool exists;
+  bool exists = false;
   QString title;
   QIcon icon;
   std::filesystem::path path;
@@ -20,13 +21,20 @@ inline QDataStream& operator<<(QDataStream& str, const RecentItem& item) {
 }
 
 inline QDataStream& operator>>(QDataStream& str, RecentItem& item) {
+  RecentItem read;
   QString path;
-  str >> item.exists >> item.title >> item.icon >> path;
-  item.path = path.toStdWString();
+  str >> read.exists >> read.title >> read.icon >> path;
+  if(str.status() == QDataStream::Ok) {
+    read.path = path.toStdWString();
+    item = std::move(read);
+  }
   return str;
 }
 
 struct RecentItemModel final : QAbstractListModel {
+  Q_OBJECT
+
+public:
   RecentItemModel(const std::vector<std::filesystem::path>& recentProjects, size_t maxRecentProjects, QObject* parent = nullptr);
 
   [[nodiscard]] QStringList mimeTypes() const override;
@@ -44,7 +52,7 @@ struct RecentItemModel final : QAbstractListModel {
 
   [[nodiscard]] int rowCount(const QModelIndex& parent = QModelIndex()) const override {
     std::ignore = parent;
-    return static_cast<int>(std::min(mMaxRecentProjects, mRecentProjects.size()));
+    return static_cast<int>(mRecentProjects.size());
   }
 
   void clicked(const QModelIndex& index);
@@ -52,12 +60,12 @@ struct RecentItemModel final : QAbstractListModel {
   bool insertRows(int row, int rows, const QModelIndex& parent = QModelIndex()) override;
 
   void removeItem(int index) {
-    if(static_cast<size_t>(index) >= mRecentProjects.size()) {
+    if(index < 0 || static_cast<size_t>(index) >= mRecentProjects.size()) {
       return;
     }
 
-    mRecentProjects.erase(std::begin(mRecentProjects) + index);
-    updateRecentProjects();
+    removeRows(index, 1);
+    mDirty = true;
   }
 
   bool removeRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
@@ -92,7 +100,6 @@ private:
   bool mDirty = false;
   size_t mMaxRecentProjects = 0;
   std::vector<RecentItem> mRecentProjects;
-  void updateRecentProjects();
 };
 
 }    // namespace qt::element::model
