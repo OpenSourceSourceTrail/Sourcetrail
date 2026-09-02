@@ -4,10 +4,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/ComponentFactory.h"
-#include "mocks/HeadlessApplicationFixture.hpp"
+#include "component/Component.h"
+#include "mocks/MockedMessageQueue.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "search/tests/MockedScreenSearchSender.hpp"
 #include "tabs/logic/TabsController.h"
@@ -22,30 +21,38 @@ using namespace testing;
  * Written before the feature-based restructuring so the move can be shown not to change behavior.
  * They pin what the controller does today; they are not a specification of what it should do.
  *
- * Every tab-opening path is gated on Application::getInstance()->isProjectLoaded(), hence the
- * HeadlessApplicationFixture. No project is loaded in these tests, so those paths take their
- * "no project" branch -- which is exactly what is pinned here.
+ * Every tab-opening path is gated on whether a project is loaded. That used to be
+ * Application::getInstance()->isProjectLoaded(), which made the controller unconstructible without
+ * a whole Application; it is now injected, so `mProjectLoaded` decides it and both branches are
+ * reachable from a test.
  */
-struct TabsControllerFix : HeadlessApplicationFixture {
+struct TabsControllerFix : Test {
   void SetUp() override {
-    HeadlessApplicationFixture::SetUp();
+    // The mocked queue records dispatches rather than delivering them -- a MessageListener created
+    // inside a test never fires -- so assertions are made on what reached the queue.
+    mMessageQueue = std::make_shared<NiceMock<MockedMessageQueue>>();
+    ON_CALL(*mMessageQueue, pushMessage(_)).WillByDefault([this](std::shared_ptr<MessageBase> message) {
+      mDispatched.push_back(message->getType());
+    });
+    ON_CALL(*mMessageQueue, processMessage(_, _)).WillByDefault([this](const std::shared_ptr<MessageBase>& message, bool) {
+      mDispatched.push_back(message->getType());
+    });
+    IMessageQueue::setInstance(mMessageQueue);
 
     mViewLayout = std::make_unique<NiceMock<MockedViewLayout>>();
     mView = std::make_shared<MockedTabsView>(mViewLayout.get());
-
-    MockedViewFactory viewFactory;
-    EXPECT_CALL(viewFactory, createTabsView(mViewLayout.get())).WillOnce(Return(mView));
-
     mStorageAccess = std::make_unique<StrictMock<MockedStorageAccess>>();
-    ComponentFactory factory(&viewFactory, mStorageAccess.get());
-    mComponent = factory.createTabsComponent(mViewLayout.get(), &mScreenSearchSender);
-    mController = mComponent->getController<TabsController>();
-    ASSERT_FALSE(mController == nullptr);
+
+    auto controller = std::make_shared<TabsController>(
+        mViewLayout.get(), nullptr, mStorageAccess.get(), &mScreenSearchSender, [this] { return mProjectLoaded; });
+    mController = controller.get();
+    mComponent = std::make_shared<Component>(mView, std::move(controller));
   }
 
   void TearDown() override {
     mComponent.reset();
-    HeadlessApplicationFixture::TearDown();
+    IMessageQueue::setInstance(nullptr);
+    mMessageQueue.reset();
   }
 
   template <typename MessageType>
@@ -53,6 +60,9 @@ struct TabsControllerFix : HeadlessApplicationFixture {
     static_cast<MessageListener<MessageType>*>(mController)->handleMessageBase(&message);
   }
 
+  bool mProjectLoaded = false;
+  std::shared_ptr<NiceMock<MockedMessageQueue>> mMessageQueue;
+  std::vector<std::string> mDispatched;
   MockedScreenSearchSender mScreenSearchSender;
   std::shared_ptr<MockedTabsView> mView;
   std::shared_ptr<Component> mComponent;
@@ -119,4 +129,25 @@ TEST_F(TabsControllerFix, indexingFinishedWithoutAProjectOpensNothing) {
   deliver(message);
 
   EXPECT_THAT(mDispatched, Not(Contains("MessageTabOpenWith")));
+}
+
+// These two were unreachable while the gate was Application::getInstance()->isProjectLoaded():
+// standing a real Application up in a test does not give you one with a project loaded.
+
+TEST_F(TabsControllerFix, activatingErrorsWithAProjectOpensAnErrorTab) {
+  mProjectLoaded = true;
+
+  MessageActivateErrors message{ErrorFilter()};
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageTabOpenWith"));
+}
+
+TEST_F(TabsControllerFix, indexingFinishedWithAProjectOpensATab) {
+  mProjectLoaded = true;
+
+  MessageIndexingFinished message;
+  deliver(message);
+
+  EXPECT_THAT(mDispatched, Contains("MessageTabOpenWith"));
 }

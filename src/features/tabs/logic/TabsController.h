@@ -1,6 +1,8 @@
 #ifndef TABS_CONTROLLER_H
 #define TABS_CONTROLLER_H
 
+#include <functional>
+
 #include "activation/messages/MessageActivateErrors.h"
 #include "component/controller/Controller.h"
 #include "component/Tab.h"
@@ -29,10 +31,18 @@ class TabsController
     , public MessageListener<MessageTabSelect>
     , public MessageListener<MessageTabState> {
 public:
+  /**
+   * `isProjectLoaded` answers whether a project is open; a tab is only ever opened when one is.
+   *
+   * Injected rather than read off Application::getInstance(), which is the only thing this
+   * controller ever wanted from it -- and asking for it made the controller unconstructible
+   * without a whole Application behind it.
+   */
   TabsController(ViewLayout* mainLayout,
                  const ViewFactory* viewFactory,
                  StorageAccess* storageAccess,
-                 ScreenSearchSender* screenSearchSender);
+                 ScreenSearchSender* screenSearchSender,
+                 std::function<bool()> isProjectLoaded);
 
   // Controller implementation
   virtual void clear();
@@ -58,6 +68,7 @@ private:
   const ViewFactory* m_viewFactory;
   StorageAccess* m_storageAccess;
   ScreenSearchSender* m_screenSearchSender;
+  std::function<bool()> m_isProjectLoaded;
 
   std::map<Id, std::shared_ptr<Tab>> m_tabs;
   std::mutex m_tabsMutex;
