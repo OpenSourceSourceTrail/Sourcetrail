@@ -219,6 +219,12 @@ struct ProjectFix : Test {
     mMockedMessageQueue.reset();
   }
 
+  // refresh() reloads the settings before it opens any dialog -- reload() is non-virtual and lands
+  // on load(). Not what these tests are about, so it is allowed rather than asserted on.
+  void MockRefreshPreamble() {
+    EXPECT_CALL(*mSettings, load(_, _)).WillRepeatedly(Return(true));
+  }
+
   std::shared_ptr<StrictMock<MockedMessageQueue>> mMockedMessageQueue;
   std::shared_ptr<StrictMock<MockedProjectSettings>> mSettings;
   std::shared_ptr<StrictMock<MockedStorageCache>> mStorageCache;
@@ -379,6 +385,59 @@ TEST_F(ProjectFix, DISABLED_loadFailed) {
 
   EXPECT_TRUE(mProject->isLoaded());
   EXPECT_FALSE(mProject->isIndexing());
+}
+
+/*
+ * Characterization tests for Project::refresh().
+ *
+ * Written before startIndexingDialog's signature changes, so the change can be shown not to alter
+ * behavior. They pin what refresh() does today.
+ */
+TEST_F(ProjectFix, refreshIsANoOpWhileAlreadyRefreshing) {
+  mProject->m_refreshStage = Project::RefreshStageType::INDEXING;
+
+  // The StrictMock dialog view asserts that no dialog is opened.
+  mProject->refresh(mDialogView, RefreshMode::AllFiles, false);
+
+  EXPECT_EQ(mProject->m_refreshStage, Project::RefreshStageType::INDEXING);
+}
+
+TEST_F(ProjectFix, refreshIsANoOpWhenNothingIsLoaded) {
+  mProject->m_state = Project::ProjectStateType::NOT_LOADED;
+
+  mProject->refresh(mDialogView, RefreshMode::AllFiles, false);
+
+  EXPECT_EQ(mProject->m_refreshStage, Project::RefreshStageType::NONE);
+}
+
+TEST_F(ProjectFix, refreshOnALoadedProjectOffersAllThreeModes) {
+  mProject->m_state = Project::ProjectStateType::LOADED;
+  MockRefreshPreamble();
+
+  std::vector<RefreshMode> offeredModes;
+  EXPECT_CALL(*mDialogView, startIndexingDialog(_, _, RefreshMode::AllFiles, false, false, _, _))
+      .WillOnce([&offeredModes](auto&&, const std::vector<RefreshMode>& modes, auto&&, auto&&, auto&&, auto&&, auto&&) {
+        offeredModes = modes;
+      });
+
+  mProject->refresh(mDialogView, RefreshMode::AllFiles, false);
+
+  EXPECT_THAT(offeredModes, ElementsAre(RefreshMode::AllFiles, RefreshMode::UpdatedFiles, RefreshMode::UpdatedAndIncompleteFiles));
+}
+
+TEST_F(ProjectFix, refreshOnAnEmptyProjectOffersOnlyAFullReindex) {
+  mProject->m_state = Project::ProjectStateType::EMPTY;
+  MockRefreshPreamble();
+
+  std::vector<RefreshMode> offeredModes;
+  EXPECT_CALL(*mDialogView, startIndexingDialog(_, _, RefreshMode::AllFiles, false, false, _, _))
+      .WillOnce([&offeredModes](auto&&, const std::vector<RefreshMode>& modes, auto&&, auto&&, auto&&, auto&&, auto&&) {
+        offeredModes = modes;
+      });
+
+  mProject->refresh(mDialogView, RefreshMode::AllFiles, false);
+
+  EXPECT_THAT(offeredModes, ElementsAre(RefreshMode::AllFiles));
 }
 
 TEST_F(ProjectFix, buildIndex_whileIndexing) {
