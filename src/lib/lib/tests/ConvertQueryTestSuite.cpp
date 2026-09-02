@@ -7,11 +7,11 @@
 #include "data/location/SourceLocationFile.h"
 #include "data/NodeType.h"
 #include "data/NodeTypeSet.h"
-#include "data/search/SearchMatch.h"
 #include "data/storage/StorageStats.h"
 #include "error/domain/ErrorFilter.h"
 #include "error/domain/ErrorInfo.h"
 #include "FileInfo.h"
+#include "search/domain/SearchMatch.h"
 #include "tooltip/domain/TooltipInfo.h"
 
 using namespace proto::convert;

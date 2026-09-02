@@ -5,6 +5,7 @@
 #include "component/controller/Controller.h"
 // message
 #include "MessageListener.h"
+#include "search/messages/MessageSearch.h"
 #include "type/code/MessageActivateFile.h"
 #include "type/code/MessageActivateSourceLocations.h"
 #include "type/code/MessageActivateTokenIds.h"
@@ -12,7 +13,6 @@
 #include "type/graph/MessageActivateNodes.h"
 #include "type/MessageResetZoom.h"
 #include "type/MessageZoom.h"
-#include "type/search/MessageSearch.h"
 
 class StorageAccess;
 

@@ -2,7 +2,7 @@
 #define CUSTOM_TRAIL_VIEW_H
 
 #include "component/view/View.h"
-#include "data/search/SearchMatch.h"
+#include "search/domain/SearchMatch.h"
 
 class CustomTrailView : public View {
 public:

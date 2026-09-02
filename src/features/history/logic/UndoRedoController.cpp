@@ -4,8 +4,8 @@
 #include "data/storage/StorageAccess.h"
 #include "history/logic/UndoRedoView.h"
 #include "project/IProject.hpp"
+#include "search/messages/MessageSearch.h"
 #include "type/MessageFlushUpdates.h"
-#include "type/search/MessageSearch.h"
 #include "utility.h"
 
 UndoRedoController::UndoRedoController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {

@@ -1,8 +1,8 @@
 #pragma once
 // internal
-#include "data/search/SearchMatch.h"
 #include "FilePath.h"
 #include "Message.h"
+#include "search/domain/SearchMatch.h"
 
 class MessageTabOpenWith final : public Message<MessageTabOpenWith> {
 public:

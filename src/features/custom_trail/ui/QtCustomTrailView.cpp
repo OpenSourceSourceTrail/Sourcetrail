@@ -13,9 +13,9 @@
 #include "activation/messages/MessageActivateTrail.h"
 #include "app/paths/ResourcePaths.h"
 #include "data/NodeTypeSet.h"
-#include "qt/element/search/QtSmartSearchBox.h"
 #include "qt/utility/utilityQt.h"
 #include "qt/window/QtMainWindow.h"
+#include "search/ui/QtSmartSearchBox.h"
 #include "settings/ColorScheme.h"
 #include "TabId.h"
 

@@ -45,16 +45,6 @@ target_sources(
           qt/element/code/QtCodeNavigator.h
           qt/element/code/QtCodeSnippet.cpp
           qt/element/code/QtCodeSnippet.h
-          qt/element/search/QtAutocompletionList.cpp
-          qt/element/search/QtAutocompletionList.h
-          qt/element/search/QtScreenSearchBox.cpp
-          qt/element/search/QtScreenSearchBox.h
-          qt/element/search/QtSearchBar.cpp
-          qt/element/search/QtSearchBar.h
-          qt/element/search/QtSearchBarButton.cpp
-          qt/element/search/QtSearchBarButton.h
-          qt/element/search/QtSmartSearchBox.cpp
-          qt/element/search/QtSmartSearchBox.h
           qt/engine/QtEngineSupervisor.cpp
           qt/engine/QtEngineSupervisor.h
           qt/element/dialog/QtLineEdit.cpp
@@ -193,10 +183,6 @@ target_sources(
           qt/view/QtGraphViewStyleImpl.h
           qt/view/QtMainView.cpp
           qt/view/QtMainView.h
-          qt/view/QtScreenSearchView.cpp
-          qt/view/QtScreenSearchView.h
-          qt/view/QtSearchView.cpp
-          qt/view/QtSearchView.h
           qt/view/QtTabbedView.cpp
           qt/view/QtTabbedView.h
           qt/view/QtViewFactory.cpp

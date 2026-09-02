@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "component/controller/helper/ScreenSearchInterfaces.h"
 #include "component/view/View.h"
 #include "data/GroupType.h"
 #include "GlobalId.hpp"
+#include "search/logic/ScreenSearchInterfaces.h"
 #include "Vec2f.h"
 
 struct DummyEdge;

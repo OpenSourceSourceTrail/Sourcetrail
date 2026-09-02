@@ -6,13 +6,13 @@
 #include <QPushButton>
 
 #include "app/paths/ResourcePaths.h"
-#include "qt/element/search/QtSearchBarButton.h"
-#include "qt/utility/utilityQt.h"
-#include "qt/view/QtViewWidgetWrapper.h"
 #include "bookmark/messages/MessageBookmarkBrowse.h"
 #include "bookmark/messages/MessageBookmarkCreate.h"
 #include "bookmark/messages/MessageBookmarkDelete.h"
 #include "bookmark/messages/MessageBookmarkEdit.h"
+#include "qt/utility/utilityQt.h"
+#include "qt/view/QtViewWidgetWrapper.h"
+#include "search/ui/QtSearchBarButton.h"
 
 QtBookmarkButtonsView::QtBookmarkButtonsView(ViewLayout* viewLayout)
     : BookmarkButtonsView(viewLayout), m_widget{new QFrame}, m_createButtonState(MessageBookmarkButtonState::CANNOT_CREATE) {

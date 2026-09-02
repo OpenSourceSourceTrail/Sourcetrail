@@ -7,8 +7,8 @@
 #include "history/messages/MessageHistoryRedo.h"
 #include "history/messages/MessageHistoryUndo.h"
 #include "history/ui/QtHistoryList.h"
-#include "qt/element/search/QtSearchBarButton.h"
 #include "qt/utility/QtContextMenu.h"
+#include "search/ui/QtSearchBarButton.h"
 
 QtUndoRedo::QtUndoRedo() : m_pressed(false), m_historyList(nullptr), m_historyHiddenAt(TimeStamp::now()) {
   setObjectName(QStringLiteral("undo_redo_bar"));

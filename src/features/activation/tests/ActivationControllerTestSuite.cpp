@@ -8,11 +8,11 @@
 #include "activation/logic/ActivationController.h"
 #include "data/graph/Edge.h"
 #include "data/name/NameHierarchy.h"
-#include "data/search/SearchMatch.h"
 #include "FilePath.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedStorageAccess.hpp"
+#include "search/domain/SearchMatch.h"
 
 using namespace testing;
 

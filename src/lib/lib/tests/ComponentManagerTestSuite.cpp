@@ -11,12 +11,12 @@
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedGraphView.hpp"
-#include "mocks/MockedScreenSearchSender.hpp"
-#include "mocks/MockedScreenSearchView.hpp"
-#include "mocks/MockedSearchView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "search/tests/MockedScreenSearchSender.hpp"
+#include "search/tests/MockedScreenSearchView.hpp"
+#include "search/tests/MockedSearchView.hpp"
 #include "settings/IApplicationSettings.hpp"
 
 using namespace testing;

@@ -40,9 +40,6 @@ set(test_lib_names
     ProjectSettingsTestSuite
     ProjectTestSuite
     ResourcePathsTestSuite
-    ScreenSearchControllerTestSuite
-    SearchControllerTestSuite
-    SearchIndexTestSuite
     SettingsMigratorTestSuite
     SettingsTestSuite
     SharedMemoryTestSuite

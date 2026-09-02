@@ -4,17 +4,17 @@
 
 #include "bookmark/logic/BookmarkButtonsView.h"
 #include "component/controller/Controller.h"
-#include "component/controller/ScreenSearchController.h"
 #include "component/view/CodeView.h"
 #include "component/view/CompositeView.h"
 #include "component/view/DialogView.h"
 #include "component/view/GraphView.h"
-#include "component/view/SearchView.h"
 #include "component/view/TabbedView.h"
 #include "component/view/ViewFactory.h"
 #include "history/logic/UndoRedoView.h"
 #include "logging.h"
 #include "refresh/logic/RefreshView.h"
+#include "search/logic/ScreenSearchController.h"
+#include "search/logic/SearchView.h"
 
 namespace {
 template <class Container>

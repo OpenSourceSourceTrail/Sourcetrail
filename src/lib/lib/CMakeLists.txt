@@ -31,7 +31,6 @@ target_sources(
           component/controller/helper/ListLayouter.h
           component/controller/helper/NetworkProtocolHelper.cpp
           component/controller/helper/NetworkProtocolHelper.h
-          component/controller/helper/ScreenSearchInterfaces.h
           component/controller/helper/SnippetMerger.cpp
           component/controller/helper/SnippetMerger.h
           component/controller/helper/TrailLayouter.cpp
@@ -44,10 +43,6 @@ target_sources(
           component/controller/GraphController.h
           component/controller/IDECommunicationController.cpp
           component/controller/IDECommunicationController.h
-          component/controller/ScreenSearchController.cpp
-          component/controller/ScreenSearchController.h
-          component/controller/SearchController.cpp
-          component/controller/SearchController.h
           component/view/helper/CodeScrollParams.h
           component/view/helper/CodeSnippetParams.cpp
           component/view/helper/CodeSnippetParams.h
@@ -65,10 +60,6 @@ target_sources(
           component/view/MetricGraphViewStyleImpl.h
           component/view/MainView.cpp
           component/view/MainView.h
-          component/view/ScreenSearchView.cpp
-          component/view/ScreenSearchView.h
-          component/view/SearchView.cpp
-          component/view/SearchView.h
           component/view/TabbedView.cpp
           component/view/TabbedView.h
           component/view/View.cpp
@@ -88,10 +79,6 @@ target_sources(
           component/NetworkFactory.h
           component/Tab.cpp
           component/Tab.h
-          data/fulltextsearch/FullTextSearchIndex.cpp
-          data/fulltextsearch/FullTextSearchIndex.h
-          data/fulltextsearch/SuffixArray.cpp
-          data/fulltextsearch/SuffixArray.h
           data/graph/token_component/TokenComponent.cpp
           data/graph/token_component/TokenComponent.h
           data/graph/token_component/TokenComponentAbstraction.cpp
@@ -176,10 +163,6 @@ target_sources(
           data/parser/ReferenceKind.h
           data/parser/SymbolKind.cpp
           data/parser/SymbolKind.h
-          data/search/SearchIndex.cpp
-          data/search/SearchIndex.h
-          data/search/SearchMatch.cpp
-          data/search/SearchMatch.h
           data/storage/type/StorageComponentAccess.h
           data/storage/type/StorageEdge.h
           data/storage/type/StorageElementComponent.h

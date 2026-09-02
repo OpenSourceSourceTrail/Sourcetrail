@@ -6,10 +6,10 @@
 
 #include "component/ComponentFactory.h"
 #include "mocks/HeadlessApplicationFixture.hpp"
-#include "mocks/MockedScreenSearchSender.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "search/tests/MockedScreenSearchSender.hpp"
 #include "tabs/logic/TabsController.h"
 #include "tabs/logic/TabsView.h"
 #include "tabs/tests/MockedTabsView.hpp"
