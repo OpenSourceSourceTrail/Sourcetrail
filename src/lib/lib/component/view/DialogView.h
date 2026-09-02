@@ -7,7 +7,6 @@
 #include "error/domain/ErrorCountInfo.h"
 #include "project/domain/RefreshInfo.h"
 
-struct IProject;
 class StorageAccess;
 
 enum DatabasePolicy { DATABASE_POLICY_KEEP, DATABASE_POLICY_DISCARD, DATABASE_POLICY_REFRESH, DATABASE_POLICY_UNKNOWN };
@@ -32,7 +31,9 @@ public:
   virtual void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress);
   virtual void hideProgressDialog();
 
-  virtual void startIndexingDialog(IProject* project,
+  // Takes what it needs to refresh, not the project it would have to ask. Presentation never names
+  // IProject: the Project state machine is Logic's, and a view that holds one can drive it.
+  virtual void startIndexingDialog(std::function<RefreshInfo(RefreshMode)> getRefreshInfo,
                                    const std::vector<RefreshMode>& enabledModes,
                                    const RefreshMode initialMode,
                                    bool enabledShallowOption,

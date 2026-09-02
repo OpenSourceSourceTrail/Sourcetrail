@@ -359,14 +359,13 @@ void Project::refresh(std::shared_ptr<DialogView> dialogView, RefreshMode refres
       enabledModes.insert(enabledModes.end(), {RefreshMode::UpdatedFiles, RefreshMode::UpdatedAndIncompleteFiles});
     }
 
-    dialogView->startIndexingDialog(
-        this,
-        enabledModes,
-        refreshMode,
-        allowsShallowIndexing,
-        useShallowIndexing,
-        [this, dialogView](const RefreshInfo& info) { buildIndex(info, dialogView); },
-        [this]() { m_refreshStage = RefreshStageType::NONE; });
+    dialogView->startIndexingDialog([this](RefreshMode mode) { return getRefreshInfo(mode); },
+                                    enabledModes,
+                                    refreshMode,
+                                    allowsShallowIndexing,
+                                    useShallowIndexing,
+                                    [this, dialogView](const RefreshInfo& info) { buildIndex(info, dialogView); },
+                                    [this]() { m_refreshStage = RefreshStageType::NONE; });
   } else {
     RefreshInfo info = getRefreshInfo(refreshMode);
     info.shallow = useShallowIndexing;

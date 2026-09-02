@@ -28,7 +28,7 @@ void DialogView::showProgressDialog(const std::wstring& /*title*/, const std::ws
 
 void DialogView::hideProgressDialog() {}
 
-void DialogView::startIndexingDialog(IProject* /*project*/,
+void DialogView::startIndexingDialog(std::function<RefreshInfo(RefreshMode)> /*getRefreshInfo*/,
                                      const std::vector<RefreshMode>& /*enabledModes*/,
                                      const RefreshMode /*initialMode*/,
                                      bool /*enabledShallowOption*/,

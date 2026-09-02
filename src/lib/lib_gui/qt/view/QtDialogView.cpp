@@ -14,7 +14,6 @@
 #include "indexing/ui/QtIndexingProgressDialog.h"
 #include "indexing/ui/QtIndexingReportDialog.h"
 #include "indexing/ui/QtIndexingStartDialog.h"
-#include "project/logic/IProject.hpp"
 #include "qt/window/QtKnownProgressDialog.h"
 #include "qt/window/QtMainWindow.h"
 #include "qt/window/QtUnknownProgressDialog.h"
@@ -97,7 +96,7 @@ void QtDialogView::hideProgressDialog() {
   setParentWindow(nullptr);
 }
 
-void QtDialogView::startIndexingDialog(IProject* project,
+void QtDialogView::startIndexingDialog(std::function<RefreshInfo(RefreshMode)> getRefreshInfo,
                                        const std::vector<RefreshMode>& enabledModes,
                                        const RefreshMode initialMode,
                                        bool enabledShallowOption,
@@ -108,7 +107,7 @@ void QtDialogView::startIndexingDialog(IProject* project,
   m_shallowIndexingEnabled = initialShallowState;
 
   m_onQtThread(
-      [this, project, enabledModes, initialMode, enabledShallowOption, initialShallowState, onStartIndexing, onCancelIndexing]() {
+      [this, getRefreshInfo, enabledModes, initialMode, enabledShallowOption, initialShallowState, onStartIndexing, onCancelIndexing]() {
         m_dialogsVisible = true;
         m_windowStack.clearWindows();
 
@@ -119,7 +118,7 @@ void QtDialogView::startIndexingDialog(IProject* project,
           m_shallowIndexingEnabled = enabled;
         });
 
-        std::function<void(RefreshMode)> onRefreshModeChanged = ([this, project, window](RefreshMode refreshMode) {
+        std::function<void(RefreshMode)> onRefreshModeChanged = ([this, getRefreshInfo, window](RefreshMode refreshMode) {
           auto it = m_refreshInfos.find(refreshMode);
           if(it != m_refreshInfos.end()) {
             window->updateRefreshInfo(it->second);
@@ -134,8 +133,8 @@ void QtDialogView::startIndexingDialog(IProject* project,
           });
           timer->start(200);
 
-          Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([this, project, window, timer, refreshMode]() {
-                           m_onQtThread2([this, window, timer, info = project->getRefreshInfo(refreshMode)]() {
+          Task::dispatch(TabId::app(), std::make_shared<TaskLambda>([this, getRefreshInfo, window, timer, refreshMode]() {
+                           m_onQtThread2([this, window, timer, info = getRefreshInfo(refreshMode)]() {
                              m_dialogsVisible = true;
                              m_refreshInfos.emplace(info.mode, info);
                              window->updateRefreshInfo(info);
