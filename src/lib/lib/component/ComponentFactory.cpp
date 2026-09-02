@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "activation/logic/ActivationController.h"
+#include "app/Application.h"
 #include "bookmark/logic/BookmarkController.h"
 #include "bookmark/logic/BookmarkView.h"
 #include "code/logic/CodeController.h"
@@ -122,7 +123,7 @@ std::shared_ptr<Component> ComponentFactory::createStatusComponent(ViewLayout* v
 std::shared_ptr<Component> ComponentFactory::createTabsComponent(ViewLayout* viewLayout, ScreenSearchSender* screenSearchSender) {
   std::shared_ptr<TabsView> view = m_viewFactory->createTabsView(viewLayout);
   std::shared_ptr<Controller> controller = std::make_shared<TabsController>(
-      viewLayout, m_viewFactory, m_storageAccess, screenSearchSender);
+      viewLayout, m_viewFactory, m_storageAccess, screenSearchSender, [] { return Application::getInstance()->isProjectLoaded(); });
 
   return std::make_shared<Component>(view, controller);
 }

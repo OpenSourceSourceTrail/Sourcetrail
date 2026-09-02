@@ -15,12 +15,15 @@
 /**
  * A test fixture that stands a headless Application singleton up around the usual controller mocks.
  *
- * TabsController and UndoRedoController both reach through Application::getInstance() on every path
- * -- including clear() -- so they cannot be characterized without one. Created with a null
- * ViewFactory, so getDialogView() and updateHistoryMenu() no-op rather than needing Qt.
+ * UndoRedoController reaches through Application::getInstance() on every path -- including clear(),
+ * because updateHistoryMenu() is called from the constructor -- so it cannot be characterized
+ * without one. Created with a null ViewFactory, so getDialogView() and updateHistoryMenu() no-op
+ * rather than needing Qt.
  *
- * Closing that reach-through is Phase 4 of the three-tier plan; once controllers take what they
- * need by injection, the suites built on this fixture can drop it.
+ * It has exactly one user left. TabsController wanted a single bool off Application and now takes
+ * it by injection, which is why TabsControllerTestSuite no longer needs this. UndoRedoController
+ * wants three unrelated things, so injecting them all to delete one fixture would be the worse
+ * trade -- this stays until that controller is worth reshaping.
  */
 struct HeadlessApplicationFixture : testing::Test {
   void SetUp() override {
