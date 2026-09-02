@@ -443,8 +443,9 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/language_packages.h.in"
                "${PROJECT_BINARY_DIR}/src/lib/lib/language_packages.h")
 
 # The engine-only half: everything that opens, migrates or drives the index database, plus the task
-# graph that fills it. Kept out of Sourcetrail_lib so the GUI physically cannot reach SQLite --
-# see the sqliteFreeGuiTestSuite check in tests/.
+# graph that fills it. This is the Data tier. Kept out of Sourcetrail_lib so the GUI physically
+# cannot reach SQLite; enforced by assert_no_transitive_link() at configure time and by the
+# guard.gui.linksNoSqlite ctest, both wired up in src/lib/lib_gui/CMakeLists.txt.
 add_library(Sourcetrail_lib_engine)
 add_library(Sourcetrail::lib::lib_engine ALIAS Sourcetrail_lib_engine)
 

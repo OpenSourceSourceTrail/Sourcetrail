@@ -381,3 +381,20 @@ set_property(SOURCE ${PROJECT_BINARY_DIR}/src/lib/lib_gui/productVersion.h PROPE
 
 # Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
 target_link_libraries(Sourcetrail_lib_gui PRIVATE Sourcetrail::warnings)
+
+# Tier guard. Presentation may name Logic; it must never name Data or SQLite. Asserted here, on
+# the library, because the Sourcetrail binary hosts the engine in-process and so contains SQLite
+# legitimately -- see cmake/assert_tier_deps.cmake.
+assert_no_transitive_link(Sourcetrail_lib_gui Sourcetrail_lib_engine Sourcetrail::lib::lib_engine
+                          SQLite::SQLite3 CppSQLite::CppSQLite3)
+
+# The symbol-table half of the same guard: assert_no_transitive_link above checks what CMake was
+# told, this checks what the compiler emitted. Linux/macOS only -- it needs nm.
+if((ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST) AND NOT WIN32)
+  find_program(NM_EXECUTABLE nm)
+  if(NM_EXECUTABLE)
+    add_test(NAME "guard.gui.linksNoSqlite"
+             COMMAND ${CMAKE_COMMAND} -DBINARY=$<TARGET_FILE:Sourcetrail_lib_gui> -DNM=${NM_EXECUTABLE} -P
+                     "${CMAKE_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
+  endif()
+endif()
