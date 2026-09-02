@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <optional>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -8,6 +9,7 @@
 
 class DialogView;
 class FilePath;
+class FilePathFilter;
 class SourceGroupSettingsWithCxxPchOptions;
 class StorageProvider;
 class Task;
@@ -25,6 +27,25 @@ std::optional<std::vector<CxxCompileCommand>> loadCompilationDatabase(const File
 /** Lists the source files a compilation database names, as absolute canonical paths. */
 std::vector<FilePath> getSourceFilesFromCDB(const FilePath& cdbPath);
 std::vector<FilePath> getSourceFilesFromCDB(const std::vector<CxxCompileCommand>& commands, const FilePath& cdbPath);
+
+/**
+ * The source files worth indexing out of the ones a compilation database names.
+ *
+ * A database lists what the build compiles, which is not the same as what exists on disk today, and
+ * it knows nothing about the project's exclude filters.
+ */
+std::set<FilePath> filterCdbSourceFiles(const std::vector<FilePath>& sourceFiles,
+                                        const std::vector<FilePathFilter>& excludeFilters);
+
+/**
+ * The top-level directories that could hold a compilation database's headers.
+ *
+ * Derived from the directories of *every* source file the database names -- excluding a source file
+ * from indexing says nothing about the headers beside it -- plus the include paths the compile
+ * commands mention. Paths that do not exist are dropped and nested ones are absorbed by their
+ * parent, so the result is the shortest set that still covers everything.
+ */
+std::vector<FilePath> deriveCdbHeaderRoots(const std::vector<FilePath>& sourceFiles, const std::vector<FilePath>& headerPaths);
 
 bool containsIncludePchFlags(const std::vector<CxxCompileCommand>& commands);
 bool containsIncludePchFlag(const std::vector<std::string>& args);

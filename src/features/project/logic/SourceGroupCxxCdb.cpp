@@ -65,15 +65,9 @@ std::set<FilePath> SourceGroupCxxCdb::getAllSourceFilePaths() const {
 }
 
 std::set<FilePath> SourceGroupCxxCdb::getAllSourceFilePaths(const std::vector<CxxCompileCommand>& commands) const {
-  const std::vector<FilePathFilter> excludeFilters = m_settings->getExcludeFiltersExpandedAndAbsolute();
-
-  std::set<FilePath> sourceFilePaths;
-  for(const FilePath& path : utility::getSourceFilesFromCDB(commands, m_settings->getCompilationDatabasePathExpandedAndAbsolute())) {
-    if(!FilePathFilter::areMatching(excludeFilters, path) && path.exists()) {
-      sourceFilePaths.insert(path);
-    }
-  }
-  return sourceFilePaths;
+  return utility::filterCdbSourceFiles(
+      utility::getSourceFilesFromCDB(commands, m_settings->getCompilationDatabasePathExpandedAndAbsolute()),
+      m_settings->getExcludeFiltersExpandedAndAbsolute());
 }
 
 std::shared_ptr<IndexerCommandProvider> SourceGroupCxxCdb::getIndexerCommandProvider(const RefreshInfo& info) const {

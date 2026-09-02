@@ -1,9 +1,13 @@
 #include <codecvt>
+#include <filesystem>
+#include <fstream>
+#include <set>
 
 #include <boost/range/algorithm/count.hpp>
 
 #include <gtest/gtest.h>
 
+#include "FilePathFilter.h"
 #include "project/logic/utilitySourceGroupCxx.h"
 
 
@@ -140,6 +144,88 @@ TEST_F(WindowsFlagConverterTest, RealWorldMsvcCommand) {
   ExpectContains(args, L"-isystemsrc\\external\\sqlite");
 
   ExpectContains(args, LR"(src\core\utility\commandline\commands\commandlineCommandConfig\CommandlineCommandConfig.cpp")");
+}
+
+}    // namespace
+
+namespace {
+
+// ============================================================================
+// Compilation-database path derivation
+//
+// The two wizard pages used to derive these paths themselves, differently: one canonicalized every
+// source file, the other deduplicated the directories first; one applied the exclude filters, the
+// other did not. These are the shared versions.
+// ============================================================================
+
+/** A real directory tree, because every derivation step calls exists() or getCanonical(). */
+class CdbPathsFix : public ::testing::Test {
+protected:
+  void SetUp() override {
+    mRoot = FilePath((std::filesystem::temp_directory_path() /
+                      ("cdbPaths" + std::to_string(::testing::UnitTest::GetInstance()->random_seed()) +
+                       std::to_string(reinterpret_cast<std::uintptr_t>(this))))
+                         .wstring());
+    std::filesystem::create_directories(mRoot.getConcatenated(L"/src/sub").str());
+    std::filesystem::create_directories(mRoot.getConcatenated(L"/include").str());
+  }
+
+  void TearDown() override {
+    std::error_code ignored;
+    std::filesystem::remove_all(mRoot.str(), ignored);
+  }
+
+  FilePath touch(const std::wstring& relative) {
+    const FilePath path = mRoot.getConcatenated(relative);
+    std::ofstream{path.str()} << "\n";
+    return path;
+  }
+
+  FilePath mRoot;
+};
+
+TEST_F(CdbPathsFix, filterKeepsExistingUnexcludedFiles) {
+  const FilePath kept = touch(L"/src/kept.cpp");
+  EXPECT_EQ(utility::filterCdbSourceFiles({kept}, {}), std::set<FilePath>{kept});
+}
+
+TEST_F(CdbPathsFix, filterDropsNonExistentFiles) {
+  EXPECT_TRUE(utility::filterCdbSourceFiles({mRoot.getConcatenated(L"/src/ghost.cpp")}, {}).empty());
+}
+
+TEST_F(CdbPathsFix, filterDropsExcludedFiles) {
+  const FilePath excluded = touch(L"/src/excluded.cpp");
+  EXPECT_TRUE(utility::filterCdbSourceFiles({excluded}, {FilePathFilter(L"**/excluded.cpp")}).empty());
+}
+
+TEST_F(CdbPathsFix, filterOnEmptyInputIsEmpty) {
+  EXPECT_TRUE(utility::filterCdbSourceFiles({}, {}).empty());
+}
+
+TEST_F(CdbPathsFix, headerRootsCollapseSourceFilesToTheirDirectory) {
+  const std::vector<FilePath> sources{touch(L"/src/a.cpp"), touch(L"/src/b.cpp")};
+  EXPECT_EQ(utility::deriveCdbHeaderRoots(sources, {}), std::vector<FilePath>{mRoot.getConcatenated(L"/src").getCanonical()});
+}
+
+TEST_F(CdbPathsFix, headerRootsAbsorbNestedDirectoriesIntoTheirParent) {
+  const std::vector<FilePath> sources{touch(L"/src/a.cpp"), touch(L"/src/sub/b.cpp")};
+  EXPECT_EQ(utility::deriveCdbHeaderRoots(sources, {}), std::vector<FilePath>{mRoot.getConcatenated(L"/src").getCanonical()});
+}
+
+TEST_F(CdbPathsFix, headerRootsDropNonExistentIncludePaths) {
+  EXPECT_TRUE(utility::deriveCdbHeaderRoots({}, {mRoot.getConcatenated(L"/no-such-include")}).empty());
+}
+
+TEST_F(CdbPathsFix, headerRootsKeepExistingIncludePaths) {
+  const FilePath include = mRoot.getConcatenated(L"/include");
+  EXPECT_EQ(utility::deriveCdbHeaderRoots({}, {include}), std::vector<FilePath>{include.getCanonical()});
+}
+
+TEST_F(CdbPathsFix, headerRootsAreDerivedFromUnfilteredSources) {
+  // The header roots come from every file the database names -- excluding a source file from
+  // indexing does not mean its directory holds no headers worth indexing.
+  const std::vector<FilePath> sources{touch(L"/src/a.cpp"), touch(L"/include/b.cpp")};
+  EXPECT_EQ(utility::deriveCdbHeaderRoots(sources, {}).size(), 2U);
 }
 
 }    // namespace
