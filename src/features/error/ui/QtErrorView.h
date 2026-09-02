@@ -2,7 +2,7 @@
 #include <QWidget>
 
 #include "component/controller/helper/ControllerProxy.h"
-#include "component/view/ErrorView.h"
+#include "error/logic/ErrorView.h"
 #include "qt/utility/QtThreadedFunctor.h"
 
 class QBoxLayout;

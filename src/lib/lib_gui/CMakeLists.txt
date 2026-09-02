@@ -191,8 +191,6 @@ target_sources(
           qt/view/QtCompositeView.h
           qt/view/QtDialogView.cpp
           qt/view/QtDialogView.h
-          qt/view/QtErrorView.cpp
-          qt/view/QtErrorView.h
           qt/view/QtGraphView.cpp
           qt/view/QtGraphView.h
           qt/view/QtGraphViewStyleImpl.cpp

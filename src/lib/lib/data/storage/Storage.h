@@ -11,13 +11,13 @@
 #include "data/storage/type/StorageComponentAccess.h"
 #include "data/storage/type/StorageEdge.h"
 #include "data/storage/type/StorageElementComponent.h"
-#include "data/storage/type/StorageError.h"
 #include "data/storage/type/StorageFile.h"
 #include "data/storage/type/StorageLocalSymbol.h"
 #include "data/storage/type/StorageNode.h"
 #include "data/storage/type/StorageOccurrence.h"
 #include "data/storage/type/StorageSourceLocation.h"
 #include "data/storage/type/StorageSymbol.h"
+#include "error/domain/StorageError.h"
 #include "GlobalId.hpp"
 
 /**

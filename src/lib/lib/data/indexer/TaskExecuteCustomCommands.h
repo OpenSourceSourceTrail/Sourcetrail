@@ -2,7 +2,7 @@
 #include <set>
 #include <vector>
 
-#include "data/ErrorCountInfo.h"
+#include "error/domain/ErrorCountInfo.h"
 #include "FilePath.h"
 #include "MessageListener.h"
 #include "Task.h"

@@ -44,8 +44,6 @@ target_sources(
           component/controller/CodeController.h
           component/controller/Controller.cpp
           component/controller/Controller.h
-          component/controller/ErrorController.cpp
-          component/controller/ErrorController.h
           component/controller/GraphController.cpp
           component/controller/GraphController.h
           component/controller/IDECommunicationController.cpp
@@ -71,8 +69,6 @@ target_sources(
           component/view/CompositeView.h
           component/view/DialogView.cpp
           component/view/DialogView.h
-          component/view/ErrorView.cpp
-          component/view/ErrorView.h
           component/view/GraphView.cpp
           component/view/GraphView.h
           component/view/GraphViewStyle.cpp
@@ -207,7 +203,6 @@ target_sources(
           data/storage/type/StorageComponentAccess.h
           data/storage/type/StorageEdge.h
           data/storage/type/StorageElementComponent.h
-          data/storage/type/StorageError.h
           data/storage/type/StorageFile.h
           data/storage/type/StorageLocalSymbol.h
           data/storage/type/StorageNode.h
@@ -228,10 +223,6 @@ target_sources(
           data/storage/StorageStats.h
           data/DefinitionKind.cpp
           data/DefinitionKind.h
-          data/ErrorCountInfo.cpp
-          data/ErrorCountInfo.h
-          data/ErrorFilter.h
-          data/ErrorInfo.h
           data/GroupType.cpp
           data/GroupType.h
           data/HierarchyCache.cpp

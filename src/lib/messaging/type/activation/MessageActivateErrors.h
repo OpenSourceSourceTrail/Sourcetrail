@@ -3,7 +3,7 @@
 #include "Message.h"
 #include "MessageActivateBase.h"
 //
-#include "data/ErrorFilter.h"
+#include "error/domain/ErrorFilter.h"
 #include "TabId.h"
 
 class MessageActivateErrors

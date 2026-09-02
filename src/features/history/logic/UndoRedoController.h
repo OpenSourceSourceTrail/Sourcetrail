@@ -4,6 +4,7 @@
 #include <list>
 
 #include "component/controller/Controller.h"
+#include "error/messages/MessageShowError.h"
 #include "history/messages/MessageHistoryRedo.h"
 #include "history/messages/MessageHistoryToPosition.h"
 #include "history/messages/MessageHistoryUndo.h"
@@ -21,7 +22,6 @@
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageShowReference.h"
 #include "type/code/MessageShowScope.h"
-#include "type/error/MessageShowError.h"
 #include "type/focus/MessageFocusChanged.h"
 #include "type/graph//MessageActivateTrailEdge.h"
 #include "type/graph/MessageDeactivateEdge.h"

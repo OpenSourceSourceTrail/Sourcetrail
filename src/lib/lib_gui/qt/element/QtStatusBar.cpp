@@ -5,8 +5,8 @@
 #include <QProgressBar>
 
 #include "app/paths/ResourcePaths.h"
+#include "error/messages/MessageErrorsAll.h"
 #include "qt/utility/utilityQt.h"
-#include "type/error/MessageErrorsAll.h"
 #include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageShowStatus.h"
 

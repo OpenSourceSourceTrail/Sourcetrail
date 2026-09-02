@@ -1,8 +1,8 @@
-#include "data/ErrorCountInfo.h"
+#include "error/domain/ErrorCountInfo.h"
 
 #include <algorithm>
 
-#include "data/ErrorInfo.h"
+#include "error/domain/ErrorInfo.h"
 
 ErrorCountInfo::ErrorCountInfo() = default;
 

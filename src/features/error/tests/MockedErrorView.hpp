@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "component/view/ErrorView.h"
+#include "error/logic/ErrorView.h"
 
 struct MockedErrorView : ErrorView {
   explicit MockedErrorView(ViewLayout* viewLayout) : ErrorView(viewLayout) {}

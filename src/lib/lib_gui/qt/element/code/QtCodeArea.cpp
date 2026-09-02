@@ -18,6 +18,7 @@
 #include <QToolTip>
 
 #include "data/location/SourceLocationFile.h"
+#include "error/messages/MessageShowError.h"
 #include "qt/element/code/QtCodeNavigator.h"
 #include "qt/utility/compatibilityQt.h"
 #include "qt/utility/QtContextMenu.h"
@@ -27,7 +28,6 @@
 #include "TextCodec.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageActivateTokenIds.h"
-#include "type/error/MessageShowError.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/plugin/MessageMoveIDECursor.h"

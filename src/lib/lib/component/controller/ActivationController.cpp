@@ -1,6 +1,7 @@
 #include "component/controller/ActivationController.h"
 
 #include "data/storage/StorageAccess.h"
+#include "error/messages/MessageErrorsAll.h"
 #include "settings/IApplicationSettings.hpp"
 #include "tooltip/messages/MessageTooltipShow.h"
 #include "type/activation/MessageActivateLegend.h"
@@ -8,7 +9,6 @@
 #include "type/activation/MessageActivateTokens.h"
 #include "type/code/MessageChangeFileView.h"
 #include "type/code/MessageScrollToLine.h"
-#include "type/error/MessageErrorsAll.h"
 #include "type/MessageFlushUpdates.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageStatus.h"

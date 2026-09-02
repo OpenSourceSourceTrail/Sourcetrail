@@ -19,7 +19,6 @@ set(test_lib_names
     ConvertLocationsTestSuite
     ConvertQueryTestSuite
     DialogViewTestSuite
-    ErrorControllerTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
     GraphControllerTestSuite

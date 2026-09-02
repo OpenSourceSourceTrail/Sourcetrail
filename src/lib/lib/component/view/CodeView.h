@@ -6,8 +6,8 @@
 #include "component/view/helper/CodeScrollParams.h"
 #include "component/view/helper/CodeSnippetParams.h"
 #include "component/view/View.h"
-#include "data/ErrorInfo.h"
 #include "data/location/LocationType.h"
+#include "error/domain/ErrorInfo.h"
 
 class CodeController;
 class FilePath;

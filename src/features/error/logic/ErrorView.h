@@ -3,9 +3,9 @@
 #include <vector>
 
 #include "component/view/View.h"
-#include "data/ErrorCountInfo.h"
-#include "data/ErrorFilter.h"
-#include "data/ErrorInfo.h"
+#include "error/domain/ErrorCountInfo.h"
+#include "error/domain/ErrorFilter.h"
+#include "error/domain/ErrorInfo.h"
 
 class ErrorView : public View {
 public:

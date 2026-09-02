@@ -7,6 +7,8 @@
 #include "component/ComponentFactory.h"
 #include "component/controller/CodeController.h"
 #include "component/view/CodeView.h"
+#include "error/messages/MessageErrorCountClear.h"
+#include "error/messages/MessageShowError.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
@@ -15,8 +17,6 @@
 #include "type/activation/MessageActivateLegend.h"
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageScrollToLine.h"
-#include "type/error/MessageErrorCountClear.h"
-#include "type/error/MessageShowError.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 

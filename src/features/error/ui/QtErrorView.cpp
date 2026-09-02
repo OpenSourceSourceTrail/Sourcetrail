@@ -1,4 +1,4 @@
-#include "qt/view/QtErrorView.h"
+#include "error/ui/QtErrorView.h"
 
 #include <QBoxLayout>
 #include <QCheckBox>
@@ -14,8 +14,8 @@
 #include <QStyledItemDelegate>
 
 #include "app/paths/ResourcePaths.h"
-#include "component/controller/ErrorController.h"
-#include "data/ErrorFilter.h"
+#include "error/domain/ErrorFilter.h"
+#include "error/logic/ErrorController.h"
 #include "qt/element/button/QtHelpButton.h"
 #include "qt/element/button/QtSelfRefreshIconButton.h"
 #include "qt/element/QtTable.h"

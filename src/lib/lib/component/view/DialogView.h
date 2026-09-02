@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "data/ErrorCountInfo.h"
+#include "error/domain/ErrorCountInfo.h"
 #include "project/RefreshInfo.h"
 
 struct IProject;

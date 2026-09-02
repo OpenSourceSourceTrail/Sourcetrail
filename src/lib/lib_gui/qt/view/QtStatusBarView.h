@@ -4,7 +4,7 @@
 #include <string>
 
 #include "component/view/StatusBarView.h"
-#include "data/ErrorCountInfo.h"
+#include "error/domain/ErrorCountInfo.h"
 #include "qt/utility/QtThreadedFunctor.h"
 
 class QtStatusBar;

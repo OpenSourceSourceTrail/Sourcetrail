@@ -3,8 +3,8 @@
 
 #include <QWidget>
 
-#include "data/ErrorInfo.h"
 #include "data/location/LocationType.h"
+#include "error/domain/ErrorInfo.h"
 #include "MessageListener.h"
 #include "qt/element/code/CodeFocusHandler.h"
 #include "qt/element/code/QtCodeFileList.h"

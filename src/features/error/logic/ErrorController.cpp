@@ -1,4 +1,4 @@
-#include "component/controller/ErrorController.h"
+#include "error/logic/ErrorController.h"
 // STL
 #include <vector>
 // internal

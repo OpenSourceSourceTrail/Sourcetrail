@@ -3,18 +3,18 @@
 #include <map>
 // internal
 #include "component/controller/helper/ActivationListener.h"
+#include "error/messages/MessageErrorCountClear.h"
+#include "error/messages/MessageErrorCountUpdate.h"
+#include "error/messages/MessageErrorsAll.h"
+#include "error/messages/MessageErrorsForFile.h"
+#include "error/messages/MessageErrorsHelpMessage.h"
+#include "error/messages/MessageShowError.h"
 #include "MessageListener.h"
-#include "type/error/MessageErrorCountClear.h"
-#include "type/error/MessageErrorCountUpdate.h"
-#include "type/error/MessageErrorsAll.h"
-#include "type/error/MessageErrorsForFile.h"
-#include "type/error/MessageErrorsHelpMessage.h"
-#include "type/error/MessageShowError.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStarted.h"
 //
 #include "component/controller/Controller.h"
-#include "component/view/ErrorView.h"
+#include "error/logic/ErrorView.h"
 
 class StorageAccess;
 

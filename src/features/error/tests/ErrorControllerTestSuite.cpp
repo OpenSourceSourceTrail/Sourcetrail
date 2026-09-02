@@ -5,10 +5,10 @@
 #include <gtest/gtest.h>
 
 #include "component/ComponentFactory.h"
-#include "component/controller/ErrorController.h"
-#include "component/view/ErrorView.h"
+#include "error/logic/ErrorController.h"
+#include "error/logic/ErrorView.h"
+#include "error/tests/MockedErrorView.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedErrorView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"

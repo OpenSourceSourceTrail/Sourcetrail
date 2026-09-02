@@ -2,10 +2,10 @@
 #define QT_DIALOG_VIEW_H
 
 #include "component/view/DialogView.h"
+#include "error/messages/MessageErrorCountUpdate.h"
 #include "MessageListener.h"
 #include "qt/utility/QtThreadedFunctor.h"
 #include "qt/window/QtWindowStack.h"
-#include "type/error/MessageErrorCountUpdate.h"
 #include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageWindowClosed.h"
 
