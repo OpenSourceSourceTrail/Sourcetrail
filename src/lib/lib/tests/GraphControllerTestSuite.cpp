@@ -4,6 +4,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "activation/messages/MessageActivateErrors.h"
+#include "activation/messages/MessageActivateFullTextSearch.h"
 #include "component/ComponentFactory.h"
 #include "component/controller/GraphController.h"
 #include "component/view/GraphView.h"
@@ -12,8 +14,6 @@
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#include "type/activation/MessageActivateErrors.h"
-#include "type/activation/MessageActivateFullTextSearch.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageDeactivateEdge.h"

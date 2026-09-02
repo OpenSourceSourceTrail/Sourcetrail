@@ -1,9 +1,9 @@
 #pragma once
 
+#include "activation/messages/MessageActivateTrail.h"
 #include "component/controller/Controller.h"
 #include "custom_trail/messages/MessageCustomTrailShow.h"
 #include "MessageListener.h"
-#include "type/activation/MessageActivateTrail.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageWindowClosed.h"
 

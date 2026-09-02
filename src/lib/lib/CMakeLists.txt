@@ -23,8 +23,6 @@ target_sources(
           app/LanguagePackage.h
           app/LanguagePackageManager.cpp
           app/LanguagePackageManager.h
-          component/controller/helper/ActivationListener.cpp
-          component/controller/helper/ActivationListener.h
           component/controller/helper/BucketLayouter.cpp
           component/controller/helper/BucketLayouter.h
           component/controller/helper/DummyEdge.h
@@ -38,8 +36,6 @@ target_sources(
           component/controller/helper/SnippetMerger.h
           component/controller/helper/TrailLayouter.cpp
           component/controller/helper/TrailLayouter.h
-          component/controller/ActivationController.cpp
-          component/controller/ActivationController.h
           component/controller/CodeController.cpp
           component/controller/CodeController.h
           component/controller/Controller.cpp

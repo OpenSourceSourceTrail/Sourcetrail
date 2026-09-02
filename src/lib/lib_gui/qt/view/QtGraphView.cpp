@@ -13,6 +13,7 @@
 #include <QSlider>
 #include <QStackedLayout>
 // internal
+#include "activation/messages/MessageActivateTrail.h"
 #include "app/paths/ResourcePaths.h"
 #include "component/controller/helper/DummyEdge.h"
 #include "component/controller/helper/DummyNode.h"
@@ -34,7 +35,6 @@
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/activation/MessageActivateTrail.h"
 #include "type/graph/MessageDeactivateEdge.h"
 #include "type/graph/MessageScrollGraph.h"
 #include "type/MessageRefreshUI.h"

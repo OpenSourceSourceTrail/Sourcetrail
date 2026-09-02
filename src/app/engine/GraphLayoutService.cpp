@@ -1,5 +1,6 @@
 #include "GraphLayoutService.h"
 
+#include "activation/messages/MessageActivateTokens.h"
 #include "component/Component.h"
 #include "component/controller/GraphController.h"
 #include "component/controller/helper/DummyEdge.h"
@@ -13,7 +14,6 @@
 #include "engine.pb.h"
 #include "logging.h"
 #include "MessageQueue.h"
-#include "type/activation/MessageActivateTokens.h"
 #include "utilityString.h"
 
 namespace {

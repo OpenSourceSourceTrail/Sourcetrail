@@ -2,10 +2,10 @@
 
 #include <memory>
 
+#include "activation/logic/ActivationController.h"
 #include "bookmark/logic/BookmarkController.h"
 #include "bookmark/logic/BookmarkView.h"
 #include "component/Component.h"
-#include "component/controller/ActivationController.h"
 #include "component/controller/CodeController.h"
 #include "component/controller/GraphController.h"
 #include "component/controller/RefreshController.h"

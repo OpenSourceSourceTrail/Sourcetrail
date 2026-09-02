@@ -16,6 +16,8 @@
 #include <QToolBar>
 #include <QToolTip>
 
+#include "activation/messages/MessageActivateBase.h"
+#include "activation/messages/MessageActivateOverview.h"
 #include "app/Application.h"
 #include "app/paths/ResourcePaths.h"
 #include "app/paths/UserPaths.h"
@@ -44,8 +46,6 @@
 #include "qt/window/QtPreferencesWindow.h"
 #include "qt/window/QtStartScreen.hpp"
 #include "settings/IApplicationSettings.hpp"
-#include "type/activation/MessageActivateBase.h"
-#include "type/activation/MessageActivateOverview.h"
 #include "type/code/MessageCodeReference.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/graph/MessageSaveAsImage.h"

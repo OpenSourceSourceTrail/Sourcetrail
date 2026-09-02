@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "activation/messages/MessageActivateLegend.h"
 #include "component/ComponentFactory.h"
 #include "component/controller/CodeController.h"
 #include "component/view/CodeView.h"
@@ -14,7 +15,6 @@
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#include "type/activation/MessageActivateLegend.h"
 #include "type/code/MessageScrollCode.h"
 #include "type/code/MessageScrollToLine.h"
 #include "type/focus/MessageFocusIn.h"

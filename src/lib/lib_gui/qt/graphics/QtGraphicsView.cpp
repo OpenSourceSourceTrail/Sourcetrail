@@ -10,6 +10,7 @@
 #include <QSvgGenerator>
 #include <QTimer>
 
+#include "activation/messages/MessageActivateLegend.h"
 #include "app/paths/ResourcePaths.h"
 #include "bookmark/messages/MessageBookmarkCreate.h"
 #include "history/messages/MessageHistoryRedo.h"
@@ -25,7 +26,6 @@
 #include "qt/utility/QtFileDialog.h"
 #include "qt/utility/utilityQt.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/activation/MessageActivateLegend.h"
 #include "type/code/MessageCodeShowDefinition.h"
 #include "type/focus/MessageFocusView.h"
 #include "type/graph/MessageGraphNodeExpand.h"

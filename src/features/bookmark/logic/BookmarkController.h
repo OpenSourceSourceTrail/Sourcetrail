@@ -1,15 +1,15 @@
 #pragma once
-#include "component/controller/Controller.h"
-#include "component/controller/helper/ActivationListener.h"
+#include "activation/logic/ActivationListener.h"
 #include "bookmark/domain/Bookmark.h"
 #include "bookmark/domain/EdgeBookmark.h"
 #include "bookmark/domain/NodeBookmark.h"
-#include "MessageListener.h"
 #include "bookmark/messages/MessageBookmarkActivate.h"
 #include "bookmark/messages/MessageBookmarkBrowse.h"
 #include "bookmark/messages/MessageBookmarkCreate.h"
 #include "bookmark/messages/MessageBookmarkDelete.h"
 #include "bookmark/messages/MessageBookmarkEdit.h"
+#include "component/controller/Controller.h"
+#include "MessageListener.h"
 #include "type/indexing/MessageIndexingFinished.h"
 
 class StorageAccess;

@@ -3,6 +3,12 @@
 
 #include <list>
 
+#include "activation/messages/MessageActivateErrors.h"
+#include "activation/messages/MessageActivateFullTextSearch.h"
+#include "activation/messages/MessageActivateLegend.h"
+#include "activation/messages/MessageActivateOverview.h"
+#include "activation/messages/MessageActivateTokens.h"
+#include "activation/messages/MessageActivateTrail.h"
 #include "component/controller/Controller.h"
 #include "error/messages/MessageShowError.h"
 #include "history/messages/MessageHistoryRedo.h"
@@ -10,12 +16,6 @@
 #include "history/messages/MessageHistoryUndo.h"
 #include "MessageBase.h"
 #include "MessageListener.h"
-#include "type/activation/MessageActivateErrors.h"
-#include "type/activation/MessageActivateFullTextSearch.h"
-#include "type/activation/MessageActivateLegend.h"
-#include "type/activation/MessageActivateOverview.h"
-#include "type/activation/MessageActivateTokens.h"
-#include "type/activation/MessageActivateTrail.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageChangeFileView.h"
 #include "type/code/MessageCodeShowDefinition.h"

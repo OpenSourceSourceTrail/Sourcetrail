@@ -1,11 +1,11 @@
 #ifndef TABS_CONTROLLER_H
 #define TABS_CONTROLLER_H
 
+#include "activation/messages/MessageActivateErrors.h"
 #include "component/controller/Controller.h"
 #include "component/Tab.h"
 #include "component/view/TabsView.h"
 #include "MessageListener.h"
-#include "type/activation/MessageActivateErrors.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/tab/MessageTabClose.h"
 #include "type/tab/MessageTabOpen.h"

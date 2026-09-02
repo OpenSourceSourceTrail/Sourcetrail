@@ -4,6 +4,12 @@
 #include <map>
 #include <string>
 
+#include "activation/messages/MessageActivateErrors.h"
+#include "activation/messages/MessageActivateFullTextSearch.h"
+#include "activation/messages/MessageActivateLegend.h"
+#include "activation/messages/MessageActivateOverview.h"
+#include "activation/messages/MessageActivateTokens.h"
+#include "activation/messages/MessageActivateTrail.h"
 #include "component/controller/Controller.h"
 #include "component/controller/helper/SnippetMerger.h"
 #include "component/view/CodeView.h"
@@ -13,12 +19,6 @@
 #include "FilePath.h"
 #include "GlobalId.hpp"
 #include "MessageListener.h"
-#include "type/activation/MessageActivateErrors.h"
-#include "type/activation/MessageActivateFullTextSearch.h"
-#include "type/activation/MessageActivateLegend.h"
-#include "type/activation/MessageActivateOverview.h"
-#include "type/activation/MessageActivateTokens.h"
-#include "type/activation/MessageActivateTrail.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageChangeFileView.h"
 #include "type/code/MessageCodeReference.h"

@@ -1,6 +1,6 @@
 #pragma once
+#include "activation/logic/ActivationListener.h"
 #include "component/controller/Controller.h"
-#include "component/controller/helper/ActivationListener.h"
 #include "MessageListener.h"
 #include "type/search/MessageFind.h"
 #include "type/search/MessageSearchAutocomplete.h"

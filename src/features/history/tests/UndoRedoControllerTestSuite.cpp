@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "activation/messages/MessageActivateLegend.h"
 #include "component/ComponentFactory.h"
 #include "history/logic/UndoRedoController.h"
 #include "history/logic/UndoRedoView.h"
@@ -14,7 +15,6 @@
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#include "type/activation/MessageActivateLegend.h"
 
 using namespace testing;
 

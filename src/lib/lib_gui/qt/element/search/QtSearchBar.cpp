@@ -2,11 +2,11 @@
 
 #include <QHBoxLayout>
 
+#include "activation/messages/MessageActivateFullTextSearch.h"
+#include "activation/messages/MessageActivateOverview.h"
 #include "app/paths/ResourcePaths.h"
 #include "qt/element/search/QtSearchBarButton.h"
 #include "qt/element/search/QtSmartSearchBox.h"
-#include "type/activation/MessageActivateFullTextSearch.h"
-#include "type/activation/MessageActivateOverview.h"
 #include "type/search/MessageSearch.h"
 #include "type/search/MessageSearchAutocomplete.h"
 

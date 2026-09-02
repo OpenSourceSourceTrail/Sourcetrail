@@ -1,11 +1,11 @@
 #ifndef TOOLTIP_CONTROLLER_H
 #define TOOLTIP_CONTROLLER_H
 
+#include "activation/messages/MessageActivateTokens.h"
 #include "component/controller/Controller.h"
 #include "MessageListener.h"
 #include "tooltip/messages/MessageTooltipHide.h"
 #include "tooltip/messages/MessageTooltipShow.h"
-#include "type/activation/MessageActivateTokens.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageScrollCode.h"
 #include "type/focus/MessageFocusIn.h"

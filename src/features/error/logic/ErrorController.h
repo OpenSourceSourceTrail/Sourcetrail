@@ -2,7 +2,7 @@
 // STL
 #include <map>
 // internal
-#include "component/controller/helper/ActivationListener.h"
+#include "activation/logic/ActivationListener.h"
 #include "error/messages/MessageErrorCountClear.h"
 #include "error/messages/MessageErrorCountUpdate.h"
 #include "error/messages/MessageErrorsAll.h"

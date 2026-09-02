@@ -5,7 +5,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "component/controller/ActivationController.h"
+#include "activation/logic/ActivationController.h"
 #include "data/graph/Edge.h"
 #include "data/name/NameHierarchy.h"
 #include "data/search/SearchMatch.h"
