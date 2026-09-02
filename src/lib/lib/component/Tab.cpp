@@ -1,6 +1,6 @@
 #include "component/Tab.h"
 
-#include "component/view/CodeView.h"
+#include "code/logic/CodeView.h"
 #include "component/view/GraphView.h"
 #include "logging.h"
 

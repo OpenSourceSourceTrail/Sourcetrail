@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "code/messages/MessageChangeFileView.h"
 #include "component/ComponentFactory.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStorageAccess.hpp"
@@ -13,7 +14,6 @@
 #include "search/logic/ScreenSearchInterfaces.h"
 #include "search/logic/ScreenSearchView.h"
 #include "search/tests/MockedScreenSearchView.hpp"
-#include "type/code/MessageChangeFileView.h"
 
 using namespace testing;
 

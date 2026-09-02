@@ -33,17 +33,10 @@ target_sources(
           component/controller/helper/SnippetMerger.h
           component/controller/helper/TrailLayouter.cpp
           component/controller/helper/TrailLayouter.h
-          component/controller/CodeController.cpp
-          component/controller/CodeController.h
           component/controller/Controller.cpp
           component/controller/Controller.h
           component/controller/GraphController.cpp
           component/controller/GraphController.h
-          component/view/helper/CodeScrollParams.h
-          component/view/helper/CodeSnippetParams.cpp
-          component/view/helper/CodeSnippetParams.h
-          component/view/CodeView.cpp
-          component/view/CodeView.h
           component/view/CompositeView.cpp
           component/view/CompositeView.h
           component/view/DialogView.cpp

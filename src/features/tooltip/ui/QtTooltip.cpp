@@ -8,8 +8,8 @@
 #include <QStyle>
 #include <QTimer>
 
+#include "code/ui/QtCodeField.h"
 #include "data/location/SourceLocationFile.h"
-#include "qt/element/code/QtCodeField.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TextCodec.h"
 #include "tooltip/domain/TooltipInfo.h"

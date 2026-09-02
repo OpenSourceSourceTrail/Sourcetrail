@@ -3,13 +3,13 @@
 #include <thread>
 
 #include "app/Application.h"
+#include "code/messages/MessageScrollToLine.h"
 #include "search/logic/ScreenSearchInterfaces.h"
 #include "search/messages/MessageFind.h"
 #include "search/messages/MessageSearch.h"
 #include "TabId.h"
 #include "TaskDispatchRegistry.h"
 #include "TaskLambda.h"
-#include "type/code/MessageScrollToLine.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageWindowChanged.h"
 

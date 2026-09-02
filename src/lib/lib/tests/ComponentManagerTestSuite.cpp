@@ -4,11 +4,11 @@
 #include <gtest/gtest.h>
 
 #include "bookmark/tests/MockedBookmarkButtonsView.hpp"
+#include "code/tests/MockedCodeView.hpp"
 #include "component/ComponentManager.h"
 #include "history/tests/MockedUndoRedoView.hpp"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
 #include "mocks/MockedGraphView.hpp"
 #include "mocks/MockedStorageAccess.hpp"

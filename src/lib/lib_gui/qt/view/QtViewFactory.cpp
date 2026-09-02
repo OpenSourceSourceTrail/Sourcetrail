@@ -2,12 +2,12 @@
 
 #include "bookmark/ui/QtBookmarkButtonsView.h"
 #include "bookmark/ui/QtBookmarkView.h"
+#include "code/ui/QtCodeView.h"
 #include "component/view/GraphViewStyle.h"
 #include "custom_trail/ui/QtCustomTrailView.h"
 #include "error/ui/QtErrorView.h"
 #include "history/ui/QtUndoRedoView.h"
 #include "qt/utility/utilityQt.h"
-#include "qt/view/QtCodeView.h"
 #include "qt/view/QtCompositeView.h"
 #include "qt/view/QtDialogView.h"
 #include "qt/view/QtGraphView.h"

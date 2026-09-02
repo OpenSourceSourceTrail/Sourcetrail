@@ -4,11 +4,11 @@
 // internal
 #include "component/controller/Controller.h"
 // message
+#include "code/messages/MessageActivateFile.h"
+#include "code/messages/MessageActivateSourceLocations.h"
+#include "code/messages/MessageActivateTokenIds.h"
 #include "MessageListener.h"
 #include "search/messages/MessageSearch.h"
-#include "type/code/MessageActivateFile.h"
-#include "type/code/MessageActivateSourceLocations.h"
-#include "type/code/MessageActivateTokenIds.h"
 #include "type/graph/MessageActivateEdge.h"
 #include "type/graph/MessageActivateNodes.h"
 #include "type/MessageResetZoom.h"

@@ -11,6 +11,7 @@
 #include <QPen>
 
 #include "app/paths/ResourcePaths.h"
+#include "code/messages/MessageCodeShowDefinition.h"
 #include "qt/graphics/base/QtRoundedRectItem.h"
 #include "qt/graphics/component/QtGraphNodeComponent.h"
 #include "qt/graphics/graph/QtGraphEdge.h"
@@ -18,7 +19,6 @@
 #include "qt/graphics/GraphFocusHandler.h"
 #include "qt/utility/QtDeviceScaledPixmap.h"
 #include "qt/utility/utilityQt.h"
-#include "type/code/MessageCodeShowDefinition.h"
 #include "type/graph/MessageGraphNodeHide.h"
 #include "type/graph/MessageGraphNodeMove.h"
 #include "utilityString.h"

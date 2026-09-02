@@ -4,10 +4,10 @@
 #include <gtest/gtest.h>
 
 #include "bookmark/tests/MockedBookmarkButtonsView.hpp"
+#include "code/tests/MockedCodeView.hpp"
 #include "component/Tab.h"
 #include "history/tests/MockedUndoRedoView.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedCompositeView.hpp"
 #include "mocks/MockedGraphView.hpp"
 #include "mocks/MockedViewFactory.hpp"

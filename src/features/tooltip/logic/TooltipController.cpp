@@ -1,13 +1,13 @@
 #include "tooltip/logic/TooltipController.h"
 
-#include "component/view/CodeView.h"
+#include "code/logic/CodeView.h"
+#include "code/messages/MessageActivateSourceLocations.h"
 #include "component/view/GraphView.h"
 #include "data/storage/StorageAccess.h"
 #include "TabId.h"
 #include "TaskDecoratorDelay.h"
 #include "TaskLambda.h"
 #include "tooltip/logic/TooltipView.h"
-#include "type/code/MessageActivateSourceLocations.h"
 
 Id TooltipController::TooltipRequest::s_requestId = 1;
 

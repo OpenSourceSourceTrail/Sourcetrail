@@ -3,8 +3,8 @@
 #include <fmt/format.h>
 
 #include "bookmark/logic/BookmarkButtonsView.h"
+#include "code/logic/CodeView.h"
 #include "component/controller/Controller.h"
-#include "component/view/CodeView.h"
 #include "component/view/CompositeView.h"
 #include "component/view/DialogView.h"
 #include "component/view/GraphView.h"

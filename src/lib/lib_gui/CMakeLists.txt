@@ -23,28 +23,6 @@ target_sources(
           qt/element/button/QtSelfRefreshIconButton.h
           qt/element/model/RecentItemModel.hpp
           qt/element/model/RecentItemModel.cpp
-          qt/element/code/CodeFocusHandler.cpp
-          qt/element/code/CodeFocusHandler.h
-          qt/element/code/QtCodeArea.cpp
-          qt/element/code/QtCodeArea.h
-          qt/element/code/QtCodeField.cpp
-          qt/element/code/QtCodeField.h
-          qt/element/code/QtCodeFile.cpp
-          qt/element/code/QtCodeFile.h
-          qt/element/code/QtCodeFileList.cpp
-          qt/element/code/QtCodeFileList.h
-          qt/element/code/QtCodeFileSingle.cpp
-          qt/element/code/QtCodeFileSingle.h
-          qt/element/code/QtCodeFileTitleBar.cpp
-          qt/element/code/QtCodeFileTitleBar.h
-          qt/element/code/QtCodeFileTitleButton.cpp
-          qt/element/code/QtCodeFileTitleButton.h
-          qt/element/code/QtCodeNavigable.cpp
-          qt/element/code/QtCodeNavigable.h
-          qt/element/code/QtCodeNavigator.cpp
-          qt/element/code/QtCodeNavigator.h
-          qt/element/code/QtCodeSnippet.cpp
-          qt/element/code/QtCodeSnippet.h
           qt/engine/QtEngineSupervisor.cpp
           qt/engine/QtEngineSupervisor.h
           qt/element/dialog/QtLineEdit.cpp
@@ -163,8 +141,6 @@ target_sources(
           qt/utility/QtThreadedFunctor.h
           qt/utility/utilityQt.cpp
           qt/utility/utilityQt.h
-          qt/view/QtCodeView.cpp
-          qt/view/QtCodeView.h
           qt/view/QtCompositeView.cpp
           qt/view/QtCompositeView.h
           qt/view/QtDialogView.cpp
@@ -295,7 +271,7 @@ add_custom_command(
 
 add_dependencies(Sourcetrail_lib_gui versionnumber)
 
-# One include root, e.g. #include "qt/view/QtCodeView.h". The binary dirs carry the generated
+# One include root, e.g. #include "qt/view/QtMainWindow.h". The binary dirs carry the generated
 # includes.h / productVersion.h and language_packages.h.
 target_include_directories(Sourcetrail_lib_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/src/lib/lib_gui
                                                       ${PROJECT_BINARY_DIR}/src/lib/lib)

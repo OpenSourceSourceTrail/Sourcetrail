@@ -5,12 +5,12 @@
 #include <set>
 
 #include "activation/logic/ActivationListener.h"
+#include "code/messages/MessageActivateLocalSymbols.h"
+#include "code/messages/MessageChangeFileView.h"
+#include "code/messages/MessageCodeShowDefinition.h"
 #include "component/controller/Controller.h"
 #include "MessageListener.h"
 #include "search/logic/ScreenSearchInterfaces.h"
-#include "type/code/MessageActivateLocalSymbols.h"
-#include "type/code/MessageChangeFileView.h"
-#include "type/code/MessageCodeShowDefinition.h"
 #include "type/graph/MessageActivateTrailEdge.h"
 #include "type/graph/MessageDeactivateEdge.h"
 #include "type/graph/MessageGraphNodeBundleSplit.h"
