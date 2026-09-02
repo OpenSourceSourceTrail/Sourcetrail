@@ -7,6 +7,7 @@
 
 #include "qt/element/dialog/QtStringListBox.h"
 #include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
+#include "utility.h"
 
 QtProjectWizardContentFlags::QtProjectWizardContentFlags(std::shared_ptr<SourceGroupSettingsWithCxxPathsAndFlags> settings,
                                                          QtProjectWizardWindow* window,

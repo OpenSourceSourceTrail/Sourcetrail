@@ -1,11 +1,11 @@
 #pragma once
 // Qt5
+#include <QFutureWatcher>
 #include <QWidget>
 // internal
 #include "FilePath.h"
 #include "project/ui/QtProjectWizardWindow.h"
 #include "qt/element/button/QtHelpButton.h"
-#include "qt/utility/QtThreadedFunctor.h"
 
 QT_FORWARD_DECLARE_CLASS(QFrame);
 QT_FORWARD_DECLARE_CLASS(QGridLayout);
@@ -56,7 +56,7 @@ protected slots:
 private:
   void showFilesDialog(const std::vector<FilePath>& filePaths);
 
-  QtThreadedFunctor<const std::vector<FilePath>&> m_showFilesFunctor;
+  QFutureWatcher<std::vector<FilePath>> m_filePathsWatcher;
 
   bool m_isRequired = false;
 };

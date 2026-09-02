@@ -23,6 +23,8 @@ target_sources(
           logic/CompilationDatabase.h
           logic/CxxToolchainRemote.cpp
           logic/CxxToolchainRemote.h
+          logic/HeaderSearchDetection.cpp
+          logic/HeaderSearchDetection.h
           logic/ICxxToolchain.cpp
           logic/ICxxToolchain.h
           logic/IProject.cpp
@@ -132,7 +134,7 @@ target_sources(
           ui/content/paths/QtProjectWizardContentPathsSource.h)
 
 if(ENABLE_UNIT_TEST)
-  foreach(test_name IN ITEMS ProjectTestSuite utilitySourceGroupCxxTestSuite)
+  foreach(test_name IN ITEMS HeaderSearchDetectionTestSuite ProjectTestSuite utilitySourceGroupCxxTestSuite)
     add_sourcetrail_test(
       NAME ${test_name}
       SOURCES tests/${test_name}.cpp
@@ -164,6 +166,6 @@ if(ENABLE_INTEGRATION_TEST)
            Sourcetrail::lib::lib_engine
            Boost::date_time
            spdlog::spdlog
-      TEST_PREFIX "integration.lib.")
+      TEST_PREFIX "integration.lib." LOCK filesystem)
   endforeach()
 endif()

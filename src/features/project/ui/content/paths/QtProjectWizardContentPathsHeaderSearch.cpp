@@ -1,36 +1,37 @@
 #include "project/ui/content/paths/QtProjectWizardContentPathsHeaderSearch.h"
 
-#include <cmath>
-
 #include <QGridLayout>
 #include <QMessageBox>
+#include <QtConcurrent>
 
 #include "app/Application.h"
-#include "FileManager.h"
+#include "project/logic/HeaderSearchDetection.h"
 #include "qt/view/QtDialogView.h"
 #include "qt/window/QtPathListDialog.h"
 #include "qt/window/QtTextEditDialog.h"
-#include "ScopedFunctor.h"
-#include "settings/IApplicationSettings.hpp"
 #include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPathsAndFlags.h"
-#include "settings/source_group/component/SourceGroupSettingsWithExcludeFilters.h"
-#include "settings/source_group/component/SourceGroupSettingsWithSourceExtensions.h"
 #include "settings/source_group/component/SourceGroupSettingsWithSourcePaths.h"
 #include "settings/source_group/SourceGroupSettings.h"
 #include "utility.h"
 #include "utility/IncludeDirective.h"
-#include "utility/IncludeProcessing.h"
 #include "utilityFile.h"
 
 QtProjectWizardContentPathsHeaderSearch::QtProjectWizardContentPathsHeaderSearch(std::shared_ptr<SourceGroupSettings> settings,
                                                                                  QtProjectWizardWindow* window,
                                                                                  bool indicateAsAdditional)
     : QtProjectWizardContentPaths(settings, window, QtPathListBox::SELECTION_POLICY_DIRECTORIES_ONLY, true)
-    , m_showDetectedIncludesResultFunctor(
-          std::bind(&QtProjectWizardContentPathsHeaderSearch::showDetectedIncludesResult, this, std::placeholders::_1))
-    , m_showValidationResultFunctor(
-          std::bind(&QtProjectWizardContentPathsHeaderSearch::showValidationResult, this, std::placeholders::_1))
     , m_indicateAsAdditional(indicateAsAdditional) {
+  // Both detections deliver on the GUI thread, so the result handlers need no marshalling of their
+  // own -- QFutureWatcher::finished is emitted here, not on the worker.
+  connect(&m_validationWatcher, &QFutureWatcher<std::vector<IncludeDirective>>::finished, this, [this] {
+    endDetection();
+    showValidationResult(m_validationWatcher.result());
+  });
+  connect(&m_detectionWatcher, &QFutureWatcher<std::set<FilePath>>::finished, this, [this] {
+    endDetection();
+    showDetectedIncludesResult(m_detectionWatcher.result());
+  });
+
   setTitleString(m_indicateAsAdditional ? "Additional Include Paths" : "Include Paths");
   setHelpString(((m_indicateAsAdditional ? "<b>Note</b>: Use the Additional Include Paths to add paths "
                                            "that are missing in the "
@@ -122,131 +123,55 @@ void QtProjectWizardContentPathsHeaderSearch::detectIncludesButtonClicked() {
   connect(m_pathsDialog.get(), &QtPathListDialog::canceled, this, &QtProjectWizardContentPathsHeaderSearch::closedPathsDialog);
 }
 
+std::optional<std::pair<utility::HeaderDetectionInputs, utility::DetectionProgress>> QtProjectWizardContentPathsHeaderSearch::beginDetection() {
+  std::optional<utility::HeaderDetectionInputs> inputs = utility::collectDetectionInputs(m_settings);
+  if(!inputs) {
+    return std::nullopt;
+  }
+
+  m_dialogView = dynamic_cast<QtDialogView*>(Application::getInstance()->getDialogView(DialogView::UseCase::PROJECT_SETUP).get());
+  m_dialogView->setParentWindow(m_window);
+
+  // QtDialogView marshals every one of these to the Qt thread itself, so the worker may call it.
+  utility::DetectionProgress progress = [dialogView = m_dialogView](const std::wstring& message, std::optional<size_t> percent) {
+    if(percent) {
+      dialogView->hideUnknownProgressDialog();
+      dialogView->showProgressDialog(L"Processing", message, *percent);
+    } else {
+      dialogView->showUnknownProgressDialog(L"Processing", message);
+    }
+  };
+
+  return std::make_pair(std::move(*inputs), std::move(progress));
+}
+
+void QtProjectWizardContentPathsHeaderSearch::endDetection() {
+  if(m_dialogView != nullptr) {
+    // Both, because a source tree with no files never reaches the determinate dialog.
+    m_dialogView->hideUnknownProgressDialog();
+    m_dialogView->hideProgressDialog();
+    m_dialogView = nullptr;
+  }
+}
+
 void QtProjectWizardContentPathsHeaderSearch::validateIncludesButtonClicked() {
   // TODO: regard Force Includes here, too!
   m_window->saveContent();
 
-  std::thread([&]() {
-    std::shared_ptr<SourceGroupSettingsWithSourceExtensions> extensionSettings =
-        std::dynamic_pointer_cast<SourceGroupSettingsWithSourceExtensions>(m_settings);
-    std::shared_ptr<SourceGroupSettingsWithSourcePaths> pathSettings =
-        std::dynamic_pointer_cast<SourceGroupSettingsWithSourcePaths>(m_settings);
-    std::shared_ptr<SourceGroupSettingsWithExcludeFilters> excludeFilterSettings =
-        std::dynamic_pointer_cast<SourceGroupSettingsWithExcludeFilters>(m_settings);
-
-    if(extensionSettings && pathSettings && excludeFilterSettings)    // FIXME: pass msettings as required type
-    {
-      std::vector<IncludeDirective> unresolvedIncludes;
-      {
-        QtDialogView* dialogView = dynamic_cast<QtDialogView*>(
-            Application::getInstance()->getDialogView(DialogView::UseCase::PROJECT_SETUP).get());
-
-        std::set<FilePath> sourceFilePaths;
-        std::vector<FilePath> indexedFilePaths;
-        std::vector<FilePath> headerSearchPaths;
-
-        {
-          dialogView->setParentWindow(m_window);
-          dialogView->showUnknownProgressDialog(L"Processing", L"Gathering Source Files");
-          ScopedFunctor dialogHider([&dialogView]() { dialogView->hideUnknownProgressDialog(); });
-
-          FileManager fileManager;
-          fileManager.update(pathSettings->getSourcePathsExpandedAndAbsolute(),
-                             excludeFilterSettings->getExcludeFiltersExpandedAndAbsolute(),
-                             extensionSettings->getSourceExtensions());
-          sourceFilePaths = fileManager.getAllSourceFilePaths();
-
-          indexedFilePaths = pathSettings->getSourcePathsExpandedAndAbsolute();
-
-          headerSearchPaths = utility::toFilePath(IApplicationSettings::getInstanceRaw()->getHeaderSearchPathsExpanded());
-          if(std::shared_ptr<SourceGroupSettingsWithCxxPathsAndFlags> cxxSettings =
-                 std::dynamic_pointer_cast<SourceGroupSettingsWithCxxPathsAndFlags>(m_settings)) {
-            utility::append(headerSearchPaths, cxxSettings->getHeaderSearchPathsExpandedAndAbsolute());
-          }
-        }
-        {
-          dialogView->setParentWindow(m_window);
-          ScopedFunctor dialogHider([&dialogView]() { dialogView->hideProgressDialog(); });
-
-          unresolvedIncludes = IncludeProcessing::getUnresolvedIncludeDirectives(
-              sourceFilePaths,
-              utility::toSet(indexedFilePaths),
-              utility::toSet(headerSearchPaths),
-              static_cast<size_t>(log2(static_cast<double>(sourceFilePaths.size()))),
-              [&](const float progress) {
-                dialogView->showProgressDialog(
-                    L"Processing",
-                    std::to_wstring(static_cast<int>(progress * static_cast<float>(sourceFilePaths.size()))) + L" Files",
-                    static_cast<size_t>(progress * 100.0f));
-              });
-        }
-      }
-      m_showValidationResultFunctor(unresolvedIncludes);
-    }
-  }).detach();
+  if(auto detection = beginDetection()) {
+    m_validationWatcher.setFuture(QtConcurrent::run(utility::findUnresolvedIncludes, detection->first, detection->second));
+  }
 }
-
 
 void QtProjectWizardContentPathsHeaderSearch::finishedSelectDetectIncludesRootPathsDialog() {
   // TODO: regard Force Includes here, too!
-  const std::vector<FilePath> searchedPaths = m_settings->makePathsExpandedAndAbsolute(m_pathsDialog->getPaths());
+  const std::set<FilePath> searchedPaths = utility::toSet(m_settings->makePathsExpandedAndAbsolute(m_pathsDialog->getPaths()));
   closedPathsDialog();
 
-  std::thread([this, searchedPaths]() {
-    std::shared_ptr<SourceGroupSettingsWithSourceExtensions> extensionSettings =
-        std::dynamic_pointer_cast<SourceGroupSettingsWithSourceExtensions>(m_settings);
-    std::shared_ptr<SourceGroupSettingsWithSourcePaths> pathSettings =
-        std::dynamic_pointer_cast<SourceGroupSettingsWithSourcePaths>(m_settings);
-    std::shared_ptr<SourceGroupSettingsWithExcludeFilters> excludeFilterSettings =
-        std::dynamic_pointer_cast<SourceGroupSettingsWithExcludeFilters>(m_settings);
-
-    if(extensionSettings && pathSettings && excludeFilterSettings)    // FIXME: pass msettings as required type
-    {
-      std::set<FilePath> detectedHeaderSearchPaths;
-      {
-        QtDialogView* dialogView = dynamic_cast<QtDialogView*>(
-            Application::getInstance()->getDialogView(DialogView::UseCase::PROJECT_SETUP).get());
-
-        std::set<FilePath> sourceFilePaths;
-        std::vector<FilePath> headerSearchPaths;
-        {
-          dialogView->setParentWindow(m_window);
-          dialogView->showUnknownProgressDialog(L"Processing", L"Gathering Source Files");
-          ScopedFunctor dialogHider([&dialogView]() { dialogView->hideUnknownProgressDialog(); });
-
-          FileManager fileManager;
-          fileManager.update(pathSettings->getSourcePathsExpandedAndAbsolute(),
-                             excludeFilterSettings->getExcludeFiltersExpandedAndAbsolute(),
-                             extensionSettings->getSourceExtensions());
-          sourceFilePaths = fileManager.getAllSourceFilePaths();
-
-          headerSearchPaths = utility::toFilePath(IApplicationSettings::getInstanceRaw()->getHeaderSearchPathsExpanded());
-          if(std::shared_ptr<SourceGroupSettingsWithCxxPathsAndFlags> cxxSettings =
-                 std::dynamic_pointer_cast<SourceGroupSettingsWithCxxPathsAndFlags>(m_settings)) {
-            utility::append(headerSearchPaths, cxxSettings->getHeaderSearchPathsExpandedAndAbsolute());
-          }
-        }
-        {
-          dialogView->setParentWindow(m_window);
-          ScopedFunctor dialogHider([&dialogView]() { dialogView->hideProgressDialog(); });
-
-          detectedHeaderSearchPaths = IncludeProcessing::getHeaderSearchDirectories(
-              sourceFilePaths,
-              utility::toSet(searchedPaths),
-              utility::toSet(headerSearchPaths),
-              static_cast<size_t>(log2(static_cast<double>(sourceFilePaths.size()))),
-              [&](const float progress) {
-                dialogView->showProgressDialog(
-                    L"Processing",
-                    std::to_wstring(static_cast<int>(progress * static_cast<float>(sourceFilePaths.size()))) + L" Files",
-                    static_cast<size_t>(progress * 100.0f));
-              });
-        }
-      }
-
-      m_showDetectedIncludesResultFunctor(detectedHeaderSearchPaths);
-    }
-  }).detach();
+  if(auto detection = beginDetection()) {
+    m_detectionWatcher.setFuture(
+        QtConcurrent::run(utility::detectHeaderSearchDirectories, detection->first, searchedPaths, detection->second));
+  }
 }
 
 void QtProjectWizardContentPathsHeaderSearch::finishedAcceptDetectedIncludePathsDialog() {
