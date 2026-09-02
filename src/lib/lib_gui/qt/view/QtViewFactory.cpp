@@ -15,11 +15,11 @@
 #include "qt/view/QtMainView.h"
 #include "qt/view/QtScreenSearchView.h"
 #include "qt/view/QtSearchView.h"
-#include "qt/view/QtStatusBarView.h"
-#include "qt/view/QtStatusView.h"
 #include "qt/view/QtTabbedView.h"
 #include "qt/view/QtTabsView.h"
 #include "refresh/ui/QtRefreshView.h"
+#include "status/ui/QtStatusBarView.h"
+#include "status/ui/QtStatusView.h"
 #include "tooltip/ui/QtTooltipView.h"
 
 QtViewFactory::QtViewFactory() = default;

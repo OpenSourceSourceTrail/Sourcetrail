@@ -52,8 +52,6 @@ set(test_lib_names
     SourceLocationTestSuite
     StorageCacheTestSuite
     StorageProviderTestSuite
-    StatusBarControllerTestSuite
-    StatusControllerTestSuite
     TabIdTestSuite
     TabsControllerTestSuite
     TabTestSuite
@@ -82,8 +80,6 @@ target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::lib::core::
 
 target_link_libraries(IncludeDirectiveTestSuite PRIVATE Sourcetrail::lib::core::utility::file::ScopedTemporaryFile)
 
-# target_link_libraries(StatusBarControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
-# target_link_libraries(StatusControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
 
 if(WIN32)
   target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")

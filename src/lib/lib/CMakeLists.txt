@@ -48,10 +48,6 @@ target_sources(
           component/controller/ScreenSearchController.h
           component/controller/SearchController.cpp
           component/controller/SearchController.h
-          component/controller/StatusBarController.cpp
-          component/controller/StatusBarController.h
-          component/controller/StatusController.cpp
-          component/controller/StatusController.h
           component/controller/TabsController.cpp
           component/controller/TabsController.h
           component/view/helper/CodeScrollParams.h
@@ -75,10 +71,6 @@ target_sources(
           component/view/ScreenSearchView.h
           component/view/SearchView.cpp
           component/view/SearchView.h
-          component/view/StatusBarView.cpp
-          component/view/StatusBarView.h
-          component/view/StatusView.cpp
-          component/view/StatusView.h
           component/view/TabbedView.cpp
           component/view/TabbedView.h
           component/view/TabsView.cpp

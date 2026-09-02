@@ -18,10 +18,10 @@
 #include "qt/window/QtMainWindow.h"
 #include "qt/window/QtUnknownProgressDialog.h"
 #include "qt/window/QtWindow.h"
+#include "status/messages/MessageStatus.h"
 #include "TabId.h"
 #include "TaskLambda.h"
 #include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageStatus.h"
 #include "utility.h"
 
 QtDialogView::QtDialogView(QtMainWindow* mainWindow, UseCase useCase, StorageAccess* storageAccess)

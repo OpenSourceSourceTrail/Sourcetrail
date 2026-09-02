@@ -3,9 +3,9 @@
 #include <QCoreApplication>
 // internal
 #include "MessageListener.h"
+#include "status/messages/MessageStatus.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageQuitApplication.h"
-#include "type/MessageStatus.h"
 
 class QtCoreApplication
     : public QCoreApplication

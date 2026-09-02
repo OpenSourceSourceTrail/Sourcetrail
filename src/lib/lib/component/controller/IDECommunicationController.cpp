@@ -4,9 +4,9 @@
 #include "data/storage/StorageAccess.h"
 #include "FileSystem.h"
 #include "logging.h"
+#include "status/messages/MessageStatus.h"
 #include "type/MessageActivateWindow.h"
 #include "type/MessageProjectNew.h"
-#include "type/MessageStatus.h"
 #include "type/plugin/MessagePingReceived.h"
 #include "type/tab/MessageTabOpenWith.h"
 

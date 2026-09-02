@@ -20,8 +20,8 @@
 #include "OrderedCache.h"
 #include "project/ICxxToolchain.h"
 #include "settings/source_group/component/cxx/SourceGroupSettingsWithCxxPchOptions.h"
+#include "status/messages/MessageStatus.h"
 #include "TaskLambda.h"
-#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityString.h"
 

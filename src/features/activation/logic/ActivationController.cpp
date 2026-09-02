@@ -6,12 +6,12 @@
 #include "data/storage/StorageAccess.h"
 #include "error/messages/MessageErrorsAll.h"
 #include "settings/IApplicationSettings.hpp"
+#include "status/messages/MessageStatus.h"
 #include "tooltip/messages/MessageTooltipShow.h"
 #include "type/code/MessageChangeFileView.h"
 #include "type/code/MessageScrollToLine.h"
 #include "type/MessageFlushUpdates.h"
 #include "type/MessageRefreshUI.h"
-#include "type/MessageStatus.h"
 #include "utility.h"
 
 ActivationController::ActivationController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}

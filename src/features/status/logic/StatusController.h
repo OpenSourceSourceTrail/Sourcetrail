@@ -2,10 +2,10 @@
 #include "component/controller/Controller.h"
 #include "MessageListener.h"
 #include "Status.h"
-#include "type/MessageClearStatusView.h"
-#include "type/MessageShowStatus.h"
-#include "type/MessageStatus.h"
-#include "type/MessageStatusFilterChanged.h"
+#include "status/messages/MessageClearStatusView.h"
+#include "status/messages/MessageShowStatus.h"
+#include "status/messages/MessageStatus.h"
+#include "status/messages/MessageStatusFilterChanged.h"
 
 class StatusView;
 

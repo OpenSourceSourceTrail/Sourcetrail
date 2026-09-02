@@ -16,8 +16,8 @@
 #include "data/storage/StorageAccess.h"
 #include "logging.h"
 #include "settings/IApplicationSettings.hpp"
+#include "status/messages/MessageStatus.h"
 #include "type/graph/MessageActivateNodes.h"
-#include "type/MessageStatus.h"
 #include "utility.h"
 #include "utilityString.h"
 

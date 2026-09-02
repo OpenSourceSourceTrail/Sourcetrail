@@ -6,8 +6,7 @@ target_sources(
   Sourcetrail_messaging
   PRIVATE ${CMAKE_CURRENT_LIST_DIR}/MessageBase.cpp ${CMAKE_CURRENT_LIST_DIR}/MessageListenerBase.cpp
           ${CMAKE_CURRENT_LIST_DIR}/MessageQueue.cpp ${CMAKE_CURRENT_LIST_DIR}/TabId.cpp
-          ${CMAKE_CURRENT_LIST_DIR}/TabId.h ${CMAKE_CURRENT_LIST_DIR}/type/MessageLoadProject.cpp
-          ${CMAKE_CURRENT_LIST_DIR}/type/MessageStatus.cpp)
+          ${CMAKE_CURRENT_LIST_DIR}/TabId.h ${CMAKE_CURRENT_LIST_DIR}/type/MessageLoadProject.cpp)
 
 target_include_directories(Sourcetrail_messaging PUBLIC ${CMAKE_CURRENT_LIST_DIR})
 

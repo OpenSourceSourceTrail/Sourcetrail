@@ -8,7 +8,7 @@
 
 #include "bookmark/domain/BookmarkCategory.h"
 #include "qt/utility/utilityQt.h"
-#include "type/MessageStatus.h"
+#include "status/messages/MessageStatus.h"
 
 QtBookmarkCreator::QtBookmarkCreator(ControllerProxy<BookmarkController>* controllerProxy, QWidget* parent, Id bookmarkId)
     : QtWindow(false, parent), m_controllerProxy(controllerProxy), m_editBookmarkId(bookmarkId), m_nodeId(0) {}

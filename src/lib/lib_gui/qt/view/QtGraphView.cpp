@@ -35,10 +35,10 @@
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
 #include "settings/IApplicationSettings.hpp"
+#include "status/messages/MessageStatus.h"
 #include "type/graph/MessageDeactivateEdge.h"
 #include "type/graph/MessageScrollGraph.h"
 #include "type/MessageRefreshUI.h"
-#include "type/MessageStatus.h"
 
 QtGraphView::QtGraphView(ViewLayout* viewLayout) : GraphView(viewLayout), m_focusHandler(this) {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame));

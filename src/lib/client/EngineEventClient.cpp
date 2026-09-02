@@ -12,10 +12,10 @@
 #include "HttpClient.h"
 #include "logging.h"
 #include "ProtoJson.h"
+#include "status/messages/MessageStatus.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStarted.h"
 #include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageStatus.h"
 #include "utilityString.h"
 
 namespace client {

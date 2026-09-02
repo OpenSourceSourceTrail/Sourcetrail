@@ -9,8 +9,8 @@
 #include "logging.h"
 #include "ProtoJson.h"
 #include "settings/ProjectSettings.h"
+#include "status/messages/MessageStatus.h"
 #include "type/indexing/MessageIndexingFinished.h"
-#include "type/MessageStatus.h"
 #include "utilityString.h"
 
 using client::call;

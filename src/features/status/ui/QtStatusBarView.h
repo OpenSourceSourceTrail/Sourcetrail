@@ -3,9 +3,9 @@
 #include <memory>
 #include <string>
 
-#include "component/view/StatusBarView.h"
 #include "error/domain/ErrorCountInfo.h"
 #include "qt/utility/QtThreadedFunctor.h"
+#include "status/logic/StatusBarView.h"
 
 class QtStatusBar;
 

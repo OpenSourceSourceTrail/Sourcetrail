@@ -4,9 +4,9 @@
 #include <condition_variable>
 
 #include "MessageListener.h"
+#include "status/messages/MessageStatus.h"
 #include "type/indexing/MessageIndexingStatus.h"
 #include "type/MessageQuitApplication.h"
-#include "type/MessageStatus.h"
 
 // Qt-free replacement for QtCoreApplication: keeps the process alive until
 // a MessageQuitApplication is dispatched.

@@ -1,4 +1,4 @@
-#include "qt/view/QtStatusView.h"
+#include "status/ui/QtStatusView.h"
 
 #include <tuple>
 
@@ -14,9 +14,9 @@
 #include "settings/ColorScheme.h"
 #include "settings/IApplicationSettings.hpp"
 #include "Status.h"
+#include "status/messages/MessageClearStatusView.h"
+#include "status/messages/MessageStatusFilterChanged.h"
 #include "to_underlying.hpp"
-#include "type/MessageClearStatusView.h"
-#include "type/MessageStatusFilterChanged.h"
 
 QtStatusView::QtStatusView(ViewLayout* viewLayout) : StatusView(viewLayout) {
   setWidgetWrapper(std::make_shared<QtViewWidgetWrapper>(new QFrame));

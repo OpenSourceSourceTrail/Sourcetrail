@@ -4,18 +4,18 @@
 #include "component/ComponentFactory.h"
 #include "MessageQueue.h"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedStatusBarView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "status/tests/MockedStatusBarView.hpp"
 #ifndef _WIN32
 #  define private public    // NOLINT
 #endif
-#include "component/controller/StatusBarController.h"
+#include "status/logic/StatusBarController.h"
 #ifndef _WIN32
 #  undef private
 #endif
-#include "component/view/StatusView.h"
+#include "status/logic/StatusView.h"
 
 
 using namespace testing;

@@ -4,18 +4,18 @@
 #include "component/ComponentFactory.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedStatusView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
 #include "Status.h"
+#include "status/tests/MockedStatusView.hpp"
 #ifndef _WIN32
 #  define private public
 #endif
-#include "component/controller/StatusController.h"
+#include "status/logic/StatusController.h"
 #ifndef _WIN32
 #  undef private
 #endif
-#include "component/view/StatusView.h"
+#include "status/logic/StatusView.h"
 
 using namespace testing;
 

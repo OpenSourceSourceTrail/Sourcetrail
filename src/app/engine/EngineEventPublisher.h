@@ -2,8 +2,8 @@
 #include "component/view/DialogView.h"
 #include "error/messages/MessageErrorCountUpdate.h"
 #include "MessageListener.h"
+#include "status/messages/MessageStatus.h"
 #include "type/indexing/MessageIndexingStarted.h"
-#include "type/MessageStatus.h"
 
 class EngineHttpService;
 

@@ -22,7 +22,7 @@
 #include "MockedSharedMemoryGarbageCollector.hpp"
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedMessageQueue.hpp"
-#include "type/MessageStatus.h"
+#include "status/messages/MessageStatus.h"
 #include "Version.h"
 
 using namespace std::chrono_literals;

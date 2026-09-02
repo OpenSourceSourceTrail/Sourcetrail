@@ -8,10 +8,10 @@
 #include "component/view/DialogView.h"
 #include "data/storage/PersistentStorage.h"
 #include "MessageQueue.h"
+#include "status/messages/MessageStatus.h"
 #include "TimeStamp.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageStatus.h"
 #include "utilityString.h"
 
 namespace {

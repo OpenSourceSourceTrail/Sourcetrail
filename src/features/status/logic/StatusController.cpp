@@ -1,7 +1,7 @@
-#include "component/controller/StatusController.h"
+#include "status/logic/StatusController.h"
 
-#include "component/view/StatusView.h"
 #include "settings/IApplicationSettings.hpp"
+#include "status/logic/StatusView.h"
 #include "utility.h"
 
 StatusController::StatusController()
