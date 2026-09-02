@@ -16,7 +16,6 @@
 #include "component/controller/StatusBarController.h"
 #include "component/controller/StatusController.h"
 #include "component/controller/TabsController.h"
-#include "component/controller/TooltipController.h"
 #include "component/view/CodeView.h"
 #include "component/view/CustomTrailView.h"
 #include "component/view/ErrorView.h"
@@ -27,10 +26,11 @@
 #include "component/view/StatusBarView.h"
 #include "component/view/StatusView.h"
 #include "component/view/TabsView.h"
-#include "component/view/TooltipView.h"
 #include "component/view/ViewFactory.h"
 #include "history/logic/UndoRedoController.h"
 #include "history/logic/UndoRedoView.h"
+#include "tooltip/logic/TooltipController.h"
+#include "tooltip/logic/TooltipView.h"
 
 ComponentFactory::ComponentFactory(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : m_viewFactory(viewFactory), m_storageAccess(storageAccess) {}

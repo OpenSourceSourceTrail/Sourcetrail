@@ -64,8 +64,6 @@ target_sources(
           component/controller/StatusController.h
           component/controller/TabsController.cpp
           component/controller/TabsController.h
-          component/controller/TooltipController.cpp
-          component/controller/TooltipController.h
           component/view/helper/CodeScrollParams.h
           component/view/helper/CodeSnippetParams.cpp
           component/view/helper/CodeSnippetParams.h
@@ -100,8 +98,6 @@ target_sources(
           component/view/TabbedView.h
           component/view/TabsView.cpp
           component/view/TabsView.h
-          component/view/TooltipView.cpp
-          component/view/TooltipView.h
           component/view/View.cpp
           component/view/View.h
           component/view/ViewFactory.h
@@ -233,8 +229,6 @@ target_sources(
           data/storage/StorageProvider.cpp
           data/storage/StorageProvider.h
           data/storage/StorageStats.h
-          data/tooltip/TooltipInfo.h
-          data/tooltip/TooltipOrigin.h
           data/DefinitionKind.cpp
           data/DefinitionKind.h
           data/ErrorCountInfo.cpp

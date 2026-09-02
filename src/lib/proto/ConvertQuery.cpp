@@ -1,9 +1,9 @@
 #include "ConvertQuery.h"
 
-#include "ConvertLocations.h"
 #include "bookmark/domain/BookmarkCategory.h"
 #include "bookmark/domain/EdgeBookmark.h"
 #include "bookmark/domain/NodeBookmark.h"
+#include "ConvertLocations.h"
 #include "data/ErrorFilter.h"
 #include "data/ErrorInfo.h"
 #include "data/name/NameHierarchy.h"
@@ -11,8 +11,8 @@
 #include "data/NodeTypeSet.h"
 #include "data/search/SearchMatch.h"
 #include "data/storage/StorageStats.h"
-#include "data/tooltip/TooltipInfo.h"
 #include "FileInfo.h"
+#include "tooltip/domain/TooltipInfo.h"
 #include "utilityString.h"
 
 namespace {

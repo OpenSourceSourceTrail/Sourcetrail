@@ -11,3 +11,4 @@ endforeach()
 
 add_subdirectory(bookmark)
 add_subdirectory(history)
+add_subdirectory(tooltip)

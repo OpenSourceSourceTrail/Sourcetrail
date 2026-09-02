@@ -4,14 +4,14 @@
 #include <gtest/gtest.h>
 
 #include "component/ComponentFactory.h"
-#include "component/controller/TooltipController.h"
-#include "component/view/TooltipView.h"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedTooltipView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
-#include "type/MessageTooltipHide.h"
+#include "tooltip/logic/TooltipController.h"
+#include "tooltip/logic/TooltipView.h"
+#include "tooltip/messages/MessageTooltipHide.h"
+#include "tooltip/tests/MockedTooltipView.hpp"
 #include "type/MessageWindowFocus.h"
 
 using namespace testing;

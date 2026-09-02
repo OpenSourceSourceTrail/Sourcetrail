@@ -1,4 +1,4 @@
-#include "qt/element/QtTooltip.h"
+#include "tooltip/ui/QtTooltip.h"
 
 #include <QApplication>
 #include <QCursor>
@@ -9,10 +9,10 @@
 #include <QTimer>
 
 #include "data/location/SourceLocationFile.h"
-#include "data/tooltip/TooltipInfo.h"
 #include "qt/element/code/QtCodeField.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TextCodec.h"
+#include "tooltip/domain/TooltipInfo.h"
 
 QtTooltip::QtTooltip(QWidget* parent) : QFrame{parent} {
   QWidget::setWindowFlags(Qt::ToolTip);

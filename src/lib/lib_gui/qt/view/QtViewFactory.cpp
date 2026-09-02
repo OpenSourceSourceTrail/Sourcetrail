@@ -20,7 +20,7 @@
 #include "qt/view/QtStatusView.h"
 #include "qt/view/QtTabbedView.h"
 #include "qt/view/QtTabsView.h"
-#include "qt/view/QtTooltipView.h"
+#include "tooltip/ui/QtTooltipView.h"
 
 QtViewFactory::QtViewFactory() = default;
 

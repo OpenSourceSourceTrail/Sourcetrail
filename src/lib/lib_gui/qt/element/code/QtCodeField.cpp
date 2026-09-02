@@ -15,10 +15,10 @@
 #include "settings/ColorScheme.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TextCodec.h"
+#include "tooltip/messages/MessageTooltipShow.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageActivateSourceLocations.h"
 #include "type/code/MessageActivateTokenIds.h"
-#include "type/MessageTooltipShow.h"
 #include "type/tab/MessageTabOpenWith.h"
 #include "utility.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "component/view/TooltipView.h"
+#include "tooltip/logic/TooltipView.h"
 
 struct MockedTooltipView : TooltipView {
   explicit MockedTooltipView(ViewLayout* viewLayout) : TooltipView(viewLayout) {}

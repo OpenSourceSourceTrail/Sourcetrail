@@ -3,6 +3,8 @@
 
 #include "component/controller/Controller.h"
 #include "MessageListener.h"
+#include "tooltip/messages/MessageTooltipHide.h"
+#include "tooltip/messages/MessageTooltipShow.h"
 #include "type/activation/MessageActivateTokens.h"
 #include "type/code/MessageActivateLocalSymbols.h"
 #include "type/code/MessageScrollCode.h"
@@ -10,8 +12,6 @@
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageGraphNodeExpand.h"
 #include "type/graph/MessageScrollGraph.h"
-#include "type/MessageTooltipHide.h"
-#include "type/MessageTooltipShow.h"
 #include "type/MessageWindowFocus.h"
 
 class StorageAccess;

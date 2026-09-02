@@ -1,4 +1,4 @@
-#include "component/view/TooltipView.h"
+#include "tooltip/logic/TooltipView.h"
 
 TooltipView::TooltipView(ViewLayout* viewLayout) : View(viewLayout) {}
 

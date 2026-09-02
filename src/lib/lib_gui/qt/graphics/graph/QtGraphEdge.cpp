@@ -14,14 +14,14 @@
 #include "qt/graphics/base/QtLineItemStraight.h"
 #include "qt/graphics/graph/QtGraphNode.h"
 #include "qt/graphics/GraphFocusHandler.h"
+#include "tooltip/messages/MessageTooltipHide.h"
+#include "tooltip/messages/MessageTooltipShow.h"
 #include "type/focus/MessageFocusIn.h"
 #include "type/focus/MessageFocusOut.h"
 #include "type/graph/MessageActivateEdge.h"
 #include "type/graph/MessageActivateTrailEdge.h"
 #include "type/graph/MessageGraphNodeBundleSplit.h"
 #include "type/graph/MessageGraphNodeHide.h"
-#include "type/MessageTooltipHide.h"
-#include "type/MessageTooltipShow.h"
 #include "utility.h"
 
 QtGraphEdge* QtGraphEdge::s_focusedEdge = nullptr;

@@ -5,8 +5,8 @@
 
 #include "component/view/View.h"
 #include "data/name/NameHierarchy.h"
-#include "data/tooltip/TooltipInfo.h"
 #include "GlobalId.hpp"
+#include "tooltip/domain/TooltipInfo.h"
 
 class TooltipView : public View {
 public:

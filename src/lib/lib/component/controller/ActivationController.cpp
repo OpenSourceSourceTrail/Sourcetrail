@@ -2,6 +2,7 @@
 
 #include "data/storage/StorageAccess.h"
 #include "settings/IApplicationSettings.hpp"
+#include "tooltip/messages/MessageTooltipShow.h"
 #include "type/activation/MessageActivateLegend.h"
 #include "type/activation/MessageActivateOverview.h"
 #include "type/activation/MessageActivateTokens.h"
@@ -11,7 +12,6 @@
 #include "type/MessageFlushUpdates.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageStatus.h"
-#include "type/MessageTooltipShow.h"
 #include "utility.h"
 
 ActivationController::ActivationController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}

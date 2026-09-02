@@ -77,8 +77,6 @@ target_sources(
           qt/element/dialog/QtStringListBoxItem.h
           qt/element/dialog/QtTextEdit.cpp
           qt/element/dialog/QtTextEdit.h
-          qt/element/QtTooltip.cpp
-          qt/element/QtTooltip.h
           qt/element/QtStatusBar.cpp
           qt/element/QtStatusBar.h
           qt/element/QtTabBar.cpp
@@ -215,8 +213,6 @@ target_sources(
           qt/view/QtStatusView.h
           qt/view/QtTabbedView.cpp
           qt/view/QtTabbedView.h
-          qt/view/QtTooltipView.cpp
-          qt/view/QtTooltipView.h
           qt/view/QtTabsView.cpp
           qt/view/QtTabsView.h
           qt/view/QtViewFactory.cpp

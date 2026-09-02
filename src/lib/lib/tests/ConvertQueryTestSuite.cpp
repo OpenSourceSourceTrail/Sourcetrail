@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "ConvertQuery.h"
 #include "bookmark/domain/BookmarkCategory.h"
 #include "bookmark/domain/EdgeBookmark.h"
 #include "bookmark/domain/NodeBookmark.h"
+#include "ConvertQuery.h"
 #include "data/ErrorFilter.h"
 #include "data/ErrorInfo.h"
 #include "data/location/SourceLocationFile.h"
@@ -11,8 +11,8 @@
 #include "data/NodeTypeSet.h"
 #include "data/search/SearchMatch.h"
 #include "data/storage/StorageStats.h"
-#include "data/tooltip/TooltipInfo.h"
 #include "FileInfo.h"
+#include "tooltip/domain/TooltipInfo.h"
 
 using namespace proto::convert;
 

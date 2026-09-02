@@ -17,9 +17,9 @@
 #include "data/search/SearchMatch.h"
 #include "data/storage/StorageStats.h"
 #include "data/storage/type/StorageEdge.h"
-#include "data/tooltip/TooltipInfo.h"
-#include "data/tooltip/TooltipOrigin.h"
 #include "GlobalId.hpp"
+#include "tooltip/domain/TooltipInfo.h"
+#include "tooltip/domain/TooltipOrigin.h"
 
 class FilePath;
 class Graph;
