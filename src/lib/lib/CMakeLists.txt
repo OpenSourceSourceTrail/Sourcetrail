@@ -44,8 +44,6 @@ target_sources(
           component/controller/CodeController.h
           component/controller/Controller.cpp
           component/controller/Controller.h
-          component/controller/CustomTrailController.cpp
-          component/controller/CustomTrailController.h
           component/controller/ErrorController.cpp
           component/controller/ErrorController.h
           component/controller/GraphController.cpp
@@ -71,7 +69,6 @@ target_sources(
           component/view/CodeView.h
           component/view/CompositeView.cpp
           component/view/CompositeView.h
-          component/view/CustomTrailView.h
           component/view/DialogView.cpp
           component/view/DialogView.h
           component/view/ErrorView.cpp

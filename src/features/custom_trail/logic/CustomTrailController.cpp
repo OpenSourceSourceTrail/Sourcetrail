@@ -1,6 +1,6 @@
-#include "component/controller/CustomTrailController.h"
+#include "custom_trail/logic/CustomTrailController.h"
 // internal
-#include "component/view/CustomTrailView.h"
+#include "custom_trail/logic/CustomTrailView.h"
 #include "data/NodeTypeSet.h"
 #include "data/storage/StorageAccess.h"
 

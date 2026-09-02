@@ -4,12 +4,12 @@
 #include <gtest/gtest.h>
 
 #include "component/ComponentFactory.h"
-#include "component/controller/CustomTrailController.h"
-#include "component/view/CustomTrailView.h"
+#include "custom_trail/logic/CustomTrailController.h"
+#include "custom_trail/logic/CustomTrailView.h"
+#include "custom_trail/tests/MockedCustomTrailView.hpp"
 #include "data/graph/Edge.h"
 #include "data/NodeTypeSet.h"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedCustomTrailView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"

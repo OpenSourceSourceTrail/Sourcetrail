@@ -2,9 +2,9 @@
 
 #include <QWidget>
 
-#include "component/controller/CustomTrailController.h"
 #include "component/controller/helper/ControllerProxy.h"
-#include "component/view/CustomTrailView.h"
+#include "custom_trail/logic/CustomTrailController.h"
+#include "custom_trail/logic/CustomTrailView.h"
 #include "qt/utility/QtThreadedFunctor.h"
 
 class QCheckBox;

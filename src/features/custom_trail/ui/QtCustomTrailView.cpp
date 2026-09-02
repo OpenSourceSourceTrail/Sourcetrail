@@ -1,4 +1,4 @@
-#include "qt/view/QtCustomTrailView.h"
+#include "custom_trail/ui/QtCustomTrailView.h"
 
 #include <QBoxLayout>
 #include <QButtonGroup>

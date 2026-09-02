@@ -18,7 +18,6 @@ set(test_lib_names
     ConvertGraphTestSuite
     ConvertLocationsTestSuite
     ConvertQueryTestSuite
-    CustomTrailControllerTestSuite
     DialogViewTestSuite
     ErrorControllerTestSuite
     FactoryTestSuite

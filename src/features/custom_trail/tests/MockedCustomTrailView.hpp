@@ -1,7 +1,7 @@
 #pragma once
 #include <gmock/gmock.h>
 
-#include "component/view/CustomTrailView.h"
+#include "custom_trail/logic/CustomTrailView.h"
 
 struct MockedCustomTrailView : CustomTrailView {
   explicit MockedCustomTrailView(ViewLayout* viewLayout) : CustomTrailView(viewLayout) {}
