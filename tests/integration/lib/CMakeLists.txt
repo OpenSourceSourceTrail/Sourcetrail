@@ -1,8 +1,6 @@
 # ${PROJECT_SOURCE_DIR}/tests/integration/lib/CMakeLists.txt
 
 set(test_lib_names
-    RefreshInfoGeneratorTestSuite
-    SourceGroupTestSuite
     PersistentStorageTestSuite
     SqliteDatabaseIndexTestSuite
     SqliteIndexStorageTestSuite

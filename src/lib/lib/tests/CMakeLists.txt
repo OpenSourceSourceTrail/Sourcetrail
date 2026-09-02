@@ -25,7 +25,6 @@ set(test_lib_names
     GraphViewStyleTestSuite # TODO(SOUR-97)
     HierarchyCacheTestSuite
     IncludeDirectiveTestSuite
-    utilitySourceGroupCxxTestSuite
     IndexerWireEnumsTestSuite
     IndexerPluginRegistryTestSuite
     IndexerWorkerServiceTestSuite
@@ -33,7 +32,6 @@ set(test_lib_names
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite
     ProjectSettingsTestSuite
-    ProjectTestSuite
     ResourcePathsTestSuite
     SettingsMigratorTestSuite
     SettingsTestSuite

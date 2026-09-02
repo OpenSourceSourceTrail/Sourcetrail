@@ -4,10 +4,10 @@
 #include <gtest/gtest.h>
 
 #include "../../../src/lib/lib/tests/mocks/MockedApplicationSetting.hpp"
-#include "data/indexer/IndexerCommandCxx.h"
-#include "data/indexer/IndexerStateInfo.h"
 #include "data/parser/cxx/CxxParser.h"
 #include "data/parser/ParserClientImpl.h"
+#include "indexing/domain/IndexerStateInfo.h"
+#include "indexing/logic/IndexerCommandCxx.h"
 #include "language_packages.h"
 #include "TestFileRegister.h"
 #include "TestStorage.h"

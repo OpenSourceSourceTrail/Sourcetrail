@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "error/domain/ErrorCountInfo.h"
-#include "project/RefreshInfo.h"
+#include "project/domain/RefreshInfo.h"
 
 struct IProject;
 class StorageAccess;

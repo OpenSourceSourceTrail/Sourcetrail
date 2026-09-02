@@ -8,7 +8,7 @@
 #include "app/Application.h"
 #include "app/paths/ResourcePaths.h"
 #include "error/messages/MessageErrorsForFile.h"
-#include "project/IProject.hpp"
+#include "project/logic/IProject.hpp"
 #include "qt/element/button/QtIconStateButton.h"
 #include "qt/element/button/QtSelfRefreshIconButton.h"
 

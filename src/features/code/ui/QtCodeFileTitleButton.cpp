@@ -6,12 +6,12 @@
 #include "app/paths/ResourcePaths.h"
 #include "code/messages/MessageActivateFile.h"
 #include "FileSystem.h"
-#include "project/IProject.hpp"
+#include "project/logic/IProject.hpp"
+#include "project/messages/MessageProjectEdit.h"
 #include "qt/utility/QtContextMenu.h"
 #include "settings/ColorScheme.h"
 #include "settings/IApplicationSettings.hpp"
 #include "tabs/messages/MessageTabOpenWith.h"
-#include "type/MessageProjectEdit.h"
 #include "utilityString.h"
 
 QtCodeFileTitleButton::QtCodeFileTitleButton(QWidget* parent)

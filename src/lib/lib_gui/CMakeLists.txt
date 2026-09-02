@@ -87,39 +87,6 @@ target_sources(
           qt/graphics/GraphFocusHandler.h
           qt/graphics/QtGraphicsView.cpp
           qt/graphics/QtGraphicsView.h
-          qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPath.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPaths.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.h
-          qt/project_wizard/content/QtProjectWizardContent.cpp
-          qt/project_wizard/content/QtProjectWizardContent.h
-          qt/project_wizard/content/QtProjectWizardContentCustomCommand.cpp
-          qt/project_wizard/content/QtProjectWizardContentCustomCommand.h
-          qt/project_wizard/content/QtProjectWizardContentExtensions.cpp
-          qt/project_wizard/content/QtProjectWizardContentExtensions.h
-          qt/project_wizard/content/QtProjectWizardContentGroup.cpp
-          qt/project_wizard/content/QtProjectWizardContentGroup.h
-          qt/project_wizard/content/QtProjectWizardContentPreferences.cpp
-          qt/project_wizard/content/QtProjectWizardContentPreferences.h
-          qt/project_wizard/content/QtProjectWizardContentProjectData.cpp
-          qt/project_wizard/content/QtProjectWizardContentProjectData.h
-          qt/project_wizard/content/QtProjectWizardContentRequiredLabel.h
-          qt/project_wizard/content/QtProjectWizardContentSelect.cpp
-          qt/project_wizard/content/QtProjectWizardContentSelect.h
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupData.cpp
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupData.h
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.cpp
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.h
-          qt/project_wizard/content/QtProjectWizardContentUnloadable.cpp
-          qt/project_wizard/content/QtProjectWizardContentUnloadable.h
-          qt/project_wizard/QtProjectWizard.cpp
-          qt/project_wizard/QtProjectWizard.h
-          qt/project_wizard/QtProjectWizardWindow.cpp
-          qt/project_wizard/QtProjectWizardWindow.h
           qt/utility/compatibilityQt.cpp
           qt/utility/compatibilityQt.h
           qt/utility/QtContextMenu.cpp
@@ -190,35 +157,7 @@ target_sources(
           qt/QtApplication.cpp
           qt/QtApplication.h
           qt/QtCoreApplication.cpp
-          qt/QtCoreApplication.h
-          qt/project_wizard/content/path/ProjectWizardModel.hpp
-          qt/project_wizard/content/path/ProjectWizardModel.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPathCDB.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPathCDB.h
-          qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h
-          qt/project_wizard/content/QtProjectWizardContentCppStandard.cpp
-          qt/project_wizard/content/QtProjectWizardContentCppStandard.h
-          qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.cpp
-          qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.h
-          qt/project_wizard/content/QtProjectWizardContentCStandard.cpp
-          qt/project_wizard/content/QtProjectWizardContentCStandard.h
-          qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.cpp
-          qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.h
-          qt/project_wizard/content/QtProjectWizardContentFlags.cpp
-          qt/project_wizard/content/QtProjectWizardContentFlags.h
-          qt/project_wizard/content/QtProjectWizardContentVS.cpp
-          qt/project_wizard/content/QtProjectWizardContentVS.h)
+          qt/QtCoreApplication.h)
 
 target_link_libraries(
   Sourcetrail_lib_gui

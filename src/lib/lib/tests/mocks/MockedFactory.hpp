@@ -3,7 +3,7 @@
 
 #include "data/storage/StorageCache.h"
 #include "factory/IFactory.hpp"
-#include "project/Project.h"
+#include "project/data/Project.h"
 #include "settings/ProjectSettings.h"
 
 namespace lib {

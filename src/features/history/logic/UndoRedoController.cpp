@@ -3,7 +3,7 @@
 #include "app/Application.h"
 #include "data/storage/StorageAccess.h"
 #include "history/logic/UndoRedoView.h"
-#include "project/IProject.hpp"
+#include "project/logic/IProject.hpp"
 #include "search/messages/MessageSearch.h"
 #include "type/MessageFlushUpdates.h"
 #include "utility.h"

@@ -156,37 +156,6 @@ target_sources(
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
           data/TaskMergeStorages.h
-          project/CompilationDatabase.cpp
-          project/CompilationDatabase.h
-          project/CxxToolchainRemote.cpp
-          project/CxxToolchainRemote.h
-          project/ICxxToolchain.cpp
-          project/ICxxToolchain.h
-          project/IProject.cpp
-          project/IProject.hpp
-          project/RefreshInfo.h
-          project/SourceGroup.cpp
-          project/SourceGroup.h
-          project/SourceGroupCustomCommand.cpp
-          project/SourceGroupCustomCommand.h
-          project/SourceGroupCxxCdb.cpp
-          project/SourceGroupCxxCdb.h
-          project/SourceGroupCxxEmpty.cpp
-          project/SourceGroupCxxEmpty.h
-          project/SourceGroupFactory.cpp
-          project/SourceGroupFactory.h
-          project/SourceGroupFactoryModule.cpp
-          project/SourceGroupFactoryModule.h
-          project/SourceGroupFactoryModuleCustom.cpp
-          project/SourceGroupFactoryModuleCustom.h
-          project/SourceGroupFactoryModuleCxx.cpp
-          project/SourceGroupFactoryModuleCxx.h
-          project/SourceGroupFactoryModuleJava.cpp
-          project/SourceGroupFactoryModuleJava.h
-          project/SourceGroupJavaEmpty.cpp
-          project/SourceGroupJavaEmpty.h
-          project/utilitySourceGroupCxx.cpp
-          project/utilitySourceGroupCxx.h
           settings/migration/SettingsMigration.cpp
           settings/migration/SettingsMigration.h
           settings/migration/SettingsMigrationDeleteKey.cpp
@@ -346,16 +315,7 @@ target_sources(
           data/storage/sqlite/SqliteIndexStorage.cpp
           data/storage/sqlite/SqliteIndexStorage.h
           data/storage/sqlite/SqliteStorage.cpp
-          data/storage/sqlite/SqliteStorage.h
-          project/DefaultTaskFactory.cpp
-          project/DefaultTaskFactory.h
-          project/ITaskFactory.h
-          project/IndexTaskBuilder.cpp
-          project/IndexTaskBuilder.h
-          project/Project.cpp
-          project/Project.h
-          project/RefreshInfoGenerator.cpp
-          project/RefreshInfoGenerator.h)
+          data/storage/sqlite/SqliteStorage.h)
 
 target_link_libraries(
   Sourcetrail_lib_engine

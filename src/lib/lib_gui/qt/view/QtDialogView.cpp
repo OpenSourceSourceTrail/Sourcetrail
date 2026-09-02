@@ -14,7 +14,7 @@
 #include "indexing/ui/QtIndexingProgressDialog.h"
 #include "indexing/ui/QtIndexingReportDialog.h"
 #include "indexing/ui/QtIndexingStartDialog.h"
-#include "project/IProject.hpp"
+#include "project/logic/IProject.hpp"
 #include "qt/window/QtKnownProgressDialog.h"
 #include "qt/window/QtMainWindow.h"
 #include "qt/window/QtUnknownProgressDialog.h"

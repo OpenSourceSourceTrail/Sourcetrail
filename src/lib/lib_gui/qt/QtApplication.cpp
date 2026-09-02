@@ -3,7 +3,7 @@
 #include <QFileOpenEvent>
 
 #include "FilePath.h"
-#include "type/MessageLoadProject.h"
+#include "project/messages/MessageLoadProject.h"
 #include "type/MessageWindowFocus.h"
 
 QtApplication::QtApplication(int& argc, char** argv) : QApplication(argc, argv) {

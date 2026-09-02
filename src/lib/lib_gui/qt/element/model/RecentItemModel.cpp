@@ -6,9 +6,9 @@
 #include <QMessageBox>
 #include <QMimeData>
 
+#include "project/messages/MessageLoadProject.h"
 #include "RangesTo.hpp"
 #include "settings/ProjectSettings.h"
-#include "type/MessageLoadProject.h"
 
 
 namespace {

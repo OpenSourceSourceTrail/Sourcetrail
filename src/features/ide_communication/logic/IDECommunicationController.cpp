@@ -5,10 +5,10 @@
 #include "FileSystem.h"
 #include "ide_communication/messages/MessagePingReceived.h"
 #include "logging.h"
+#include "project/messages/MessageProjectNew.h"
 #include "status/messages/MessageStatus.h"
 #include "tabs/messages/MessageTabOpenWith.h"
 #include "type/MessageActivateWindow.h"
-#include "type/MessageProjectNew.h"
 
 IDECommunicationController::IDECommunicationController(StorageAccess* storageAccess) : m_storageAccess(storageAccess) {}
 

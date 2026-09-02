@@ -31,13 +31,13 @@
 #include "data/NodeTypeSet.h"
 #include "data/storage/PersistentStorage.h"
 #include "data/storage/StorageStats.h"
-#include "data/tooltip/TooltipOrigin.h"
 #include "EngineChannel.h"
 #include "FilePath.h"
 #include "HttpStorageAccess.h"
 #include "MessageQueue.h"
 #include "settings/details/ApplicationSettings.h"
 #include "settings/IApplicationSettings.hpp"
+#include "tooltip/domain/TooltipOrigin.h"
 
 namespace {
 

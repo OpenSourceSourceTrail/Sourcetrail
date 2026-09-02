@@ -22,17 +22,17 @@
 #include "indexing/messages/MessageIndexingInterrupted.h"
 #include "language_packages.h"
 #include "productVersion.h"
-#include "project/CxxToolchainRemote.h"
-#include "project/ICxxToolchain.h"
-#include "project/SourceGroupFactory.h"
-#include "project/SourceGroupFactoryModuleCustom.h"
-#include "project/SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
-#include "project/SourceGroupFactoryModuleJava.h"
+#include "project/logic/CxxToolchainRemote.h"
+#include "project/logic/ICxxToolchain.h"
+#include "project/logic/SourceGroupFactory.h"
+#include "project/logic/SourceGroupFactoryModuleCustom.h"
+#include "project/logic/SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
+#include "project/logic/SourceGroupFactoryModuleJava.h"
+#include "project/messages/MessageLoadProject.h"
 #include "ScopedFunctor.h"
 #include "settings/ApplicationSettingsPrefiller.h"
 #include "settings/details/ApplicationSettings.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/MessageLoadProject.h"
 #include "Version.h"
 
 namespace {

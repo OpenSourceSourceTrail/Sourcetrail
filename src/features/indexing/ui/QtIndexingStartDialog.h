@@ -1,7 +1,7 @@
 #pragma once
 
 #include "indexing/ui/QtIndexingDialog.h"
-#include "project/RefreshInfo.h"
+#include "project/domain/RefreshInfo.h"
 
 class QLabel;
 class QRadioButton;
