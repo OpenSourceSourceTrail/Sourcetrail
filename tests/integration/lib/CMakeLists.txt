@@ -21,5 +21,5 @@ foreach(test_name IN LISTS test_lib_names)
          Sourcetrail::lib::lib_engine
          Boost::date_time
          spdlog::spdlog
-    TEST_PREFIX "integration.lib.")
+    TEST_PREFIX "integration.lib." LOCK filesystem)
 endforeach()
