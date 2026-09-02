@@ -9,12 +9,12 @@
 #include "component/view/CompositeView.h"
 #include "component/view/DialogView.h"
 #include "component/view/GraphView.h"
-#include "component/view/RefreshView.h"
 #include "component/view/SearchView.h"
 #include "component/view/TabbedView.h"
 #include "component/view/ViewFactory.h"
 #include "history/logic/UndoRedoView.h"
 #include "logging.h"
+#include "refresh/logic/RefreshView.h"
 
 namespace {
 template <class Container>

@@ -39,7 +39,6 @@ set(test_lib_names
     NetworkProtocolHelperTestSuite
     ProjectSettingsTestSuite
     ProjectTestSuite
-    RefreshControllerTestSuite
     ResourcePathsTestSuite
     ScreenSearchControllerTestSuite
     SearchControllerTestSuite

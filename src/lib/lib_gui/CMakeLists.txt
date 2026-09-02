@@ -197,8 +197,6 @@ target_sources(
           qt/view/QtGraphViewStyleImpl.h
           qt/view/QtMainView.cpp
           qt/view/QtMainView.h
-          qt/view/QtRefreshView.cpp
-          qt/view/QtRefreshView.h
           qt/view/QtScreenSearchView.cpp
           qt/view/QtScreenSearchView.h
           qt/view/QtSearchView.cpp

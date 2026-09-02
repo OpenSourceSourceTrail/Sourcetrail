@@ -10,11 +10,11 @@
 #include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedCompositeView.hpp"
 #include "mocks/MockedGraphView.hpp"
-#include "mocks/MockedRefreshView.hpp"
 #include "mocks/MockedScreenSearchSender.hpp"
 #include "mocks/MockedSearchView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "refresh/tests/MockedRefreshView.hpp"
 #include "type/focus/MessageFocusView.h"
 #include "type/MessageRefreshUI.h"
 

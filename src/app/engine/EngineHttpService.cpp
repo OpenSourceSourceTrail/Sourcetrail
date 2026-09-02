@@ -30,12 +30,12 @@
 #include "project/CompilationDatabase.h"
 #include "project/utilitySourceGroupCxx.h"
 #include "ProtoJson.h"
+#include "refresh/messages/MessageRefresh.h"
 #include "TextAccess.h"
 #include "TimeStamp.h"
 #include "tooltip/domain/TooltipInfo.h"
 #include "type/indexing/MessageIndexingInterrupted.h"
 #include "type/MessageLoadProject.h"
-#include "type/MessageRefresh.h"
 #include "utilityString.h"
 #include "Version.h"
 

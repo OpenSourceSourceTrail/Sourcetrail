@@ -44,8 +44,6 @@ target_sources(
           component/controller/GraphController.h
           component/controller/IDECommunicationController.cpp
           component/controller/IDECommunicationController.h
-          component/controller/RefreshController.cpp
-          component/controller/RefreshController.h
           component/controller/ScreenSearchController.cpp
           component/controller/ScreenSearchController.h
           component/controller/SearchController.cpp
@@ -73,8 +71,6 @@ target_sources(
           component/view/MetricGraphViewStyleImpl.h
           component/view/MainView.cpp
           component/view/MainView.h
-          component/view/RefreshView.cpp
-          component/view/RefreshView.h
           component/view/ScreenSearchView.cpp
           component/view/ScreenSearchView.h
           component/view/SearchView.cpp

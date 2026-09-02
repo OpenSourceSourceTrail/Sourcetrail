@@ -1,4 +1,4 @@
-#include "qt/view/QtRefreshView.h"
+#include "refresh/ui/QtRefreshView.h"
 
 #include <QCoreApplication>
 #include <QFrame>
@@ -8,8 +8,8 @@
 #include "qt/element/search/QtSearchBarButton.h"
 #include "qt/utility/utilityQt.h"
 #include "qt/view/QtViewWidgetWrapper.h"
+#include "refresh/messages/MessageRefresh.h"
 #include "type/indexing/MessageIndexingShowDialog.h"
-#include "type/MessageRefresh.h"
 
 QtRefreshView::QtRefreshView(ViewLayout* viewLayout) : RefreshView(viewLayout), m_widget{new QFrame} {
   m_widget->setObjectName(QStringLiteral("refresh_bar"));

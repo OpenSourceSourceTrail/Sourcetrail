@@ -4,13 +4,13 @@
 #include <gtest/gtest.h>
 
 #include "component/ComponentFactory.h"
-#include "component/controller/RefreshController.h"
-#include "component/view/RefreshView.h"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedRefreshView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "refresh/logic/RefreshController.h"
+#include "refresh/logic/RefreshView.h"
+#include "refresh/tests/MockedRefreshView.hpp"
 
 using namespace testing;
 

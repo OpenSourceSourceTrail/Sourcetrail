@@ -5,10 +5,10 @@
 #include "error/messages/MessageErrorCountClear.h"
 #include "error/messages/MessageErrorCountUpdate.h"
 #include "MessageListener.h"
+#include "refresh/messages/MessageRefresh.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/indexing/MessageIndexingStarted.h"
 #include "type/indexing/MessageIndexingStatus.h"
-#include "type/MessageRefresh.h"
 #include "type/MessageStatus.h"
 #include "type/plugin/MessagePingReceived.h"
 

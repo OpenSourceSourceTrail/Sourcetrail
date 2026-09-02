@@ -8,13 +8,13 @@
 #include "FilePath.h"
 #include "project/IProject.hpp"
 // messages
-#include "MessageListener.h"
 #include "bookmark/messages/MessageBookmarkUpdate.hpp"
+#include "MessageListener.h"
+#include "refresh/messages/MessageRefresh.h"
 #include "type/indexing/MessageIndexingFinished.h"
 #include "type/MessageActivateWindow.h"
 #include "type/MessageCloseProject.h"
 #include "type/MessageLoadProject.h"
-#include "type/MessageRefresh.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageSwitchColorScheme.h"
 
