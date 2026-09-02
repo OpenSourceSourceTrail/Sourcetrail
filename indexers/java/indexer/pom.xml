@@ -11,8 +11,9 @@
   <properties>
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <grpc.version>1.68.1</grpc.version>
+    <grpc.version>1.75.0</grpc.version>
     <protobuf.version>3.25.5</protobuf.version>
+    <javaparser.version>3.26.4</javaparser.version>
     <!-- The proto contracts shared with the C++ engine; single source of truth. -->
     <proto.sourceDir>${project.basedir}/../../../src/lib/proto</proto.sourceDir>
   </properties>
@@ -32,6 +33,11 @@
       <groupId>io.grpc</groupId>
       <artifactId>grpc-stub</artifactId>
       <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.javaparser</groupId>
+      <artifactId>javaparser-core</artifactId>
+      <version>${javaparser.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>

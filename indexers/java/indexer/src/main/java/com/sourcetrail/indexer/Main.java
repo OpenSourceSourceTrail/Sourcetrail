@@ -16,8 +16,8 @@ public final class Main {
 
     long processId = Long.parseLong(args[0]);
     String engineEndpoint = args[2];
-    // args[3] sharedDataPath, args[4] userDataPath, args[5] logFilePath: unused by increment 3.
+    // args[3] sharedDataPath, args[4] userDataPath, args[5] logFilePath are not yet used.
 
-    new GrpcWorker(engineEndpoint, processId, new EmptyIndexer()).work();
+    new GrpcWorker(engineEndpoint, processId, new JavaIndexer()).work();
   }
 }
