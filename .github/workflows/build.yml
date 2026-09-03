@@ -200,23 +200,20 @@ jobs:
               "binary_dir": "build",
               "sr_san": "thread,undefined",
             }
-          - {
-              name: "Ubuntu Latest CLang MSan",
-              tag: "clang",
-              "with_cxx": "",
-              "binary_dir": "build",
-              "sr_san": "memory",
-            }
+          # Disabled: the MSan leg. To re-enable, delete this comment line and strip the
+          # "# " prefix from the lines below, pasting it back into `config` as a list item.
+          # - {
+          #     name: "Ubuntu Latest CLang MSan",
+          #     tag: "clang",
+          #     "with_cxx": "",
+          #     "binary_dir": "build",
+          #     "sr_san": "memory",
+          #   }
 
     name: ${{ matrix.config.name }}
     needs: [clang-format, cmake-format, deps]
     if: ${{ !cancelled() && needs.clang-format.result == 'success' && needs.cmake-format.result == 'success' }}
     runs-on: ubuntu-24.04
-    # MSan flags every read through Conan's protobuf as uninitialized because that package isn't
-    # built with -fsanitize=memory itself -- a false positive until protobuf gets an
-    # msan-instrumented Conan build, not a real defect. Don't let it redden the whole run
-    # meanwhile.
-    continue-on-error: ${{ matrix.config.name == 'Ubuntu Latest CLang MSan' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
