@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 612" width="900" height="612" role="img" aria-label="Frontend time per Clang time-trace bucket, baseline versus with a precompiled header">
+<style>
+  .surface { fill: #fcfcfb; }
+  .ink     { fill: #0b0b0b; }
+  .ink2    { fill: #52514e; }
+  .grid    { stroke: #e3e2df; stroke-width: 1; }
+  .axis    { stroke: #c9c8c4; stroke-width: 1; }
+  .s1      { fill: #2a78d6; }
+  .s2      { fill: #eb6834; }
+  .s1s     { stroke: #2a78d6; }
+  .s2s     { stroke: #eb6834; }
+  .ring    { stroke: #fcfcfb; }
+  .refline { stroke: #a9a8a4; stroke-width: 2; stroke-dasharray: 5 4; }
+  text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink     { fill: #ffffff; }
+    .ink2    { fill: #c3c2b7; }
+    .grid    { stroke: #333230; }
+    .axis    { stroke: #4a4946; }
+    .s1      { fill: #3987e5; }
+    .s2      { fill: #d95926; }
+    .s1s     { stroke: #3987e5; }
+    .s2s     { stroke: #d95926; }
+    .ring    { stroke: #1a1a19; }
+    .refline { stroke: #6b6a66; }
+  }
+</style>
+<rect class="surface" width="900" height="612"/>
+<text class="ink" x="24" y="30" font-size="16" font-weight="600">Where the frontend time goes</text>
+<text class="ink2" x="24" y="50" font-size="12.5">48 translation units, summed seconds per -ftime-trace bucket. Buckets nest, so they overlap.</text>
+<rect class="s1" x="558" y="22" width="11" height="11" rx="2"/><text class="ink2" x="576" y="32" font-size="12.5">Baseline</text>
+<rect class="s2" x="650" y="22" width="11" height="11" rx="2"/><text class="ink2" x="668" y="32" font-size="12.5">With precompiled header</text>
+<line class="grid" x1="290.0" y1="68" x2="290.0" y2="538"/>
+<text class="ink2" x="290.0" y="558" font-size="11.5" text-anchor="middle">0s</text>
+<line class="grid" x1="354.8" y1="68" x2="354.8" y2="538"/>
+<text class="ink2" x="354.8" y="558" font-size="11.5" text-anchor="middle">20s</text>
+<line class="grid" x1="419.5" y1="68" x2="419.5" y2="538"/>
+<text class="ink2" x="419.5" y="558" font-size="11.5" text-anchor="middle">40s</text>
+<line class="grid" x1="484.2" y1="68" x2="484.2" y2="538"/>
+<text class="ink2" x="484.2" y="558" font-size="11.5" text-anchor="middle">60s</text>
+<line class="grid" x1="549.0" y1="68" x2="549.0" y2="538"/>
+<text class="ink2" x="549.0" y="558" font-size="11.5" text-anchor="middle">80s</text>
+<line class="grid" x1="613.8" y1="68" x2="613.8" y2="538"/>
+<text class="ink2" x="613.8" y="558" font-size="11.5" text-anchor="middle">100s</text>
+<line class="grid" x1="678.5" y1="68" x2="678.5" y2="538"/>
+<text class="ink2" x="678.5" y="558" font-size="11.5" text-anchor="middle">120s</text>
+<line class="grid" x1="743.2" y1="68" x2="743.2" y2="538"/>
+<text class="ink2" x="743.2" y="558" font-size="11.5" text-anchor="middle">140s</text>
+<line class="grid" x1="808.0" y1="68" x2="808.0" y2="538"/>
+<text class="ink2" x="808.0" y="558" font-size="11.5" text-anchor="middle">160s</text>
+<text class="ink2" x="549.0" y="580" font-size="11.5" text-anchor="middle">seconds of CPU across the sample</text>
+<line class="axis" x1="290" y1="68" x2="290" y2="538"/>
+<text class="ink" x="276" y="96" font-size="12.5" text-anchor="end">Whole compilation</text>
+<path class="s1" d="M290,78 H793.843256725 A4,4 0 0 1 797.843256725,82 V89 A4,4 0 0 1 793.843256725,93 H290 Z"/>
+<path class="s2" d="M290,95 H607.0483871874999 A4,4 0 0 1 611.0483871874999,99 V106 A4,4 0 0 1 607.0483871874999,110 H290 Z"/>
+<text class="ink" x="820" y="100" font-size="12.5" font-weight="600">-37%</text>
+<text class="ink" x="276" y="142" font-size="12.5" text-anchor="end">Frontend</text>
+<path class="s1" d="M290,124 H793.3899581625 A4,4 0 0 1 797.3899581625,128 V135 A4,4 0 0 1 793.3899581625,139 H290 Z"/>
+<path class="s2" d="M290,141 H605.9152265750001 A4,4 0 0 1 609.9152265750001,145 V152 A4,4 0 0 1 605.9152265750001,156 H290 Z"/>
+<text class="ink" x="820" y="146" font-size="12.5" font-weight="600">-37%</text>
+<text class="ink" x="276" y="188" font-size="12.5" text-anchor="end">ParseClass</text>
+<path class="s1" d="M290,170 H484.86749408749995 A4,4 0 0 1 488.86749408749995,174 V181 A4,4 0 0 1 484.86749408749995,185 H290 Z"/>
+<path class="s2" d="M290,187 H371.6164029875 A4,4 0 0 1 375.6164029875,191 V198 A4,4 0 0 1 371.6164029875,202 H290 Z"/>
+<text class="ink" x="820" y="192" font-size="12.5" font-weight="600">-57%</text>
+<text class="ink" x="276" y="234" font-size="12.5" text-anchor="end">Source (#include work)</text>
+<path class="s1" d="M290,216 H467.959096725 A4,4 0 0 1 471.959096725,220 V227 A4,4 0 0 1 467.959096725,231 H290 Z"/>
+<path class="s2" d="M290,233 H367.58721445000003 A4,4 0 0 1 371.58721445000003,237 V244 A4,4 0 0 1 367.58721445000003,248 H290 Z"/>
+<text class="ink" x="820" y="238" font-size="12.5" font-weight="600">-55%</text>
+<text class="ink" x="276" y="280" font-size="12.5" text-anchor="end">InstantiateFunction</text>
+<path class="s1" d="M290,262 H445.43006266249995 A4,4 0 0 1 449.43006266249995,266 V273 A4,4 0 0 1 445.43006266249995,277 H290 Z"/>
+<path class="s2" d="M290,279 H451.8464380125 A4,4 0 0 1 455.8464380125,283 V290 A4,4 0 0 1 451.8464380125,294 H290 Z"/>
+<text class="ink" x="820" y="284" font-size="12.5" font-weight="600">+4%</text>
+<text class="ink" x="276" y="326" font-size="12.5" text-anchor="end">ParseDeclarationOrFunctionDefinition</text>
+<path class="s1" d="M290,308 H443.36619202500003 A4,4 0 0 1 447.36619202500003,312 V319 A4,4 0 0 1 443.36619202500003,323 H290 Z"/>
+<path class="s2" d="M290,325 H364.01754695 A4,4 0 0 1 368.01754695,329 V336 A4,4 0 0 1 364.01754695,340 H290 Z"/>
+<text class="ink" x="820" y="330" font-size="12.5" font-weight="600">-50%</text>
+<text class="ink" x="276" y="372" font-size="12.5" text-anchor="end">PerformPendingInstantiations</text>
+<path class="s1" d="M290,354 H405.6046686625 A4,4 0 0 1 409.6046686625,358 V365 A4,4 0 0 1 405.6046686625,369 H290 Z"/>
+<path class="s2" d="M290,371 H429.418977275 A4,4 0 0 1 433.418977275,375 V382 A4,4 0 0 1 429.418977275,386 H290 Z"/>
+<text class="ink" x="820" y="376" font-size="12.5" font-weight="600">+20%</text>
+<text class="ink" x="276" y="418" font-size="12.5" text-anchor="end">InstantiateClass</text>
+<path class="s1" d="M290,400 H402.85204903749997 A4,4 0 0 1 406.85204903749997,404 V411 A4,4 0 0 1 402.85204903749997,415 H290 Z"/>
+<path class="s2" d="M290,417 H372.84472343749997 A4,4 0 0 1 376.84472343749997,421 V428 A4,4 0 0 1 372.84472343749997,432 H290 Z"/>
+<text class="ink" x="820" y="422" font-size="12.5" font-weight="600">-26%</text>
+<text class="ink" x="276" y="464" font-size="12.5" text-anchor="end">ParseFunctionDefinition</text>
+<path class="s1" d="M290,446 H377.53539149999995 A4,4 0 0 1 381.53539149999995,450 V457 A4,4 0 0 1 377.53539149999995,461 H290 Z"/>
+<path class="s2" d="M290,463 H333.7572916625 A4,4 0 0 1 337.7572916625,467 V474 A4,4 0 0 1 333.7572916625,478 H290 Z"/>
+<text class="ink" x="820" y="468" font-size="12.5" font-weight="600">-48%</text>
+<text class="ink" x="276" y="510" font-size="12.5" text-anchor="end">CheckConstraintSatisfaction</text>
+<path class="s1" d="M290,492 H346.1275072125 A4,4 0 0 1 350.1275072125,496 V503 A4,4 0 0 1 346.1275072125,507 H290 Z"/>
+<path class="s2" d="M290,509 H334.474135675 A4,4 0 0 1 338.474135675,513 V520 A4,4 0 0 1 334.474135675,524 H290 Z"/>
+<text class="ink" x="820" y="514" font-size="12.5" font-weight="600">-19%</text>
+</svg>

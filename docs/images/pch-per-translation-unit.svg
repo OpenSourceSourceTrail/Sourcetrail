@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 600" width="640" height="600" role="img" aria-label="Per translation unit frontend time, baseline on the x axis versus with a precompiled header on the y axis">
+<style>
+  .surface { fill: #fcfcfb; }
+  .ink     { fill: #0b0b0b; }
+  .ink2    { fill: #52514e; }
+  .grid    { stroke: #e3e2df; stroke-width: 1; }
+  .axis    { stroke: #c9c8c4; stroke-width: 1; }
+  .s1      { fill: #2a78d6; }
+  .s2      { fill: #eb6834; }
+  .s1s     { stroke: #2a78d6; }
+  .s2s     { stroke: #eb6834; }
+  .ring    { stroke: #fcfcfb; }
+  .refline { stroke: #a9a8a4; stroke-width: 2; stroke-dasharray: 5 4; }
+  text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink     { fill: #ffffff; }
+    .ink2    { fill: #c3c2b7; }
+    .grid    { stroke: #333230; }
+    .axis    { stroke: #4a4946; }
+    .s1      { fill: #3987e5; }
+    .s2      { fill: #d95926; }
+    .s1s     { stroke: #3987e5; }
+    .s2s     { stroke: #d95926; }
+    .ring    { stroke: #1a1a19; }
+    .refline { stroke: #6b6a66; }
+  }
+</style>
+<rect class="surface" width="640" height="600"/>
+<text class="ink" x="24" y="30" font-size="16" font-weight="600">44 of 48 translation units got faster</text>
+<text class="ink2" x="24" y="50" font-size="12.5">One dot per translation unit. Below the dashed line is faster; above it, the prefix cost more than it saved.</text>
+<line class="grid" x1="66.0" y1="78" x2="66.0" y2="522"/>
+<line class="grid" x1="66" y1="522.0" x2="616" y2="522.0"/>
+<text class="ink2" x="66.0" y="542" font-size="11.5" text-anchor="middle">0s</text>
+<text class="ink2" x="56" y="526.0" font-size="11.5" text-anchor="end">0s</text>
+<line class="grid" x1="203.5" y1="78" x2="203.5" y2="522"/>
+<line class="grid" x1="66" y1="411.0" x2="616" y2="411.0"/>
+<text class="ink2" x="203.5" y="542" font-size="11.5" text-anchor="middle">2s</text>
+<text class="ink2" x="56" y="415.0" font-size="11.5" text-anchor="end">2s</text>
+<line class="grid" x1="341.0" y1="78" x2="341.0" y2="522"/>
+<line class="grid" x1="66" y1="300.0" x2="616" y2="300.0"/>
+<text class="ink2" x="341.0" y="542" font-size="11.5" text-anchor="middle">4s</text>
+<text class="ink2" x="56" y="304.0" font-size="11.5" text-anchor="end">4s</text>
+<line class="grid" x1="478.5" y1="78" x2="478.5" y2="522"/>
+<line class="grid" x1="66" y1="189.0" x2="616" y2="189.0"/>
+<text class="ink2" x="478.5" y="542" font-size="11.5" text-anchor="middle">6s</text>
+<text class="ink2" x="56" y="193.0" font-size="11.5" text-anchor="end">6s</text>
+<line class="grid" x1="616.0" y1="78" x2="616.0" y2="522"/>
+<line class="grid" x1="66" y1="78.0" x2="616" y2="78.0"/>
+<text class="ink2" x="616.0" y="542" font-size="11.5" text-anchor="middle">8s</text>
+<text class="ink2" x="56" y="82.0" font-size="11.5" text-anchor="end">8s</text>
+<line class="refline" x1="66" y1="522" x2="616" y2="78.0"/>
+<text class="ink2" x="608" y="120.0" font-size="11.5" text-anchor="end">no change</text>
+<circle class="s1 ring" cx="407" cy="27" r="5" stroke-width="2"/><text class="ink2" x="420" y="31" font-size="12.5">faster</text>
+<circle class="s2 ring" cx="482" cy="27" r="5" stroke-width="2"/><text class="ink2" x="495" y="31" font-size="12.5">slower</text>
+<circle class="s1 ring" cx="602.0" cy="168.6" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="545.0" cy="248.2" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="496.7" cy="236.5" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="478.8" cy="216.5" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="455.0" cy="251.2" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="441.1" cy="250.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="426.3" cy="264.9" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="397.2" cy="422.0" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="386.4" cy="316.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="384.2" cy="425.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="371.1" cy="392.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="363.1" cy="475.1" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="356.4" cy="300.7" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="350.5" cy="432.6" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="341.0" cy="435.9" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="329.0" cy="325.1" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="328.5" cy="318.8" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="318.6" cy="439.7" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="312.5" cy="445.8" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="297.7" cy="366.9" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="297.0" cy="367.4" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="281.8" cy="425.1" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="281.5" cy="443.1" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="277.8" cy="370.9" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="271.2" cy="469.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="270.1" cy="459.2" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="266.9" cy="401.2" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="260.0" cy="415.9" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="244.1" cy="460.1" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="237.7" cy="485.8" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="233.3" cy="473.1" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="233.0" cy="472.5" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="231.9" cy="479.5" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="231.6" cy="471.5" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="215.8" cy="499.2" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="213.9" cy="487.2" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="210.3" cy="484.5" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="209.4" cy="476.6" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="195.5" cy="500.4" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="177.2" cy="474.8" r="5" stroke-width="2"/>
+<circle class="s2 ring" cx="175.8" cy="421.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="169.2" cy="463.4" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="160.7" cy="449.3" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="156.0" cy="456.6" r="5" stroke-width="2"/>
+<circle class="s1 ring" cx="140.6" cy="463.7" r="5" stroke-width="2"/>
+<circle class="s2 ring" cx="136.9" cy="463.5" r="5" stroke-width="2"/>
+<circle class="s2 ring" cx="106.9" cy="479.1" r="5" stroke-width="2"/>
+<circle class="s2 ring" cx="85.3" cy="505.4" r="5" stroke-width="2"/>
+<text class="ink2" x="341.0" y="570" font-size="12.5" text-anchor="middle">baseline</text>
+<text class="ink2" x="18" y="300.0" font-size="12.5" text-anchor="middle" transform="rotate(-90 18 300.0)">with precompiled header</text>
+</svg>
