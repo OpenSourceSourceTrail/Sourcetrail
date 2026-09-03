@@ -43,9 +43,11 @@ private:
 
   void run();
 
-  std::thread mThread;
   std::deque<Entry> mEntries;
   mutable std::mutex mMutex;
   std::condition_variable mCondition;
   bool mStopped = false;
+  // Declared last on purpose: members are initialised in declaration order, and the constructor
+  // starts run() on this thread. Everything the worker touches must already be constructed.
+  std::thread mThread;
 };

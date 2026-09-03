@@ -12,7 +12,6 @@
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/VirtualFileSystem.h>
 // internal
-#include "data/indexer/IndexerCommandCxx.h"
 #include "data/parser/cxx/ASTAction.h"
 #include "data/parser/cxx/CanonicalFilePathCache.h"
 #include "data/parser/cxx/ClangInvocationInfo.h"
@@ -22,7 +21,9 @@
 #include "data/parser/ParserClient.h"
 #include "FilePath.h"
 #include "FileRegister.h"
+#include "indexing/logic/IndexerCommandCxx.h"
 #include "logging.h"
+#include "Profiling.h"
 #include "settings/IApplicationSettings.hpp"
 #include "TextAccess.h"
 #include "utility.h"
@@ -145,6 +146,8 @@ void CxxParser::buildIndex(const std::wstring& fileName,
 }
 
 void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabase, const FilePath& sourceFilePath) {
+  SR_ZONE_N("cxx/runTool");
+
   initializeLLVM();
 
   clang::tooling::ClangTool tool(*pCompilationDatabase, std::vector<std::string>(1, utility::encodeToUtf8(sourceFilePath.wstr())));
@@ -157,7 +160,11 @@ void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabas
   tool.setPrintErrorMessage(false);
 
   ClangInvocationInfo info;
-  info = ClangInvocationInfo::getClangInvocationString(pCompilationDatabase);
+  {
+    // Builds a driver invocation of its own, so it is not free even when the log line is discarded.
+    SR_ZONE_N("cxx/invocation-string");
+    info = ClangInvocationInfo::getClangInvocationString(pCompilationDatabase);
+  }
   LOG_INFO("Clang Invocation: " +
            info.invocation.substr(
                0, IApplicationSettings::getInstanceRaw()->getVerboseIndexerLoggingEnabled() ? std::string::npos : 20000));
@@ -167,7 +174,13 @@ void CxxParser::runTool(clang::tooling::CompilationDatabase* pCompilationDatabas
   }
 
   auto* pAction = new ASTAction(m_client, pCanonicalFilePathCache, m_indexerStateInfo);
-  tool.run(new SingleFrontendActionFactory(pAction));
+  {
+    // Minus the cxx/indexDecl zone nested inside it, this is the Clang frontend itself:
+    // preprocessing, parsing and sema. The difference is what says whether to attack the compiler
+    // flags or our own AST traversal.
+    SR_ZONE_N("cxx/tool.run");
+    tool.run(new SingleFrontendActionFactory(pAction));
+  }
 
   if(!m_client->hasContent()) {
     if(info.invocation.empty()) {

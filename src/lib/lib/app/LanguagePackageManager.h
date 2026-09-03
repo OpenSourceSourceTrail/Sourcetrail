@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <vector>
 
 class IndexerComposite;
@@ -17,6 +18,7 @@ public:
 
 private:
   static Ptr s_instance;
+  static std::once_flag s_once;
   LanguagePackageManager();
 
   std::vector<std::shared_ptr<LanguagePackage>> m_packages;

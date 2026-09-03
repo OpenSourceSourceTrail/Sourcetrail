@@ -12,17 +12,17 @@
 #  define private public
 #endif
 #include "app/Application.h"
-#include "project/Project.h"
+#include "project/data/Project.h"
 #include "settings/ProjectSettings.h"
 #ifndef D_WINDOWS
 #  undef private
 #endif
 #include "MockedFactory.hpp"
-#include "MockedProject.hpp"
 #include "MockedSharedMemoryGarbageCollector.hpp"
 #include "mocks/MockedApplicationSetting.hpp"
 #include "mocks/MockedMessageQueue.hpp"
-#include "type/MessageStatus.h"
+#include "project/tests/MockedProject.hpp"
+#include "status/messages/MessageStatus.h"
 #include "Version.h"
 
 using namespace std::chrono_literals;

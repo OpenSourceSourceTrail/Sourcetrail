@@ -1,14 +1,7 @@
 # ${PROJECT_SOURCE_DIR}/tests/integration/lib/CMakeLists.txt
 
-set(test_lib_names
-    RefreshInfoGeneratorTestSuite
-    SourceGroupTestSuite
-    PersistentStorageTestSuite
-    SqliteBookmarkStorageTestSuite
-    SqliteDatabaseIndexTestSuite
-    SqliteIndexStorageTestSuite
-    SqliteStorageTestSuite
-    StorageTestSuite)
+set(test_lib_names PersistentStorageTestSuite SqliteDatabaseIndexTestSuite SqliteIndexStorageTestSuite
+                   SqliteStorageTestSuite StorageTestSuite)
 
 foreach(test_name IN LISTS test_lib_names)
   add_sourcetrail_test(
@@ -28,5 +21,5 @@ foreach(test_name IN LISTS test_lib_names)
          Sourcetrail::lib::lib_engine
          Boost::date_time
          spdlog::spdlog
-    TEST_PREFIX "integration.lib.")
+    TEST_PREFIX "integration.lib." LOCK filesystem)
 endforeach()

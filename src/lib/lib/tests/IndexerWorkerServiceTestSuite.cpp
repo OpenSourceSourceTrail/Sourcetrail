@@ -3,9 +3,9 @@
 
 #include <gtest/gtest.h>
 
-#include "data/indexer/grpc/IndexerWorkerServiceImpl.h"
 #include "data/storage/StorageProvider.h"
 #include "FilePath.h"
+#include "indexing/logic/grpc/IndexerWorkerServiceImpl.h"
 
 using namespace std::chrono_literals;
 

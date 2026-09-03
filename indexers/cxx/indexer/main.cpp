@@ -9,9 +9,10 @@
 #include "app/LanguagePackageManager.h"
 #include "app/paths/AppPath.h"
 #include "app/paths/UserPaths.h"
-#include "data/indexer/grpc/GrpcIndexer.h"
+#include "indexing/logic/grpc/GrpcIndexer.h"
 #include "language_packages.h"
 #include "logging.h"
+#include "Profiling.h"
 #include "settings/details/ApplicationSettings.h"
 #include "settings/IApplicationSettings.hpp"
 
@@ -19,7 +20,7 @@
 #  include "CxxHelperMode.h"
 #  include "LanguagePackageCxx.h"
 #  include "project/CxxToolchainLocal.h"
-#  include "project/ICxxToolchain.h"
+#  include "project/logic/ICxxToolchain.h"
 #endif
 
 #ifdef _WIN32
@@ -72,6 +73,10 @@ int main(int argc, char* argv[]) {
     LOG_ERROR("Invalid processId: " + std::string(e.what()));
     return EXIT_FAILURE;
   }
+
+  // Offset by the worker's id: a Tracy client binds one port, and the worker inherits the engine's
+  // environment, so without this every process would fight over the same one. Worker 1 is 8087.
+  const profiling::Scope tracyScope{static_cast<unsigned short>(profiling::DefaultPort + processId)};
 
   const std::string endpointFlag = argv[2];
   if(endpointFlag != "--engine-endpoint") {

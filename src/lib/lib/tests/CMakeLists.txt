@@ -11,7 +11,6 @@ target_link_libraries(lib_test_utilities PRIVATE Sourcetrail::warnings)
 set(test_lib_names
     AppPathTestSuite
     ApplicationTestSuite # TODO(Hussein): Move to integration-tests
-    BookmarkControllerTestSuite
     ComponentFactoryTestSuite
     ComponentManagerTestSuite
     ComponentTestSuite
@@ -21,24 +20,15 @@ set(test_lib_names
     DialogViewTestSuite
     FactoryTestSuite
     FileHandlerTestSuite
-    GraphTestSuite
-    GraphViewStyleTestSuite # TODO(SOUR-97)
-    HierarchyCacheTestSuite
     IncludeDirectiveTestSuite
-    utilitySourceGroupCxxTestSuite
-    IndexerCommandJavaTestSuite
     IndexerWireEnumsTestSuite
-    IndexerCompositeTestSuite
     IndexerPluginRegistryTestSuite
     IndexerWorkerServiceTestSuite
     IntermediateStorageTestSuite
     LanguagePackageManagerTestSuite
     LocationTypeTestSuite
-    NetworkProtocolHelperTestSuite
     ProjectSettingsTestSuite
-    ProjectTestSuite
     ResourcePathsTestSuite
-    SearchIndexTestSuite
     SettingsMigratorTestSuite
     SettingsTestSuite
     SharedMemoryTestSuite
@@ -48,11 +38,8 @@ set(test_lib_names
     SourceLocationTestSuite
     StorageCacheTestSuite
     StorageProviderTestSuite
-    StatusBarControllerTestSuite
-    StatusControllerTestSuite
     TabIdTestSuite
     TabTestSuite
-    TaskBuildIndexTestSuite
     TimeStampTestSuite
     TreeTestSuite
     UserPathsTestSuite)
@@ -61,7 +48,7 @@ foreach(test_name IN LISTS test_lib_names)
   add_sourcetrail_test(
     NAME ${test_name}
     SOURCES ${test_name}.cpp
-    DEPS lib_test_utilities lib::mocks Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess Qt6::Gui
+    DEPS lib_test_utilities lib::mocks Sourcetrail::lib::lib_engine Sourcetrail::lib::core::utility::TextAccess
     TEST_PREFIX "unittests.lib.")
 
   target_compile_definitions(${test_name} PUBLIC ST_TESTING=1)
@@ -76,9 +63,6 @@ target_link_libraries(LanguagePackageManagerTestSuite PRIVATE Sourcetrail::lib::
 target_link_libraries(SingleValueCacheTestSuite PRIVATE Sourcetrail::lib::core::utility::SingleValueCache)
 
 target_link_libraries(IncludeDirectiveTestSuite PRIVATE Sourcetrail::lib::core::utility::file::ScopedTemporaryFile)
-
-# target_link_libraries(StatusBarControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
-# target_link_libraries(StatusControllerTestSuite PRIVATE Sourcetrail::lib::messaging)
 
 if(WIN32)
   target_compile_options(ComponentManagerTestSuite PRIVATE "/bigobj")

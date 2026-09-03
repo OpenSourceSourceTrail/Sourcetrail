@@ -2,14 +2,14 @@
 
 #include "app/Application.h"
 #include "component/view/DialogView.h"
-#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h"
-#include "qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h"
-#include "qt/project_wizard/content/QtProjectWizardContentGroup.h"
-#include "qt/project_wizard/content/QtProjectWizardContentPreferences.h"
-#include "type/MessageLoadProject.h"
+#include "ide_communication/messages/MessagePluginPortChange.h"
+#include "project/messages/MessageLoadProject.h"
+#include "project/ui/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h"
+#include "project/ui/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h"
+#include "project/ui/content/QtProjectWizardContentGroup.h"
+#include "project/ui/content/QtProjectWizardContentPreferences.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageScrollSpeedChange.h"
-#include "type/plugin/MessagePluginPortChange.h"
 #include "utilityApp.h"
 
 QtPreferencesWindow::QtPreferencesWindow(QWidget* parent) : QtProjectWizardWindow(parent) {

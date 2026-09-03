@@ -16,6 +16,9 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::utilityApp
           Sourcetrail::lib::core::utility::commandline::CommandLineParser)
 
+# The lib_gui binary dir is here for productVersion.h, which cmake/version.cmake generates into it.
+# Not a GUI dependency -- but until that header is generated somewhere neutral, a headless binary
+# still has to look in the GUI's build directory for it.
 target_include_directories(Sourcetrail_cli PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}" "${PROJECT_BINARY_DIR}/src/lib/lib"
                                                    "${PROJECT_BINARY_DIR}/src/lib/lib_gui")
 

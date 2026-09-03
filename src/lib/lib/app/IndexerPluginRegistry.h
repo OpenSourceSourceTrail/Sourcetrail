@@ -1,11 +1,12 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <vector>
 
-#include "data/indexer/IndexerCommandType.h"
 #include "FilePath.h"
+#include "indexing/domain/IndexerCommandType.h"
 #include "settings/LanguageType.h"
 #include "settings/source_group/SourceGroupType.h"
 
@@ -42,6 +43,7 @@ public:
 
 private:
   static Ptr s_instance;
+  static std::once_flag s_once;
   IndexerPluginRegistry();
 
   static std::optional<Plugin> loadManifest(const FilePath& manifestFilePath);

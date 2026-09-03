@@ -2,35 +2,36 @@
 
 #include <memory>
 
+#include "activation/logic/ActivationController.h"
+#include "app/Application.h"
+#include "bookmark/logic/BookmarkController.h"
+#include "bookmark/logic/BookmarkView.h"
+#include "code/logic/CodeController.h"
+#include "code/logic/CodeView.h"
 #include "component/Component.h"
-#include "component/controller/ActivationController.h"
-#include "component/controller/BookmarkController.h"
-#include "component/controller/CodeController.h"
-#include "component/controller/CustomTrailController.h"
-#include "component/controller/ErrorController.h"
-#include "component/controller/GraphController.h"
-#include "component/controller/RefreshController.h"
-#include "component/controller/ScreenSearchController.h"
-#include "component/controller/SearchController.h"
-#include "component/controller/StatusBarController.h"
-#include "component/controller/StatusController.h"
-#include "component/controller/TabsController.h"
-#include "component/controller/TooltipController.h"
-#include "component/controller/UndoRedoController.h"
-#include "component/view/BookmarkView.h"
-#include "component/view/CodeView.h"
-#include "component/view/CustomTrailView.h"
-#include "component/view/ErrorView.h"
-#include "component/view/GraphView.h"
-#include "component/view/RefreshView.h"
-#include "component/view/ScreenSearchView.h"
-#include "component/view/SearchView.h"
-#include "component/view/StatusBarView.h"
-#include "component/view/StatusView.h"
-#include "component/view/TabsView.h"
-#include "component/view/TooltipView.h"
-#include "component/view/UndoRedoView.h"
 #include "component/view/ViewFactory.h"
+#include "custom_trail/logic/CustomTrailController.h"
+#include "custom_trail/logic/CustomTrailView.h"
+#include "error/logic/ErrorController.h"
+#include "error/logic/ErrorView.h"
+#include "graph/logic/GraphController.h"
+#include "graph/logic/GraphView.h"
+#include "history/logic/UndoRedoController.h"
+#include "history/logic/UndoRedoView.h"
+#include "refresh/logic/RefreshController.h"
+#include "refresh/logic/RefreshView.h"
+#include "search/logic/ScreenSearchController.h"
+#include "search/logic/ScreenSearchView.h"
+#include "search/logic/SearchController.h"
+#include "search/logic/SearchView.h"
+#include "status/logic/StatusBarController.h"
+#include "status/logic/StatusBarView.h"
+#include "status/logic/StatusController.h"
+#include "status/logic/StatusView.h"
+#include "tabs/logic/TabsController.h"
+#include "tabs/logic/TabsView.h"
+#include "tooltip/logic/TooltipController.h"
+#include "tooltip/logic/TooltipView.h"
 
 ComponentFactory::ComponentFactory(const ViewFactory* viewFactory, StorageAccess* storageAccess)
     : m_viewFactory(viewFactory), m_storageAccess(storageAccess) {}
@@ -122,7 +123,7 @@ std::shared_ptr<Component> ComponentFactory::createStatusComponent(ViewLayout* v
 std::shared_ptr<Component> ComponentFactory::createTabsComponent(ViewLayout* viewLayout, ScreenSearchSender* screenSearchSender) {
   std::shared_ptr<TabsView> view = m_viewFactory->createTabsView(viewLayout);
   std::shared_ptr<Controller> controller = std::make_shared<TabsController>(
-      viewLayout, m_viewFactory, m_storageAccess, screenSearchSender);
+      viewLayout, m_viewFactory, m_storageAccess, screenSearchSender, [] { return Application::getInstance()->isProjectLoaded(); });
 
   return std::make_shared<Component>(view, controller);
 }

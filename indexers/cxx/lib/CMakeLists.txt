@@ -109,6 +109,7 @@ target_link_libraries(
           Sourcetrail::lib::core::utility::TextAccess
           Sourcetrail::lib::core::utility::TextCodec
           Sourcetrail::lib::core::utility::utility
+          Sourcetrail::lib::core::utility::profiling
           Sourcetrail::lib::core::utility::file::FileRegister
           Sourcetrail::lib::core::utility::file::FilePathFilter
           Sourcetrail::lib::core::utility::file::FileManager

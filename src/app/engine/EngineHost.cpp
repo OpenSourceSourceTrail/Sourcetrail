@@ -8,12 +8,12 @@
 #include "EngineEventPublisher.h"
 #include "EngineHttpService.h"
 #include "HttpServer.h"
-#include "project/CxxToolchainRemote.h"
-#include "project/ICxxToolchain.h"
-#include "project/SourceGroupFactory.h"
-#include "project/SourceGroupFactoryModuleCustom.h"
-#include "project/SourceGroupFactoryModuleCxx.h"
-#include "project/SourceGroupFactoryModuleJava.h"
+#include "project/logic/CxxToolchainRemote.h"
+#include "project/logic/ICxxToolchain.h"
+#include "project/logic/SourceGroupFactory.h"
+#include "project/logic/SourceGroupFactoryModuleCustom.h"
+#include "project/logic/SourceGroupFactoryModuleCxx.h"
+#include "project/logic/SourceGroupFactoryModuleJava.h"
 #include "utilityUuid.h"
 
 namespace engine_host {

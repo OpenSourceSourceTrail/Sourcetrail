@@ -1,12 +1,10 @@
 #include "app/LanguagePackageManager.h"
 
 #include "app/LanguagePackage.h"
-#include "data/indexer/IndexerComposite.h"
+#include "indexing/logic/IndexerComposite.h"
 
 LanguagePackageManager::Ptr LanguagePackageManager::getInstance() {
-  if(!s_instance) {
-    s_instance = std::shared_ptr<LanguagePackageManager>(new LanguagePackageManager());
-  }
+  std::call_once(s_once, [] { s_instance = std::shared_ptr<LanguagePackageManager>(new LanguagePackageManager()); });
   return s_instance;
 }
 
@@ -29,5 +27,6 @@ std::shared_ptr<IndexerComposite> LanguagePackageManager::instantiateSupportedIn
 }
 
 LanguagePackageManager::Ptr LanguagePackageManager::s_instance;
+std::once_flag LanguagePackageManager::s_once;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 LanguagePackageManager::LanguagePackageManager() = default;

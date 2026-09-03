@@ -2,7 +2,7 @@
 
 #include "logging.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/MessageStatus.h"
+#include "status/messages/MessageStatus.h"
 #include "utility.h"
 #include "utility/path_detector/utilityPathDetection.h"
 

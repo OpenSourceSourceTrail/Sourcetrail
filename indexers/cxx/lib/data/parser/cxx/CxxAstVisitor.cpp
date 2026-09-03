@@ -4,11 +4,11 @@
 #include <clang/Basic/Version.h>
 #include <clang/Lex/Preprocessor.h>
 
-#include "data/indexer/IndexerStateInfo.h"
 #include "data/parser/cxx/CanonicalFilePathCache.h"
 #include "data/parser/cxx/utilityClang.h"
 #include "data/parser/ParseLocation.h"
 #include "data/parser/ParserClient.h"
+#include "indexing/domain/IndexerStateInfo.h"
 #include "logging.h"
 
 CxxAstVisitor::CxxAstVisitor(clang::ASTContext* astContext,

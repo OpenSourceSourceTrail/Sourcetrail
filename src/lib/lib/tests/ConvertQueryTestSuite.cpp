@@ -1,18 +1,18 @@
 #include <gtest/gtest.h>
 
+#include "bookmark/domain/BookmarkCategory.h"
+#include "bookmark/domain/EdgeBookmark.h"
+#include "bookmark/domain/NodeBookmark.h"
 #include "ConvertQuery.h"
-#include "data/bookmark/BookmarkCategory.h"
-#include "data/bookmark/EdgeBookmark.h"
-#include "data/bookmark/NodeBookmark.h"
-#include "data/ErrorFilter.h"
-#include "data/ErrorInfo.h"
 #include "data/location/SourceLocationFile.h"
-#include "data/NodeType.h"
-#include "data/NodeTypeSet.h"
-#include "data/search/SearchMatch.h"
 #include "data/storage/StorageStats.h"
-#include "data/tooltip/TooltipInfo.h"
+#include "error/domain/ErrorFilter.h"
+#include "error/domain/ErrorInfo.h"
 #include "FileInfo.h"
+#include "graph/domain/NodeType.h"
+#include "graph/domain/NodeTypeSet.h"
+#include "search/domain/SearchMatch.h"
+#include "tooltip/domain/TooltipInfo.h"
 
 using namespace proto::convert;
 

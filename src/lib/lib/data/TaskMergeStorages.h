@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "../../scheduling/Task.h"
+#include "Task.h"
 
 class StorageProvider;
 

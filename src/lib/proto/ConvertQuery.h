@@ -1,6 +1,6 @@
 #pragma once
-#include "data/NodeKind.h"
 #include "engine.pb.h"
+#include "graph/domain/NodeKind.h"
 
 class BookmarkCategory;
 class NodeTypeSet;

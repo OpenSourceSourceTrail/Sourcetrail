@@ -11,7 +11,7 @@
 #include <gmock/gmock.h>
 
 #define private public
-#include "../../../lib/tests/mocks/MockedMessageQueue.hpp"
+#include "MockedMessageQueue.hpp"
 #include "qt/element/model/RecentItemModel.hpp"
 #undef private
 

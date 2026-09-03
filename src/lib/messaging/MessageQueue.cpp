@@ -5,14 +5,14 @@
 #include <mutex>
 #include <thread>
 
-#include "../../../scheduling/TaskflowGroupParallel.h"
-#include "../../../scheduling/TaskGroupSequence.h"
-#include "../../../scheduling/TaskLambda.h"
-#include "component/TabId.h"
 #include "logging.h"
 #include "MessageBase.h"
 #include "MessageFilter.h"
 #include "MessageListenerBase.h"
+#include "TabId.h"
+#include "TaskflowGroupParallel.h"
+#include "TaskGroupSequence.h"
+#include "TaskLambda.h"
 
 IMessageQueue::Ptr IMessageQueue::sInstance;
 

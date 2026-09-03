@@ -3,12 +3,10 @@
 #include "utilityString.h"
 
 std::shared_ptr<ColorScheme> ColorScheme::s_instance;
+std::once_flag ColorScheme::s_once;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 std::shared_ptr<ColorScheme> ColorScheme::getInstance() {
-  if(!s_instance) {
-    s_instance = std::shared_ptr<ColorScheme>(new ColorScheme);
-  }
-
+  std::call_once(s_once, [] { s_instance = std::shared_ptr<ColorScheme>(new ColorScheme); });
   return s_instance;
 }
 

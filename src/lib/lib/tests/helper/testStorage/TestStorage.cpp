@@ -1,12 +1,12 @@
 #include "TestStorage.h"
 
-#include "data/graph/Edge.h"
 #include "data/location/LocationType.h"
 #include "data/name/NameHierarchy.h"
-#include "data/NodeType.h"
 #include "data/parser/AccessKind.h"
 #include "data/storage/Storage.h"
 #include "FilePath.h"
+#include "graph/domain/Edge.h"
+#include "graph/domain/NodeType.h"
 #include "utilityString.h"
 
 std::shared_ptr<TestStorage> TestStorage::create(const std::shared_ptr<const Storage>& storage) {

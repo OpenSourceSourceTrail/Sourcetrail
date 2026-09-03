@@ -2,28 +2,29 @@
 
 #include <queue>
 
-#include "data/graph/ElementComponentKind.h"
-#include "data/graph/Graph.h"
-#include "data/graph/token_component/TokenComponentAccess.h"
-#include "data/graph/token_component/TokenComponentBundledEdges.h"
-#include "data/graph/token_component/TokenComponentFilePath.h"
-#include "data/graph/token_component/TokenComponentInheritanceChain.h"
-#include "data/graph/token_component/TokenComponentIsAmbiguous.h"
-#include "data/IndexingPhaseStats.h"
 #include "data/location/SourceLocationCollection.h"
 #include "data/location/SourceLocationFile.h"
-#include "data/NodeTypeSet.h"
 #include "data/parser/AccessKind.h"
 #include "data/parser/ParseLocation.h"
+#include "error/messages/MessageErrorCountUpdate.h"
 #include "FileInfo.h"
 #include "FilePath.h"
+#include "graph/domain/ElementComponentKind.h"
+#include "graph/domain/Graph.h"
+#include "graph/domain/NodeTypeSet.h"
+#include "graph/domain/token_component/TokenComponentAccess.h"
+#include "graph/domain/token_component/TokenComponentBundledEdges.h"
+#include "graph/domain/token_component/TokenComponentFilePath.h"
+#include "graph/domain/token_component/TokenComponentInheritanceChain.h"
+#include "graph/domain/token_component/TokenComponentIsAmbiguous.h"
+#include "indexing/domain/IndexingPhaseStats.h"
 #include "logging.h"
+#include "Profiling.h"
 #include "settings/IApplicationSettings.hpp"
+#include "status/messages/MessageStatus.h"
 #include "TextAccess.h"
 #include "TextCodec.h"
 #include "TimeStamp.h"
-#include "type/error/MessageErrorCountUpdate.h"
-#include "type/MessageStatus.h"
 #include "UnorderedCache.h"
 #include "utility.h"
 #include "utilityApp.h"
@@ -376,24 +377,29 @@ void PersistentStorage::buildCaches() {
 
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::filePathMaps);
+    SR_ZONE_N("engine/filePathMaps");
     buildFilePathMaps();
   }
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::searchIndex);
+    SR_ZONE_N("engine/searchIndex");
     buildSearchIndex();
   }
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::memberEdgeOrder);
+    SR_ZONE_N("engine/memberEdgeOrder");
     buildMemberEdgeIdOrderMap();
   }
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::hierarchyCache);
+    SR_ZONE_N("engine/hierarchyCache");
     buildHierarchyCache();
   }
 }
 
 void PersistentStorage::optimizeMemory() {
   const indexing_stats::ScopedPhase timer(indexing_stats::optimizeDatabase);
+  SR_ZONE_N("engine/optimizeDatabase");
   m_sqliteIndexStorage.setTime();
   m_sqliteIndexStorage.optimizeMemory();
 
@@ -487,6 +493,7 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
     if(m_fullTextSearchCodec != codec.getName()) {
       MessageStatus(L"Building fulltext search index", false, true).dispatch();
       const indexing_stats::ScopedPhase timer(indexing_stats::fullTextIndex);
+      SR_ZONE_N("engine/fullTextIndex");
       buildFullTextSearchIndex();
     }
   }

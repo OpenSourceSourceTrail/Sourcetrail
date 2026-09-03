@@ -2,6 +2,7 @@
 // internal
 #include "data/parser/cxx/CxxAstVisitor.h"
 #include "data/parser/cxx/CxxVerboseAstVisitor.h"
+#include "Profiling.h"
 #include "settings/IApplicationSettings.hpp"
 
 ASTConsumer::ASTConsumer(clang::ASTContext* context,
@@ -21,5 +22,6 @@ ASTConsumer::ASTConsumer(clang::ASTContext* context,
 ASTConsumer::~ASTConsumer() = default;
 
 void ASTConsumer::HandleTranslationUnit(clang::ASTContext& context) {
+  SR_ZONE_N("cxx/indexDecl");
   m_visitor->indexDecl(context.getTranslationUnitDecl());
 }

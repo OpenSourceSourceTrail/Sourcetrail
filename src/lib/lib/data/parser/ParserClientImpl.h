@@ -2,11 +2,11 @@
 
 #include <set>
 
-#include "data/DefinitionKind.h"
-#include "data/graph/Node.h"
 #include "data/location/LocationType.h"
 #include "data/parser/ParserClient.h"
 #include "data/storage/IntermediateStorage.h"
+#include "graph/domain/DefinitionKind.h"
+#include "graph/domain/Node.h"
 
 class ParserClientImpl : public ParserClient {
 public:

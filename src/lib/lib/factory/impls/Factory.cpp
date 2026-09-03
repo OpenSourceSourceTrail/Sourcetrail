@@ -3,7 +3,7 @@
 #include "data/storage/StorageCache.h"
 #include "logging.h"
 #include "MessageQueue.h"
-#include "project/Project.h"
+#include "project/data/Project.h"
 #include "settings/ProjectSettings.h"
 #include "utility/interprocess/details/SharedMemoryGarbageCollector.h"
 #include "utilityApp.h"

@@ -3,20 +3,20 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "bookmark/tests/MockedBookmarkButtonsView.hpp"
+#include "code/tests/MockedCodeView.hpp"
 #include "component/ComponentManager.h"
+#include "graph/tests/MockedGraphView.hpp"
+#include "history/tests/MockedUndoRedoView.hpp"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedBookmarkButtonsView.hpp"
-#include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedDialogView.hpp"
-#include "mocks/MockedGraphView.hpp"
-#include "mocks/MockedScreenSearchSender.hpp"
-#include "mocks/MockedScreenSearchView.hpp"
-#include "mocks/MockedSearchView.hpp"
 #include "mocks/MockedStorageAccess.hpp"
-#include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "search/tests/MockedScreenSearchSender.hpp"
+#include "search/tests/MockedScreenSearchView.hpp"
+#include "search/tests/MockedSearchView.hpp"
 #include "settings/IApplicationSettings.hpp"
 
 using namespace testing;

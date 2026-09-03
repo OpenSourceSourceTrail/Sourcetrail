@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "data/graph/Graph.h"
+#include "graph/domain/Graph.h"
 #include "TextAccess.h"
 #define private public    // NOLINT(clang-diagnostic-keyword-macro)
 #include "data/storage/StorageCache.h"

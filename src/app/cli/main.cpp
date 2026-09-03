@@ -19,20 +19,21 @@
 #include "ConsoleApplication.h"
 #include "factory/impls/Factory.hpp"
 #include "FilePath.h"
+#include "indexing/messages/MessageIndexingInterrupted.h"
 #include "language_packages.h"
 #include "productVersion.h"
-#include "project/CxxToolchainRemote.h"
-#include "project/ICxxToolchain.h"
-#include "project/SourceGroupFactory.h"
-#include "project/SourceGroupFactoryModuleCustom.h"
-#include "project/SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
-#include "project/SourceGroupFactoryModuleJava.h"
+#include "Profiling.h"
+#include "project/logic/CxxToolchainRemote.h"
+#include "project/logic/ICxxToolchain.h"
+#include "project/logic/SourceGroupFactory.h"
+#include "project/logic/SourceGroupFactoryModuleCustom.h"
+#include "project/logic/SourceGroupFactoryModuleCxx.h"    // BUILD_CXX_LANGUAGE_PACKAGE
+#include "project/logic/SourceGroupFactoryModuleJava.h"
+#include "project/messages/MessageLoadProject.h"
 #include "ScopedFunctor.h"
 #include "settings/ApplicationSettingsPrefiller.h"
 #include "settings/details/ApplicationSettings.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/indexing/MessageIndexingInterrupted.h"
-#include "type/MessageLoadProject.h"
 #include "Version.h"
 
 namespace {
@@ -58,6 +59,8 @@ void addSourceGroupModules() {
 }    // namespace
 
 int main(int argc, char* argv[]) {
+  const profiling::Scope tracyScope{profiling::DefaultPort};
+
   // Disable logger as default till load it from settings
   if(auto* logger = spdlog::default_logger_raw(); nullptr != logger) {
     for(auto& sink : logger->sinks()) {

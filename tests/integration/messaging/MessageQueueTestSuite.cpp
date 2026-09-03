@@ -1,3 +1,4 @@
+#include <atomic>
 #include <chrono>
 #include <memory>
 #include <thread>
@@ -12,10 +13,10 @@
 #ifndef _WIN32
 #  undef private
 #endif
-#include "component/TabId.h"
 #include "Message.h"
 #include "MessageFilter.h"
 #include "MessageListener.h"
+#include "TabId.h"
 
 
 namespace {
@@ -37,7 +38,7 @@ class TestMessageListener : public MessageListener<TestMessage> {
 public:
   TestMessageListener() = default;
 
-  int m_messageCount = 0;
+  std::atomic<int> m_messageCount = 0;
 
 private:
   void handleMessage(TestMessage* /*message*/) override {
@@ -49,7 +50,7 @@ class Test2MessageListener : public MessageListener<Test2Message> {
 public:
   Test2MessageListener() = default;
 
-  int m_messageCount = 0;
+  std::atomic<int> m_messageCount = 0;
 
 private:
   void handleMessage(Test2Message* /*message*/) override {

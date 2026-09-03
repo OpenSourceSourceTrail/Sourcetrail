@@ -6,9 +6,9 @@
 
 #include "component/view/MainView.h"
 #include "MessageListener.h"
+#include "project/messages/MessageProjectEdit.h"
+#include "project/messages/MessageProjectNew.h"
 #include "qt/utility/QtThreadedFunctor.h"
-#include "type/MessageProjectEdit.h"
-#include "type/MessageProjectNew.h"
 #include "type/MessageWindowChanged.h"
 
 class QtMainWindow;

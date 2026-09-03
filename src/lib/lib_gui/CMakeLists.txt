@@ -11,10 +11,6 @@ target_sources(
           platform_includes/includesLinux.h
           platform_includes/includesMac.h
           platform_includes/includesWindows.h
-          qt/element/bookmark/QtBookmark.cpp
-          qt/element/bookmark/QtBookmark.h
-          qt/element/bookmark/QtBookmarkCategory.cpp
-          qt/element/bookmark/QtBookmarkCategory.h
           qt/element/button/QtHelpButton.cpp
           qt/element/button/QtHelpButton.h
           qt/element/button/QtHoverButton.cpp
@@ -27,42 +23,6 @@ target_sources(
           qt/element/button/QtSelfRefreshIconButton.h
           qt/element/model/RecentItemModel.hpp
           qt/element/model/RecentItemModel.cpp
-          qt/element/code/CodeFocusHandler.cpp
-          qt/element/code/CodeFocusHandler.h
-          qt/element/code/QtCodeArea.cpp
-          qt/element/code/QtCodeArea.h
-          qt/element/code/QtCodeField.cpp
-          qt/element/code/QtCodeField.h
-          qt/element/code/QtCodeFile.cpp
-          qt/element/code/QtCodeFile.h
-          qt/element/code/QtCodeFileList.cpp
-          qt/element/code/QtCodeFileList.h
-          qt/element/code/QtCodeFileSingle.cpp
-          qt/element/code/QtCodeFileSingle.h
-          qt/element/code/QtCodeFileTitleBar.cpp
-          qt/element/code/QtCodeFileTitleBar.h
-          qt/element/code/QtCodeFileTitleButton.cpp
-          qt/element/code/QtCodeFileTitleButton.h
-          qt/element/code/QtCodeNavigable.cpp
-          qt/element/code/QtCodeNavigable.h
-          qt/element/code/QtCodeNavigator.cpp
-          qt/element/code/QtCodeNavigator.h
-          qt/element/code/QtCodeSnippet.cpp
-          qt/element/code/QtCodeSnippet.h
-          qt/element/history/QtHistoryList.cpp
-          qt/element/history/QtHistoryList.h
-          qt/element/history/QtUndoRedo.cpp
-          qt/element/history/QtUndoRedo.h
-          qt/element/search/QtAutocompletionList.cpp
-          qt/element/search/QtAutocompletionList.h
-          qt/element/search/QtScreenSearchBox.cpp
-          qt/element/search/QtScreenSearchBox.h
-          qt/element/search/QtSearchBar.cpp
-          qt/element/search/QtSearchBar.h
-          qt/element/search/QtSearchBarButton.cpp
-          qt/element/search/QtSearchBarButton.h
-          qt/element/search/QtSmartSearchBox.cpp
-          qt/element/search/QtSmartSearchBox.h
           qt/engine/QtEngineSupervisor.cpp
           qt/engine/QtEngineSupervisor.h
           qt/element/dialog/QtLineEdit.cpp
@@ -85,95 +45,8 @@ target_sources(
           qt/element/dialog/QtStringListBoxItem.h
           qt/element/dialog/QtTextEdit.cpp
           qt/element/dialog/QtTextEdit.h
-          qt/element/QtTooltip.cpp
-          qt/element/QtTooltip.h
-          qt/element/QtStatusBar.cpp
-          qt/element/QtStatusBar.h
-          qt/element/QtTabBar.cpp
-          qt/element/QtTabBar.h
           qt/element/QtTable.cpp
           qt/element/QtTable.h
-          qt/graphics/base/QtCountCircleItem.cpp
-          qt/graphics/base/QtCountCircleItem.h
-          qt/graphics/base/QtLineItemAngled.cpp
-          qt/graphics/base/QtLineItemAngled.h
-          qt/graphics/base/QtLineItemBase.cpp
-          qt/graphics/base/QtLineItemBase.h
-          qt/graphics/base/QtLineItemBezier.cpp
-          qt/graphics/base/QtLineItemBezier.h
-          qt/graphics/base/QtLineItemStraight.cpp
-          qt/graphics/base/QtLineItemStraight.h
-          qt/graphics/base/QtRoundedRectItem.cpp
-          qt/graphics/base/QtRoundedRectItem.h
-          qt/graphics/component/QtGraphNodeComponent.cpp
-          qt/graphics/component/QtGraphNodeComponent.h
-          qt/graphics/component/QtGraphNodeComponentClickable.cpp
-          qt/graphics/component/QtGraphNodeComponentClickable.h
-          qt/graphics/component/QtGraphNodeComponentMoveable.cpp
-          qt/graphics/component/QtGraphNodeComponentMoveable.h
-          qt/graphics/graph/QtGraphEdge.cpp
-          qt/graphics/graph/QtGraphEdge.h
-          qt/graphics/graph/QtGraphNode.cpp
-          qt/graphics/graph/QtGraphNode.h
-          qt/graphics/graph/QtGraphNodeAccess.cpp
-          qt/graphics/graph/QtGraphNodeAccess.h
-          qt/graphics/graph/QtGraphNodeBundle.cpp
-          qt/graphics/graph/QtGraphNodeBundle.h
-          qt/graphics/graph/QtGraphNodeData.cpp
-          qt/graphics/graph/QtGraphNodeData.h
-          qt/graphics/graph/QtGraphNodeExpandToggle.cpp
-          qt/graphics/graph/QtGraphNodeExpandToggle.h
-          qt/graphics/graph/QtGraphNodeGroup.cpp
-          qt/graphics/graph/QtGraphNodeGroup.h
-          qt/graphics/graph/QtGraphNodeQualifier.cpp
-          qt/graphics/graph/QtGraphNodeQualifier.h
-          qt/graphics/graph/QtGraphNodeText.cpp
-          qt/graphics/graph/QtGraphNodeText.h
-          qt/graphics/GraphFocusHandler.cpp
-          qt/graphics/GraphFocusHandler.h
-          qt/graphics/QtGraphicsView.cpp
-          qt/graphics/QtGraphicsView.h
-          qt/network/QtIDECommunicationController.cpp
-          qt/network/QtIDECommunicationController.h
-          qt/network/QtNetworkFactory.cpp
-          qt/network/QtNetworkFactory.h
-          qt/network/QtRequest.cpp
-          qt/network/QtRequest.h
-          qt/network/QtTcpWrapper.cpp
-          qt/network/QtTcpWrapper.h
-          qt/project_wizard/content/path/QtProjectWizardContentPath.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPath.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPaths.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPaths.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsExclude.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsSource.h
-          qt/project_wizard/content/QtProjectWizardContent.cpp
-          qt/project_wizard/content/QtProjectWizardContent.h
-          qt/project_wizard/content/QtProjectWizardContentCustomCommand.cpp
-          qt/project_wizard/content/QtProjectWizardContentCustomCommand.h
-          qt/project_wizard/content/QtProjectWizardContentExtensions.cpp
-          qt/project_wizard/content/QtProjectWizardContentExtensions.h
-          qt/project_wizard/content/QtProjectWizardContentGroup.cpp
-          qt/project_wizard/content/QtProjectWizardContentGroup.h
-          qt/project_wizard/content/QtProjectWizardContentPreferences.cpp
-          qt/project_wizard/content/QtProjectWizardContentPreferences.h
-          qt/project_wizard/content/QtProjectWizardContentProjectData.cpp
-          qt/project_wizard/content/QtProjectWizardContentProjectData.h
-          qt/project_wizard/content/QtProjectWizardContentRequiredLabel.h
-          qt/project_wizard/content/QtProjectWizardContentSelect.cpp
-          qt/project_wizard/content/QtProjectWizardContentSelect.h
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupData.cpp
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupData.h
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.cpp
-          qt/project_wizard/content/QtProjectWizardContentSourceGroupInfoText.h
-          qt/project_wizard/content/QtProjectWizardContentUnloadable.cpp
-          qt/project_wizard/content/QtProjectWizardContentUnloadable.h
-          qt/project_wizard/QtProjectWizard.cpp
-          qt/project_wizard/QtProjectWizard.h
-          qt/project_wizard/QtProjectWizardWindow.cpp
-          qt/project_wizard/QtProjectWizardWindow.h
           qt/utility/compatibilityQt.cpp
           qt/utility/compatibilityQt.h
           qt/utility/QtContextMenu.cpp
@@ -195,62 +68,20 @@ target_sources(
           qt/utility/QtThreadedFunctor.h
           qt/utility/utilityQt.cpp
           qt/utility/utilityQt.h
-          qt/view/QtBookmarkButtonsView.cpp
-          qt/view/QtBookmarkButtonsView.h
-          qt/view/QtBookmarkView.cpp
-          qt/view/QtBookmarkView.h
-          qt/view/QtCodeView.cpp
-          qt/view/QtCodeView.h
           qt/view/QtCompositeView.cpp
           qt/view/QtCompositeView.h
-          qt/view/QtCustomTrailView.cpp
-          qt/view/QtCustomTrailView.h
           qt/view/QtDialogView.cpp
           qt/view/QtDialogView.h
-          qt/view/QtErrorView.cpp
-          qt/view/QtErrorView.h
-          qt/view/QtGraphView.cpp
-          qt/view/QtGraphView.h
-          qt/view/QtGraphViewStyleImpl.cpp
-          qt/view/QtGraphViewStyleImpl.h
           qt/view/QtMainView.cpp
           qt/view/QtMainView.h
-          qt/view/QtRefreshView.cpp
-          qt/view/QtRefreshView.h
-          qt/view/QtScreenSearchView.cpp
-          qt/view/QtScreenSearchView.h
-          qt/view/QtSearchView.cpp
-          qt/view/QtSearchView.h
-          qt/view/QtStatusBarView.cpp
-          qt/view/QtStatusBarView.h
-          qt/view/QtStatusView.cpp
-          qt/view/QtStatusView.h
           qt/view/QtTabbedView.cpp
           qt/view/QtTabbedView.h
-          qt/view/QtTooltipView.cpp
-          qt/view/QtTooltipView.h
-          qt/view/QtTabsView.cpp
-          qt/view/QtTabsView.h
-          qt/view/QtUndoRedoView.cpp
-          qt/view/QtUndoRedoView.h
           qt/view/QtViewFactory.cpp
           qt/view/QtViewFactory.h
           qt/view/QtViewWidgetWrapper.cpp
           qt/view/QtViewWidgetWrapper.h
           qt/window/QtAbout.cpp
           qt/window/QtAbout.h
-          qt/window/QtBookmarkBrowser.cpp
-          qt/window/QtBookmarkBrowser.h
-          qt/window/QtBookmarkCreator.cpp
-          qt/window/QtBookmarkCreator.h
-          qt/window/QtIndexingDialog.cpp
-          qt/window/QtIndexingDialog.h
-          qt/window/QtIndexingProgressDialog.cpp
-          qt/window/QtIndexingProgressDialog.h
-          qt/window/QtIndexingReportDialog.cpp
-          qt/window/QtIndexingReportDialog.h
-          qt/window/QtIndexingStartDialog.cpp
-          qt/window/QtIndexingStartDialog.h
           qt/window/QtKeyboardShortcuts.cpp
           qt/window/QtKeyboardShortcuts.h
           qt/window/QtKnownProgressDialog.cpp
@@ -282,35 +113,7 @@ target_sources(
           qt/QtApplication.cpp
           qt/QtApplication.h
           qt/QtCoreApplication.cpp
-          qt/QtCoreApplication.h
-          qt/project_wizard/content/path/ProjectWizardModel.hpp
-          qt/project_wizard/content/path/ProjectWizardModel.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPathCDB.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPathCDB.h
-          qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.cpp
-          qt/project_wizard/content/path/QtProjectWizardContentPathCxxPch.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearch.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsFrameworkSearchGlobal.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearch.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsHeaderSearchGlobal.h
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.cpp
-          qt/project_wizard/content/paths/QtProjectWizardContentPathsIndexedHeaders.h
-          qt/project_wizard/content/QtProjectWizardContentCppStandard.cpp
-          qt/project_wizard/content/QtProjectWizardContentCppStandard.h
-          qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.cpp
-          qt/project_wizard/content/QtProjectWizardContentCrossCompilationOptions.h
-          qt/project_wizard/content/QtProjectWizardContentCStandard.cpp
-          qt/project_wizard/content/QtProjectWizardContentCStandard.h
-          qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.cpp
-          qt/project_wizard/content/QtProjectWizardContentCxxPchFlags.h
-          qt/project_wizard/content/QtProjectWizardContentFlags.cpp
-          qt/project_wizard/content/QtProjectWizardContentFlags.h
-          qt/project_wizard/content/QtProjectWizardContentVS.cpp
-          qt/project_wizard/content/QtProjectWizardContentVS.h)
+          qt/QtCoreApplication.h)
 
 target_link_libraries(
   Sourcetrail_lib_gui
@@ -355,7 +158,7 @@ add_custom_command(
 
 add_dependencies(Sourcetrail_lib_gui versionnumber)
 
-# One include root, e.g. #include "qt/view/QtCodeView.h". The binary dirs carry the generated
+# One include root, e.g. #include "qt/view/QtMainWindow.h". The binary dirs carry the generated
 # includes.h / productVersion.h and language_packages.h.
 target_include_directories(Sourcetrail_lib_gui PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/src/lib/lib_gui
                                                       ${PROJECT_BINARY_DIR}/src/lib/lib)
@@ -381,3 +184,20 @@ set_property(SOURCE ${PROJECT_BINARY_DIR}/src/lib/lib_gui/productVersion.h PROPE
 
 # Project warning set. PRIVATE so it applies here and is not inflicted on consumers.
 target_link_libraries(Sourcetrail_lib_gui PRIVATE Sourcetrail::warnings)
+
+# Tier guard. Presentation may name Logic; it must never name Data or SQLite. Asserted here, on
+# the library, because the Sourcetrail binary hosts the engine in-process and so contains SQLite
+# legitimately -- see cmake/assert_tier_deps.cmake.
+assert_no_transitive_link(Sourcetrail_lib_gui Sourcetrail_lib_engine Sourcetrail::lib::lib_engine SQLite::SQLite3
+                          CppSQLite::CppSQLite3)
+
+# The symbol-table half of the same guard: assert_no_transitive_link above checks what CMake was
+# told, this checks what the compiler emitted. Linux/macOS only -- it needs nm.
+if((ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST) AND NOT WIN32)
+  find_program(NM_EXECUTABLE nm)
+  if(NM_EXECUTABLE)
+    add_test(NAME "guard.gui.linksNoSqlite"
+             COMMAND ${CMAKE_COMMAND} -DBINARY=$<TARGET_FILE:Sourcetrail_lib_gui> -DNM=${NM_EXECUTABLE} -P
+                     "${CMAKE_SOURCE_DIR}/cmake/assert_no_sqlite.cmake")
+  endif()
+endif()

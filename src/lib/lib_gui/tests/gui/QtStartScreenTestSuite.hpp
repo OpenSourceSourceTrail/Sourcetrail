@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-#include "../../../lib/tests/mocks/MockedApplicationSetting.hpp"
+#include "MockedApplicationSetting.hpp"
 
 namespace qt::window {
 class QtStartScreen;

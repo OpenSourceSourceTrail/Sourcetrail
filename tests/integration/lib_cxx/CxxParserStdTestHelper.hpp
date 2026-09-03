@@ -16,10 +16,10 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "data/indexer/IndexerStateInfo.h"
 #include "data/parser/cxx/CxxParser.h"
 #include "data/parser/ParserClientImpl.h"
 #include "data/storage/IntermediateStorage.h"
+#include "indexing/domain/IndexerStateInfo.h"
 #include "MockedApplicationSetting.hpp"
 #include "TestFileRegister.h"
 #include "TestStorage.h"

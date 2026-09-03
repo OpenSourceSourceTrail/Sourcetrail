@@ -27,20 +27,20 @@
 #include <string>
 #include <vector>
 
-#include "data/ErrorInfo.h"
 #include "data/location/LocationType.h"
 #include "data/storage/sqlite/SqliteDatabaseIndex.h"
 #include "data/storage/sqlite/SqliteStorage.h"
 #include "data/storage/type/StorageComponentAccess.h"
 #include "data/storage/type/StorageEdge.h"
 #include "data/storage/type/StorageElementComponent.h"
-#include "data/storage/type/StorageError.h"
 #include "data/storage/type/StorageFile.h"
 #include "data/storage/type/StorageLocalSymbol.h"
 #include "data/storage/type/StorageNode.h"
 #include "data/storage/type/StorageOccurrence.h"
 #include "data/storage/type/StorageSourceLocation.h"
 #include "data/storage/type/StorageSymbol.h"
+#include "error/domain/ErrorInfo.h"
+#include "error/domain/StorageError.h"
 #include "GlobalId.hpp"
 #include "LowMemoryStringMap.h"
 #include "utility.h"

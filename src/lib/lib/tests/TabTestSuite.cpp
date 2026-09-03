@@ -3,18 +3,18 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "bookmark/tests/MockedBookmarkButtonsView.hpp"
+#include "code/tests/MockedCodeView.hpp"
 #include "component/Tab.h"
+#include "graph/tests/MockedGraphView.hpp"
+#include "history/tests/MockedUndoRedoView.hpp"
 #include "MockedMessageQueue.hpp"
-#include "mocks/MockedBookmarkButtonsView.hpp"
-#include "mocks/MockedCodeView.hpp"
 #include "mocks/MockedCompositeView.hpp"
-#include "mocks/MockedGraphView.hpp"
-#include "mocks/MockedRefreshView.hpp"
-#include "mocks/MockedScreenSearchSender.hpp"
-#include "mocks/MockedSearchView.hpp"
-#include "mocks/MockedUndoRedoView.hpp"
 #include "mocks/MockedViewFactory.hpp"
 #include "mocks/MockedViewLayout.hpp"
+#include "refresh/tests/MockedRefreshView.hpp"
+#include "search/tests/MockedScreenSearchSender.hpp"
+#include "search/tests/MockedSearchView.hpp"
 #include "type/focus/MessageFocusView.h"
 #include "type/MessageRefreshUI.h"
 

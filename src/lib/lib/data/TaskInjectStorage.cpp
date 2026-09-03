@@ -4,9 +4,10 @@
 #include <thread>
 #include <utility>
 
-#include "data/IndexingPhaseStats.h"
 #include "data/storage/Storage.h"
 #include "data/storage/StorageProvider.h"
+#include "indexing/domain/IndexingPhaseStats.h"
+#include "Profiling.h"
 
 TaskInjectStorage::TaskInjectStorage(std::shared_ptr<StorageProvider> storageProvider, std::weak_ptr<Storage> target)
     : m_storageProvider(std::move(storageProvider)), m_target(std::move(target)) {}
@@ -20,6 +21,7 @@ Task::TaskState TaskInjectStorage::doUpdate(std::shared_ptr<Blackboard> /*blackb
       // TODO(Hussein): What happen if lock failed but provider is consumed?!
       if(const auto target = m_target.lock()) {
         const indexing_stats::ScopedPhase timer(indexing_stats::inject);
+        SR_ZONE_N("engine/inject");
         target->inject(source.get());
         return STATE_SUCCESS;
       }

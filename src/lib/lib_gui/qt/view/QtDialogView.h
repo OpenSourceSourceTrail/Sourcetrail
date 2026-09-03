@@ -2,11 +2,11 @@
 #define QT_DIALOG_VIEW_H
 
 #include "component/view/DialogView.h"
+#include "error/messages/MessageErrorCountUpdate.h"
+#include "indexing/messages/MessageIndexingShowDialog.h"
 #include "MessageListener.h"
 #include "qt/utility/QtThreadedFunctor.h"
 #include "qt/window/QtWindowStack.h"
-#include "type/error/MessageErrorCountUpdate.h"
-#include "type/indexing/MessageIndexingShowDialog.h"
 #include "type/MessageWindowClosed.h"
 
 class QtMainWindow;
@@ -33,7 +33,7 @@ public:
   void showProgressDialog(const std::wstring& title, const std::wstring& message, size_t progress) override;
   void hideProgressDialog() override;
 
-  void startIndexingDialog(IProject* project,
+  void startIndexingDialog(std::function<RefreshInfo(RefreshMode)> getRefreshInfo,
                            const std::vector<RefreshMode>& enabledModes,
                            const RefreshMode initialMode,
                            bool enabledShallowOption,

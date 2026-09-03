@@ -1,0 +1,170 @@
+#include <memory>
+#include <string>
+#include <vector>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
+#include "component/ComponentFactory.h"
+#include "bookmark/logic/BookmarkController.h"
+#include "bookmark/logic/BookmarkView.h"
+#include "MockedMessageQueue.hpp"
+#include "bookmark/tests/MockedBookmarkView.hpp"
+#include "mocks/MockedStorageAccess.hpp"
+#include "mocks/MockedViewFactory.hpp"
+#include "mocks/MockedViewLayout.hpp"
+#include "bookmark/messages/MessageBookmarkUpdate.hpp"
+
+using namespace testing;
+using testing::Return;
+
+struct BookmarkControllerFix : public Test {
+  void SetUp() override {
+    mMessageQueue = std::make_shared<MockedMessageQueue>();
+    IMessageQueue::setInstance(mMessageQueue);
+
+    // MockedMessageQueue records dispatches instead of delivering them, so a MessageListener would
+    // never fire. Record every dispatch and assert on that. Both entry points matter:
+    // dispatch() reaches pushMessage(), dispatchImmediately() reaches processMessage().
+    EXPECT_CALL(*mMessageQueue, pushMessage(_)).Times(AnyNumber()).WillRepeatedly([this](std::shared_ptr<MessageBase> message) {
+      mDispatched.push_back(message->getType());
+    });
+    EXPECT_CALL(*mMessageQueue, processMessage(_, _))
+        .Times(AnyNumber())
+        .WillRepeatedly([this](const std::shared_ptr<MessageBase>& message, bool) { mDispatched.push_back(message->getType()); });
+
+    mViewLayout = std::make_unique<StrictMock<MockedViewLayout>>();
+    mView = std::make_shared<StrictMock<MockedBookmarkView>>(mViewLayout.get());
+
+    MockedViewFactory viewFactory;
+    EXPECT_CALL(viewFactory, createBookmarkView(mViewLayout.get())).InSequence(mSequence).WillOnce(Return(mView));
+
+    mStorageAccess = std::make_unique<StrictMock<MockedStorageAccess>>();
+    ComponentFactory factory(&viewFactory, mStorageAccess.get());
+    mComponent = factory.createBookmarkComponent(mViewLayout.get());
+    mController = mComponent->getController<BookmarkController>();
+    ASSERT_FALSE(mController == nullptr);
+  }
+
+  void TearDown() override {
+    mComponent.reset();
+    IMessageQueue::setInstance(nullptr);
+    mMessageQueue.reset();
+  }
+
+  void MockUpdate(bool skipNodes = false, bool skipEdges = false) {
+    EXPECT_CALL(*mView, bookmarkBrowserIsVisible()).InSequence(mSequence).WillOnce(Return(false));
+    if(!skipNodes) {
+      EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+    }
+    if(!skipEdges) {
+      EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
+    }
+  }
+
+  void MockCleanBookmarkCategories() const {
+    EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+    EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
+    EXPECT_CALL(*mStorageAccess, getAllBookmarkCategories())
+        .InSequence(mSequence)
+        .WillOnce(Return(MockedStorageAccess::BookmarkCategories{}));
+  }
+
+  std::shared_ptr<MockedMessageQueue> mMessageQueue;
+  testing::Sequence mSequence;
+  std::vector<std::string> mDispatched;
+  std::shared_ptr<StrictMock<MockedBookmarkView>> mView;
+  std::shared_ptr<Component> mComponent;
+  std::unique_ptr<StrictMock<MockedViewLayout>> mViewLayout;
+  std::unique_ptr<StrictMock<MockedStorageAccess>> mStorageAccess;
+  BookmarkController* mController = nullptr;
+};
+
+TEST_F(BookmarkControllerFix, clear) {
+  mController->clear();
+}
+
+TEST_F(BookmarkControllerFix, displayBookmarks) {
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
+  EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
+  mController->displayBookmarks();
+}
+
+TEST_F(BookmarkControllerFix, displayBookmarksFor) {
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
+  EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
+  mController->displayBookmarksFor(Bookmark::Filter::Unknown, Bookmark::Order::None);
+}
+
+#ifndef _WIN32
+TEST_F(BookmarkControllerFix, displayBookmarksFor2) {
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  EXPECT_CALL(*mStorageAccess, getAllEdgeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::EdgeBookmarks{}));
+  EXPECT_CALL(*mView, displayBookmarks(_)).InSequence(mSequence).WillOnce(Return());
+  mController->displayBookmarksFor(Bookmark::Filter::All, Bookmark::Order::DateDescending);
+}
+#endif
+
+TEST_F(BookmarkControllerFix, createBookmark) {
+  EXPECT_CALL(*mStorageAccess, addNodeBookmark(_)).InSequence(mSequence).WillOnce(Return(0));
+  MockUpdate();
+
+  const std::wstring name = L"bookmark";
+  const std::wstring comment = L"comment";
+  const std::wstring category = L"category";
+  constexpr Id expectedId = 10;
+  mController->createBookmark(name, comment, category, expectedId);
+
+  // createBookmark() dispatches the button state; the update comes out of update(), which it calls
+  // through dispatchImmediately(). Both land in mDispatched.
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkButtonState"));
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkUpdate"));
+}
+
+TEST_F(BookmarkControllerFix, createBookmarkWithDefaultId) {
+  EXPECT_CALL(*mStorageAccess, addNodeBookmark(_)).InSequence(mSequence).WillOnce(Return(0));
+  MockUpdate();
+
+  const std::wstring name = L"bookmark";
+  const std::wstring comment = L"comment";
+  const std::wstring category = L"category";
+  constexpr Id expectedId = 0;
+  mController->createBookmark(name, comment, category, expectedId);
+
+  // createBookmark() dispatches the button state; the update comes out of update(), which it calls
+  // through dispatchImmediately(). Both land in mDispatched.
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkButtonState"));
+  EXPECT_THAT(mDispatched, Contains("MessageBookmarkUpdate"));
+}
+
+TEST_F(BookmarkControllerFix, editBookmark) {
+  EXPECT_CALL(*mStorageAccess, updateBookmark(_, _, _, _)).InSequence(mSequence).WillOnce(Return());
+  MockCleanBookmarkCategories();
+  MockUpdate(true, true);
+
+  const std::wstring name = L"bookmark";
+  const std::wstring comment = L"comment";
+  const std::wstring category = L"category";
+  constexpr Id expectedId = 10;
+  mController->editBookmark(expectedId, name, comment, category);
+}
+
+TEST_F(BookmarkControllerFix, deleteBookmark) {
+  EXPECT_CALL(*mStorageAccess, removeBookmark(_)).InSequence(mSequence).WillOnce(Return());
+  MockCleanBookmarkCategories();
+  MockUpdate(true, true);
+
+  constexpr Id expectedId = 10;
+  mController->deleteBookmark(expectedId);
+}
+
+TEST_F(BookmarkControllerFix, deleteCategory) {
+  EXPECT_CALL(*mStorageAccess, removeBookmarkCategory(_)).InSequence(mSequence).WillOnce(Return());
+  EXPECT_CALL(*mStorageAccess, getAllNodeBookmarks()).InSequence(mSequence).WillOnce(Return(MockedStorageAccess::NodeBookmarks{}));
+  MockUpdate(true);
+
+  constexpr Id expectedId = 10;
+  mController->deleteBookmarkCategory(expectedId);
+}

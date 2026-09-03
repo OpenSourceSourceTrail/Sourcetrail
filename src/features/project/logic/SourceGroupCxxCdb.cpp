@@ -1,0 +1,280 @@
+#include "project/logic/SourceGroupCxxCdb.h"
+
+#include <filesystem>
+#include <map>
+
+#include <fmt/format.h>
+#include <fmt/xchar.h>
+
+#include "app/Application.h"
+#include "indexing/logic/CxxIndexerCommandProvider.h"
+#include "indexing/logic/IndexerCommandCxx.h"
+#include "logging.h"
+#include "project/domain/RefreshInfo.h"
+#include "project/logic/utilitySourceGroupCxx.h"
+#include "settings/IApplicationSettings.hpp"
+#include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
+#include "status/messages/MessageStatus.h"
+#include "TaskLambda.h"
+#include "utility.h"
+#include "utilityFile.h"
+#include "utilityString.h"
+
+namespace {
+
+/** Resolves the source file an entry names, the way Clang's own database reader would. */
+FilePath sourcePathOf(const CxxCompileCommand& command, const FilePath& cdbPath) {
+  FilePath sourcePath = FilePath(utility::decodeFromUtf8(command.file)).makeCanonical();
+  if(!sourcePath.isAbsolute()) {
+    sourcePath = FilePath(utility::decodeFromUtf8(command.directory + '/' + command.file)).makeCanonical();
+    if(!sourcePath.isAbsolute()) {
+      sourcePath = cdbPath.getParentDirectory().getConcatenated(sourcePath).makeCanonical();
+    }
+  }
+  return sourcePath;
+}
+
+/** One compile command, ready to become an IndexerCommandCxx. */
+struct PreparedCommand final {
+  FilePath sourcePath;
+  FilePath workingDirectory;
+  std::vector<std::wstring> cdbFlags;
+  std::wstring macroSignature;
+  bool hadIncludePchFlag = false;
+};
+
+// Precompiling costs a parse and a file of its own per group, so only the groups big enough to earn
+// that back get one, and only a handful of them.
+constexpr size_t MinCommandsPerAutoPch = 8;
+constexpr size_t MaxAutoPchCount = 8;
+
+/** An automatic precompiled header per macro state, keyed by that state. */
+std::map<std::wstring, std::vector<std::wstring>> buildAutoPchPerMacroSignature(const std::vector<PreparedCommand>& commands,
+                                                                                const std::vector<std::wstring>& compilerFlags,
+                                                                                const std::set<FilePath>& indexedPaths,
+                                                                                const FilePath& outputDirectory) {
+  std::map<std::wstring, std::vector<FilePath>> filesPerSignature;
+  std::map<std::wstring, std::vector<std::wstring>> flagsPerSignature;
+  for(const PreparedCommand& command : commands) {
+    filesPerSignature[command.macroSignature].push_back(command.sourcePath);
+    flagsPerSignature.try_emplace(command.macroSignature, command.cdbFlags);
+  }
+
+  std::vector<const std::pair<const std::wstring, std::vector<FilePath>>*> groups;
+  for(const auto& group : filesPerSignature) {
+    if(group.second.size() >= MinCommandsPerAutoPch) {
+      groups.push_back(&group);
+    }
+  }
+  std::ranges::sort(groups, [](const auto* lhs, const auto* rhs) { return lhs->second.size() > rhs->second.size(); });
+  if(groups.size() > MaxAutoPchCount) {
+    groups.resize(MaxAutoPchCount);
+  }
+
+  std::map<std::wstring, std::vector<std::wstring>> pchFlags;
+  size_t index = 0;
+  for(const auto* group : groups) {
+    std::vector<std::wstring> flags = utility::concat(flagsPerSignature[group->first], compilerFlags);
+    std::vector<std::wstring> result = utility::buildAutoPch(
+        group->second, flags, indexedPaths, outputDirectory, L"sourcetrail_auto_pch_" + std::to_wstring(index++));
+    if(!result.empty()) {
+      pchFlags.emplace(group->first, std::move(result));
+    }
+  }
+  return pchFlags;
+}
+
+}    // namespace
+
+SourceGroupCxxCdb::SourceGroupCxxCdb(std::shared_ptr<SourceGroupSettingsCxxCdb> settings) : m_settings(std::move(settings)) {}
+
+bool SourceGroupCxxCdb::prepareIndexing() {
+  FilePath cdbPath = m_settings->getCompilationDatabasePathExpandedAndAbsolute();
+  if(!cdbPath.empty() && !cdbPath.exists()) {
+    std::wstring error =
+        L"Can't refresh project. The compilation database of the project does not exist "
+        L"anymore: " +
+        cdbPath.wstr();
+    MessageStatus(error, true).dispatch();
+    Application::getInstance()->handleDialog(error, {L"Ok"});
+    return false;
+  }
+  return true;
+}
+
+std::set<FilePath> SourceGroupCxxCdb::filterToContainedFilePaths(const std::set<FilePath>& filePaths) const {
+  return SourceGroup::filterToContainedFilePaths(filePaths,
+                                                 getAllSourceFilePaths(),
+                                                 utility::toSet(m_settings->getIndexedHeaderPathsExpandedAndAbsolute()),
+                                                 m_settings->getExcludeFiltersExpandedAndAbsolute());
+}
+
+std::set<FilePath> SourceGroupCxxCdb::getAllSourceFilePaths() const {
+  const std::optional<std::vector<CxxCompileCommand>> commands = utility::loadCompilationDatabase(
+      m_settings->getCompilationDatabasePathExpandedAndAbsolute());
+  return commands ? getAllSourceFilePaths(*commands) : std::set<FilePath>{};
+}
+
+std::set<FilePath> SourceGroupCxxCdb::getAllSourceFilePaths(const std::vector<CxxCompileCommand>& commands) const {
+  return utility::filterCdbSourceFiles(
+      utility::getSourceFilesFromCDB(commands, m_settings->getCompilationDatabasePathExpandedAndAbsolute()),
+      m_settings->getExcludeFiltersExpandedAndAbsolute());
+}
+
+std::shared_ptr<IndexerCommandProvider> SourceGroupCxxCdb::getIndexerCommandProvider(const RefreshInfo& info) const {
+  std::shared_ptr<CxxIndexerCommandProvider> provider = std::make_shared<CxxIndexerCommandProvider>();
+
+  const FilePath cdbPath = m_settings->getCompilationDatabasePathExpandedAndAbsolute();
+  const std::optional<std::vector<CxxCompileCommand>> commands = utility::loadCompilationDatabase(cdbPath);
+  if(!commands) {
+    return provider;
+  }
+
+  std::vector<std::wstring> compilerFlags = getBaseCompilerFlags();
+  utility::append(compilerFlags, m_settings->getCompilerFlags());
+
+  const std::vector<std::wstring> includePchFlags = utility::getIncludePchFlags(m_settings.get());
+
+  const std::set<FilePath> indexedHeaderPaths = utility::toSet(m_settings->getIndexedHeaderPathsExpandedAndAbsolute());
+  const std::set<FilePathFilter> excludeFilters = utility::toSet(m_settings->getExcludeFiltersExpandedAndAbsolute());
+  const std::set<FilePath> sourceFilePaths = getAllSourceFilePaths(*commands);
+
+  // A precompiled header is only accepted by a parse whose macro state matches the one it was built
+  // with, so the commands are grouped by that state first and each group gets its own.
+  std::vector<PreparedCommand> prepared;
+  for(const CxxCompileCommand& command : *commands) {
+    const FilePath sourcePath = sourcePathOf(command, cdbPath);
+
+    if(info.filesToIndex.contains(sourcePath) && sourceFilePaths.contains(sourcePath)) {
+      std::vector<std::wstring> cdbFlags = utility::convert<std::string, std::wstring>(
+          command.arguments, [](const std::string& str) { return utility::decodeFromUtf8(str); });
+      if(cdbFlags.empty()) {
+        continue;
+      }
+
+      // Convert windows flags to unix style for clang on windows
+      if(std::filesystem::path{cdbFlags.front()}.filename() == L"cl.exe") {
+        if(!utility::convertWindowsStyleFlagsToUnixStyleFlags(cdbFlags)) {
+          fmt::print(L"RC file detected, skipping indexing. {}", cdbFlags.front());
+          continue;
+        }
+      } else if(std::filesystem::path{cdbFlags.front()}.filename() == L"rc.exe") {
+        fmt::print(L"RC file detected, skipping indexing. {}", cdbFlags.front());
+        // Remove RC files from indexing
+        continue;
+      }
+
+      utility::removeIncludePchFlag(cdbFlags);
+
+      prepared.push_back(PreparedCommand{.sourcePath = sourcePath,
+                                         .workingDirectory = FilePath(utility::decodeFromUtf8(command.directory)),
+                                         .cdbFlags = cdbFlags,
+                                         .macroSignature = utility::macroSignatureOf(cdbFlags),
+                                         .hadIncludePchFlag = command.arguments.size() != cdbFlags.size()});
+    }
+  }
+
+  const std::map<std::wstring, std::vector<std::wstring>> autoPchFlags = includePchFlags.empty() ?
+      buildAutoPchPerMacroSignature(prepared,
+                                    compilerFlags,
+                                    utility::concat(indexedHeaderPaths, sourceFilePaths),
+                                    m_settings->getPchDependenciesDirectoryPath()) :
+      std::map<std::wstring, std::vector<std::wstring>>{};
+
+  for(const PreparedCommand& command : prepared) {
+    std::vector<std::wstring> cdbFlags = command.cdbFlags;
+    if(command.hadIncludePchFlag) {
+      utility::append(cdbFlags, includePchFlags);
+    }
+    if(const auto found = autoPchFlags.find(command.macroSignature); found != autoPchFlags.end()) {
+      utility::append(cdbFlags, found->second);
+    }
+
+    provider->addCommand(std::make_shared<IndexerCommandCxx>(command.sourcePath,
+                                                             utility::concat(indexedHeaderPaths, {command.sourcePath}),
+                                                             excludeFilters,
+                                                             std::set<FilePathFilter>(),
+                                                             command.workingDirectory,
+                                                             utility::concat(cdbFlags, compilerFlags)));
+  }
+
+  provider->logStats();
+
+  return provider;
+}
+
+std::vector<std::shared_ptr<IndexerCommand>> SourceGroupCxxCdb::getIndexerCommands(const RefreshInfo& info) const {
+  return getIndexerCommandProvider(info)->consumeAllCommands();
+}
+
+std::shared_ptr<Task> SourceGroupCxxCdb::getPreIndexTask(std::shared_ptr<StorageProvider> storageProvider,
+                                                         std::shared_ptr<DialogView> dialogView) const {
+  if(m_settings->getPchInputFilePath().empty()) {
+    return std::make_shared<TaskLambda>([]() {});
+  }
+
+  std::vector<std::wstring> compilerFlags;
+
+  if(m_settings->getUseCompilerFlags()) {
+    const FilePath cdbPath = m_settings->getCompilationDatabasePathExpandedAndAbsolute();
+    if(const std::optional<std::vector<CxxCompileCommand>> commands = utility::loadCompilationDatabase(cdbPath)) {
+      const std::set<FilePath> sourceFilePaths = getAllSourceFilePaths(*commands);
+      for(const CxxCompileCommand& command : *commands) {
+        const FilePath sourcePath = sourcePathOf(command, cdbPath);
+
+        if(sourceFilePaths.contains(sourcePath) && utility::containsIncludePchFlag(command.arguments)) {
+          for(const std::string& arg : command.arguments) {
+            if((!compilerFlags.empty() || utility::isPrefix<std::string>("-", arg)) &&
+               FilePath(arg).fileName() != sourcePath.fileName()) {
+              compilerFlags.emplace_back(utility::decodeFromUtf8(arg));
+            }
+          }
+
+          // This used to ask Clang to render the invocation and test it for "-x" "c++". The test was
+          // `std::string::find(...)` used as a bool, so it was true unless the match landed at offset
+          // zero -- impossible, the invocation starts with the compiler path. Spelling out what it
+          // always did drops the last reason for this file to know about Clang.
+          compilerFlags.emplace_back(L"-x");
+          compilerFlags.emplace_back(L"c++");
+          break;
+        }
+      }
+    }
+  }
+
+  utility::append(compilerFlags, getBaseCompilerFlags());
+
+  if(m_settings->getUseCompilerFlags()) {
+    utility::append(compilerFlags, m_settings->getCompilerFlags());
+  }
+
+  utility::append(compilerFlags, m_settings->getPchFlags());
+
+  return utility::createBuildPchTask(m_settings.get(), compilerFlags, storageProvider, dialogView);
+}
+
+std::shared_ptr<SourceGroupSettings> SourceGroupCxxCdb::getSourceGroupSettings() {
+  return m_settings;
+}
+
+std::shared_ptr<const SourceGroupSettings> SourceGroupCxxCdb::getSourceGroupSettings() const {
+  return m_settings;
+}
+
+std::vector<std::wstring> SourceGroupCxxCdb::getBaseCompilerFlags() const {
+  std::vector<std::wstring> compilerFlags;
+
+  IApplicationSettings* appSettings = IApplicationSettings::getInstanceRaw();
+
+  utility::append(compilerFlags,
+                  IndexerCommandCxx::getCompilerFlagsForSystemHeaderSearchPaths(
+                      utility::concat(m_settings->getHeaderSearchPathsExpandedAndAbsolute(),
+                                      utility::toFilePath(appSettings->getHeaderSearchPathsExpanded()))));
+
+  utility::append(compilerFlags,
+                  IndexerCommandCxx::getCompilerFlagsForFrameworkSearchPaths(
+                      utility::concat(m_settings->getFrameworkSearchPathsExpandedAndAbsolute(),
+                                      utility::toFilePath(appSettings->getFrameworkSearchPathsExpanded()))));
+
+  return compilerFlags;
+}

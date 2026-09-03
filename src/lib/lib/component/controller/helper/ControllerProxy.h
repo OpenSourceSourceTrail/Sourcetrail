@@ -2,8 +2,8 @@
 // STL
 #include <functional>
 // internal
-#include "../../../../scheduling/TaskLambda.h"
 #include "component/view/View.h"
+#include "TaskLambda.h"
 
 template <typename ControllerType>
 class ControllerProxy {

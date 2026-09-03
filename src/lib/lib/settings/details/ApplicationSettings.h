@@ -2,7 +2,7 @@
 #include <cassert>
 #include <filesystem>
 
-#include "data/GroupType.h"
+#include "graph/domain/GroupType.h"
 #include "settings/IApplicationSettings.hpp"
 
 class TimeStamp;

@@ -1,6 +1,6 @@
 #include "component/view/DialogView.h"
 
-#include "type/indexing/MessageIndexingStatus.h"
+#include "indexing/messages/MessageIndexingStatus.h"
 
 DialogView::DialogView(UseCase useCase, StorageAccess* storageAccess) : m_useCase(useCase), m_storageAccess(storageAccess) {}
 
@@ -28,7 +28,7 @@ void DialogView::showProgressDialog(const std::wstring& /*title*/, const std::ws
 
 void DialogView::hideProgressDialog() {}
 
-void DialogView::startIndexingDialog(IProject* /*project*/,
+void DialogView::startIndexingDialog(std::function<RefreshInfo(RefreshMode)> /*getRefreshInfo*/,
                                      const std::vector<RefreshMode>& /*enabledModes*/,
                                      const RefreshMode /*initialMode*/,
                                      bool /*enabledShallowOption*/,

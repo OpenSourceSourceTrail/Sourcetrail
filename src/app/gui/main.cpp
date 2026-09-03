@@ -22,11 +22,14 @@
 #include "factory/impls/Factory.hpp"
 #include "FilePath.h"
 #include "HttpStorageAccess.h"
+#include "ide_communication/ui/QtNetworkFactory.h"
 #include "includes.h"
+#include "indexing/messages/MessageIndexingInterrupted.h"
 #include "logging.h"
 #include "productVersion.h"
+#include "Profiling.h"
+#include "project/messages/MessageLoadProject.h"
 #include "qt/engine/QtEngineSupervisor.h"
-#include "qt/network/QtNetworkFactory.h"
 #include "qt/QtApplication.h"
 #include "qt/QtCoreApplication.h"
 #include "qt/utility/utilityQt.h"
@@ -35,9 +38,7 @@
 #include "settings/ApplicationSettingsPrefiller.h"
 #include "settings/details/ApplicationSettings.h"
 #include "settings/IApplicationSettings.hpp"
-#include "type/indexing/MessageIndexingInterrupted.h"
-#include "type/MessageLoadProject.h"
-#include "type/MessageStatus.h"
+#include "status/messages/MessageStatus.h"
 #include "utilityApp.h"
 #include "utilityString.h"
 #include "Version.h"
@@ -265,6 +266,10 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 }    // namespace
 
 int main(int argc, char* argv[]) {
+  // Opens the Tracy client; a no-op unless the build was configured with -DENABLE_TRACY=ON. First
+  // statement in main because a zone reached before it is undefined behaviour.
+  const profiling::Scope tracyScope{profiling::DefaultPort};
+
   // Disable logger as default till load it from settings
   if(auto* logger = spdlog::default_logger_raw(); nullptr != logger) {
     for(auto& sink : logger->sinks()) {

@@ -7,19 +7,19 @@
 #include <string>
 #include <vector>
 
-#include "data/bookmark/BookmarkCategory.h"
-#include "data/bookmark/EdgeBookmark.h"
-#include "data/bookmark/NodeBookmark.h"
-#include "data/ErrorCountInfo.h"
-#include "data/ErrorFilter.h"
-#include "data/ErrorInfo.h"
+#include "bookmark/domain/BookmarkCategory.h"
+#include "bookmark/domain/EdgeBookmark.h"
+#include "bookmark/domain/NodeBookmark.h"
 #include "data/location/LocationType.h"
-#include "data/search/SearchMatch.h"
 #include "data/storage/StorageStats.h"
 #include "data/storage/type/StorageEdge.h"
-#include "data/tooltip/TooltipInfo.h"
-#include "data/tooltip/TooltipOrigin.h"
+#include "error/domain/ErrorCountInfo.h"
+#include "error/domain/ErrorFilter.h"
+#include "error/domain/ErrorInfo.h"
 #include "GlobalId.hpp"
+#include "search/domain/SearchMatch.h"
+#include "tooltip/domain/TooltipInfo.h"
+#include "tooltip/domain/TooltipOrigin.h"
 
 class FilePath;
 class Graph;

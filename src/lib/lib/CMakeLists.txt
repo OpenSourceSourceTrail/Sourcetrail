@@ -23,95 +23,18 @@ target_sources(
           app/LanguagePackage.h
           app/LanguagePackageManager.cpp
           app/LanguagePackageManager.h
-          component/controller/helper/ActivationListener.cpp
-          component/controller/helper/ActivationListener.h
-          component/controller/helper/BucketLayouter.cpp
-          component/controller/helper/BucketLayouter.h
-          component/controller/helper/DummyEdge.h
-          component/controller/helper/DummyNode.h
-          component/controller/helper/ListLayouter.cpp
-          component/controller/helper/ListLayouter.h
-          component/controller/helper/NetworkProtocolHelper.cpp
-          component/controller/helper/NetworkProtocolHelper.h
-          component/controller/helper/ScreenSearchInterfaces.h
           component/controller/helper/SnippetMerger.cpp
           component/controller/helper/SnippetMerger.h
-          component/controller/helper/TrailLayouter.cpp
-          component/controller/helper/TrailLayouter.h
-          component/controller/ActivationController.cpp
-          component/controller/ActivationController.h
-          component/controller/BookmarkController.cpp
-          component/controller/BookmarkController.h
-          component/controller/CodeController.cpp
-          component/controller/CodeController.h
           component/controller/Controller.cpp
           component/controller/Controller.h
-          component/controller/CustomTrailController.cpp
-          component/controller/CustomTrailController.h
-          component/controller/ErrorController.cpp
-          component/controller/ErrorController.h
-          component/controller/GraphController.cpp
-          component/controller/GraphController.h
-          component/controller/IDECommunicationController.cpp
-          component/controller/IDECommunicationController.h
-          component/controller/RefreshController.cpp
-          component/controller/RefreshController.h
-          component/controller/ScreenSearchController.cpp
-          component/controller/ScreenSearchController.h
-          component/controller/SearchController.cpp
-          component/controller/SearchController.h
-          component/controller/StatusBarController.cpp
-          component/controller/StatusBarController.h
-          component/controller/StatusController.cpp
-          component/controller/StatusController.h
-          component/controller/TabsController.cpp
-          component/controller/TabsController.h
-          component/controller/TooltipController.cpp
-          component/controller/TooltipController.h
-          component/controller/UndoRedoController.cpp
-          component/controller/UndoRedoController.h
-          component/view/helper/CodeScrollParams.h
-          component/view/helper/CodeSnippetParams.cpp
-          component/view/helper/CodeSnippetParams.h
-          component/view/BookmarkButtonsView.cpp
-          component/view/BookmarkButtonsView.h
-          component/view/BookmarkView.cpp
-          component/view/BookmarkView.h
-          component/view/CodeView.cpp
-          component/view/CodeView.h
           component/view/CompositeView.cpp
           component/view/CompositeView.h
-          component/view/CustomTrailView.h
           component/view/DialogView.cpp
           component/view/DialogView.h
-          component/view/ErrorView.cpp
-          component/view/ErrorView.h
-          component/view/GraphView.cpp
-          component/view/GraphView.h
-          component/view/GraphViewStyle.cpp
-          component/view/GraphViewStyle.h
-          component/view/GraphViewStyleImpl.h
-          component/view/MetricGraphViewStyleImpl.h
           component/view/MainView.cpp
           component/view/MainView.h
-          component/view/RefreshView.cpp
-          component/view/RefreshView.h
-          component/view/ScreenSearchView.cpp
-          component/view/ScreenSearchView.h
-          component/view/SearchView.cpp
-          component/view/SearchView.h
-          component/view/StatusBarView.cpp
-          component/view/StatusBarView.h
-          component/view/StatusView.cpp
-          component/view/StatusView.h
           component/view/TabbedView.cpp
           component/view/TabbedView.h
-          component/view/TabsView.cpp
-          component/view/TabsView.h
-          component/view/TooltipView.cpp
-          component/view/TooltipView.h
-          component/view/UndoRedoView.cpp
-          component/view/UndoRedoView.h
           component/view/View.cpp
           component/view/View.h
           component/view/ViewFactory.h
@@ -125,81 +48,8 @@ target_sources(
           component/ComponentFactory.h
           component/ComponentManager.cpp
           component/ComponentManager.h
-          component/NetworkFactory.cpp
-          component/NetworkFactory.h
           component/Tab.cpp
           component/Tab.h
-          component/TabId.cpp
-          component/TabId.h
-          data/bookmark/Bookmark.cpp
-          data/bookmark/Bookmark.h
-          data/bookmark/BookmarkCategory.cpp
-          data/bookmark/BookmarkCategory.h
-          data/bookmark/EdgeBookmark.cpp
-          data/bookmark/EdgeBookmark.h
-          data/bookmark/NodeBookmark.cpp
-          data/bookmark/NodeBookmark.h
-          data/fulltextsearch/FullTextSearchIndex.cpp
-          data/fulltextsearch/FullTextSearchIndex.h
-          data/fulltextsearch/SuffixArray.cpp
-          data/fulltextsearch/SuffixArray.h
-          data/graph/token_component/TokenComponent.cpp
-          data/graph/token_component/TokenComponent.h
-          data/graph/token_component/TokenComponentAbstraction.cpp
-          data/graph/token_component/TokenComponentAbstraction.h
-          data/graph/token_component/TokenComponentAccess.cpp
-          data/graph/token_component/TokenComponentAccess.h
-          data/graph/token_component/TokenComponentBundledEdges.cpp
-          data/graph/token_component/TokenComponentBundledEdges.h
-          data/graph/token_component/TokenComponentConst.cpp
-          data/graph/token_component/TokenComponentConst.h
-          data/graph/token_component/TokenComponentFilePath.cpp
-          data/graph/token_component/TokenComponentFilePath.h
-          data/graph/token_component/TokenComponentInheritanceChain.h
-          data/graph/token_component/TokenComponentIsAmbiguous.h
-          data/graph/token_component/TokenComponentStatic.cpp
-          data/graph/token_component/TokenComponentStatic.h
-          data/graph/Edge.cpp
-          data/graph/Edge.h
-          data/graph/ElementComponentKind.cpp
-          data/graph/ElementComponentKind.h
-          data/graph/Graph.cpp
-          data/graph/Graph.h
-          data/graph/Node.cpp
-          data/graph/Node.h
-          data/graph/Token.cpp
-          data/graph/Token.h
-          data/indexer/grpc/GrpcIndexer.cpp
-          data/indexer/grpc/GrpcIndexer.h
-          data/indexer/grpc/IndexerWorkerServiceImpl.cpp
-          data/indexer/grpc/IndexerWorkerServiceImpl.h
-          data/indexer/CombinedIndexerCommandProvider.cpp
-          data/indexer/CombinedIndexerCommandProvider.h
-          data/indexer/Indexer.h
-          data/indexer/IndexerBase.cpp
-          data/indexer/IndexerBase.h
-          data/indexer/IndexerCommand.cpp
-          data/indexer/IndexerCommand.h
-          data/indexer/IndexerCommandCustom.cpp
-          data/indexer/IndexerCommandCustom.h
-          data/indexer/CxxIndexerCommandProvider.cpp
-          data/indexer/CxxIndexerCommandProvider.h
-          data/indexer/IndexerCommandCxx.cpp
-          data/indexer/IndexerCommandJava.cpp
-          data/indexer/IndexerCommandJava.h
-          data/indexer/IndexerCommandProvider.cpp
-          data/indexer/IndexerCommandProvider.h
-          data/indexer/IndexerCommandType.cpp
-          data/indexer/IndexerCommandType.h
-          data/indexer/IndexerComposite.cpp
-          data/indexer/IndexerComposite.h
-          data/indexer/IndexerStateInfo.h
-          data/indexer/MemoryIndexerCommandProvider.cpp
-          data/indexer/MemoryIndexerCommandProvider.h
-          data/indexer/TaskBuildIndex.cpp
-          data/indexer/TaskBuildIndex.h
-          data/indexer/TaskFillIndexerCommandQueue.cpp
-          data/indexer/TaskFillIndexerCommandQueue.h
           data/location/LocationType.cpp
           data/location/LocationType.h
           data/location/SourceLocation.cpp
@@ -227,18 +77,9 @@ target_sources(
           data/parser/ReferenceKind.h
           data/parser/SymbolKind.cpp
           data/parser/SymbolKind.h
-          data/search/SearchIndex.cpp
-          data/search/SearchIndex.h
-          data/search/SearchMatch.cpp
-          data/search/SearchMatch.h
-          data/storage/type/StorageBookmarkCategory.h
-          data/storage/type/StorageBookmark.h
-          data/storage/type/StorageBookmarkedEdge.h
-          data/storage/type/StorageBookmarkedNode.h
           data/storage/type/StorageComponentAccess.h
           data/storage/type/StorageEdge.h
           data/storage/type/StorageElementComponent.h
-          data/storage/type/StorageError.h
           data/storage/type/StorageFile.h
           data/storage/type/StorageLocalSymbol.h
           data/storage/type/StorageNode.h
@@ -257,61 +98,11 @@ target_sources(
           data/storage/StorageProvider.cpp
           data/storage/StorageProvider.h
           data/storage/StorageStats.h
-          data/tooltip/TooltipInfo.h
-          data/tooltip/TooltipOrigin.h
-          data/DefinitionKind.cpp
-          data/DefinitionKind.h
-          data/ErrorCountInfo.cpp
-          data/ErrorCountInfo.h
-          data/ErrorFilter.h
-          data/ErrorInfo.h
-          data/GroupType.cpp
-          data/GroupType.h
-          data/HierarchyCache.cpp
-          data/HierarchyCache.h
-          data/NodeKind.cpp
-          data/NodeKind.h
-          data/NodeType.cpp
-          data/NodeType.h
-          data/NodeTypeSet.cpp
-          data/NodeTypeSet.h
-          data/IndexingPhaseStats.cpp
-          data/IndexingPhaseStats.h
+          data/storage/StorageVersion.h
           data/TaskInjectStorage.cpp
           data/TaskInjectStorage.h
           data/TaskMergeStorages.cpp
           data/TaskMergeStorages.h
-          project/CompilationDatabase.cpp
-          project/CompilationDatabase.h
-          project/CxxToolchainRemote.cpp
-          project/CxxToolchainRemote.h
-          project/ICxxToolchain.cpp
-          project/ICxxToolchain.h
-          project/IProject.cpp
-          project/IProject.hpp
-          project/RefreshInfo.h
-          project/SourceGroup.cpp
-          project/SourceGroup.h
-          project/SourceGroupCustomCommand.cpp
-          project/SourceGroupCustomCommand.h
-          project/SourceGroupCxxCdb.cpp
-          project/SourceGroupCxxCdb.h
-          project/SourceGroupCxxEmpty.cpp
-          project/SourceGroupCxxEmpty.h
-          project/SourceGroupFactory.cpp
-          project/SourceGroupFactory.h
-          project/SourceGroupFactoryModule.cpp
-          project/SourceGroupFactoryModule.h
-          project/SourceGroupFactoryModuleCustom.cpp
-          project/SourceGroupFactoryModuleCustom.h
-          project/SourceGroupFactoryModuleCxx.cpp
-          project/SourceGroupFactoryModuleCxx.h
-          project/SourceGroupFactoryModuleJava.cpp
-          project/SourceGroupFactoryModuleJava.h
-          project/SourceGroupJavaEmpty.cpp
-          project/SourceGroupJavaEmpty.h
-          project/utilitySourceGroupCxx.cpp
-          project/utilitySourceGroupCxx.h
           settings/migration/SettingsMigration.cpp
           settings/migration/SettingsMigration.h
           settings/migration/SettingsMigrationDeleteKey.cpp
@@ -396,7 +187,7 @@ target_sources(
           settings/source_group/type/SourceGroupSettingsCxxCdb.h)
 
 # One include root. Headers are spelled by their path below it, e.g.
-# #include "data/graph/Graph.h". The binary dir carries the generated language_packages.h; the proto
+# #include "graph/domain/Graph.h". The binary dir carries the generated language_packages.h; the proto
 # headers arrive through the Sourcetrail::lib::proto::api link below.
 target_include_directories(Sourcetrail_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR}/src/lib/lib)
 
@@ -405,21 +196,26 @@ target_link_libraries(
   PUBLIC Sourcetrail::lib::messaging
          Sourcetrail::lib::proto::api
          Sourcetrail::lib::proto::convert
-         gRPC::grpc++
          Sourcetrail::lib::core::utility::ConfigManager
          Sourcetrail::lib::core::utility::LowMemoryStringMap
          Sourcetrail::lib::core::utility::OrderedCache
+         Sourcetrail::lib::core::utility::profiling
+         # scheduling stays PUBLIC: ControllerProxy.h, a public Logic header every Qt view includes,
+         # takes a TaskLambda by value. Demoting it needs that header to stop naming Task first.
+         Sourcetrail::lib::scheduling
          Sourcetrail::lib::core::utility::Status
+         Sourcetrail::lib::core::utility::TimeStamp
          Sourcetrail::lib::core::utility::Tree
          Sourcetrail::lib::core::utility::utility
          Sourcetrail::lib::core::utility::Migration
          Sourcetrail::lib::core::utility::Migrator
+         Sourcetrail::lib::core::utility::file::FileInfo
          Sourcetrail::lib::core::utility::file::FilePath
          Sourcetrail::lib::core::utility::file::FilePathFilter
          Sourcetrail::lib::core::utility::toUnderlying
-         Sourcetrail::lib::scheduling
          nonstd::expected-lite
   PRIVATE Sourcetrail::lib::core
+          gRPC::grpc++
           Sourcetrail::lib::core::utility::rangesTo
           Sourcetrail::lib::core::utility::ConfigManager
           Sourcetrail::lib::core::utility::logging
@@ -443,8 +239,9 @@ configure_file("${PROJECT_SOURCE_DIR}/cmake/language_packages.h.in"
                "${PROJECT_BINARY_DIR}/src/lib/lib/language_packages.h")
 
 # The engine-only half: everything that opens, migrates or drives the index database, plus the task
-# graph that fills it. Kept out of Sourcetrail_lib so the GUI physically cannot reach SQLite --
-# see the sqliteFreeGuiTestSuite check in tests/.
+# graph that fills it. This is the Data tier. Kept out of Sourcetrail_lib so the GUI physically
+# cannot reach SQLite; enforced by assert_no_transitive_link() at configure time and by the
+# guard.gui.linksNoSqlite ctest, both wired up in src/lib/lib_gui/CMakeLists.txt.
 add_library(Sourcetrail_lib_engine)
 add_library(Sourcetrail::lib::lib_engine ALIAS Sourcetrail_lib_engine)
 
@@ -456,8 +253,6 @@ target_sources(
           data/TaskCleanStorage.h
           data/TaskFinishParsing.cpp
           data/TaskFinishParsing.h
-          data/indexer/TaskExecuteCustomCommands.cpp
-          data/indexer/TaskExecuteCustomCommands.h
           data/parser/TaskParseWrapper.cpp
           data/parser/TaskParseWrapper.h
           data/storage/PersistentStorage.cpp
@@ -467,26 +262,18 @@ target_sources(
           data/storage/migration/SqliteStorageMigrationLambda.cpp
           data/storage/migration/SqliteStorageMigrationLambda.h
           data/storage/migration/SqliteStorageMigrator.h
-          data/storage/sqlite/SqliteBookmarkStorage.cpp
-          data/storage/sqlite/SqliteBookmarkStorage.h
           data/storage/sqlite/SqliteDatabaseIndex.cpp
           data/storage/sqlite/SqliteDatabaseIndex.h
           data/storage/sqlite/SqliteIndexStorage.cpp
           data/storage/sqlite/SqliteIndexStorage.h
           data/storage/sqlite/SqliteStorage.cpp
-          data/storage/sqlite/SqliteStorage.h
-          project/DefaultTaskFactory.cpp
-          project/DefaultTaskFactory.h
-          project/ITaskFactory.h
-          project/IndexTaskBuilder.cpp
-          project/IndexTaskBuilder.h
-          project/Project.cpp
-          project/Project.h
-          project/RefreshInfoGenerator.cpp
-          project/RefreshInfoGenerator.h)
+          data/storage/sqlite/SqliteStorage.h)
 
 target_link_libraries(
   Sourcetrail_lib_engine
+  # CppSQLite stays PUBLIC: SqliteStorage.h -- a public header -- includes CppSQLite3.h, which is
+  # what the TODO(Hussein) at the top of that file is about. Demoting it to PRIVATE breaks every
+  # consumer that includes SqliteStorage.h; it can move once that header stops leaking the type.
   PUBLIC Sourcetrail::lib::lib CppSQLite::CppSQLite3
   PRIVATE Sourcetrail::lib::core
           Sourcetrail::lib::core::utility::logging

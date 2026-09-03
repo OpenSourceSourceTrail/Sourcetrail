@@ -1,5 +1,5 @@
 #pragma once
-#include "project/ICxxToolchain.h"
+#include "project/logic/ICxxToolchain.h"
 
 /** The C/C++ toolchain of a process that has Clang linked in -- the indexer worker. */
 class CxxToolchainLocal final : public ICxxToolchain {

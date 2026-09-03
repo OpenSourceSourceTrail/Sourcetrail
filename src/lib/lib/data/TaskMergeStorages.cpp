@@ -4,8 +4,9 @@
 #include <thread>
 #include <utility>
 
-#include "data/IndexingPhaseStats.h"
 #include "data/storage/StorageProvider.h"
+#include "indexing/domain/IndexingPhaseStats.h"
+#include "Profiling.h"
 
 TaskMergeStorages::TaskMergeStorages(std::shared_ptr<StorageProvider> storageProvider)
     : m_storageProvider(std::move(storageProvider)) {}
@@ -25,6 +26,7 @@ Task::TaskState TaskMergeStorages::doUpdate(std::shared_ptr<Blackboard> /*blackb
     }
     if(target && source) {
       const indexing_stats::ScopedPhase timer(indexing_stats::merge);
+      SR_ZONE_N("engine/merge");
       target->inject(source.get());
       m_storageProvider->insert(target);
       return STATE_SUCCESS;

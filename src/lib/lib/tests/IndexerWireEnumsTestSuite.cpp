@@ -2,7 +2,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 // internal
-#include "data/indexer/IndexerCommandType.h"
+#include "indexing/domain/IndexerCommandType.h"
 #include "settings/LanguageType.h"
 #include "settings/source_group/SourceGroupType.h"
 

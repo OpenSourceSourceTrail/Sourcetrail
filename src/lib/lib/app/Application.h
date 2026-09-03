@@ -6,15 +6,15 @@
 
 #include "component/view/DialogView.h"
 #include "FilePath.h"
-#include "project/IProject.hpp"
+#include "project/logic/IProject.hpp"
 // messages
+#include "bookmark/messages/MessageBookmarkUpdate.hpp"
+#include "indexing/messages/MessageIndexingFinished.h"
 #include "MessageListener.h"
-#include "type/bookmark/MessageBookmarkUpdate.hpp"
-#include "type/indexing/MessageIndexingFinished.h"
+#include "project/messages/MessageCloseProject.h"
+#include "project/messages/MessageLoadProject.h"
+#include "refresh/messages/MessageRefresh.h"
 #include "type/MessageActivateWindow.h"
-#include "type/MessageCloseProject.h"
-#include "type/MessageLoadProject.h"
-#include "type/MessageRefresh.h"
 #include "type/MessageRefreshUI.h"
 #include "type/MessageSwitchColorScheme.h"
 

@@ -10,8 +10,8 @@
 #include "Capabilities.h"
 #include "EngineChannel.h"
 #include "logging.h"
+#include "status/messages/MessageStatus.h"
 #include "type/MessageRefreshUI.h"
-#include "type/MessageStatus.h"
 
 namespace {
 

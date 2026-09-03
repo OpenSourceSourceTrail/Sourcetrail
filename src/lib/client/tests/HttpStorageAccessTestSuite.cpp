@@ -5,13 +5,13 @@
 #include <gtest/gtest.h>
 
 #include "Capabilities.h"
-#include "data/graph/Graph.h"
 #include "data/location/SourceLocationCollection.h"
 #include "data/location/SourceLocationFile.h"
 #include "data/name/NameHierarchy.h"
-#include "data/NodeType.h"
 #include "EngineChannel.h"
 #include "EngineHttpService.h"
+#include "graph/domain/Graph.h"
+#include "graph/domain/NodeType.h"
 #include "HttpServer.h"
 #include "HttpStorageAccess.h"
 #include "MockedStorageAccess.hpp"

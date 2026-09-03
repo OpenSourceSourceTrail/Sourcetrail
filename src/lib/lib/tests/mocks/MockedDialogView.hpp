@@ -18,7 +18,7 @@ struct MockedDialogView : DialogView {
 
   MOCK_METHOD(void,
               startIndexingDialog,
-              (IProject*,
+              (std::function<RefreshInfo(RefreshMode)>,
                const std::vector<RefreshMode>&,
                const RefreshMode,
                bool,

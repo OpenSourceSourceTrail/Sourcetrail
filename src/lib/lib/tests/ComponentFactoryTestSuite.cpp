@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include "activation/logic/ActivationController.h"
 #include "component/ComponentFactory.h"
-#include "component/controller/ActivationController.h"
 #include "MockedApplicationSetting.hpp"
 #include "MockedMessageQueue.hpp"
 #include "mocks/MockedStorageAccess.hpp"
