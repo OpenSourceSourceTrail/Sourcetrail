@@ -69,7 +69,7 @@ target_sources(
 
 if(ENABLE_UNIT_TEST)
   foreach(test_name IN ITEMS IndexerCommandJavaTestSuite IndexerCompositeTestSuite IndexerWorkerServiceImplTestSuite
-                        TaskBuildIndexTestSuite)
+                             TaskBuildIndexTestSuite)
     add_sourcetrail_test(
       NAME ${test_name}
       SOURCES tests/${test_name}.cpp
