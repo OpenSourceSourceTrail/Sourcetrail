@@ -233,8 +233,10 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
         }
         for(ResolvedMethodDeclaration candidate : decl.get().getDeclaredMethods()) {
           if(overrides(resolved, candidate)) {
-            storage.edge(id, storage.nodeByName(Kinds.NODE_METHOD, chainForResolvedCallable(candidate)),
-                Kinds.EDGE_OVERRIDE);
+            long overridden = storage.nodeByName(Kinds.NODE_METHOD, chainForResolvedCallable(candidate));
+            // Located at the overriding method's own name, the way the C++ indexer records an
+            // override reference: there is no other token in the file that stands for it.
+            location(storage.edge(id, overridden, Kinds.EDGE_OVERRIDE), md.getName(), Kinds.LOCATION_TOKEN);
           }
         }
       }
