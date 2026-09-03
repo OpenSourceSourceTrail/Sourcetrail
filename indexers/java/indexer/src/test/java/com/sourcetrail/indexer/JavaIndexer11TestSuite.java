@@ -188,8 +188,9 @@ class JavaIndexer11TestSuite extends JavaStdTestSuite {
     assertEquals(0, s.proto().getErrorsCount());
     assertTrue(s.classes.contains("public Outer <1:1 <1:14 1:18> 8:1>"),
         "outer class: " + s.classes);
-    // the anonymous class field x is emitted as a member of Outer (flat hierarchy in the collector)
-    assertTrue(s.fields.contains("default Outer.x <4:11 4:11>"),
+    // x belongs to the anonymous class, not to Outer, and the read of it inside helper() resolves
+    // to that same node rather than adding a second one under Outer.
+    assertEquals(List.of("default Outer.anonymous class (Test.java<3:12>).x <4:11 4:11>"), s.fields,
         "anonymous class field x: " + s.fields);
     assertTrue(s.methods.contains(
         "default void Outer.anonymous class (Test.java<3:12>).helper() <5:7 <5:12 5:17> 5:34>"),

@@ -327,6 +327,34 @@ class JavaIndexerTest {
         "the parameter's use must reach its declaration: " + s.typeUses);
   }
 
+  /**
+   * Members of an anonymous class belong to it, not to the class it sits inside. findAncestor on
+   * TypeDeclaration walks straight past an anonymous body, which used to attach them to the
+   * enclosing named type -- so the graph said Outer owned a method whose own name said otherwise.
+   */
+  @Test
+  void anonymous_class_members_belong_to_the_anonymous_class() throws IOException {
+    TestStorage s = index("public class Outer {\n"
+        + "  Object make() {\n"
+        + "    return new Object() {\n"
+        + "      int x = 1;\n"
+        + "      void helper() { int v = x; }\n"
+        + "    };\n"
+        + "  }\n"
+        + "}\n");
+
+    long outer = s.node(Kinds.NODE_CLASS, "Outer\ts").getId();
+    long anonymous = s.node(Kinds.NODE_CLASS, "anonymous class").getId();
+    long field = s.node(Kinds.NODE_FIELD, "x").getId();
+    long helper = s.node(Kinds.NODE_METHOD, "helper").getId();
+
+    assertTrue(s.hasEdge(anonymous, field, Kinds.EDGE_MEMBER), "x belongs to the anonymous class");
+    assertTrue(s.hasEdge(anonymous, helper, Kinds.EDGE_MEMBER), "helper belongs to it too");
+    assertFalse(s.hasEdge(outer, field, Kinds.EDGE_MEMBER), "and not to Outer");
+    assertEquals(1, s.fields.size(),
+        "the read of x must resolve to the declared field, not add a second: " + s.fields);
+  }
+
   // ---- record components ---------------------------------------------
 
   /**

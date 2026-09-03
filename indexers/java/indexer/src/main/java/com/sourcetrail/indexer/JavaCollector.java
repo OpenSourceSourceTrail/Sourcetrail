@@ -244,7 +244,7 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
     access(cd, id);
     location(id, cd.getName(), Kinds.LOCATION_TOKEN);
     annotations(cd, id);
-    findAncestor(cd, TypeDeclaration.class).ifPresent(parent -> storage.edge(idOfType(parent), id, Kinds.EDGE_MEMBER));
+    enclosingTypeOf(cd).ifPresent(parent -> storage.edge(idOfEnclosingType(parent), id, Kinds.EDGE_MEMBER));
     return id;
   }
 
@@ -311,16 +311,16 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
   }
 
   private void emitField(FieldDeclaration fd, VariableDeclarator var) {
-    Optional<TypeDeclaration> parentOpt = findAncestor(var, TypeDeclaration.class);
+    Optional<Node> parentOpt = enclosingTypeOf(var);
     Names.Element[] chain = parentOpt
-        .map(parent -> concat(chainForType(parent), Names.Element.plain(var.getNameAsString())))
+        .map(parent -> concat(chainForEnclosingType(parent), Names.Element.plain(var.getNameAsString())))
         .orElseGet(() -> new Names.Element[]{Names.Element.plain(var.getNameAsString())});
 
     long id = storage.nodeFor(var, Kinds.NODE_FIELD, chain);
     storage.symbol(id, Kinds.DEFINITION_EXPLICIT);
     access(fd, id);
     location(id, var.getName(), Kinds.LOCATION_TOKEN);
-    parentOpt.ifPresent(parent -> storage.edge(idOfType(parent), id, Kinds.EDGE_MEMBER));
+    parentOpt.ifPresent(parent -> storage.edge(idOfEnclosingType(parent), id, Kinds.EDGE_MEMBER));
     typeReference(id, var.getType(), var.getType(), Kinds.EDGE_TYPE_USAGE);
     annotations(fd, id);
   }
@@ -552,7 +552,13 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
         return;
       }
       if(resolved.isField()) {
-        Names.Element[] owner = chainForResolvedType(resolved.asField().declaringType().asReferenceType());
+        // The solver's own declaringType() reports the nearest *named* class, so a field of an
+        // anonymous class comes back owned by the class outside it -- and the read would then name
+        // a different node than the declaration. Take the owner from the AST when there is one.
+        Names.Element[] owner = resolved.toAst()
+            .flatMap(JavaCollector::enclosingTypeOf)
+            .map(this::chainForEnclosingType)
+            .orElseGet(() -> chainForResolvedType(resolved.asField().declaringType().asReferenceType()));
         long target = storage.nodeByName(
             Kinds.NODE_FIELD, Names.join(concat(owner, Names.Element.plain(resolved.getName()))));
         location(storage.edge(scope(), target, Kinds.EDGE_USAGE), range, Kinds.LOCATION_TOKEN);
@@ -788,10 +794,50 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
       String qualified = decl.getQualifiedName();
       return (qualified == null || qualified.isEmpty()) ? new Names.Element[0] : Names.split(qualified);
     }
-    Names.Element[] container = findAncestor(anonymous.get(), TypeDeclaration.class)
+    return chainForAnonymous(anonymous.get());
+  }
+
+  /** Element chain for an anonymous class body: its enclosing named type, then its positional name. */
+  private Names.Element[] chainForAnonymous(ObjectCreationExpr oce) {
+    Names.Element[] container = findAncestor(oce, TypeDeclaration.class)
         .map(this::chainForType)
         .orElseGet(() -> new Names.Element[0]);
-    return concat(container, Names.Element.plain(anonymousTypeName(anonymous.get())));
+    return concat(container, Names.Element.plain(anonymousTypeName(oce)));
+  }
+
+  /**
+   * The nearest enclosing type of a declaration, which may be an anonymous class body.
+   *
+   * <p>{@code findAncestor(node, TypeDeclaration.class)} walks straight past an anonymous body to
+   * the named type outside it, so a member of an anonymous class would be attached to the wrong
+   * owner -- and, on the paths that build names lexically, named after it too.
+   */
+  private static Optional<Node> enclosingTypeOf(Node node) {
+    for(Node cur = node.getParentNode().orElse(null); cur != null; cur = cur.getParentNode().orElse(null)) {
+      if(cur instanceof TypeDeclaration) {
+        return Optional.of(cur);
+      }
+      if(cur instanceof ObjectCreationExpr oce && oce.getAnonymousClassBody().isPresent()) {
+        return Optional.of(cur);
+      }
+    }
+    return Optional.empty();
+  }
+
+  /** Element chain for whatever {@link #enclosingTypeOf} returned. */
+  private Names.Element[] chainForEnclosingType(Node owner) {
+    return (owner instanceof TypeDeclaration<?> td) ? chainForType(td) : chainForAnonymous((ObjectCreationExpr) owner);
+  }
+
+  /** Node id for whatever {@link #enclosingTypeOf} returned, creating the node if needed. */
+  private long idOfEnclosingType(Node owner) {
+    if(owner instanceof TypeDeclaration<?> td) {
+      return idOfType(td);
+    }
+    if(!storage.known(owner)) {
+      storage.nodeFor(owner, Kinds.NODE_CLASS, chainForAnonymous((ObjectCreationExpr) owner));
+    }
+    return storage.idOf(owner);
   }
 
   /** The {@link ObjectCreationExpr} behind a resolved type, present only for anonymous classes. */
@@ -875,7 +921,7 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
         joined.append("[]");
       }
     }
-    Names.Element[] parent = findAncestor(cd, TypeDeclaration.class).map(this::chainForType)
+    Names.Element[] parent = enclosingTypeOf(cd).map(this::chainForEnclosingType)
         .orElseGet(() -> new Names.Element[0]);
     return Names.join(
         concat(parent, Names.Element.signature(cd.getNameAsString(), declaredReturnType, "(" + joined + ")")));
