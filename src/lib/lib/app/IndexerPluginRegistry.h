@@ -5,6 +5,8 @@
 #include <optional>
 #include <vector>
 
+#include <mutex>
+
 #include "FilePath.h"
 #include "indexing/domain/IndexerCommandType.h"
 #include "settings/LanguageType.h"
