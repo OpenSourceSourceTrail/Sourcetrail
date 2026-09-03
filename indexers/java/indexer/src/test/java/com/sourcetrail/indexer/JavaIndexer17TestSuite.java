@@ -79,13 +79,10 @@ class JavaIndexer17TestSuite extends JavaStdTestSuite {
    * <p>Each component declares a private final field (JLS 8.10.3), and the reference to {@code x}
    * in the compact constructor merges onto that field rather than fabricating a second node.
    *
-   * <p>Remaining gaps:
-   * <ul>
-   *   <li>ponytail: implicit accessor methods (x(), y()) are not emitted — JavaCollector does
-   *       not synthesise accessors from record components. Fix: emit a NODE_METHOD per component.
-   *   <li>ponytail: the compact constructor is not emitted as a Point() constructor —
-   *       JavaCollector does not visit CompactConstructorDeclaration. Fix: add a visitor for it.
-   * </ul>
+   * <p>Each component also declares a public accessor, emitted implicitly. The compact
+   * constructor is the canonical one, so it carries the components as its parameters — that
+   * is the name a {@code new Point(1, 2)} call site resolves to, and both sides must land on
+   * one node.
    */
   @Test
   void record_with_compact_constructor_and_accessors() throws IOException {
@@ -99,11 +96,40 @@ class JavaIndexer17TestSuite extends JavaStdTestSuite {
     // Record is emitted as NODE_CLASS.
     assertEquals(List.of("default Point <1:1 <1:8 1:12> 5:1>"), s.classes);
     assertEquals(List.of("private Point.x <1:18 1:18>", "private Point.y <1:25 1:25>"), s.fields);
-    // ponytail: accessor methods and compact constructor are not emitted.
-    // The only method is the IllegalArgumentException constructor used inside the body.
     assertEquals(
-        List.of("void java.lang.IllegalArgumentException.IllegalArgumentException()"),
+        List.of("public int Point.x() <1:18 1:18>",
+            "public int Point.y() <1:25 1:25>",
+            "default void Point.Point(int, int) <2:3 <2:3 2:7> 4:3>",
+            "void java.lang.IllegalArgumentException.IllegalArgumentException()"),
         s.methods);
+  }
+
+  /**
+   * A call to an implicit accessor, and a {@code new} of the canonical constructor, must land on
+   * the nodes the record declaration emitted rather than fabricating a second pair — the engine
+   * dedups on {@code (type, serializedName)}, so a name mismatch would silently split each symbol.
+   *
+   * <p>JLS 8.10.3 (implicitly declared members of a record class).
+   */
+  @Test
+  void record_accessor_and_constructor_calls_merge_onto_the_declarations() throws IOException {
+    TestStorage s = index(
+        "record Point(int x, int y) { }\n"
+        + "class Use {\n"
+        + "  int m() { return new Point(1, 2).x(); }\n"
+        + "}\n");
+    assertEquals(0, s.proto().getErrorsCount());
+    // One accessor node per component, one constructor node — not two of each.
+    assertEquals(
+        List.of("public int Point.x() <1:18 1:18>",
+            "public int Point.y() <1:25 1:25>",
+            "default int Use.m() <3:3 <3:7 3:7> 3:41>",
+            "void Point.Point(int, int)"),
+        s.methods);
+    assertEquals(
+        List.of("int Use.m() -> int Point.x() <3:36 3:36>",
+            "int Use.m() -> void Point.Point(int, int) <3:24 3:28>"),
+        s.calls);
   }
 
   /**

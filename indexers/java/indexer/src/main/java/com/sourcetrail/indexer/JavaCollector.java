@@ -9,6 +9,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.CallableDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.CompactConstructorDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.EnumConstantDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
@@ -183,12 +184,13 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
   }
 
   /**
-   * A record component declares a private final field (JLS 8.10.3). JavaParser models it as a
-   * {@link Parameter}, so without this it falls through {@link #visit(Parameter, Void)} and is
-   * recorded as a local variable -- leaving the record itself with no members at all.
+   * A record component declares a private final field and a public accessor method (JLS 8.10.3).
+   * JavaParser models the component as a {@link Parameter}, so without this it falls through
+   * {@link #visit(Parameter, Void)} and is recorded as a local variable -- leaving the record
+   * itself with no members at all.
    *
-   * <p>ponytail: the implicit accessor each component also declares is still not emitted; that
-   * needs a synthesised NODE_METHOD per component, which has no AST node to hang a location on.
+   * <p>The accessor has no AST node of its own, so it is keyed by name alone: the component's
+   * node is already claimed by the field, and {@link Storage#nodeFor} would hand that id back.
    */
   private void emitRecordComponent(RecordDeclaration rd, long typeId, Parameter component) {
     long id = storage.nodeFor(component, Kinds.NODE_FIELD,
@@ -199,6 +201,52 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
     storage.edge(typeId, id, Kinds.EDGE_MEMBER);
     typeReference(id, component.getType(), component.getType(), Kinds.EDGE_TYPE_USAGE);
     annotations(component, id);
+
+    long accessorId = storage.nodeByName(Kinds.NODE_METHOD,
+        Names.join(concat(chainForType(rd), Names.Element.signature(component.getNameAsString(),
+            describe(component.getType()), "()"))));
+    storage.symbol(accessorId, Kinds.DEFINITION_IMPLICIT);
+    storage.access(accessorId, Kinds.ACCESS_PUBLIC);
+    location(accessorId, component.getName(), Kinds.LOCATION_TOKEN);
+    storage.edge(typeId, accessorId, Kinds.EDGE_MEMBER);
+  }
+
+  /**
+   * A compact constructor <em>is</em> the canonical constructor, so it has to carry the same name a
+   * {@code new Point(...)} call site produces. Its own parameter list is always empty, so the
+   * components supply it; {@code ccd.resolve()} does not answer for a compact constructor.
+   */
+  @Override
+  public void visit(CompactConstructorDeclaration ccd, Void arg) {
+    StringBuilder params = new StringBuilder();
+    for(Parameter component : findAncestor(ccd, RecordDeclaration.class)
+        .map(RecordDeclaration::getParameters).orElseGet(NodeList::new)) {
+      if(params.length() > 0) {
+        params.append(", ");
+      }
+      params.append(describe(component.getType()));
+    }
+    String name = Names.join(concat(
+        enclosingTypeOf(ccd).map(this::chainForEnclosingType).orElseGet(() -> new Names.Element[0]),
+        Names.Element.signature(ccd.getNameAsString(), "void", "(" + params + ")")));
+    long id = storage.nodeFor(ccd, Kinds.NODE_METHOD, name);
+    storage.symbol(id, Kinds.DEFINITION_EXPLICIT);
+    access(ccd, id);
+    location(id, ccd.getName(), Kinds.LOCATION_TOKEN);
+    location(id, ccd, Kinds.LOCATION_SCOPE);
+    annotations(ccd, id);
+    enclosingTypeOf(ccd)
+        .ifPresent(parent -> storage.edge(idOfEnclosingType(parent), id, Kinds.EDGE_MEMBER));
+    inScope(id, () -> super.visit(ccd, arg));
+  }
+
+  /** Resolved name of a written type, falling back to the as-written form. */
+  private static String describe(com.github.javaparser.ast.type.Type type) {
+    try {
+      return type.resolve().describe();
+    } catch(RuntimeException e) {
+      return type.asString();
+    }
   }
 
   @Override
