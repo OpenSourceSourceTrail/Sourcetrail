@@ -22,7 +22,8 @@ std::string urlEncode(const std::string& text) {
 
   std::string out;
   out.reserve(text.size());
-  for(const unsigned char chr : text) {
+  for(const char rawChr : text) {
+    const auto chr = static_cast<unsigned char>(rawChr);
     // Unreserved per RFC 3986. Everything else -- '/' and ':' in a Windows path included -- is
     // escaped, so a file path survives as a single path segment.
     if((chr >= 'A' && chr <= 'Z') || (chr >= 'a' && chr <= 'z') || (chr >= '0' && chr <= '9') || chr == '-' || chr == '_' ||

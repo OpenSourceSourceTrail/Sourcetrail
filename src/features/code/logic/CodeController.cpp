@@ -195,9 +195,8 @@ void CodeController::handleMessage(MessageActivateTokens* message) {
     size_t referenceCount = m_collection->getSourceLocationCount();
 
     std::wstring status;
-    for(const SearchMatch& match : message->getSearchMatches()) {
-      status += L"Activate \"" + match.name + L"\": ";
-      break;
+    if(!message->getSearchMatches().empty()) {
+      status += L"Activate \"" + message->getSearchMatches().front().name + L"\": ";
     }
 
     status += std::to_wstring(message->tokenIds.size()) + L" ";

@@ -49,7 +49,6 @@ set(SOURCETRAIL_COMMON_WARNINGS
     -Wno-overloaded-virtual
     -Wconversion # warn on type conversions that may lose data
     -Wsign-conversion # warn on sign conversions
-    -Wnull-dereference # warn if a null dereference is detected
     -Wdouble-promotion # warn if float is implicit promoted to double
     -Wformat=2 # warn on security issues around functions that format output (ie printf)
     -Wimplicit-fallthrough # warn on statements that fallthrough without an explicit annotation
@@ -57,7 +56,11 @@ set(SOURCETRAIL_COMMON_WARNINGS
 
 set(SOURCETRAIL_CLANG_WARNINGS
     ${SOURCETRAIL_COMMON_WARNINGS}
-    -Wc++20-compat-pedantic
+    # -Wc++20-compat-pedantic is deliberately absent: it warns about constructs incompatible with
+    # standards *before* C++20, and every hit is Qt's Q_CONSTINIT expanding to constinit in
+    # generated moc translation units. Nothing in this project can act on it.
+    -Wno-keyword-macro # test suites reach privates with `#define private public`; -Wpedantic
+                       # enables the warning and it cannot be narrowed to non-test code
     -Wcall-to-pure-virtual-from-ctor-dtor
     -Wcalled-once-parameter
     -Wcast-calling-convention
@@ -71,6 +74,8 @@ set(SOURCETRAIL_CLANG_WARNINGS
     -Wunreachable-code
     -Wuninitialized
     -Wthread-safety
+    -Wnull-dereference # warn if a null dereference is detected. Clang only: GCC emits it at inlining time
+                       # against std/boost/LLVM headers, which -isystem cannot suppress
     -Wswitch)
 
 set(SOURCETRAIL_GCC_WARNINGS
@@ -79,7 +84,8 @@ set(SOURCETRAIL_GCC_WARNINGS
     -Wduplicated-cond # warn if if / else chain has duplicated conditions
     -Wduplicated-branches # warn if if / else branches have duplicated code
     -Wlogical-op # warn about logical operations being used where bitwise were probably wanted
-    -Wuseless-cast # warn if you perform a cast to the same type
+    # -Wuseless-cast is deliberately absent: it fires on the explicit-width casts the proto boundary
+    # needs (static_cast<Id>(uint64), useless only where uint64_t and size_t happen to be the same type)
     -Wundef
     -Wformat-truncation)
 

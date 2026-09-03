@@ -38,7 +38,7 @@ FileHandler::Ptr FileHandler::createFileFromBuffer(fs::path filepath, const std:
   oStream.close();
 
   std::error_code errorCode;
-  if(auto fileSize = fs::file_size(filepath, errorCode) != buffer.size()) {
+  if(fs::file_size(filepath, errorCode) != buffer.size()) {
     return nullptr;
   }
 

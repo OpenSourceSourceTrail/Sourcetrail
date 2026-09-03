@@ -1,6 +1,18 @@
 #pragma once
 // boost
+// date_time's templates instantiate under whatever warning flags the including translation unit
+// carries, and they do not pass ours -- -isystem does not help, the instantiation point is ours.
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wsign-conversion"
+#  pragma GCC diagnostic ignored "-Wconversion"
+#  pragma GCC diagnostic ignored "-Wold-style-cast"
+#  pragma GCC diagnostic ignored "-Wdouble-promotion"
+#endif
 #include <boost/date_time/posix_time/posix_time.hpp>
+#ifdef __GNUC__
+#  pragma GCC diagnostic pop
+#endif
 
 class TimeStamp final {
 public:

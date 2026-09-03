@@ -71,7 +71,7 @@ SourceLocation* SourceLocationFile::addSourceLocation(LocationType type,
                                                       size_t endLineNumber,
                                                       size_t endColumnNumber) {
   auto pStart = std::make_shared<SourceLocation>(this, type, locationId, tokenIds, startLineNumber, startColumnNumber, true);
-  auto pEnd = std::make_shared<SourceLocation>(pStart.get(), endLineNumber, endColumnNumber);
+  auto pEnd = SourceLocation::createEndSourceLocation(pStart.get(), endLineNumber, endColumnNumber);
 
   m_locations.insert(pStart);
   m_locations.insert(pEnd);
@@ -97,7 +97,7 @@ SourceLocation* SourceLocationFile::addSourceLocationCopy(const SourceLocation* 
     }
   }
 
-  auto pCopy = std::make_shared<SourceLocation>(location, this);
+  auto pCopy = SourceLocation::createSourceLocationFromAnother(location, this);
   m_locations.insert(pCopy);
 
   if(pCopy->getLocationId() != 0U) {
