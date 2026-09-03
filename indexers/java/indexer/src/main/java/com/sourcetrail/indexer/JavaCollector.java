@@ -21,8 +21,10 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.MethodReferenceExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.expr.TypeExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.nodeTypes.NodeWithAnnotations;
 import com.github.javaparser.ast.nodeTypes.modifiers.NodeWithAccessModifiers;
@@ -403,6 +405,45 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
     location(storage.edge(scope(), target, Kinds.EDGE_CALL), mce.getName(),
         solved ? Kinds.LOCATION_TOKEN : Kinds.LOCATION_UNSOLVED);
     super.visit(mce, arg);
+  }
+
+  /**
+   * A method reference is a call: {@code list.forEach(this::helper)} reaches {@code helper} just as
+   * {@code helper()} does, and without this the call graph simply loses that edge.
+   *
+   * <p>The location covers the whole {@code scope::name} expression rather than just the name
+   * token: JavaParser exposes the identifier as a String with no range of its own, and deriving one
+   * from the expression's end would break on {@code Foo :: bar}.
+   */
+  @Override
+  public void visit(MethodReferenceExpr mre, Void arg) {
+    if("new".equals(mre.getIdentifier())) {
+      // ponytail: JavaParser cannot resolve a constructor reference ("Constructor calls not yet
+      //           resolvable"), so record the type being constructed and skip the call edge rather
+      //           than fabricating a "new()" method node that matches no declaration.
+      if(mre.getScope() instanceof TypeExpr te) {
+        typeReference(scope(), te.getType(), te, Kinds.EDGE_TYPE_USAGE);
+      }
+      super.visit(mre, arg);
+      return;
+    }
+
+    String serialized = null;
+    try {
+      serialized = chainForResolvedCallable(mre.resolve());
+    } catch(RuntimeException e) {
+      // Unresolvable reference: fall through to the name-only form below.
+    }
+
+    boolean solved = serialized != null;
+    if(!solved) {
+      serialized = Names.join(Names.Element.signature(mre.getIdentifier(), "", "()"));
+    }
+
+    long target = storage.nodeByName(Kinds.NODE_METHOD, serialized);
+    location(storage.edge(scope(), target, Kinds.EDGE_CALL), mre,
+        solved ? Kinds.LOCATION_TOKEN : Kinds.LOCATION_UNSOLVED);
+    super.visit(mre, arg);
   }
 
   @Override

@@ -56,18 +56,14 @@ class JavaIndexer8TestSuite extends JavaStdTestSuite {
 
   /**
    * JLS §15.13 — Static method reference (JSR 335, Java SE 8).
-   * {@code String::valueOf} is sugar for a static method invocation; the
-   * indexer parses the code without error and emits an import edge for
-   * {@code java.util.function.Function}.
-   *
-   * <p>ponytail: {@code JavaCollector} does not visit {@code MethodReferenceExpr},
-   * so no call edge is emitted for the referenced method. Add when
-   * {@code MethodReferenceExpr} is handled in {@code JavaCollector}.
+   * {@code String::valueOf} is sugar for a static method invocation, so it must reach the method
+   * in the call graph exactly as {@code String.valueOf(x)} would. The location spans the whole
+   * {@code scope::name} expression, since the identifier has no range of its own.
    *
    * @see <a href="https://jcp.org/en/jsr/detail?id=335">JSR 335</a>
    */
   @Test
-  void staticMethodReferenceEmitsImportEdge() throws IOException {
+  void staticMethodReferenceEmitsCallEdge() throws IOException {
     TestStorage s = index(
         "import java.util.function.Function;\n"
         + "public class Foo {\n"
@@ -79,22 +75,20 @@ class JavaIndexer8TestSuite extends JavaStdTestSuite {
     assertTrue(
         s.imports.contains("Test.java -> java.util.function.Function <1:1 1:35>"),
         "import edge must be emitted for java.util.function.Function; got: " + s.imports);
-    // ponytail: call edge for String::valueOf not emitted — JavaCollector skips MethodReferenceExpr
+    assertTrue(
+        s.calls.contains("void Foo.m() -> java.lang.String java.lang.String.valueOf(java.lang.Object) <4:35 4:49>"),
+        "String::valueOf must reach the method it names; got: " + s.calls);
   }
 
   /**
    * JLS §15.13 — Instance method reference on {@code this} (JSR 335, Java SE 8).
-   * {@code this::helper} is an instance-capture method reference; the code
-   * parses without error and the helper method node is emitted.
-   *
-   * <p>ponytail: {@code JavaCollector} does not visit {@code MethodReferenceExpr},
-   * so no call edge is emitted for the reference. Add when
-   * {@code MethodReferenceExpr} is handled in {@code JavaCollector}.
+   * The call edge must land on the declaration node in this same file, which is the case that
+   * proves the reference and the declaration serialize to one and the same name.
    *
    * @see <a href="https://jcp.org/en/jsr/detail?id=335">JSR 335</a>
    */
   @Test
-  void instanceMethodReferenceOnThisEmitsMethodNode() throws IOException {
+  void instanceMethodReferenceOnThisEmitsCallEdge() throws IOException {
     TestStorage s = index(
         "import java.util.function.Supplier;\n"
         + "public class Foo {\n"
@@ -108,7 +102,37 @@ class JavaIndexer8TestSuite extends JavaStdTestSuite {
         s.methods.contains(
             "default java.lang.String Foo.helper() <3:3 <3:10 3:15> 3:32>"),
         "helper method must be emitted even when referenced via this::helper; got: " + s.methods);
-    // ponytail: call edge for this::helper not emitted — JavaCollector skips MethodReferenceExpr
+    assertTrue(
+        s.calls.contains("void Foo.m() -> java.lang.String Foo.helper() <5:28 5:39>"),
+        "this::helper must reach the declaration in this file; got: " + s.calls);
+  }
+
+  /**
+   * JLS §15.13 — Constructor reference (JSR 335, Java SE 8).
+   *
+   * <p>ponytail: JavaParser 3.26.4 cannot resolve a constructor reference ("Constructor calls not
+   * yet resolvable"), so {@code JavaCollector} records the type being constructed and emits no
+   * call edge, rather than fabricating a {@code new()} method node matching no declaration. Flip
+   * this to a call-edge assertion if a JavaParser upgrade makes it resolvable.
+   *
+   * @see <a href="https://jcp.org/en/jsr/detail?id=335">JSR 335</a>
+   */
+  @Test
+  void constructorReferenceEmitsTypeUseNotACall() throws IOException {
+    TestStorage s = index(
+        "import java.util.function.Supplier;\n"
+        + "public class Foo {\n"
+        + "  void m() {\n"
+        + "    Supplier<String> sup = String::new;\n"
+        + "  }\n"
+        + "}\n");
+    assertEquals(0, s.proto().getErrorsCount());
+    assertTrue(
+        s.typeUses.contains("void Foo.m() -> java.lang.String <4:28 4:33>"),
+        "the constructed type must still be recorded; got: " + s.typeUses);
+    assertTrue(
+        s.calls.isEmpty(),
+        "an unresolvable constructor reference must not fabricate a call; got: " + s.calls);
   }
 
   // ---- JSR 335: default interface method ------------------------------
