@@ -54,11 +54,32 @@ For iterating on Java code, skip CMake and use Maven directly (JDK 21, `maven.co
 ```
 mvn -f indexer/pom.xml package          # regenerate stubs, compile, run tests, shade the jar
 mvn -f indexer/pom.xml test             # tests only
-mvn -f indexer/pom.xml test -Dtest=JavaIndexerTest#recordEmitsClassNode   # one test
+mvn -f indexer/pom.xml test -Dtest=JavaIndexer17TestSuite   # one suite
 ```
 
-Tests are JUnit 5 (`JavaIndexerTest`); they index real Java source from a temp file through
-`JavaIndexer.index` and assert on the emitted proto — the same path the gRPC worker runs.
+`pom.xml` pins `maven-surefire-plugin` to 3.2.5. Do not drop that version: Maven's default is
+surefire 2.17, which predates the JUnit 5 provider and reports `Tests run: 0` with BUILD SUCCESS —
+which is exactly what it did, unnoticed, until 2026-09. Check the surefire version in the `mvn`
+output before debugging a Java test that appears to have no effect.
+
+Tests are JUnit 5, in two layers:
+
+- `JavaIndexerTest` / `NamesTest` / `GrpcWorkerTest` — emitter mechanics, name serialization and the
+  gRPC protocol loop.
+- `JavaIndexer{8,11,17,21}TestSuite` — one suite per Java LTS level, the analogue of
+  `tests/integration/lib_cxx/CxxParser{11,14,17,20,23}TestSuite.cpp`: one test per language feature,
+  asserting on readable bins from the test-scope `TestStorage` (a port of the C++
+  `src/lib/lib/tests/helper/testStorage/TestStorage.cpp`). Each pins its level through
+  `IndexerCommand.language_standard`, the way the C++ suites pin `-std=c++NN`; `JavaStdTestSuite` is
+  the shared base. `JavaIndexer8TestSuite.java21RecordPatternFailsAtStandard8` is what proves the
+  standard is actually wired through `JavaIndexer.languageLevelOf`.
+
+All expectation strings in the LTS suites were captured from live runs, not derived — reproduce a
+changed one by printing the bin rather than reasoning about column numbers.
+
+`TestStorage.errors` is always empty: `Storage.error()` emits a `StorageError` row but no
+`LOCATION_ERROR` source location, and the ported formatter needs one. Assert parse failures with
+`s.proto().getErrorsCount()`, not the `errors` bin.
 
 The shade plugin's `ServicesResourceTransformer` is load-bearing: without it gRPC's
 `META-INF/services` entries collide and channel construction fails with
