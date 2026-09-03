@@ -110,7 +110,7 @@ bool TimeStamp::isSameDay(const TimeStamp& other) const {
 
 size_t TimeStamp::deltaDays(const TimeStamp& other) const {
   boost::gregorian::date_duration deltaDate = m_time.date() - other.m_time.date();
-  return std::abs(deltaDate.days());
+  return static_cast<size_t>(std::abs(deltaDate.days()));
 }
 
 size_t TimeStamp::deltaHours(const TimeStamp& other) const {

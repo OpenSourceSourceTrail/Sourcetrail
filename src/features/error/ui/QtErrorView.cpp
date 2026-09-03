@@ -330,5 +330,5 @@ bool QtErrorView::isShownError(const ErrorInfo& error) {
 }
 
 void QtErrorView::showErrorHelpMessage() {
-  m_onQtThread([this]() { createErrorHelpButtonInfo().displayMessage(nullptr); });
+  m_onQtThread([]() { createErrorHelpButtonInfo().displayMessage(nullptr); });
 }

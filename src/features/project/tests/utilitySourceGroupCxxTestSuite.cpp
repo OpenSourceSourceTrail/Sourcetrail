@@ -46,7 +46,7 @@ protected:
 
   // Helper to count occurrences
   size_t CountOccurrences(const std::vector<std::wstring>& args, const std::wstring& flag) {
-    return boost::range::count(args, flag);
+    return static_cast<size_t>(boost::range::count(args, flag));
   }
 };
 

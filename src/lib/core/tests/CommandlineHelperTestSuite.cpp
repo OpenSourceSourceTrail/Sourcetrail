@@ -33,7 +33,7 @@ TEST(CommandLineHelper, missingParseConfigFile) {
   // clang-format on
 
   int argc = 3;
-  char* argv[] = {"", "--config-file", "something"};
+  const char* argv[] = {"", "--config-file", "something"};
 
   po::variables_map variablesMap;
   po::store(po::parse_command_line(argc, argv, desc), variablesMap);
@@ -57,7 +57,7 @@ TEST(CommandLineHelper, goodCaseParseConfigFile) {
   // clang-format on
 
   int argc = 3;
-  char* argv[] = {"", "--config-file", "/tmp/config"};
+  const char* argv[] = {"", "--config-file", "/tmp/config"};
 
   po::variables_map variablesMap;
   po::store(po::parse_command_line(argc, argv, desc), variablesMap);

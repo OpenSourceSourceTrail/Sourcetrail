@@ -5,6 +5,7 @@
 #include "indexing/logic/IndexerCommand.h"
 #include "indexing/logic/IndexerComposite.h"
 #include "indexing/tests/MockedIndexer.hpp"
+#include "language_packages.h"
 
 using namespace testing;
 

@@ -23,8 +23,8 @@ using tcp = boost::asio::ip::tcp;
 namespace http {
 
 struct Client::Impl {
-  Impl(std::string host, uint16_t port, std::string token)
-      : host(std::move(host)), port(port), authToken(std::move(token)), socket(io) {}
+  Impl(std::string hostName, uint16_t portNumber, std::string token)
+      : host(std::move(hostName)), port(portNumber), authToken(std::move(token)), socket(io) {}
 
   std::string host;
   uint16_t port;
@@ -171,8 +171,8 @@ std::optional<ClientResponse> Client::request(const std::string& method,
 // ---- EventSource -----------------------------------------------------------
 
 struct EventSource::Impl {
-  Impl(std::string host, uint16_t port, std::string token)
-      : host(std::move(host)), port(port), authToken(std::move(token)), socket(io) {}
+  Impl(std::string hostName, uint16_t portNumber, std::string token)
+      : host(std::move(hostName)), port(portNumber), authToken(std::move(token)), socket(io) {}
 
   std::string host;
   uint16_t port;

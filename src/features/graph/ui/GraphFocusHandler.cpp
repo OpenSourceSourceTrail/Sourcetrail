@@ -324,7 +324,7 @@ QtGraphEdge* GraphFocusHandler::findNextEdge(QPointF pos, Direction direction, Q
       }
 
       qreal dist = distX * distXMult + distY * distYMult;
-      if(!minDist || dist < minDist) {
+      if(closestEdge == nullptr || dist < minDist) {
         minDist = dist;
         closestEdge = edge;
       }

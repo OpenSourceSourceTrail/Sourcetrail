@@ -5,6 +5,7 @@
 #include "app/LanguagePackageManager.h"
 #include "indexing/logic/IndexerComposite.h"
 #include "indexing/tests/MockedIndexer.hpp"
+#include "language_packages.h"
 #include "ScopedFunctor.h"
 
 using namespace testing;

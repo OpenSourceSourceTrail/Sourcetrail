@@ -326,7 +326,7 @@ void QtGraphView::rebuildGraph(std::shared_ptr<Graph> graph,
     // move graph to center
     QPointF center = itemsBoundingRect(m_nodes).center();
     const Vec2f o = GraphViewStyle::alignOnRaster({static_cast<float>(center.x()), static_cast<float>(center.y())});
-    QPointF offset = QPointF(o.x, o.y);
+    QPointF offset = QPointF(static_cast<qreal>(o.x), static_cast<qreal>(o.y));
     m_sceneRectOffset = offset - center;
 
     for(QtGraphNode* node : m_nodes) {
@@ -541,7 +541,7 @@ void QtGraphView::ensureNodeVisible(QtGraphNode* node) {
   QtGraphicsView* view = getView();
 
   QVector4D r = node->getBoundingRect();
-  QRectF rect(r.x(), r.y(), r.z() - r.x(), r.w() - r.y());
+  QRectF rect(r.toVector2D().toPointF(), QPointF(static_cast<qreal>(r.z()), static_cast<qreal>(r.w())));
 
   if(rect.width() > view->width() - 100) {
     rect.setWidth(view->width() - 100);
@@ -940,7 +940,8 @@ QtGraphEdge* QtGraphView::createEdge(QGraphicsView* view,
       }
 
       for(const QVector4D& rect : path) {
-        m_virtualNodeRects.push_back(QRectF(QPointF(rect.x(), rect.y()), QPointF(rect.z(), rect.w())));
+        m_virtualNodeRects.push_back(
+            QRectF(rect.toVector2D().toPointF(), QPointF(static_cast<qreal>(rect.z()), static_cast<qreal>(rect.w()))));
       }
 
       qtEdge->setIsTrailEdge(path, trailMode == Graph::TRAIL_HORIZONTAL);
@@ -1016,7 +1017,9 @@ void QtGraphView::centerNode(QtGraphNode* node) {
   QVector2D pos = node->getPosition();
   QVector2D size = node->getSize();
 
-  QRectF rect(pos.x(), pos.y(), size.x(), size.y());
+  const QPointF origin = pos.toPointF();
+  const QPointF extent = size.toPointF();
+  QRectF rect(origin.x(), origin.y(), extent.x(), extent.y());
 
   if(rect.height() > view->height() - 200) {
     rect.setHeight(view->height() - 200);

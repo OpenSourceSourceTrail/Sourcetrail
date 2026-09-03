@@ -108,7 +108,7 @@ bool QtGraphNode::setPosition(const QVector2D& position) {
 
   if(std::fabs(offset.x()) >= std::numeric_limits<float>::epsilon() ||
      std::fabs(offset.y()) >= std::numeric_limits<float>::epsilon()) {
-    this->moveBy(offset.x(), offset.y());
+    this->moveBy(static_cast<qreal>(offset.x()), static_cast<qreal>(offset.y()));
     setColumnSize({});
     notifyEdgesAfterMove();
     return true;
@@ -124,9 +124,10 @@ const QVector2D& QtGraphNode::getSize() const {
 void QtGraphNode::setSize(const QVector2D& size) {
   m_size = size;
 
-  this->setRect(0, 0, size.x(), size.y());
-  m_rect->setRect(0, 0, size.x(), size.y());
-  m_undefinedRect->setRect(1, 1, size.x() - 2, size.y() - 2);
+  const QPointF extent = size.toPointF();
+  this->setRect(0, 0, extent.x(), extent.y());
+  m_rect->setRect(0, 0, extent.x(), extent.y());
+  m_undefinedRect->setRect(1, 1, extent.x() - 2, extent.y() - 2);
 }
 
 const QVector2D& QtGraphNode::getColumnSize() const {
@@ -549,7 +550,7 @@ void QtGraphNode::setStyle(const GraphViewStyle::NodeStyle& style) {
     m_icon = new QGraphicsPixmapItem(utility::colorizePixmap(pixmap.pixmap(), style.color.icon.c_str()), this);
     m_icon->setTransformationMode(Qt::SmoothTransformation);
     m_icon->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
-    m_icon->setPos(style.iconOffset.x, style.iconOffset.y);
+    m_icon->setPos(static_cast<qreal>(style.iconOffset.x), static_cast<qreal>(style.iconOffset.y));
   }
 
   QFont font(style.fontName.c_str());

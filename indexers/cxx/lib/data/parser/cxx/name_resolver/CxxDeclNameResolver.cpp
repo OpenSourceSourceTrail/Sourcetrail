@@ -116,10 +116,10 @@ std::unique_ptr<CxxDeclName> CxxDeclNameResolver::getDeclName(const clang::Named
             if(templateArgumentList.get(i).isDependent()) {
               llvm::PointerUnion<clang::ClassTemplateDecl*, clang::ClassTemplatePartialSpecializationDecl*> pu =
                   templateSpecialitarionDecl->getSpecializedTemplateOrPartial();
-              if(pu.is<clang::ClassTemplateDecl*>()) {
-                return getDeclName(pu.get<clang::ClassTemplateDecl*>());
-              } else if(pu.is<clang::ClassTemplatePartialSpecializationDecl*>()) {
-                return getDeclName(pu.get<clang::ClassTemplatePartialSpecializationDecl*>());
+              if(llvm::isa<clang::ClassTemplateDecl*>(pu)) {
+                return getDeclName(llvm::cast<clang::ClassTemplateDecl*>(pu));
+              } else if(llvm::isa<clang::ClassTemplatePartialSpecializationDecl*>(pu)) {
+                return getDeclName(llvm::cast<clang::ClassTemplatePartialSpecializationDecl*>(pu));
               }
             }
 
@@ -288,10 +288,10 @@ std::unique_ptr<CxxDeclName> CxxDeclNameResolver::getDeclName(const clang::Named
             if(templateArgument.isDependent()) {
               llvm::PointerUnion<clang::VarTemplateDecl*, clang::VarTemplatePartialSpecializationDecl*> pu =
                   templateSpecializationDeclaration->getSpecializedTemplateOrPartial();
-              if(pu.is<clang::VarTemplateDecl*>()) {
-                return getDeclName(pu.get<clang::VarTemplateDecl*>());
-              } else if(pu.is<clang::VarTemplatePartialSpecializationDecl*>()) {
-                return getDeclName(pu.get<clang::VarTemplatePartialSpecializationDecl*>());
+              if(llvm::isa<clang::VarTemplateDecl*>(pu)) {
+                return getDeclName(llvm::cast<clang::VarTemplateDecl*>(pu));
+              } else if(llvm::isa<clang::VarTemplatePartialSpecializationDecl*>(pu)) {
+                return getDeclName(llvm::cast<clang::VarTemplatePartialSpecializationDecl*>(pu));
               }
             }
             templateParameterNames.push_back(getTemplateArgumentName(templateArgument));

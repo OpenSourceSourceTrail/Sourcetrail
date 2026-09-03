@@ -221,10 +221,7 @@ std::vector<T> toVector(const std::set<T>& d) {
 
 template <typename T>
 std::vector<T> toVector(const std::list<T>& d) {
-  std::vector<T> v;
-  v.reserve(d.size());
-  v.insert(v.begin(), d.begin(), d.end());
-  return v;
+  return std::vector<T>(d.begin(), d.end());
 }
 
 template <typename T>

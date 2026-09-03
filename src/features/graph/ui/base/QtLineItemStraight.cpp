@@ -1,6 +1,7 @@
 #include "graph/ui/base/QtLineItemStraight.h"
 
 #include <QBrush>
+#include <QLineF>
 #include <QPen>
 
 QtLineItemStraight::QtLineItemStraight(QGraphicsItem* parent) : QGraphicsLineItem(parent) {
@@ -12,7 +13,7 @@ QtLineItemStraight::~QtLineItemStraight() {}
 void QtLineItemStraight::updateLine(const QVector2D& origin, const QVector2D& target, const GraphViewStyle::EdgeStyle& style) {
   prepareGeometryChange();
 
-  setLine(origin.x(), origin.y(), target.x(), target.y());
+  setLine(QLineF(origin.toPointF(), target.toPointF()));
 
   setPen(QPen(QBrush(style.color.c_str()), static_cast<double>(style.width), Qt::SolidLine));
 }

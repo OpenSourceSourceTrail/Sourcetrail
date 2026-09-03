@@ -41,6 +41,7 @@ TEST(SourceLocation, createEndSourceLocation) {
   EXPECT_EQ(endSourceLocation->getStartLocation(), &startSourceLocation);
   EXPECT_EQ(endSourceLocation->getEndLocation(), endSourceLocation.get());
   EXPECT_EQ(endSourceLocation->getOtherLocation(), &startSourceLocation);
+  EXPECT_EQ(startSourceLocation.getOtherLocation(), endSourceLocation.get());
   EXPECT_EQ(endSourceLocation->getLocationId(), 1);
   EXPECT_THAT(endSourceLocation->getTokenIds(), IsEmpty());
   EXPECT_EQ(endSourceLocation->getType(), LocationType::LOCATION_FULLTEXT_SEARCH);

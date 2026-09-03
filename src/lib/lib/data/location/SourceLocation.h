@@ -40,10 +40,8 @@ public:
                  size_t columnNumber,
                  bool isStart);
 
-  [[deprecated]] SourceLocation(SourceLocation* pOther, size_t lineNumber, size_t columnNumber);
   static Ptr createEndSourceLocation(SourceLocation* pOther, size_t lineNumber, size_t columnNumber);
 
-  [[deprecated]] SourceLocation(const SourceLocation* pOther, SourceLocationFile* pFile);
   static Ptr createSourceLocationFromAnother(const SourceLocation* pOther, SourceLocationFile* pFile);
 
   ~SourceLocation();

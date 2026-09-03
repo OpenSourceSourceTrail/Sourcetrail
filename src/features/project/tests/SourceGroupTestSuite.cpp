@@ -49,8 +49,6 @@
   } while((void)0, 0)
 
 namespace {
-const bool updateExpectedOutput = false;
-
 static FilePath getInputDirectoryPath(const std::wstring& projectName) {
   return FilePath(L"data/SourceGroupTestSuite/" + projectName + L"/input").makeAbsolute().makeCanonical();
 }

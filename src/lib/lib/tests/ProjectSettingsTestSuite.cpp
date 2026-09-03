@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "language_packages.h"
 #include "settings/ProjectSettings.h"
 #include "settings/source_group/component/SourceGroupSettingsWithSourcePaths.h"
 #include "settings/source_group/SourceGroupSettings.h"

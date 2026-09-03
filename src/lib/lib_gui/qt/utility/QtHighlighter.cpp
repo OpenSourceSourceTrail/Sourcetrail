@@ -400,8 +400,8 @@ void QtHighlighter::formatBlockForRule(const QTextBlock& block,
 
   while(it.hasNext()) {
     QRegularExpressionMatch match = it.next();
-    const int index = match.capturedStart();
-    const int length = match.capturedLength();
+    const int index = static_cast<int>(match.capturedStart());
+    const int length = static_cast<int>(match.capturedLength());
 
     if(!isInRange(pos + index, *ranges)) {
       applyFormat(pos + index, pos + index + length, format);
