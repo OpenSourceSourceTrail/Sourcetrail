@@ -4,6 +4,8 @@
 #include <optional>
 #include <vector>
 
+#include <mutex>
+
 #include "FilePath.h"
 #include "indexing/domain/IndexerCommandType.h"
 #include "settings/LanguageType.h"
@@ -42,6 +44,7 @@ public:
 
 private:
   static Ptr s_instance;
+  static std::once_flag s_once;
   IndexerPluginRegistry();
 
   static std::optional<Plugin> loadManifest(const FilePath& manifestFilePath);

@@ -6,9 +6,7 @@
 #include "settings/source_group/SourceGroupSettings.h"
 
 std::shared_ptr<SourceGroupFactory> SourceGroupFactory::getInstance() {
-  if(!s_instance) {
-    s_instance = std::shared_ptr<SourceGroupFactory>(new SourceGroupFactory());
-  }
+  std::call_once(s_once, [] { s_instance = std::shared_ptr<SourceGroupFactory>(new SourceGroupFactory()); });
   return s_instance;
 }
 
@@ -54,5 +52,6 @@ std::shared_ptr<SourceGroup> SourceGroupFactory::createSourceGroup(std::shared_p
 }
 
 std::shared_ptr<SourceGroupFactory> SourceGroupFactory::s_instance;
+std::once_flag SourceGroupFactory::s_once;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 SourceGroupFactory::SourceGroupFactory() {}

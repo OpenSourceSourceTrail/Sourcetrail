@@ -2,6 +2,7 @@
 #define SOURCE_GROUP_FACTORY_H
 
 #include <memory>
+#include <mutex>
 #include <vector>
 
 #include "settings/source_group/SourceGroupType.h"
@@ -24,6 +25,7 @@ public:
 
 private:
   static std::shared_ptr<SourceGroupFactory> s_instance;
+  static std::once_flag s_once;
   SourceGroupFactory();
 
   std::vector<std::shared_ptr<SourceGroupFactoryModule>> m_modules;

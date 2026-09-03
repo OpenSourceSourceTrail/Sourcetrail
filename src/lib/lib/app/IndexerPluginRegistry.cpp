@@ -12,11 +12,10 @@
 #include "utilityString.h"
 
 IndexerPluginRegistry::Ptr IndexerPluginRegistry::s_instance;
+std::once_flag IndexerPluginRegistry::s_once;    // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
 
 IndexerPluginRegistry::Ptr IndexerPluginRegistry::getInstance() {
-  if(!s_instance) {
-    s_instance = std::shared_ptr<IndexerPluginRegistry>(new IndexerPluginRegistry());
-  }
+  std::call_once(s_once, [] { s_instance = std::shared_ptr<IndexerPluginRegistry>(new IndexerPluginRegistry()); });
   return s_instance;
 }
 

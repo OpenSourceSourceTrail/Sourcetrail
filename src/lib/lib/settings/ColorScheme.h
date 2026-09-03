@@ -1,4 +1,6 @@
 #pragma once
+#include <mutex>
+
 // internal
 #include "graph/domain/Edge.h"
 #include "graph/domain/Node.h"
@@ -33,6 +35,7 @@ protected:
   ColorScheme();
 
   static std::shared_ptr<ColorScheme> s_instance;
+  static std::once_flag s_once;
 
   static std::string stateToString(ColorState state);
 };
