@@ -256,7 +256,7 @@ CheckOptions:
   bugprone-argument-comment.CommentCharacterLiterals: '0'
   modernize-use-nullptr.NullMacros: 'NULL'
   readability-suspicious-call-argument.SuffixDissimilarBelow: '25'
-  cppcoreguidelines-macro-usage.AllowedRegexp: '^DEBUG_*'
+  cppcoreguidelines-macro-usage.AllowedRegexp: '^(DEBUG_|SR_)'
   readability-suspicious-call-argument.LevenshteinSimilarAbove: '66'
   cppcoreguidelines-narrowing-conversions.PedanticMode: 'false'
   modernize-make-shared.IgnoreDefaultInitialization: 'true'

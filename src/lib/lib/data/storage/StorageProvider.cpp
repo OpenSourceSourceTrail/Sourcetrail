@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "indexing/domain/IndexingPhaseStats.h"
+#include "Profiling.h"
 
 int StorageProvider::getStorageCount() const noexcept {
   const std::lock_guard lock(mStoragesMutex);
@@ -25,6 +26,8 @@ nonstd::expected<void, std::string> StorageProvider::insert(std::shared_ptr<Inte
       mStorages, [storageSize](const auto& currentStorage) { return currentStorage->getSourceLocationCount() < storageSize; });
   std::ignore = mStorages.insert(iterator, std::move(storage));
   indexing_stats::recordStorageQueueDepth(mStorages.size());
+  // Queue full means the workers are ahead and injection is the bottleneck; empty means the reverse.
+  SR_PLOT("engine/storage-queue-depth", static_cast<int64_t>(mStorages.size()));
   return {};
 }
 

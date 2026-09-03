@@ -27,6 +27,7 @@
 #include "indexing/messages/MessageIndexingInterrupted.h"
 #include "logging.h"
 #include "productVersion.h"
+#include "Profiling.h"
 #include "project/messages/MessageLoadProject.h"
 #include "qt/engine/QtEngineSupervisor.h"
 #include "qt/QtApplication.h"
@@ -265,6 +266,10 @@ int runGui(int argc, char** argv, const Version& version, commandline::CommandLi
 }    // namespace
 
 int main(int argc, char* argv[]) {
+  // Opens the Tracy client; a no-op unless the build was configured with -DENABLE_TRACY=ON. First
+  // statement in main because a zone reached before it is undefined behaviour.
+  const profiling::Scope tracyScope{profiling::DefaultPort};
+
   // Disable logger as default till load it from settings
   if(auto* logger = spdlog::default_logger_raw(); nullptr != logger) {
     for(auto& sink : logger->sinks()) {

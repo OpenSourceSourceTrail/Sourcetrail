@@ -75,6 +75,7 @@ Everything lands in `build/app/`, alongside the `data`, `user` and `plugins` dir
 - `ENABLE_UNIT_TEST` / `ENABLE_GUI_TEST` / `ENABLE_INTEGRATION_TEST`
 - `SR_SAN` — comma-separated sanitizers applied build-wide (`address`, `undefined`, `thread`, `memory`; `memory` is Clang-only, GNU+Clang otherwise)
 - `ENABLE_COVERAGE` (run with `ninja coverage`)
+- `ENABLE_TRACY` — Tracy profiler client for the indexing path; see `docs/profiling.md`
 - `SOURCETRAIL_WARNING_AS_ERROR`, `SOURCETRAIL_USE_LIBCPP`, `USE_ALTERNATE_LINKER`
 
 ## Tests
@@ -159,4 +160,4 @@ The version string is generated from git tags/commits at configure time (`cmake/
 
 ## Documentation
 
-`DOCUMENTATION.md` is the end-user manual (features, UI, shortcuts, project setup) — consult it for application *behavior*, not architecture. `CHANGELOG.md` tracks release history. `.claude/skills/` holds task-scoped guides (`architecture`, `cmake`, `cpp20`, `grpc-ipc`, `qt6`, `testing`).
+`DOCUMENTATION.md` is the end-user manual (features, UI, shortcuts, project setup) — consult it for application *behavior*, not architecture. `CHANGELOG.md` tracks release history. `docs/profiling.md` covers Tracy captures of an index run (`ENABLE_TRACY`). `.claude/skills/` holds task-scoped guides (`architecture`, `cmake`, `cpp20`, `grpc-ipc`, `qt6`, `testing`).

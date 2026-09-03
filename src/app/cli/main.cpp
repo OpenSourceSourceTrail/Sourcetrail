@@ -22,6 +22,7 @@
 #include "indexing/messages/MessageIndexingInterrupted.h"
 #include "language_packages.h"
 #include "productVersion.h"
+#include "Profiling.h"
 #include "project/logic/CxxToolchainRemote.h"
 #include "project/logic/ICxxToolchain.h"
 #include "project/logic/SourceGroupFactory.h"
@@ -58,6 +59,8 @@ void addSourceGroupModules() {
 }    // namespace
 
 int main(int argc, char* argv[]) {
+  const profiling::Scope tracyScope{profiling::DefaultPort};
+
   // Disable logger as default till load it from settings
   if(auto* logger = spdlog::default_logger_raw(); nullptr != logger) {
     for(auto& sink : logger->sinks()) {

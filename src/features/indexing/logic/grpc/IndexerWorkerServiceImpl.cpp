@@ -7,6 +7,7 @@
 #include "data/storage/StorageProvider.h"
 #include "FilePath.h"
 #include "logging.h"
+#include "Profiling.h"
 #include "utilityString.h"
 
 IndexerWorkerServiceImpl::IndexerWorkerServiceImpl(std::shared_ptr<StorageProvider> storageProvider)
@@ -118,8 +119,13 @@ grpc::Status IndexerWorkerServiceImpl::PushIntermediateStorage(grpc::ServerConte
                                                                const sourcetrail::PushIntermediateStorageRequest* req,
                                                                sourcetrail::PushIntermediateStorageResponse* /*resp*/) {
   const auto receiveStart = std::chrono::steady_clock::now();
-  auto storage = proto::convert::fromProto(req->storage());
+  std::shared_ptr<IntermediateStorage> storage;
+  {
+    SR_ZONE_N("engine/recv-fromProto");
+    storage = proto::convert::fromProto(req->storage());
+  }
   if(storage) {
+    SR_ZONE_N("engine/recv-insert");
     LOG_INFO(fmt::format("IndexerWorkerService: received IntermediateStorage from process {}", req->process_id()));
     mStorageProvider->insert(storage);
     mIndexedFileCount++;

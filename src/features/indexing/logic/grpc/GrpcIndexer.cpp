@@ -13,6 +13,7 @@
 #include "indexer_worker.grpc.pb.h"
 #include "indexing/logic/IndexerComposite.h"
 #include "logging.h"
+#include "Profiling.h"
 #include "ScopedFunctor.h"
 #include "utilityString.h"
 
@@ -47,6 +48,8 @@ double elapsedMs(WorkerClock::time_point start) {
 }    // namespace
 
 void GrpcIndexer::work() {
+  SR_THREAD_NAME("indexer-worker");
+
   grpc::ChannelArguments channelArgs;
   channelArgs.SetMaxReceiveMessageSize(grpc_indexer::UnlimitedMessageSize);
   channelArgs.SetMaxSendMessageSize(grpc_indexer::UnlimitedMessageSize);
@@ -96,7 +99,11 @@ void GrpcIndexer::work() {
     sourcetrail::PullCommandResponse pullResp;
 
     const auto pullStart = WorkerClock::now();
-    grpc::Status status = stub->PullCommand(&ctx, pullReq, &pullResp);
+    grpc::Status status;
+    {
+      SR_ZONE_N("worker/pull");
+      status = stub->PullCommand(&ctx, pullReq, &pullResp);
+    }
     timings.pullMs += elapsedMs(pullStart);
     if(!status.ok()) {
       LOG_ERROR(fmt::format("{} PullCommand failed: {}", mProcessId, status.error_message()));
@@ -132,7 +139,12 @@ void GrpcIndexer::work() {
 
     LOG_INFO(fmt::format("{} indexing: {}", mProcessId, cmdMsg.source_file_path()));
     const auto parseStart = WorkerClock::now();
-    auto pResult = pIndexer->index(pCommand);
+    std::shared_ptr<IntermediateStorage> pResult;
+    {
+      SR_ZONE_N("worker/parse");
+      SR_ZONE_TEXT(cmdMsg.source_file_path().data(), cmdMsg.source_file_path().size());
+      pResult = pIndexer->index(pCommand);
+    }
     timings.parseMs += elapsedMs(parseStart);
     ++timings.files;
 
@@ -146,12 +158,20 @@ void GrpcIndexer::work() {
       sourcetrail::PushIntermediateStorageRequest pushReq;
       pushReq.set_process_id(static_cast<uint64_t>(mProcessId));
       const auto serializeStart = WorkerClock::now();
-      *pushReq.mutable_storage() = proto::convert::toProto(*pResult);
+      {
+        // TODO: compress data using zstd
+        SR_ZONE_N("worker/serialize");
+        *pushReq.mutable_storage() = proto::convert::toProto(*pResult);
+      }
       timings.serializeMs += elapsedMs(serializeStart);
 
       sourcetrail::PushIntermediateStorageResponse pushResp;
       const auto pushStart = WorkerClock::now();
-      grpc::Status pushStatus = stub->PushIntermediateStorage(&pushCtx, pushReq, &pushResp);
+      grpc::Status pushStatus;
+      {
+        SR_ZONE_N("worker/push");
+        pushStatus = stub->PushIntermediateStorage(&pushCtx, pushReq, &pushResp);
+      }
       timings.pushMs += elapsedMs(pushStart);
       if(pushStatus.ok()) {
         indexed = true;
@@ -173,6 +193,9 @@ void GrpcIndexer::work() {
       sourcetrail::StatusReportResponse statusResp;
       stub->ReportStatus(&statusCtx, report, &statusResp);
     }
+
+    // One frame per translation unit, so the timeline reads as a sequence of files.
+    SR_FRAME_MARK("file");
   }
 
   // Report done

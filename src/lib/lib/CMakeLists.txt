@@ -199,6 +199,7 @@ target_link_libraries(
          Sourcetrail::lib::core::utility::ConfigManager
          Sourcetrail::lib::core::utility::LowMemoryStringMap
          Sourcetrail::lib::core::utility::OrderedCache
+         Sourcetrail::lib::core::utility::profiling
          # scheduling stays PUBLIC: ControllerProxy.h, a public Logic header every Qt view includes,
          # takes a TaskLambda by value. Demoting it needs that header to stop naming Task first.
          Sourcetrail::lib::scheduling

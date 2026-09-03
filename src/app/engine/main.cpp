@@ -19,6 +19,7 @@
 #include "FilePath.h"
 #include "language_packages.h"
 #include "productVersion.h"
+#include "Profiling.h"
 #include "ScopedFunctor.h"
 #include "settings/ApplicationSettingsPrefiller.h"
 #include "settings/details/ApplicationSettings.h"
@@ -40,6 +41,8 @@ void signalHandler(int /*signum*/) {
 
 // argv: [--port <port>]
 int main(int argc, char* argv[]) {
+  const profiling::Scope tracyScope{profiling::DefaultPort};
+
   if(auto* logger = spdlog::default_logger_raw(); logger != nullptr) {
     for(auto& sink : logger->sinks()) {
       sink->set_level(spdlog::level::level_enum::off);

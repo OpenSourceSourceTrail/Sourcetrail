@@ -20,6 +20,7 @@ option(ENABLE_ENGINE_HTTP_TEST "Build engine_http." OFF)
 option(ENABLE_MCP_TEST "Build mcp." OFF)
 option(ENABLE_COVERAGE "Build coverage report, run `ninja coverage`." OFF)
 option(ENABLE_BUILD_WITH_TIME_TRACE "Trace building time." OFF)
+option(ENABLE_TRACY "Build with the Tracy profiler client, see docs/profiling.md." OFF)
 
 option(SOURCETRAIL_CMAKE_VERBOSE "CMake verbose" OFF)
 option(SOURCETRAIL_WARNING_AS_ERROR "Treat warnings as errors" OFF)
@@ -121,6 +122,44 @@ find_package(protobuf CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SQLite3 CONFIG REQUIRED)
 find_package(Taskflow CONFIG REQUIRED)
+# Tracy ---------------------------------------------------------------------------------------------------------------------------
+# Not a Conan dependency: ConanCenter's newest recipe is 0.13.1, and the client wanted here is
+# 0.14.1. FetchContent is the only mechanism in this build that reaches the network at configure
+# time, which is why it stays behind an option that is off by default.
+if(ENABLE_TRACY)
+  include(FetchContent)
+  # Tracy's own master switch, off by default since 0.14: without it TracyClient builds but every
+  # zone compiles away, and a capture stays empty.
+  set(TRACY_ENABLE
+      ON
+      CACHE BOOL "" FORCE)
+  # On-demand is not optional: without it the client queues every event from process start, so a
+  # long index with no profiler attached grows without bound.
+  set(TRACY_ON_DEMAND
+      ON
+      CACHE BOOL "" FORCE)
+  # The engine and its workers each bind a Tracy port, and the workers inherit the engine's
+  # environment, so the port has to be chosen inside each process -- after main() starts.
+  set(TRACY_DELAYED_INIT
+      ON
+      CACHE BOOL "" FORCE)
+  set(TRACY_MANUAL_LIFETIME
+      ON
+      CACHE BOOL "" FORCE)
+  FetchContent_Declare(
+    tracy
+    GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+    GIT_TAG v0.14.1
+    GIT_SHALLOW TRUE)
+  FetchContent_MakeAvailable(tracy)
+  # Third-party headers, treated like LLVM's in indexers/cxx/lib: HeaderFilterRegex is '*' and
+  # SOURCETRAIL_WARNING_AS_ERROR would otherwise fail the build on code we do not own.
+  get_target_property(SR_TRACY_INCLUDES TracyClient INTERFACE_INCLUDE_DIRECTORIES)
+  target_include_directories(TracyClient SYSTEM INTERFACE ${SR_TRACY_INCLUDES})
+  set(SR_TRACY_DEPS TracyClient)
+else()
+  set(SR_TRACY_DEPS "")
+endif()
 # Boost --------------------------------------------------------------------------------------------------------------------------
 set(Boost_USE_MULTITHREAD ON)
 set(Boost_USE_STATIC_LIBS
@@ -158,7 +197,7 @@ if(ENABLE_UNIT_TEST OR ENABLE_INTEGRATION_TEST)
   target_link_libraries(
     gtest_main
     PUBLIC GTest::gmock GTest::gtest spdlog::spdlog Sourcetrail::lib::core::utility::utilityString
-           Sourcetrail::lib::core::utility::TextCodec
+           Sourcetrail::lib::core::utility::TextCodec Sourcetrail::lib::core::utility::profiling
     PRIVATE Sourcetrail::warnings)
 endif()
 

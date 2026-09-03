@@ -19,6 +19,7 @@
 #include "graph/domain/token_component/TokenComponentIsAmbiguous.h"
 #include "indexing/domain/IndexingPhaseStats.h"
 #include "logging.h"
+#include "Profiling.h"
 #include "settings/IApplicationSettings.hpp"
 #include "status/messages/MessageStatus.h"
 #include "TextAccess.h"
@@ -376,24 +377,29 @@ void PersistentStorage::buildCaches() {
 
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::filePathMaps);
+    SR_ZONE_N("engine/filePathMaps");
     buildFilePathMaps();
   }
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::searchIndex);
+    SR_ZONE_N("engine/searchIndex");
     buildSearchIndex();
   }
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::memberEdgeOrder);
+    SR_ZONE_N("engine/memberEdgeOrder");
     buildMemberEdgeIdOrderMap();
   }
   {
     const indexing_stats::ScopedPhase timer(indexing_stats::hierarchyCache);
+    SR_ZONE_N("engine/hierarchyCache");
     buildHierarchyCache();
   }
 }
 
 void PersistentStorage::optimizeMemory() {
   const indexing_stats::ScopedPhase timer(indexing_stats::optimizeDatabase);
+  SR_ZONE_N("engine/optimizeDatabase");
   m_sqliteIndexStorage.setTime();
   m_sqliteIndexStorage.optimizeMemory();
 
@@ -487,6 +493,7 @@ std::shared_ptr<SourceLocationCollection> PersistentStorage::getFullTextSearchLo
     if(m_fullTextSearchCodec != codec.getName()) {
       MessageStatus(L"Building fulltext search index", false, true).dispatch();
       const indexing_stats::ScopedPhase timer(indexing_stats::fullTextIndex);
+      SR_ZONE_N("engine/fullTextIndex");
       buildFullTextSearchIndex();
     }
   }
