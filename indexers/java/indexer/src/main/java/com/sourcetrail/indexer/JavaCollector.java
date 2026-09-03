@@ -39,6 +39,7 @@ import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclarat
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedTypeParameterDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
@@ -349,14 +350,85 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(TypeParameter tp, Void arg) {
-    long id = declareLocal(tp, tp.getName());
+    long id = emitTypeParameter(tp);
     for(ClassOrInterfaceType bound : tp.getTypeBound()) {
-      typeReference(scope(), bound, bound, Kinds.EDGE_TYPE_USAGE);
-    }
-    if(id != 0) {
-      storage.access(id, Kinds.ACCESS_TYPE_PARAMETER);
+      typeReference(id != 0 ? id : scope(), bound, bound, Kinds.EDGE_TYPE_USAGE);
     }
     super.visit(tp, arg);
+  }
+
+  /**
+   * A type parameter is a symbol of its own, not a local variable: uses of {@code T} inside the
+   * class have to resolve back to it, or they fabricate a class node named {@code T} in the current
+   * package -- the same defect
+   * {@code JavaIndexerTest.a_bare_local_variable_read_does_not_fabricate_a_class_node} guards
+   * against for variables.
+   *
+   * <p>The name has to match what {@link #typeReference} builds for a use, so both sides go through
+   * {@link #chainForTypeParameter} on the same resolved declaration. {@code TypeParameter.resolve()}
+   * throws, so the resolved form is fetched from the owner's type-parameter list instead.
+   */
+  private long emitTypeParameter(TypeParameter tp) {
+    Optional<ResolvedTypeParameterDeclaration> resolved = resolveTypeParameter(tp);
+    if(resolved.isEmpty()) {
+      // Unresolvable owner: keep the old local-symbol form rather than inventing a name that no
+      // use site could reproduce.
+      long local = declareLocal(tp, tp.getName());
+      if(local != 0) {
+        storage.access(local, Kinds.ACCESS_TYPE_PARAMETER);
+      }
+      return 0;
+    }
+
+    long id = storage.nodeFor(tp, Kinds.NODE_TYPE_PARAMETER, chainForTypeParameter(resolved.get()));
+    storage.symbol(id, Kinds.DEFINITION_EXPLICIT);
+    storage.access(id, Kinds.ACCESS_TYPE_PARAMETER);
+    location(id, tp.getName(), Kinds.LOCATION_TOKEN);
+    storage.edge(scope(), id, Kinds.EDGE_MEMBER);
+    return id;
+  }
+
+  /** The resolved form of a declared type parameter, via its owner: TypeParameter.resolve() throws. */
+  private static Optional<ResolvedTypeParameterDeclaration> resolveTypeParameter(TypeParameter tp) {
+    Node parent = tp.getParentNode().orElse(null);
+    try {
+      List<ResolvedTypeParameterDeclaration> declared;
+      if(parent instanceof TypeDeclaration<?> td) {
+        declared = td.resolve().getTypeParameters();
+      } else if(parent instanceof MethodDeclaration md) {
+        declared = md.resolve().getTypeParameters();
+      } else if(parent instanceof ConstructorDeclaration cd) {
+        declared = cd.resolve().getTypeParameters();
+      } else {
+        return Optional.empty();
+      }
+      return declared.stream().filter(d -> tp.getNameAsString().equals(d.getName())).findFirst();
+    } catch(RuntimeException e) {
+      return Optional.empty();
+    }
+  }
+
+  /** Element chain for a type parameter: its container, then its own name. */
+  private static Names.Element[] chainForTypeParameter(ResolvedTypeParameterDeclaration tp) {
+    String container = tp.getContainerQualifiedName();
+    if(container == null || container.isEmpty()) {
+      return new Names.Element[]{Names.Element.plain(tp.getName())};
+    }
+    return concat(splitTypeParameterContainer(container), Names.Element.plain(tp.getName()));
+  }
+
+  /**
+   * Split a type parameter's container into name elements. A method container carries its parameter
+   * list -- {@code p.Box.pick(U, java.lang.String)} -- and the dots inside that list are not name
+   * separators, so only the part ahead of it is treated as a dotted path.
+   */
+  private static Names.Element[] splitTypeParameterContainer(String container) {
+    int paren = container.indexOf('(');
+    int dot = container.lastIndexOf('.', paren < 0 ? container.length() - 1 : paren);
+    if(dot < 0) {
+      return new Names.Element[]{Names.Element.plain(container)};
+    }
+    return concat(Names.split(container.substring(0, dot)), Names.Element.plain(container.substring(dot + 1)));
   }
 
   /** Record a local symbol at its declaration and return its id (0 if it has no source range). */
@@ -601,6 +673,14 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
     int kind = Kinds.NODE_CLASS;
     try {
       ResolvedType resolvedType = cit.resolve();
+      if(resolvedType.isTypeVariable()) {
+        // A use of a type parameter; without this it falls through to the lexical form below and
+        // fabricates a class node named after the parameter in the current package.
+        long parameter = storage.nodeByName(Kinds.NODE_TYPE_PARAMETER,
+            Names.join(chainForTypeParameter(resolvedType.asTypeVariable().asTypeParameter())));
+        location(storage.edge(from, parameter, edgeType), range, Kinds.LOCATION_TOKEN);
+        return;
+      }
       if(resolvedType.isReferenceType()) {
         ResolvedReferenceType resolved = resolvedType.asReferenceType();
         fqn = resolved.getQualifiedName();

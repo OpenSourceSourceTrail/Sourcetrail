@@ -3,6 +3,7 @@ package com.sourcetrail.indexer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -211,21 +212,12 @@ class JavaIndexer11TestSuite extends JavaStdTestSuite {
         + "  public T get() { return value; }\n"
         + "}\n");
     assertEquals(0, s.proto().getErrorsCount());
-    // ponytail: the typeParameters bin is always empty. visit(TypeParameter) calls declareLocal(),
-    //           so the *declaration* of T becomes a local symbol with ACCESS_TYPE_PARAMETER rather
-    //           than a NODE_TYPE_PARAMETER node. Fix: emit NODE_TYPE_PARAMETER there.
-    assertTrue(s.typeParameters.isEmpty(),
-        "known gap: T's declaration is a local symbol, not a type-parameter node: " + s.typeParameters);
-    assertTrue(s.classes.contains("public Box <1:1 <1:14 1:16> 4:1>"),
-        "Box class: " + s.classes);
-    // ponytail: worse than the missing node -- every *use* of T (the field type, the return type)
-    //           fabricates a bare class node named "T" in the current package, because
-    //           typeReference() resolves the unqualified name lexically and cannot tell a type
-    //           parameter from a real type. This is the same defect JavaIndexerTest already guards
-    //           against for local variables (a_bare_local_variable_read_does_not_fabricate_a_class_node),
-    //           still open for type parameters. Fix: skip names bound by an enclosing type parameter.
-    assertTrue(s.classes.contains("T"),
-        "uses of T fabricate a class node (collector gap): " + s.classes);
+    assertTrue(s.typeParameters.contains("Box.T <1:18 1:18>"),
+        "T is a type parameter of Box: " + s.typeParameters);
+    assertEquals(List.of("public Box <1:1 <1:14 1:16> 4:1>"), s.classes,
+        "a use of T must not fabricate a class named T in the current package");
+    assertTrue(s.typeUses.contains("Box.value -> Box.T <2:11 2:11>"),
+        "the field's type must reach the type parameter, not a fabricated class: " + s.typeUses);
     assertTrue(s.fields.contains("private Box.value <2:13 2:17>"),
         "value field: " + s.fields);
     assertTrue(s.methods.contains("public T Box.get() <3:3 <3:12 3:14> 3:34>"),

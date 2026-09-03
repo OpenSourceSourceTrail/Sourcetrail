@@ -286,6 +286,47 @@ class JavaIndexerTest {
 
   // ---- ids -----------------------------------------------------------
 
+  // ---- type parameters ------------------------------------------------
+
+  /**
+   * A type parameter is a symbol of its own. Emitting it as a local variable left every use of
+   * {@code T} to be resolved lexically, which fabricated a class node named {@code T} in the
+   * current package -- the type-level twin of
+   * {@link #a_bare_local_variable_read_does_not_fabricate_a_class_node}.
+   */
+  @Test
+  void a_type_parameter_is_a_node_its_uses_resolve_to() throws IOException {
+    TestStorage s = index("package com.example;\n"
+        + "public class Box<T> {\n"
+        + "  private T value;\n"
+        + "}\n", "com/example/Box.java", List.of());
+
+    long parameter = s.node(Kinds.NODE_TYPE_PARAMETER, "T").getId();
+    long box = s.node(Kinds.NODE_CLASS, "Box\ts").getId();
+    long value = s.node(Kinds.NODE_FIELD, "value").getId();
+
+    assertEquals(Kinds.ACCESS_TYPE_PARAMETER, s.accessOf(parameter));
+    assertTrue(s.hasEdge(box, parameter, Kinds.EDGE_MEMBER), "T belongs to Box");
+    assertTrue(s.hasEdge(value, parameter, Kinds.EDGE_TYPE_USAGE),
+        "the field's type must reach the parameter, not a fabricated class");
+    assertTrue(s.names().stream().noneMatch(n -> n.contains("example\ts\tp\tnT")),
+        "a use of T must not become a class in the current package: " + s.names());
+  }
+
+  /** Method-level parameters carry their method's signature in the container name. */
+  @Test
+  void a_method_type_parameter_is_scoped_to_its_method() throws IOException {
+    TestStorage s = index("public class Util {\n"
+        + "  static <U> U pick(U a, String b) { return a; }\n"
+        + "}\n");
+
+    assertTrue(s.typeParameters.contains("Util.pick(U, java.lang.String).U <2:11 2:11>"),
+        "type parameters: " + s.typeParameters);
+    assertTrue(s.typeUses.contains(
+        "U Util.pick(U, java.lang.String) -> Util.pick(U, java.lang.String).U <2:21 2:21>"),
+        "the parameter's use must reach its declaration: " + s.typeUses);
+  }
+
   // ---- record components ---------------------------------------------
 
   /**
