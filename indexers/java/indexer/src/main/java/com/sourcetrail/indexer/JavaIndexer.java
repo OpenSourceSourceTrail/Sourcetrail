@@ -1,10 +1,11 @@
 package com.sourcetrail.indexer;
 
-import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
-import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
-import java.io.IOException;
+import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import java.nio.file.Path;
 import sourcetrail.SourcetrailCommon.IndexerCommand;
 import sourcetrail.SourcetrailCommon.IntermediateStorage;
@@ -14,10 +15,15 @@ import sourcetrail.SourcetrailCommon.IntermediateStorage;
  * with {@link JavaCollector}, and emits an {@link IntermediateStorage} for the
  * engine to merge.
  *
- * <p>The collector emits one node per declaration (type, method, field, enum
- * constant, etc.), edges for every reference (extends / implements / calls /
- * type usages / annotations / imports), and source locations for GUI
- * highlighting.
+ * <p>Resolution is best-effort: a {@link JavaSymbolSolver} built from the command's classpath
+ * resolves calls, field accesses and inheritance to real declarations, and whatever it cannot
+ * resolve falls back to {@link NameResolver}'s lexical FQN and is marked
+ * {@link Kinds#LOCATION_UNSOLVED} so the GUI shows it as unresolved rather than as a confident
+ * wrong answer. A project with no configured classpath still produces a usable graph.
+ *
+ * <p>No failure escapes this class: a parse error or an exception mid-walk produces whatever was
+ * collected so far, plus a {@code StorageError} and {@code complete = false} on the file, rather
+ * than taking the worker process down.
  */
 public final class JavaIndexer implements Indexer {
 
@@ -38,27 +44,34 @@ public final class JavaIndexer implements Indexer {
     }
 
     String path = command.getSourceFilePath();
-    Path file = Path.of(path);
+    Storage storage = new Storage(path);
 
     try {
-      ParserConfiguration config = configuration.setLanguageLevel(languageLevelOf(command.getLanguageStandard()));
-      com.github.javaparser.JavaParser parser = new com.github.javaparser.JavaParser(config);
-      ParseResult<CompilationUnit> result = parser.parse(file);
+      ParserConfiguration config = configuration.setLanguageLevel(languageLevelOf(command.getLanguageStandard()))
+          .setSymbolResolver(new JavaSymbolSolver(TypeSolvers.forClassPaths(command.getClassPathsList())));
 
-      if(result.isSuccessful() && result.getResult().isPresent()) {
-        CompilationUnit cu = result.getResult().get();
-        NameResolver resolver = new NameResolver(cu);
-        Storage storage = new Storage(path);
-        JavaCollector collector = new JavaCollector(storage, resolver);
-        collector.visitRoot(cu);
+      ParseResult<CompilationUnit> result = new JavaParser(config).parse(Path.of(path));
+
+      if(!result.isSuccessful() || result.getResult().isEmpty()) {
+        for(Problem problem : result.getProblems()) {
+          storage.error(problem.getVerboseMessage(), path);
+        }
+        if(result.getProblems().isEmpty()) {
+          storage.error("Failed to parse file.", path);
+        }
+        storage.setFileComplete(false);
         return storage.build();
       }
 
-      // Parse failed: emit an empty storage so the engine marks this file as
-      // incomplete rather than crashing the worker process.
-      return IntermediateStorage.newBuilder().setNextId(1).build();
-    } catch(IOException | RuntimeException e) {
-      return IntermediateStorage.newBuilder().setNextId(1).build();
+      CompilationUnit cu = result.getResult().get();
+      new JavaCollector(storage, new NameResolver(cu), path).visitRoot(cu);
+      return storage.build();
+    } catch(Exception e) {
+      // Keep the partial graph: it is strictly better than nothing, and the error row plus
+      // complete=false tells the engine (and the user) that this file is not fully indexed.
+      storage.error(e.getClass().getSimpleName() + ": " + e.getMessage(), path);
+      storage.setFileComplete(false);
+      return storage.build();
     }
   }
 
