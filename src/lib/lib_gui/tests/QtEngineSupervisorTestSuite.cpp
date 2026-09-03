@@ -31,6 +31,23 @@ void ensureApplication() {
 }
 
 /**
+ * QProcess' failed-exec path deadlocks under ThreadSanitizer, and only that path -- the tests that
+ * spawn a stub which execs successfully all pass. With a missing binary the forked child never
+ * reports the exec failure (it is left a zombie) and the parent blocks forever reading the
+ * child-status pipe: single-threaded, `wchan` = anon_pipe_read. Nothing in QtEngineSupervisor is
+ * involved beyond calling QProcess::start(), and no TSAN_OPTIONS setting avoids it, so the affected
+ * test skips itself rather than burning the ctest timeout.
+ */
+bool underThreadSanitizer() {
+#if defined(__has_feature)
+#  if __has_feature(thread_sanitizer)
+  return true;
+#  endif
+#endif
+  return false;
+}
+
+/**
  * The supervisor's whole job is reacting to a child process, so these tests drive it with real
  * child processes -- stub "engines" written as shell scripts. Mocking QProcess would test nothing.
  */
@@ -147,6 +164,11 @@ TEST_F(QtEngineSupervisorFix, givesUpAfterRepeatedImmediateFailures) {
 }
 
 TEST_F(QtEngineSupervisorFix, reportsUnavailableWhenTheEngineBinaryIsMissing) {
+  // Deliberately not a compile-time branch: a `#if` here makes the rest of the body unreachable
+  // and trips -Wunreachable-code, which CI counts.
+  if(underThreadSanitizer()) {
+    GTEST_SKIP() << "QProcess reports a failed exec through a pipe that deadlocks under TSan.";
+  }
   mSupervisor->setEnginePath(QDir(mDir.path()).filePath(QStringLiteral("does_not_exist")));
   QSignalSpy unavailable(mSupervisor.get(), &QtEngineSupervisor::engineUnavailable);
 

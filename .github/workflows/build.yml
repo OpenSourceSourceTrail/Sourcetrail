@@ -341,7 +341,19 @@ jobs:
       # exposes) burns the entire 6-hour job ceiling instead of failing fast with a report that
       # names the stuck test.
       # engine_http is disabled for CI for now: TODO re-enable once it's stable there.
+      #
+      # TSAN_OPTIONS is inert on the legs that are not built with -fsanitize=thread.
+      #   io_sync=2                       -- globally synchronise IO operations. TSan models a file
+      #     descriptor as a memory location, so when one thread closes an fd and the kernel hands the
+      #     same fd *number* to another thread there is no happens-before edge and TSan reports a
+      #     race (seen as "in pipe"/"close"/"fstat"/"epoll_create1" with "Location is file descriptor
+      #     N"). This supplies the missing edge instead of blacklisting a frame name, so genuine
+      #     races on our own memory keep being reported.
+      #   ignore_noninstrumented_modules=1 -- Qt is not built with TSan, so TSan cannot see
+      #     QThreadPool's and QArrayData's internal synchronisation and flags correct Qt code.
       - name: Test
+        env:
+          TSAN_OPTIONS: "io_sync=2 ignore_noninstrumented_modules=1"
         run: ctest -Q --timeout 300 --test-dir ${{github.workspace}}/${{ matrix.config.binary_dir }} -E '^integration\.engine_http\.' --output-junit ${{github.workspace}}/${{ matrix.config.binary_dir }}/report.xml
 
       - name: Upload ctest logs on failure

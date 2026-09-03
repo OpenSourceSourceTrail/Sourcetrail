@@ -91,6 +91,12 @@ ctest --test-dir build -R "unittests\.lib\."
 ```
 Registered prefixes: `unittests.lib.`, `unittests.lib_gui.`, `unittests.client.`, `unittests.core.`, `integration.lib.`, `integration.lib_cxx.`, `integration.messaging`.
 
+The TSan leg runs with `TSAN_OPTIONS="io_sync=2 ignore_noninstrumented_modules=1"` (set on the
+`Test` step in `.github/workflows/build.yml`). The first supplies the happens-before edge TSan
+lacks when the kernel recycles a file-descriptor *number* across threads; the second drops reports
+whose stacks are entirely inside uninstrumented Qt. Export the same two when reproducing a TSan
+failure locally, or you will chase reports CI does not have.
+
 New test targets go through the `add_sourcetrail_test()` helper (`cmake/add_sourcetrail_test.cmake`), not raw `add_executable` — it wires up `Sourcetrail::gtest_main` and `gtest_discover_tests`; `SR_SAN` applies sanitizer flags build-wide, not per-target. Copy the calling convention from `src/lib/lib_gui/tests/CMakeLists.txt`.
 
 ## Formatting / Linting
