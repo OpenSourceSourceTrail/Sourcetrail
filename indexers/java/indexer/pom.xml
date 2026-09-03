@@ -91,6 +91,35 @@
         </configuration>
       </plugin>
       <plugin>
+        <!-- Coverage: `mvn verify` writes target/site/jacoco/index.html. Bound to the default
+             lifecycle rather than a profile so it costs one agent flag and never goes stale. -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
+        <executions>
+          <execution>
+            <id>prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <excludes>
+                <!-- protobuf/gRPC stubs, regenerated every build; they would be ~400 of the
+                     ~420 classes in the bundle and bury the numbers that matter. -->
+                <exclude>sourcetrail/**</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.xolstice.maven.plugins</groupId>
         <artifactId>protobuf-maven-plugin</artifactId>
         <version>0.6.1</version>

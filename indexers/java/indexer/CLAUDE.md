@@ -77,6 +77,11 @@ Tests are JUnit 5, in two layers:
 All expectation strings in the LTS suites were captured from live runs, not derived — reproduce a
 changed one by printing the bin rather than reasoning about column numbers.
 
+Coverage: `mvn -f indexer/pom.xml clean verify` writes an HTML report to
+`indexer/target/site/jacoco/index.html` (JaCoCo, generated proto stubs excluded). Use `clean` —
+an incremental `verify` over a stale `target/` fails with `NoSuchMethodError: ...access$7()` from
+regenerated protobuf classes, which has nothing to do with the code under test.
+
 `TestStorage.errors` is always empty: `Storage.error()` emits a `StorageError` row but no
 `LOCATION_ERROR` source location, and the ported formatter needs one. Assert parse failures with
 `s.proto().getErrorsCount()`, not the `errors` bin.
