@@ -68,7 +68,8 @@ target_sources(
           ui/QtIndexingStartDialog.h)
 
 if(ENABLE_UNIT_TEST)
-  foreach(test_name IN ITEMS IndexerCommandJavaTestSuite IndexerCompositeTestSuite TaskBuildIndexTestSuite)
+  foreach(test_name IN ITEMS IndexerCommandJavaTestSuite IndexerCompositeTestSuite IndexerWorkerServiceImplTestSuite
+                        TaskBuildIndexTestSuite)
     add_sourcetrail_test(
       NAME ${test_name}
       SOURCES tests/${test_name}.cpp

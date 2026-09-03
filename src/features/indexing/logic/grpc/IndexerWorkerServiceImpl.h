@@ -9,10 +9,10 @@
 #include <condition_variable>
 #include <grpcpp/grpcpp.h>
 
+#include "FilePath.h"
 #include "indexer_worker.grpc.pb.h"
 
 class IntermediateStorage;
-class FilePath;
 class StorageProvider;
 
 class IndexerWorkerServiceImpl final : public sourcetrail::IndexerWorkerService::Service {
@@ -62,8 +62,10 @@ public:
   // Number of files that have started indexing (monotonic; for progress display)
   size_t getStartedFileCount() const;
 
-  // Currently active file paths (for progress dialog)
-  std::vector<FilePath> getCurrentlyIndexedSourceFilePaths();
+  // Files whose indexing started since the last call; empties the list. The progress dialog wants
+  // one line per file, so it must see each START_FILE exactly once: reading the set of in-flight
+  // files instead reported the same file on every poll for as long as that file took to index.
+  std::vector<FilePath> drainStartedSourceFilePaths();
 
   // gRPC service methods
   grpc::Status PullCommand(grpc::ServerContext* ctx,
@@ -97,6 +99,7 @@ private:
   std::mutex mStatusMutex;
   std::vector<FilePath> mCrashedFiles;
   std::unordered_map<uint64_t, std::string> mCurrentFileByProcess;
+  std::vector<FilePath> mStartedFilesSinceDrain;
 
   // broadcast interrupt to all WatchInterrupt streams
   std::atomic<size_t> mIndexedFileCount{0};

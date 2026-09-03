@@ -109,14 +109,19 @@ Task::TaskState TaskBuildIndex::doUpdate(std::shared_ptr<Blackboard> blackboard)
   // Update progress from gRPC service counts
   if(mIndexerWorkerService) {
     const size_t indexedCount = mIndexerWorkerService->getIndexedFileCount();
-    if(indexedCount > mLastReportedIndexedCount) {
+    const bool finishedCountChanged = indexedCount > mLastReportedIndexedCount;
+    if(finishedCountChanged) {
       const size_t delta = indexedCount - mLastReportedIndexedCount;
       mLastReportedIndexedCount = indexedCount;
       blackboard->update<int>("indexed_source_file_count", [delta](int count) { return count + static_cast<int>(delta); });
     }
 
-    const std::vector<FilePath> indexingFiles = mIndexerWorkerService->getCurrentlyIndexedSourceFilePaths();
-    if(!indexingFiles.empty()) {
+    // A tick with no newly started file can still move the bar: the files already in flight finish.
+    // Refreshing only when a file *starts* left the percentage short for the whole tail of a run,
+    // where the last commands are being finished and no new ones are handed out. An empty path list
+    // updates the counts alone -- the status log gets a line per file, from the drain.
+    const std::vector<FilePath> indexingFiles = mIndexerWorkerService->drainStartedSourceFilePaths();
+    if(!indexingFiles.empty() || finishedCountChanged) {
       updateIndexingDialog(blackboard, indexingFiles);
     }
   }

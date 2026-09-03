@@ -1,5 +1,7 @@
 #include "indexing/logic/grpc/IndexerWorkerServiceImpl.h"
 
+#include <utility>
+
 #include <fmt/format.h>
 
 #include "Convert.h"
@@ -80,15 +82,9 @@ size_t IndexerWorkerServiceImpl::getStartedFileCount() const {
   return mStartedFileCount.load();
 }
 
-std::vector<FilePath> IndexerWorkerServiceImpl::getCurrentlyIndexedSourceFilePaths() {
+std::vector<FilePath> IndexerWorkerServiceImpl::drainStartedSourceFilePaths() {
   const std::lock_guard<std::mutex> lock(mStatusMutex);
-  std::vector<FilePath> paths;
-  for(auto& [pid, file] : mCurrentFileByProcess) {
-    if(!file.empty()) {
-      paths.emplace_back(utility::decodeFromUtf8(file));
-    }
-  }
-  return paths;
+  return std::exchange(mStartedFilesSinceDrain, {});
 }
 
 grpc::Status IndexerWorkerServiceImpl::PullCommand(grpc::ServerContext* /*ctx*/,
@@ -150,6 +146,7 @@ grpc::Status IndexerWorkerServiceImpl::ReportStatus(grpc::ServerContext* /*ctx*/
       mCrashedFiles.emplace_back(utility::decodeFromUtf8(prev));
     }
     mCurrentFileByProcess[pid] = req->file_path();
+    mStartedFilesSinceDrain.emplace_back(utility::decodeFromUtf8(req->file_path()));
     mStartedFileCount++;
     LOG_INFO(fmt::format("IndexerWorkerService: process {} started indexing {}", pid, req->file_path()));
     break;
