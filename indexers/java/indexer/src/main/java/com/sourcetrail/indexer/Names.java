@@ -77,6 +77,14 @@ public final class Names {
     return elements;
   }
 
+  /** Append one element to a chain. */
+  public static Element[] concat(Element[] base, Element extra) {
+    Element[] out = new Element[base.length + 1];
+    System.arraycopy(base, 0, out, 0, base.length);
+    out[base.length] = extra;
+    return out;
+  }
+
   /** Serialize a single name with the file {@code /} delimiter. */
   public static String file(String path) {
     return join(FILE_DELIM, new Element[]{Element.plain(path == null ? "" : path)});

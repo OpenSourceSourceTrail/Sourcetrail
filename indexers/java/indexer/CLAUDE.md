@@ -23,7 +23,11 @@ engine  --gRPC-->  Main -> GrpcWorker -> JavaIndexer -> JavaCollector -> Storage
 - `JavaIndexer` — parses one file with JavaParser (no classpath, no symbol solver). Any parse or
   runtime failure returns an empty `IntermediateStorage` with `nextId = 1` rather than throwing:
   the engine then marks the file incomplete instead of losing the worker process.
-- `JavaCollector` — `VoidVisitorAdapter` walk emitting nodes/edges/locations.
+- `JavaCollector` — `VoidVisitorAdapter` walk emitting nodes/edges/locations. Decides *what* to
+  emit and from which scope; every serialized name and node kind comes from `SymbolNames`.
+- `SymbolNames` — serialized names and node kinds (resolved-first, lexical fallback), plus the AST
+  navigation they need. Touches no `Storage`; a declaration and a reference must go through the
+  same method here or they will not merge.
 - `NameResolver` — purely lexical FQN resolution from the package declaration + import table.
   Wildcard imports are skipped; unresolved simple names are assumed to be in the current package.
 - `Storage` — buffers proto messages, allocates ids from 1 (`FILE_ID = 1` is the file node), and
