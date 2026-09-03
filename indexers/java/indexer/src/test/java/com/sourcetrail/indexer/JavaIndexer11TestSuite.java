@@ -122,21 +122,17 @@ class JavaIndexer11TestSuite extends JavaStdTestSuite {
         + "  }\n"
         + "}\n");
     assertEquals(0, s.proto().getErrorsCount());
-    // ponytail: anonymous-class node names are non-deterministic. JavaParser's symbol solver
-    //           names them "Anonymous-<random UUID>", and JavaCollector passes that straight
-    //           through, so the same source yields a different serialized name on every run.
-    //           The engine dedups nodes on (type, serializedName) at merge time, so these
-    //           symbols never merge -- exactly the drift CLAUDE.md warns about. Fix: derive the
-    //           name from the source position instead of the resolved name. Until then these
-    //           assertions must match on the stable location substring, not the whole string.
     assertTrue(s.classes.contains("public DiamondAnon <2:1 <2:14 2:24> 8:1>"),
         "outer class: " + s.classes);
-    assertTrue(s.methods.stream().anyMatch(m -> m.contains(
-        "compare(java.lang.String, java.lang.String) <5:7 <5:18 5:24> 5:71>")),
+    // The anonymous class is named by source position, so this is an exact string.
+    assertTrue(s.methods.contains(
+        "public int DiamondAnon.anonymous class (Test.java<4:28>)"
+        + ".compare(java.lang.String, java.lang.String) <5:7 <5:18 5:24> 5:71>"),
         "anonymous class compare() method: " + s.methods);
     // the constructor call to the anonymous class is emitted as a call from m()
-    assertTrue(s.calls.stream().anyMatch(c -> c.startsWith(
-        "void DiamondAnon.m() ->") && c.contains("<4:32 4:43>")),
+    assertTrue(s.calls.contains(
+        "void DiamondAnon.m() -> void DiamondAnon.anonymous class (Test.java<4:28>)"
+        + ".anonymous class (Test.java<4:28>)() <4:32 4:43>"),
         "call from m() to anonymous class constructor: " + s.calls);
   }
 
@@ -194,15 +190,8 @@ class JavaIndexer11TestSuite extends JavaStdTestSuite {
     // the anonymous class field x is emitted as a member of Outer (flat hierarchy in the collector)
     assertTrue(s.fields.contains("default Outer.x <4:11 4:11>"),
         "anonymous class field x: " + s.fields);
-    // ponytail: anonymous-class node names are non-deterministic. JavaParser's symbol solver
-    //           names them "Anonymous-<random UUID>", and JavaCollector passes that straight
-    //           through, so the same source yields a different serialized name on every run.
-    //           The engine dedups nodes on (type, serializedName) at merge time, so these
-    //           symbols never merge -- exactly the drift CLAUDE.md warns about. Fix: derive the
-    //           name from the source position instead of the resolved name. Until then these
-    //           assertions must match on the stable location substring, not the whole string.
-    assertTrue(s.methods.stream().anyMatch(m -> m.contains(
-        "helper() <5:7 <5:12 5:17> 5:34>")),
+    assertTrue(s.methods.contains(
+        "default void Outer.anonymous class (Test.java<3:12>).helper() <5:7 <5:12 5:17> 5:34>"),
         "anonymous class helper() method: " + s.methods);
   }
 

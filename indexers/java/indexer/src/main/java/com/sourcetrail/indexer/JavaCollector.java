@@ -33,6 +33,7 @@ import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
+import com.github.javaparser.resolution.declarations.ResolvedConstructorDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
@@ -411,8 +412,9 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
         return;
       }
       if(resolved.isField()) {
-        String owner = resolved.asField().declaringType().getQualifiedName();
-        long target = storage.nodeByName(Kinds.NODE_FIELD, Names.join(Names.split(owner + "." + resolved.getName())));
+        Names.Element[] owner = chainForResolvedType(resolved.asField().declaringType().asReferenceType());
+        long target = storage.nodeByName(
+            Kinds.NODE_FIELD, Names.join(concat(owner, Names.Element.plain(resolved.getName()))));
         location(storage.edge(scope(), target, Kinds.EDGE_USAGE), range, Kinds.LOCATION_TOKEN);
         return;
       }
@@ -593,7 +595,7 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
   /** FQ-name element chain for a type declaration (outer to inner order). */
   private Names.Element[] chainForType(TypeDeclaration td) {
     try {
-      return Names.split(td.resolve().getQualifiedName());
+      return chainForResolvedType(td.resolve());
     } catch(RuntimeException e) {
       // Fall through to the lexical form.
     }
@@ -617,11 +619,69 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
   }
 
   /**
+   * FQ-name element chain for a resolved type, with anonymous classes given a stable name. Every
+   * owner name goes through here, so a declaration and a reference to it still produce the
+   * identical string.
+   *
+   * <p>An anonymous class is recognised by its AST node being an {@link ObjectCreationExpr} rather
+   * than a {@link TypeDeclaration}; the solver's own {@code isAnonymousClass()} returns false for
+   * them and {@code containerType()} throws, so neither can be used here.
+   *
+   * <p>ponytail: a *named* class declared inside an anonymous class body still takes the
+   * getQualifiedName() branch, and that name embeds the random id. Rare enough to leave; fix by
+   * building the whole chain from the AST if it ever matters.
+   */
+  private Names.Element[] chainForResolvedType(ResolvedReferenceTypeDeclaration decl) {
+    if(decl == null) {
+      return new Names.Element[0];
+    }
+    Optional<ObjectCreationExpr> anonymous = anonymousAstOf(decl);
+    if(anonymous.isEmpty()) {
+      String qualified = decl.getQualifiedName();
+      return (qualified == null || qualified.isEmpty()) ? new Names.Element[0] : Names.split(qualified);
+    }
+    Names.Element[] container = findAncestor(anonymous.get(), TypeDeclaration.class)
+        .map(this::chainForType)
+        .orElseGet(() -> new Names.Element[0]);
+    return concat(container, Names.Element.plain(anonymousTypeName(anonymous.get())));
+  }
+
+  /** The {@link ObjectCreationExpr} behind a resolved type, present only for anonymous classes. */
+  private static Optional<ObjectCreationExpr> anonymousAstOf(ResolvedReferenceTypeDeclaration decl) {
+    return decl.toAst().filter(ObjectCreationExpr.class::isInstance).map(ObjectCreationExpr.class::cast);
+  }
+
+  /**
+   * A stable name for an anonymous class.
+   *
+   * <p>JavaParser's symbol solver names them {@code Anonymous-<random UUID>}, a fresh value on
+   * every run. The engine dedups nodes on ({@code type}, {@code serializedName}) at merge time, so
+   * a random id means an anonymous class -- and every method and field inside it -- never merges
+   * with itself, neither across the files that reference it nor across re-indexes of the same
+   * file. Name it by source position instead, following the C++ indexer's convention in
+   * {@code CxxDeclNameResolver::getNameForAnonymousSymbol}.
+   */
+  private String anonymousTypeName(ObjectCreationExpr expr) {
+    Optional<Range> range = expr.getRange();
+    if(range.isEmpty()) {
+      return "anonymous class";
+    }
+    Range r = range.get();
+    return "anonymous class (" + fileName + "<" + r.begin.line + ":" + r.begin.column + ">)";
+  }
+
+  /**
    * Serialized name of a resolved method or constructor. Declarations and call sites both go through
    * this, so the two sides produce the identical string and merge into one node across files.
    */
-  private static String chainForResolvedCallable(ResolvedMethodLikeDeclaration decl) {
-    String owner = decl.declaringType().getQualifiedName();
+  private String chainForResolvedCallable(ResolvedMethodLikeDeclaration decl) {
+    ResolvedReferenceTypeDeclaration owner = decl.declaringType();
+    Names.Element[] parent = chainForResolvedType(owner);
+    // A constructor is named after its type, so an anonymous one would carry the random id here
+    // even though the owner chain above no longer does.
+    String name = (decl instanceof ResolvedConstructorDeclaration)
+        ? anonymousAstOf(owner).map(this::anonymousTypeName).orElseGet(decl::getName)
+        : decl.getName();
     String returnType = "void";
     if(decl instanceof ResolvedMethodDeclaration method) {
       try {
@@ -637,8 +697,7 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
       }
       params.append(describe(decl, i));
     }
-    Names.Element[] parent = (owner == null || owner.isEmpty()) ? new Names.Element[0] : Names.split(owner);
-    return Names.join(concat(parent, Names.Element.signature(decl.getName(), returnType, "(" + params + ")")));
+    return Names.join(concat(parent, Names.Element.signature(name, returnType, "(" + params + ")")));
   }
 
   /**

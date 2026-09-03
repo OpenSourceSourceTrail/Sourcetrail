@@ -286,6 +286,37 @@ class JavaIndexerTest {
 
   // ---- ids -----------------------------------------------------------
 
+  // ---- anonymous classes --------------------------------------------
+
+  /**
+   * JavaParser's symbol solver names anonymous classes {@code Anonymous-<random UUID>}. The engine
+   * dedups nodes on (type, serializedName) at merge time, so passing that through means an
+   * anonymous class and everything declared in it gets a brand-new identity on every index run and
+   * never merges with itself. JavaCollector replaces it with the C++ indexer's positional
+   * convention; this pins both halves of that.
+   */
+  @Test
+  void anonymous_class_names_are_stable_and_carry_no_random_id() throws IOException {
+    String source = "public class Outer {\n"
+        + "  Runnable make() {\n"
+        + "    return new Runnable() {\n"
+        + "      public void run() { }\n"
+        + "    };\n"
+        + "  }\n"
+        + "}\n";
+
+    TestStorage first = index(source);
+    TestStorage second = index(source);
+
+    assertEquals(first.names(), second.names(),
+        "the same source must serialize to the same names on every run, or nothing merges");
+    assertTrue(first.names().stream().noneMatch(n -> n.contains("Anonymous-")),
+        "no name may carry the solver's random anonymous id: " + first.names());
+    assertTrue(first.methods.contains(
+        "public void Outer.anonymous class (Test.java<3:12>).run() <4:7 <4:19 4:21> 4:27>"),
+        "anonymous class members are named by source position: " + first.methods);
+  }
+
   @Test
   void ids_are_unique_across_every_table_and_below_next_id() throws IOException {
     TestStorage s = index("import java.util.List;\n"
