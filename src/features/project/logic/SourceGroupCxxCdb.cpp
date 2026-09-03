@@ -1,6 +1,7 @@
 #include "project/logic/SourceGroupCxxCdb.h"
 
 #include <filesystem>
+#include <map>
 
 #include <fmt/format.h>
 #include <fmt/xchar.h>
@@ -31,6 +32,56 @@ FilePath sourcePathOf(const CxxCompileCommand& command, const FilePath& cdbPath)
     }
   }
   return sourcePath;
+}
+
+/** One compile command, ready to become an IndexerCommandCxx. */
+struct PreparedCommand final {
+  FilePath sourcePath;
+  FilePath workingDirectory;
+  std::vector<std::wstring> cdbFlags;
+  std::wstring macroSignature;
+  bool hadIncludePchFlag = false;
+};
+
+// Precompiling costs a parse and a file of its own per group, so only the groups big enough to earn
+// that back get one, and only a handful of them.
+constexpr size_t MinCommandsPerAutoPch = 8;
+constexpr size_t MaxAutoPchCount = 8;
+
+/** An automatic precompiled header per macro state, keyed by that state. */
+std::map<std::wstring, std::vector<std::wstring>> buildAutoPchPerMacroSignature(const std::vector<PreparedCommand>& commands,
+                                                                                const std::vector<std::wstring>& compilerFlags,
+                                                                                const std::set<FilePath>& indexedPaths,
+                                                                                const FilePath& outputDirectory) {
+  std::map<std::wstring, std::vector<FilePath>> filesPerSignature;
+  std::map<std::wstring, std::vector<std::wstring>> flagsPerSignature;
+  for(const PreparedCommand& command : commands) {
+    filesPerSignature[command.macroSignature].push_back(command.sourcePath);
+    flagsPerSignature.try_emplace(command.macroSignature, command.cdbFlags);
+  }
+
+  std::vector<const std::pair<const std::wstring, std::vector<FilePath>>*> groups;
+  for(const auto& group : filesPerSignature) {
+    if(group.second.size() >= MinCommandsPerAutoPch) {
+      groups.push_back(&group);
+    }
+  }
+  std::ranges::sort(groups, [](const auto* lhs, const auto* rhs) { return lhs->second.size() > rhs->second.size(); });
+  if(groups.size() > MaxAutoPchCount) {
+    groups.resize(MaxAutoPchCount);
+  }
+
+  std::map<std::wstring, std::vector<std::wstring>> pchFlags;
+  size_t index = 0;
+  for(const auto* group : groups) {
+    std::vector<std::wstring> flags = utility::concat(flagsPerSignature[group->first], compilerFlags);
+    std::vector<std::wstring> result = utility::buildAutoPch(
+        group->second, flags, indexedPaths, outputDirectory, L"sourcetrail_auto_pch_" + std::to_wstring(index++));
+    if(!result.empty()) {
+      pchFlags.emplace(group->first, std::move(result));
+    }
+  }
+  return pchFlags;
 }
 
 }    // namespace
@@ -88,6 +139,9 @@ std::shared_ptr<IndexerCommandProvider> SourceGroupCxxCdb::getIndexerCommandProv
   const std::set<FilePathFilter> excludeFilters = utility::toSet(m_settings->getExcludeFiltersExpandedAndAbsolute());
   const std::set<FilePath> sourceFilePaths = getAllSourceFilePaths(*commands);
 
+  // A precompiled header is only accepted by a parse whose macro state matches the one it was built
+  // with, so the commands are grouped by that state first and each group gets its own.
+  std::vector<PreparedCommand> prepared;
   for(const CxxCompileCommand& command : *commands) {
     const FilePath sourcePath = sourcePathOf(command, cdbPath);
 
@@ -112,17 +166,36 @@ std::shared_ptr<IndexerCommandProvider> SourceGroupCxxCdb::getIndexerCommandProv
 
       utility::removeIncludePchFlag(cdbFlags);
 
-      if(command.arguments.size() != cdbFlags.size()) {
-        utility::append(cdbFlags, includePchFlags);
-      }
-
-      provider->addCommand(std::make_shared<IndexerCommandCxx>(sourcePath,
-                                                               utility::concat(indexedHeaderPaths, {sourcePath}),
-                                                               excludeFilters,
-                                                               std::set<FilePathFilter>(),
-                                                               FilePath(utility::decodeFromUtf8(command.directory)),
-                                                               utility::concat(cdbFlags, compilerFlags)));
+      prepared.push_back(PreparedCommand{.sourcePath = sourcePath,
+                                         .workingDirectory = FilePath(utility::decodeFromUtf8(command.directory)),
+                                         .cdbFlags = cdbFlags,
+                                         .macroSignature = utility::macroSignatureOf(cdbFlags),
+                                         .hadIncludePchFlag = command.arguments.size() != cdbFlags.size()});
     }
+  }
+
+  const std::map<std::wstring, std::vector<std::wstring>> autoPchFlags = includePchFlags.empty() ?
+      buildAutoPchPerMacroSignature(prepared,
+                                    compilerFlags,
+                                    utility::concat(indexedHeaderPaths, sourceFilePaths),
+                                    m_settings->getPchDependenciesDirectoryPath()) :
+      std::map<std::wstring, std::vector<std::wstring>>{};
+
+  for(const PreparedCommand& command : prepared) {
+    std::vector<std::wstring> cdbFlags = command.cdbFlags;
+    if(command.hadIncludePchFlag) {
+      utility::append(cdbFlags, includePchFlags);
+    }
+    if(const auto found = autoPchFlags.find(command.macroSignature); found != autoPchFlags.end()) {
+      utility::append(cdbFlags, found->second);
+    }
+
+    provider->addCommand(std::make_shared<IndexerCommandCxx>(command.sourcePath,
+                                                             utility::concat(indexedHeaderPaths, {command.sourcePath}),
+                                                             excludeFilters,
+                                                             std::set<FilePathFilter>(),
+                                                             command.workingDirectory,
+                                                             utility::concat(cdbFlags, compilerFlags)));
   }
 
   provider->logStats();
@@ -161,8 +234,8 @@ std::shared_ptr<Task> SourceGroupCxxCdb::getPreIndexTask(std::shared_ptr<Storage
           // `std::string::find(...)` used as a bool, so it was true unless the match landed at offset
           // zero -- impossible, the invocation starts with the compiler path. Spelling out what it
           // always did drops the last reason for this file to know about Clang.
-          compilerFlags.push_back(L"-x");
-          compilerFlags.push_back(L"c++");
+          compilerFlags.emplace_back(L"-x");
+          compilerFlags.emplace_back(L"c++");
           break;
         }
       }

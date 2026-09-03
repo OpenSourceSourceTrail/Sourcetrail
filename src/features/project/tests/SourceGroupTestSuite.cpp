@@ -22,7 +22,15 @@
 #include "Version.h"
 
 #if BUILD_CXX_LANGUAGE_PACKAGE
+#  include "Blackboard.h"
+#  include "data/parser/cxx/CxxParser.h"
+#  include "data/parser/ParserClientImpl.h"
+#  include "data/storage/IntermediateStorage.h"
+#  include "data/storage/StorageProvider.h"
+#  include "FileRegister.h"
+#  include "indexing/domain/IndexerStateInfo.h"
 #  include "indexing/logic/IndexerCommandCxx.h"
+#  include "MockedDialogView.hpp"
 #  include "project/CxxToolchainLocal.h"
 #  include "project/logic/ICxxToolchain.h"
 #  include "project/logic/SourceGroupCxxCdb.h"
@@ -30,6 +38,7 @@
 #  include "settings/source_group/type/SourceGroupSettingsCEmpty.h"
 #  include "settings/source_group/type/SourceGroupSettingsCppEmpty.h"
 #  include "settings/source_group/type/SourceGroupSettingsCxxCdb.h"
+#  include "Task.h"
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 
 
@@ -266,6 +275,153 @@ TEST_F(SourceGroupFix, sourceGroupCxxCdbGeneratesExpectedOutput) {
   sourceGroupSettings->setCompilerFlags({L"-local-flag"});
 
   generateAndCompareExpectedOutput(projectName, std::make_shared<SourceGroupCxxCdb>(sourceGroupSettings));
+}
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+
+#if BUILD_CXX_LANGUAGE_PACKAGE
+TEST_F(SourceGroupFix, sourceGroupCxxCdbPrecompilesTheHeadersItsFilesShare) {
+  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{}));
+  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
+      .WillOnce(testing::Return(std::vector<std::filesystem::path>{}));
+
+  // A compilation database of enough files sharing their standard-library includes for an automatic
+  // precompiled header to be worth building.
+  const FilePath root =
+      FilePath(std::filesystem::temp_directory_path().wstring()).concatenate(FilePath(L"sourcetrail_auto_pch_cdb"));
+  std::filesystem::remove_all(root.str());
+  std::filesystem::create_directories(root.str());
+
+  std::string database = "[\n";
+  for(int file = 0; file < 12; file++) {
+    const FilePath sourcePath = root.getConcatenated(L"file" + std::to_wstring(file) + L".cpp");
+    std::ofstream source(sourcePath.str());
+    source << "#include <map>\n#include <string>\n#include <vector>\nint value" << file << " = " << file << ";\n";
+    source.close();
+
+    database += std::string(file == 0 ? "" : ",\n") + " {\"directory\": \"" + root.str() + "\", \"file\": \"" + sourcePath.str() +
+        "\", \"command\": \"/usr/bin/clang++ -std=c++20 -c " + sourcePath.str() + "\"}";
+  }
+  database += "\n]\n";
+
+  const FilePath databasePath = root.getConcatenated(L"compile_commands.json");
+  std::ofstream databaseFile(databasePath.str());
+  databaseFile << database;
+  databaseFile.close();
+
+  // Building a precompiled header needs the Clang builtin headers the app ships beside its binary.
+  AppPath::setSharedDataDirectoryPath(FilePath(ST_SHARED_DATA_DIR));
+
+  ProjectSettings projectSettings;
+  projectSettings.setProjectFilePath(L"auto_pch_project", root);
+
+  auto sourceGroupSettings = std::make_shared<SourceGroupSettingsCxxCdb>("fake_id", &projectSettings);
+  sourceGroupSettings->setCompilationDatabasePath(databasePath);
+
+  const SourceGroupCxxCdb sourceGroup(sourceGroupSettings);
+  RefreshInfo info;
+  info.filesToIndex = sourceGroup.getAllSourceFilePaths();
+  const std::vector<std::shared_ptr<IndexerCommand>> indexerCommands = sourceGroup.getIndexerCommands(info);
+
+  ASSERT_EQ(indexerCommands.size(), 12);
+
+  const FilePath pchPath = sourceGroupSettings->getPchDependenciesDirectoryPath().getConcatenated(L"sourcetrail_auto_pch_0.pch");
+  EXPECT_TRUE(pchPath.recheckExists()) << "no precompiled header at " << pchPath.str();
+
+  for(const std::shared_ptr<IndexerCommand>& indexerCommand : indexerCommands) {
+    const auto* cxxCommand = dynamic_cast<const IndexerCommandCxx*>(indexerCommand.get());
+    ASSERT_NE(cxxCommand, nullptr);
+    const std::vector<std::wstring> flags = cxxCommand->getCompilerFlags();
+    EXPECT_NE(std::ranges::find(flags, L"-include-pch"), flags.end())
+        << "command for " << indexerCommand->getSourceFilePath().str() << " does not use the precompiled header";
+    EXPECT_NE(std::ranges::find(flags, pchPath.wstr()), flags.end());
+  }
+
+  // Presence of the flags is not the same as a parse accepting them: a cc1-only flag spelled
+  // without -Xclang makes the driver reject the whole command line, which shows up as an indexing
+  // error rather than a missing flag. So run one of the commands the way the indexer would.
+  const auto firstCommand = std::dynamic_pointer_cast<IndexerCommandCxx>(indexerCommands.front());
+  ASSERT_NE(firstCommand, nullptr);
+
+  EXPECT_CALL(*mMockedApplicationSettings, getLoggingEnabled).WillRepeatedly(testing::Return(false));
+  EXPECT_CALL(*mMockedApplicationSettings, getVerboseIndexerLoggingEnabled).WillRepeatedly(testing::Return(false));
+
+  auto parsedStorage = std::make_shared<IntermediateStorage>();
+  CxxParser parser(
+      std::make_shared<ParserClientImpl>(parsedStorage.get()),
+      std::make_shared<FileRegister>(
+          firstCommand->getSourceFilePath(), std::set<FilePath>{firstCommand->getSourceFilePath()}, std::set<FilePathFilter>{}),
+      std::make_shared<IndexerStateInfo>());
+  parser.buildIndex(firstCommand);
+
+  for(const StorageError& error : parsedStorage->getErrors()) {
+    ADD_FAILURE() << "parsing with the precompiled header reported: " << utility::encodeToUtf8(error.message);
+  }
+}
+#endif    // BUILD_CXX_LANGUAGE_PACKAGE
+
+#if BUILD_CXX_LANGUAGE_PACKAGE
+TEST_F(SourceGroupFix, sourceGroupCxxEmptyBuildsThePrecompiledHeaderItsSettingsName) {
+  EXPECT_CALL(*mMockedApplicationSettings, getHeaderSearchPathsExpanded)
+      .WillRepeatedly(testing::Return(std::vector<std::filesystem::path>{}));
+  EXPECT_CALL(*mMockedApplicationSettings, getFrameworkSearchPathsExpanded)
+      .WillRepeatedly(testing::Return(std::vector<std::filesystem::path>{}));
+  EXPECT_CALL(*mMockedApplicationSettings, getLoggingEnabled).WillRepeatedly(testing::Return(false));
+  EXPECT_CALL(*mMockedApplicationSettings, getVerboseIndexerLoggingEnabled).WillRepeatedly(testing::Return(false));
+
+  AppPath::setSharedDataDirectoryPath(FilePath(ST_SHARED_DATA_DIR));
+
+  const FilePath root =
+      FilePath(std::filesystem::temp_directory_path().wstring()).concatenate(FilePath(L"sourcetrail_manual_pch"));
+  std::filesystem::remove_all(root.str());
+  std::filesystem::create_directories(root.str());
+
+  const FilePath headerPath = root.getConcatenated(L"stdafx.h");
+  std::ofstream header(headerPath.str());
+  header << "#pragma once\n#include <string>\n#include <vector>\n";
+  header.close();
+
+  const FilePath sourcePath = root.getConcatenated(L"main.cpp");
+  std::ofstream source(sourcePath.str());
+  source << "#include <string>\nstd::string name() { return \"x\"; }\n";
+  source.close();
+
+  ProjectSettings projectSettings;
+  projectSettings.setProjectFilePath(L"manual_pch_project", root);
+
+  auto sourceGroupSettings = std::make_shared<SourceGroupSettingsCppEmpty>("fake_id", &projectSettings);
+  sourceGroupSettings->setSourcePaths({root});
+  sourceGroupSettings->setSourceExtensions({L".cpp"});
+  sourceGroupSettings->setCppStandard(L"c++20");
+  sourceGroupSettings->setPchInputFilePathFilePath(headerPath);
+
+  const SourceGroupCxxEmpty sourceGroup(sourceGroupSettings);
+
+  auto storageProvider = std::make_shared<StorageProvider>();
+  auto dialogView = std::make_shared<testing::NiceMock<MockedDialogView>>();
+  sourceGroup.getPreIndexTask(storageProvider, dialogView)->update(std::make_shared<Blackboard>());
+
+  const FilePath pchPath = sourceGroupSettings->getPchDependenciesDirectoryPath().getConcatenated(L"stdafx.pch");
+  ASSERT_TRUE(pchPath.recheckExists()) << "no precompiled header at " << pchPath.str();
+
+  // And the flags that make a parse read it have to be ones the driver accepts.
+  RefreshInfo info;
+  info.filesToIndex = sourceGroup.getAllSourceFilePaths();
+  const std::vector<std::shared_ptr<IndexerCommand>> indexerCommands = sourceGroup.getIndexerCommands(info);
+  ASSERT_EQ(indexerCommands.size(), 1);
+
+  const auto command = std::dynamic_pointer_cast<IndexerCommandCxx>(indexerCommands.front());
+  ASSERT_NE(command, nullptr);
+
+  auto parsedStorage = std::make_shared<IntermediateStorage>();
+  CxxParser parser(std::make_shared<ParserClientImpl>(parsedStorage.get()),
+                   std::make_shared<FileRegister>(sourcePath, std::set<FilePath>{sourcePath}, std::set<FilePathFilter>{}),
+                   std::make_shared<IndexerStateInfo>());
+  parser.buildIndex(command);
+
+  for(const StorageError& error : parsedStorage->getErrors()) {
+    ADD_FAILURE() << "parsing with the precompiled header reported: " << utility::encodeToUtf8(error.message);
+  }
 }
 #endif    // BUILD_CXX_LANGUAGE_PACKAGE
 

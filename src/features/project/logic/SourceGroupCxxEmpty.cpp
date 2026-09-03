@@ -64,8 +64,20 @@ std::shared_ptr<IndexerCommandProvider> SourceGroupCxxEmpty::getIndexerCommandPr
 
   std::vector<std::wstring> compilerFlags = getBaseCompilerFlags();
   utility::append(compilerFlags, dynamic_cast<const SourceGroupSettingsWithCxxPathsAndFlags*>(mSettings.get())->getCompilerFlags());
-  utility::append(
-      compilerFlags, utility::getIncludePchFlags(dynamic_cast<const SourceGroupSettingsWithCxxPchOptions*>(mSettings.get())));
+  const auto* pchSettings = dynamic_cast<const SourceGroupSettingsWithCxxPchOptions*>(mSettings.get());
+  const std::vector<std::wstring> includePchFlags = utility::getIncludePchFlags(pchSettings);
+  if(!includePchFlags.empty()) {
+    utility::append(compilerFlags, includePchFlags);
+  } else if(pchSettings != nullptr) {
+    // No precompiled header configured: derive one from the headers these files share. Every source
+    // file here is compiled with the same flags, so a single one covers the whole source group.
+    utility::append(compilerFlags,
+                    utility::buildAutoPch(utility::toVector(getAllSourceFilePaths()),
+                                          compilerFlags,
+                                          indexedPaths,
+                                          pchSettings->getPchDependenciesDirectoryPath(),
+                                          L"sourcetrail_auto_pch"));
+  }
 
   std::shared_ptr<CxxIndexerCommandProvider> provider = std::make_shared<CxxIndexerCommandProvider>();
   for(const FilePath& sourcePath : getAllSourceFilePaths()) {

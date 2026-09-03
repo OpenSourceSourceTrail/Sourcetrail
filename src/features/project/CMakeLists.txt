@@ -148,7 +148,7 @@ endif()
 
 if(ENABLE_INTEGRATION_TEST)
   # Real files and a real index, hence the integration prefix.
-  foreach(test_name IN ITEMS RefreshInfoGeneratorTestSuite SourceGroupTestSuite)
+  foreach(test_name IN ITEMS AutoPchTestSuite RefreshInfoGeneratorTestSuite SourceGroupTestSuite)
     add_sourcetrail_test(
       NAME ${test_name}
       SOURCES tests/${test_name}.cpp
@@ -168,4 +168,11 @@ if(ENABLE_INTEGRATION_TEST)
            spdlog::spdlog
       TEST_PREFIX "integration.lib." LOCK filesystem)
   endforeach()
+
+  # The automatic precompiled header is built with the Clang builtin headers the app ships, so the
+  # source group suite has to be told where that directory lives.
+  target_compile_definitions(SourceGroupTestSuite PRIVATE ST_SHARED_DATA_DIR="${CMAKE_BINARY_DIR}/app")
+  # It also parses one file with the flags it produced, which is the only way to catch a flag the
+  # Clang driver rejects.
+  target_link_libraries(SourceGroupTestSuite PRIVATE Sourcetrail::lib::core::utility::file::FileRegister)
 endif()
