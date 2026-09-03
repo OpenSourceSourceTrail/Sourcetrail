@@ -173,7 +173,29 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
     for(ClassOrInterfaceType impl : rd.getImplementedTypes()) {
       typeReference(typeId, impl, impl, Kinds.EDGE_INHERITANCE);
     }
+    for(Parameter component : rd.getParameters()) {
+      emitRecordComponent(rd, typeId, component);
+    }
     inScope(typeId, () -> super.visit(rd, arg));
+  }
+
+  /**
+   * A record component declares a private final field (JLS 8.10.3). JavaParser models it as a
+   * {@link Parameter}, so without this it falls through {@link #visit(Parameter, Void)} and is
+   * recorded as a local variable -- leaving the record itself with no members at all.
+   *
+   * <p>ponytail: the implicit accessor each component also declares is still not emitted; that
+   * needs a synthesised NODE_METHOD per component, which has no AST node to hang a location on.
+   */
+  private void emitRecordComponent(RecordDeclaration rd, long typeId, Parameter component) {
+    long id = storage.nodeFor(component, Kinds.NODE_FIELD,
+        concat(chainForType(rd), Names.Element.plain(component.getNameAsString())));
+    storage.symbol(id, Kinds.DEFINITION_EXPLICIT);
+    storage.access(id, Kinds.ACCESS_PRIVATE);
+    location(id, component.getName(), Kinds.LOCATION_TOKEN);
+    storage.edge(typeId, id, Kinds.EDGE_MEMBER);
+    typeReference(id, component.getType(), component.getType(), Kinds.EDGE_TYPE_USAGE);
+    annotations(component, id);
   }
 
   @Override
@@ -304,6 +326,11 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
 
   @Override
   public void visit(Parameter param, Void arg) {
+    // A record component is a field, emitted by visit(RecordDeclaration); it is not a local.
+    if(param.getParentNode().filter(RecordDeclaration.class::isInstance).isPresent()) {
+      super.visit(param, arg);
+      return;
+    }
     declareLocal(param, param.getName());
     typeReference(scope(), param.getType(), param.getType(), Kinds.EDGE_TYPE_USAGE);
     super.visit(param, arg);

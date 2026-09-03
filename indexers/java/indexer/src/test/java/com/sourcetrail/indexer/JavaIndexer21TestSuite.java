@@ -229,9 +229,9 @@ class JavaIndexer21TestSuite extends JavaStdTestSuite {
     assertEquals(0, s.proto().getErrorsCount());
     // Local record Pair is emitted as a class nested under Wrapper.
     assertTrue(s.classes.contains("default Wrapper.Pair <3:12 3:15>"));
-    // Record components a and b appear as local symbols.
-    assertTrue(s.localSymbols.contains("Test.java<3:17> <3:21 3:21>"));
-    assertTrue(s.localSymbols.contains("Test.java<3:24> <3:28 3:28>"));
+    // Components a and b are fields of the record, not locals of the enclosing method.
+    assertTrue(s.fields.contains("private Wrapper.Pair.a <3:21 3:21>"), "fields: " + s.fields);
+    assertTrue(s.fields.contains("private Wrapper.Pair.b <3:28 3:28>"), "fields: " + s.fields);
   }
 
   /**

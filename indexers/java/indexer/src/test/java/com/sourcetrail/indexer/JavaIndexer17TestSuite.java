@@ -76,13 +76,11 @@ class JavaIndexer17TestSuite extends JavaStdTestSuite {
    * A record is emitted as {@code NODE_CLASS}. Its components should appear as fields with
    * locations, and the implicit accessor methods (x(), y()) should be emitted.
    *
-   * <p>Observed gaps (JavaCollector does not yet emit these):
+   * <p>Each component declares a private final field (JLS 8.10.3), and the reference to {@code x}
+   * in the compact constructor merges onto that field rather than fabricating a second node.
+   *
+   * <p>Remaining gaps:
    * <ul>
-   *   <li>ponytail: record components are not emitted as fields at all. {@code visit(RecordDeclaration)}
-   *       delegates to {@code super.visit}, which routes the components through
-   *       {@code visit(Parameter)} — so they land in {@code localSymbols}, not {@code fields}.
-   *       A record with an empty body yields {@code fields == []}. Fix: emit a NODE_FIELD per
-   *       component in {@code visit(RecordDeclaration)} before descending.
    *   <li>ponytail: implicit accessor methods (x(), y()) are not emitted — JavaCollector does
    *       not synthesise accessors from record components. Fix: emit a NODE_METHOD per component.
    *   <li>ponytail: the compact constructor is not emitted as a Point() constructor —
@@ -100,11 +98,7 @@ class JavaIndexer17TestSuite extends JavaStdTestSuite {
     assertEquals(0, s.proto().getErrorsCount());
     // Record is emitted as NODE_CLASS.
     assertEquals(List.of("default Point <1:1 <1:8 1:12> 5:1>"), s.classes);
-    // ponytail: record components are not emitted as fields at all -- JavaCollector routes them
-    //           through visit(Parameter), so they become local symbols. "Point.x" below is not the
-    //           component declaration; it is the placeholder field node created by the *reference*
-    //           to x inside the compact constructor. A record with an empty body yields fields=[].
-    assertEquals(List.of("Point.x"), s.fields);
+    assertEquals(List.of("private Point.x <1:18 1:18>", "private Point.y <1:25 1:25>"), s.fields);
     // ponytail: accessor methods and compact constructor are not emitted.
     // The only method is the IllegalArgumentException constructor used inside the body.
     assertEquals(

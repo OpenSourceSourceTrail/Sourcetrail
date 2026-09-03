@@ -286,6 +286,43 @@ class JavaIndexerTest {
 
   // ---- ids -----------------------------------------------------------
 
+  // ---- record components ---------------------------------------------
+
+  /**
+   * A record component declares a private final field (JLS 8.10.3), but JavaParser models it as a
+   * Parameter -- so without an explicit emission it falls through visit(Parameter) and is recorded
+   * as a local variable, leaving the record with no members at all.
+   */
+  @Test
+  void record_components_are_fields_of_the_record() throws IOException {
+    TestStorage s = index("record Point(int x, int y) { }\n");
+
+    long point = s.node(Kinds.NODE_CLASS, "Point").getId();
+    long x = s.node(Kinds.NODE_FIELD, "x").getId();
+    long y = s.node(Kinds.NODE_FIELD, "y").getId();
+
+    assertTrue(s.hasEdge(point, x, Kinds.EDGE_MEMBER), "x must be a member of Point");
+    assertTrue(s.hasEdge(point, y, Kinds.EDGE_MEMBER), "y must be a member of Point");
+    assertEquals(Kinds.ACCESS_PRIVATE, s.accessOf(x));
+    assertTrue(s.locationTypesOf(x).contains(Kinds.LOCATION_TOKEN),
+        "the component needs a token location or the GUI cannot navigate to it");
+    assertTrue(s.proto().getLocalSymbolsList().isEmpty(),
+        "components are fields, not locals: " + s.proto().getLocalSymbolsList());
+  }
+
+  @Test
+  void a_component_read_in_the_compact_constructor_merges_onto_its_field() throws IOException {
+    // Declaration and reference must serialize identically, or the record ends up with two
+    // "x" nodes -- one declared, one fabricated by the read.
+    TestStorage s = index("record Point(int x, int y) {\n"
+        + "  Point {\n"
+        + "    if(x < 0) { throw new IllegalArgumentException(); }\n"
+        + "  }\n"
+        + "}\n");
+
+    assertEquals(2, s.fields.size(), "one node per component, not one per mention: " + s.fields);
+  }
+
   // ---- anonymous classes --------------------------------------------
 
   /**
