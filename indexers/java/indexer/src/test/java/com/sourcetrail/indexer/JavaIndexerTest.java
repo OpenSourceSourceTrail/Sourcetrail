@@ -202,6 +202,19 @@ class JavaIndexerTest {
   }
 
   @Test
+  void an_imported_interface_is_not_recorded_as_a_class() throws IOException {
+    // The node kind is half the merge key: importing an interface as NODE_CLASS splits it from its
+    // own declaration into two nodes, silently, at merge time.
+    IntermediateStorage s = index("import java.util.List;\npublic class Foo { }\n");
+
+    assertTrue(names(s).stream()
+            .filter(n -> n.contains("List"))
+            .count() == 1,
+        "java.util.List must appear once, not once per node kind: " + names(s));
+    assertTrue(hasNode(s, Kinds.NODE_INTERFACE), "List is an interface and must be recorded as one");
+  }
+
+  @Test
   void wildcard_imports_are_skipped() throws IOException {
     IntermediateStorage s = index("import java.util.*;\npublic class Foo { }\n");
     assertTrue(edgesOf(s, Kinds.EDGE_IMPORT).isEmpty(), "a wildcard import names a package, not a symbol");

@@ -31,11 +31,13 @@ import com.github.javaparser.ast.type.ReferenceType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.TypeParameter;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
+import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import java.nio.file.Path;
@@ -63,14 +65,16 @@ import java.util.function.Supplier;
 public final class JavaCollector extends VoidVisitorAdapter<Void> {
   private final Storage storage;
   private final NameResolver resolver;
+  private final TypeSolver typeSolver;
   private final String fileName;
 
   /** Enclosing symbol ids, innermost last. Empty means "file scope". */
   private final Deque<Long> scopes = new ArrayDeque<>();
 
-  public JavaCollector(Storage storage, NameResolver resolver, String filePath) {
+  public JavaCollector(Storage storage, NameResolver resolver, TypeSolver typeSolver, String filePath) {
     this.storage = storage;
     this.resolver = resolver;
+    this.typeSolver = typeSolver;
     this.fileName = fileNameOf(filePath);
   }
 
@@ -120,8 +124,13 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
     if(name == null || name.isEmpty()) {
       return;
     }
-    long target = storage.nodeByName(Kinds.NODE_CLASS, Names.join(Names.split(name)));
-    location(storage.edge(storage.fileId(), target, Kinds.EDGE_IMPORT), imp, Kinds.LOCATION_TOKEN);
+    // The node kind is part of the merge key, so guessing NODE_CLASS for an imported interface
+    // splits that interface into two nodes instead of erroring. Ask the solver what it actually is.
+    int kind = resolveKindOf(name);
+    boolean solved = kind != 0;
+    long target = storage.nodeByName(solved ? kind : Kinds.NODE_CLASS, Names.join(Names.split(name)));
+    location(storage.edge(storage.fileId(), target, Kinds.EDGE_IMPORT), imp,
+        solved ? Kinds.LOCATION_TOKEN : Kinds.LOCATION_UNSOLVED);
     super.visit(imp, arg);
   }
 
@@ -544,6 +553,19 @@ public final class JavaCollector extends VoidVisitorAdapter<Void> {
 
     long target = storage.nodeByName(kind, Names.join(Names.split(fqn)));
     location(storage.edge(from, target, edgeType), range, solved ? Kinds.LOCATION_TOKEN : Kinds.LOCATION_UNSOLVED);
+  }
+
+  /** Node kind for a fully qualified type name, or 0 when the solver cannot place it. */
+  private int resolveKindOf(String qualifiedName) {
+    try {
+      SymbolReference<ResolvedReferenceTypeDeclaration> ref = typeSolver.tryToSolveType(qualifiedName);
+      if(ref.isSolved()) {
+        return kindFor(ref.getCorrespondingDeclaration());
+      }
+    } catch(RuntimeException e) {
+      // Unresolvable name; the caller falls back to NODE_CLASS and marks the location unsolved.
+    }
+    return 0;
   }
 
   private static int kindFor(ResolvedReferenceTypeDeclaration decl) {

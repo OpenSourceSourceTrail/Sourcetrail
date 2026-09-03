@@ -5,6 +5,7 @@ import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.Problem;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import java.nio.file.Path;
 import sourcetrail.SourcetrailCommon.IndexerCommand;
@@ -47,8 +48,9 @@ public final class JavaIndexer implements Indexer {
     Storage storage = new Storage(path);
 
     try {
+      TypeSolver typeSolver = TypeSolvers.forClassPaths(command.getClassPathsList());
       ParserConfiguration config = configuration.setLanguageLevel(languageLevelOf(command.getLanguageStandard()))
-          .setSymbolResolver(new JavaSymbolSolver(TypeSolvers.forClassPaths(command.getClassPathsList())));
+          .setSymbolResolver(new JavaSymbolSolver(typeSolver));
 
       ParseResult<CompilationUnit> result = new JavaParser(config).parse(Path.of(path));
 
@@ -64,7 +66,7 @@ public final class JavaIndexer implements Indexer {
       }
 
       CompilationUnit cu = result.getResult().get();
-      new JavaCollector(storage, new NameResolver(cu), path).visitRoot(cu);
+      new JavaCollector(storage, new NameResolver(cu), typeSolver, path).visitRoot(cu);
       return storage.build();
     } catch(Exception e) {
       // Keep the partial graph: it is strictly better than nothing, and the error row plus
