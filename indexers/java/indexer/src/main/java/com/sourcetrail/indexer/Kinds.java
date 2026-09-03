@@ -3,12 +3,11 @@ package com.sourcetrail.indexer;
 /**
  * Integer constants mirroring the C++ enums the engine uses. Values must stay in sync
  * with the equivalent int values in:
- *   src/lib/lib/data/NodeKind.h            (NodeKind / StorageNode.type)
- *   src/lib/lib/data/DefinitionKind.h      (DefinitionKind / StorageSymbol.definition_kind)
- *   src/lib/lib/data/parser/AccessKind.h   (AccessKind / StorageComponentAccess.type)
- *   src/lib/lib/data/graph/Edge.h          (Edge::EdgeType / StorageEdge.type)
- *   src/lib/lib/data/location/LocationType.h (LocationType / StorageSourceLocation.type)
- *   src/lib/lib/data/parser/ReferenceKind.h (ReferenceKind — used internally only)
+ *   src/features/graph/domain/NodeKind.h       (NodeKind / StorageNode.type)
+ *   src/features/graph/domain/Edge.h           (Edge::EdgeType / StorageEdge.type)
+ *   src/features/graph/domain/DefinitionKind.h (DefinitionKind / StorageSymbol.definition_kind)
+ *   src/lib/lib/data/parser/AccessKind.h       (AccessKind / StorageComponentAccess.type)
+ *   src/lib/lib/data/location/LocationType.h   (LocationType / StorageSourceLocation.type)
  */
 public final class Kinds {
   private Kinds() {}
